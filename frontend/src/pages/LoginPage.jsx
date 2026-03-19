@@ -30,7 +30,11 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <h1>AIDEA</h1>
+        <img
+          src="https://aideaacademy.eu/demo/wp-content/uploads/2026/01/aidea-logo-3-AIdEA-COLORED-162px.png"
+          alt="AIDEA"
+          className="login-logo"
+        />
         <p className="login-subtitle">Teacher AI Training Platform</p>
 
         <form onSubmit={handleSubmit}>
@@ -60,6 +64,18 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <div className="login-footer">
+          <img
+            src="https://aideaacademy.eu/demo/wp-content/uploads/2026/03/EN-Co-funded-by-the-EU_PANTONE-300x63-1.jpg"
+            alt="Co-funded by the European Union"
+            className="login-eu-logo"
+          />
+          <p className="login-eu-text">
+            Funded by the European Union. Views and opinions expressed are however those of the
+            author(s) only and do not necessarily reflect those of the European Union or the EACEA.
+          </p>
+        </div>
       </div>
     </div>
   )

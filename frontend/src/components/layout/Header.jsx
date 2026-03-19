@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Search, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Header.css'
 
@@ -14,7 +15,7 @@ export default function Header() {
       <div className="header-title">AI Teacher Training Platform</div>
 
       <div className="header-search">
-        <span className="search-icon">🔍</span>
+        <Search size={15} className="search-icon" />
         <input type="text" placeholder="Search courses..." />
       </div>
 
@@ -23,7 +24,7 @@ export default function Header() {
         <span className="username">
           {user?.first_name} {user?.last_name}
         </span>
-        <span className="chevron">▾</span>
+        <ChevronDown size={15} className="chevron" />
 
         {menuOpen && (
           <div className="user-menu">

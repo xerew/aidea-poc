@@ -6,18 +6,20 @@
 
 /* Continue Learning Banner */
 .continue-banner {
-  background: #1f2937;
+  background: var(--color-primary);
   color: #fff;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   padding: 2rem 2.5rem;
+  box-shadow: var(--shadow);
 }
 
 .continue-label {
-  font-size: 0.85rem;
-  color: #9ca3af;
-  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0 0 0.4rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.07em;
+  font-weight: 500;
 }
 
 .continue-banner h2 {
@@ -28,7 +30,7 @@
 }
 
 .current-module {
-  color: #d1d5db;
+  color: rgba(255,255,255,0.8);
   margin: 0 0 1.25rem;
   font-size: 0.95rem;
 }
@@ -43,36 +45,37 @@
 .progress-bar {
   flex: 1;
   height: 6px;
-  background: #374151;
+  background: rgba(255,255,255,0.25);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background: #fff;
+  background: var(--color-cyan);
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
 
 .progress-fill.dark {
-  background: #1f2937;
+  background: var(--color-primary);
 }
 
 .progress-pct {
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: rgba(255,255,255,0.7);
   white-space: nowrap;
 }
 
 .resume-btn {
   background: #fff;
-  color: #1f2937;
+  color: var(--color-primary);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.6rem 1.5rem;
   font-size: 0.95rem;
   font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
   transition: opacity 0.15s;
 }
@@ -83,9 +86,9 @@
 
 /* Pillars */
 .pillars-section h2 {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--color-text);
   margin: 0 0 1.25rem;
 }
 
@@ -96,56 +99,60 @@
 }
 
 .pillar-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  transition: box-shadow 0.2s;
+}
+
+.pillar-card:hover {
+  box-shadow: var(--shadow);
 }
 
 .pillar-card h3 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
-  margin: 0;
+  color: var(--color-primary);
 }
 
 .pillar-desc {
   font-size: 0.875rem;
-  color: #6b7280;
-  margin: 0;
-  line-height: 1.5;
+  color: var(--color-text-muted);
+  line-height: 1.55;
 }
 
 .pillar-progress {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
 }
 
 .pillar-pct {
   font-weight: 600;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .pillar-card .progress-bar {
-  background: #e5e7eb;
+  background: var(--color-border);
 }
 
 .pillar-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
   margin-top: 0.25rem;
 }
 
 .pillar-footer a {
-  color: #111827;
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }
@@ -155,9 +162,9 @@
 }
 
 .page-error {
-  color: #dc2626;
+  color: var(--color-red);
 }
 
 .page-loading {
-  color: #6b7280;
+  color: var(--color-text-muted);
 }

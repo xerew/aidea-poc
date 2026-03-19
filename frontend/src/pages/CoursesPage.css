@@ -1,0 +1,204 @@
+.courses-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.courses-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.35rem;
+}
+
+.courses-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+}
+
+/* Filters */
+.courses-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.filter-icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.courses-filters label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.courses-filters select {
+  padding: 0.4rem 2rem 0.4rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--color-text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  cursor: pointer;
+}
+
+.courses-filters select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.courses-count {
+  margin-left: auto;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+/* Grid */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Card */
+.course-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: box-shadow 0.2s;
+}
+
+.course-card:hover {
+  box-shadow: var(--shadow);
+}
+
+.course-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Pillar badges */
+.pillar-badge {
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.25rem 0.7rem;
+  border-radius: 9999px;
+  border: 1.5px solid;
+}
+
+.pillar-badge--blue {
+  color: #2563eb;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.pillar-badge--purple {
+  color: var(--color-primary);
+  border-color: #c4b5fd;
+  background: var(--color-purple-light);
+}
+
+.pillar-badge--green {
+  color: #16a34a;
+  border-color: #86efac;
+  background: var(--color-green-light);
+}
+
+.level-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.course-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.course-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  flex: 1;
+}
+
+.course-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+/* Progress */
+.course-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--color-text);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* Buttons */
+.course-btn {
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  margin-top: 0.25rem;
+}
+
+.course-btn--dark {
+  background: var(--color-text);
+  color: #fff;
+  border: none;
+}
+
+.course-btn--dark:hover {
+  opacity: 0.85;
+}
+
+.course-btn--outline {
+  background: transparent;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+
+.course-btn--outline:hover {
+  background: var(--color-bg);
+}

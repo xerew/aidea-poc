@@ -35,6 +35,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,4 +153,66 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
+}
+
+# Jazzmin Admin Theme
+JAZZMIN_SETTINGS = {
+    'site_title': 'AIDEA Admin',
+    'site_header': 'AIDEA',
+    'site_brand': 'AIDEA',
+    'site_logo': None,
+    'welcome_sign': 'AIDEA – Teacher AI Training Platform',
+    'copyright': 'AIDEA by ICCS',
+    'search_model': ['auth.User', 'hub.Course'],
+    'topmenu_links': [
+        {'name': 'Platform', 'url': 'http://localhost:5173', 'new_window': True},
+    ],
+    'show_sidebar': True,
+    'navigation_expanded': True,
+    'icons': {
+        'auth':                 'fas fa-users-cog',
+        'auth.user':            'fas fa-user',
+        'auth.group':           'fas fa-users',
+        'hub.userprofile':      'fas fa-id-badge',
+        'hub.learningpillar':   'fas fa-layer-group',
+        'hub.course':           'fas fa-book-open',
+        'hub.module':           'fas fa-puzzle-piece',
+        'hub.enrollment':       'fas fa-graduation-cap',
+    },
+    'default_icon_parents': 'fas fa-folder',
+    'default_icon_children': 'fas fa-circle',
+    'related_modal_active': False,
+    'use_google_fonts_cdn': True,
+    'show_ui_builder': False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'navbar_small_text': False,
+    'footer_small_text': True,
+    'body_small_text': False,
+    'brand_small_text': False,
+    'brand_colour': 'navbar-primary',
+    'accent': 'accent-primary',
+    'navbar': 'navbar-dark',
+    'no_navbar_border': True,
+    'navbar_fixed': True,
+    'layout_boxed': False,
+    'footer_fixed': False,
+    'sidebar_fixed': True,
+    'sidebar': 'sidebar-dark-primary',
+    'sidebar_nav_small_text': False,
+    'sidebar_disable_expand': False,
+    'sidebar_nav_child_indent': True,
+    'sidebar_nav_compact_style': False,
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style': False,
+    'theme': 'default',
+    'button_classes': {
+        'primary': 'btn-primary',
+        'secondary': 'btn-secondary',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
+    },
 }

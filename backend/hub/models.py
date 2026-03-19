@@ -30,10 +30,18 @@ class LearningPillar(models.Model):
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    pillar = models.ForeignKey(LearningPillar, on_delete=models.PROTECT, related_name='courses')
-    created_at = models.DateTimeField(auto_now_add=True)
+    class Level(models.TextChoices):
+        BEGINNER     = 'beginner',     'Beginner'
+        INTERMEDIATE = 'intermediate', 'Intermediate'
+        ADVANCED     = 'advanced',     'Advanced'
+
+    title              = models.CharField(max_length=200)
+    description        = models.TextField(blank=True)
+    pillar             = models.ForeignKey(LearningPillar, on_delete=models.PROTECT, related_name='courses')
+    level              = models.CharField(max_length=20, choices=Level.choices, default=Level.BEGINNER)
+    duration_hours     = models.PositiveSmallIntegerField(default=0)
+    learning_outcomes  = models.JSONField(default=list, blank=True)
+    created_at         = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['pillar', 'title']
@@ -43,9 +51,11 @@ class Course(models.Model):
 
 
 class Module(models.Model):
-    title = models.CharField(max_length=200)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
-    order = models.PositiveSmallIntegerField(default=0)
+    title            = models.CharField(max_length=200)
+    description      = models.TextField(blank=True)
+    course           = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
+    order            = models.PositiveSmallIntegerField(default=0)
+    duration_minutes = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
         ordering = ['order']

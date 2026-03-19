@@ -4,10 +4,13 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import LearningPillar, Enrollment
+from .models import LearningPillar, Course, Enrollment
+from rest_framework import status
 from .serializers import (
     AideaTokenObtainPairSerializer,
     ContinueLearningSerializer,
+    CourseDetailSerializer,
+    CourseListSerializer,
     PillarSummarySerializer,
 )
 
@@ -24,6 +27,48 @@ class LogoutView(APIView):
             token = RefreshToken(refresh_token)
             token.blacklist()
         return Response({'detail': 'Logged out.'})
+
+
+class CoursesView(APIView):
+    def get(self, request):
+        qs = Course.objects.select_related('pillar').prefetch_related('modules')
+        pillar = request.query_params.get('pillar')
+        level  = request.query_params.get('level')
+        search = request.query_params.get('search')
+        if pillar:
+            qs = qs.filter(pillar__slug=pillar)
+        if level:
+            qs = qs.filter(level=level)
+        if search:
+            qs = qs.filter(title__icontains=search)
+        serializer = CourseListSerializer(qs, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+class CourseDetailView(APIView):
+    def get(self, request, pk):
+        try:
+            course = Course.objects.prefetch_related('modules').select_related('pillar').get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CourseDetailSerializer(course, context={'request': request})
+        return Response(serializer.data)
+
+
+class CourseEnrollView(APIView):
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        enrollment, created = Enrollment.objects.get_or_create(
+            user=request.user,
+            course=course,
+        )
+        return Response(
+            {'enrolled': True, 'created': created},
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
 
 
 class HomeView(APIView):

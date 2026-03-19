@@ -29,15 +29,80 @@ class AideaTokenObtainPairSerializer(TokenObtainPairSerializer):
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
-        fields = ['id', 'title', 'order']
+        fields = ['id', 'title', 'description', 'order', 'duration_minutes']
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    modules = ModuleSerializer(many=True, read_only=True)
+class PillarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LearningPillar
+        fields = ['id', 'name', 'slug']
+
+
+class CourseListSerializer(serializers.ModelSerializer):
+    pillar = PillarSerializer(read_only=True)
+    module_count = serializers.IntegerField(source='modules.count', read_only=True)
+    progress_pct = serializers.SerializerMethodField()
+    is_enrolled = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'pillar', 'modules']
+        fields = [
+            'id', 'title', 'description', 'pillar',
+            'level', 'duration_hours', 'module_count',
+            'progress_pct', 'is_enrolled',
+        ]
+
+    def _enrollment(self, obj):
+        user = self.context['request'].user
+        cache = self.context.setdefault('_enrollment_cache', {})
+        if obj.id not in cache:
+            try:
+                cache[obj.id] = Enrollment.objects.get(user=user, course=obj)
+            except Enrollment.DoesNotExist:
+                cache[obj.id] = None
+        return cache[obj.id]
+
+    def get_progress_pct(self, obj):
+        enrollment = self._enrollment(obj)
+        return enrollment.progress_pct if enrollment else None
+
+    def get_is_enrolled(self, obj):
+        return self._enrollment(obj) is not None
+
+
+class CourseDetailSerializer(serializers.ModelSerializer):
+    pillar = PillarSerializer(read_only=True)
+    modules = ModuleSerializer(many=True, read_only=True)
+    module_count = serializers.IntegerField(source='modules.count', read_only=True)
+    is_enrolled = serializers.SerializerMethodField()
+    progress_pct = serializers.SerializerMethodField()
+    current_module_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
+        fields = [
+            'id', 'title', 'description', 'pillar', 'level', 'duration_hours',
+            'learning_outcomes', 'module_count', 'modules',
+            'is_enrolled', 'progress_pct', 'current_module_id',
+        ]
+
+    def _enrollment(self, obj):
+        user = self.context['request'].user
+        try:
+            return Enrollment.objects.get(user=user, course=obj)
+        except Enrollment.DoesNotExist:
+            return None
+
+    def get_is_enrolled(self, obj):
+        return self._enrollment(obj) is not None
+
+    def get_progress_pct(self, obj):
+        e = self._enrollment(obj)
+        return e.progress_pct if e else None
+
+    def get_current_module_id(self, obj):
+        e = self._enrollment(obj)
+        return e.current_module_id if e else None
 
 
 class ContinueLearningSerializer(serializers.ModelSerializer):
