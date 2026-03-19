@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Filter } from 'lucide-react'
+import PropTypes from 'prop-types'
 import client from '../api/client'
 import './CoursesPage.css'
 
@@ -14,6 +15,20 @@ const LEVEL_LABELS = {
   beginner:     'Beginner',
   intermediate: 'Intermediate',
   advanced:     'Advanced',
+}
+
+CourseCard.propTypes = {
+  course: PropTypes.shape({
+    id: PropTypes.number,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    level: PropTypes.string,
+    duration_hours: PropTypes.number,
+    module_count: PropTypes.number,
+    is_enrolled: PropTypes.bool,
+    progress_pct: PropTypes.number,
+    pillar: PropTypes.shape({ slug: PropTypes.string, name: PropTypes.string }),
+  }),
 }
 
 function CourseCard({ course }) {
@@ -63,7 +78,7 @@ export default function CoursesPage() {
   const [pillars, setPillars]     = useState([])
   const [pillarFilter, setPillar] = useState('')
   const [levelFilter, setLevel]   = useState('')
-  const [search, setSearch]       = useState('')
+  const [search]                  = useState('')
   const [error, setError]         = useState('')
 
   useEffect(() => {

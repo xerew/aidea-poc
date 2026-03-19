@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
 import client from '../api/client'
 import './HomePage.css'
+
+ContinueLearningBanner.propTypes = {
+  data: PropTypes.shape({
+    course_title: PropTypes.string,
+    current_module_title: PropTypes.string,
+    progress_pct: PropTypes.number,
+  }),
+}
 
 function ContinueLearningBanner({ data }) {
   if (!data) return null
@@ -20,6 +29,16 @@ function ContinueLearningBanner({ data }) {
       <button className="resume-btn">Resume</button>
     </div>
   )
+}
+
+PillarCard.propTypes = {
+  pillar: PropTypes.shape({
+    name: PropTypes.string,
+    description: PropTypes.string,
+    progress_pct: PropTypes.number,
+    course_count: PropTypes.number,
+    slug: PropTypes.string,
+  }),
 }
 
 function PillarCard({ pillar }) {

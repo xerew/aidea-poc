@@ -1,3 +1,7 @@
+import PropTypes from 'prop-types'
+
+PlaceholderPage.propTypes = { title: PropTypes.string }
+
 export default function PlaceholderPage({ title }) {
   return (
     <div style={{ color: '#6b7280', paddingTop: '2rem' }}>

@@ -100,7 +100,7 @@ export default function CourseDetailPage() {
       {/* What You'll Learn */}
       {course.learning_outcomes?.length > 0 && (
         <div className="outcomes-card">
-          <h2>What You'll Learn</h2>
+          <h2>What You&apos;ll Learn</h2>
           <div className="outcomes-grid">
             {course.learning_outcomes.map((outcome, i) => (
               <div key={i} className="outcome-item">

@@ -1,7 +1,10 @@
 import { createContext, useContext, useState, useCallback } from 'react'
+import PropTypes from 'prop-types'
 import client from '../api/client'
 
 const AuthContext = createContext(null)
+
+AuthProvider.propTypes = { children: PropTypes.node }
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
@@ -36,6 +39,7 @@ export function AuthProvider({ children }) {
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext)
 }

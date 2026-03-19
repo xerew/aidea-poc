@@ -3,7 +3,7 @@ import { House, BookOpen, GraduationCap, BarChart2, User, PenLine } from 'lucide
 import './Sidebar.css'
 
 const NAV_ITEMS = [
-  { to: '/',          label: 'Home',             Icon: House },
+  { to: '/',          label: 'Home',              Icon: House },
   { to: '/courses',   label: 'Courses',           Icon: BookOpen },
   { to: '/learning',  label: 'My Learning',       Icon: GraduationCap },
   { to: '/analytics', label: 'Content Analytics', Icon: BarChart2 },
@@ -22,14 +22,14 @@ export default function Sidebar() {
       </div>
       <nav>
         <ul>
-          {NAV_ITEMS.map(({ to, label, Icon }) => (
+            {NAV_ITEMS.map(({ to, label, Icon: NavIcon }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
-                <Icon size={18} className="nav-icon" />
+                <NavIcon size={18} className="nav-icon" />
                 <span>{label}</span>
               </NavLink>
             </li>
