@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import UserProfile, LearningPillar, Course, Module, Enrollment
+
+from .models import Course, Enrollment, LearningPillar, Module, UserProfile
 
 
 @admin.register(UserProfile)

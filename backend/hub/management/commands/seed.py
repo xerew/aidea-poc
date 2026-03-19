@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
-from hub.models import UserProfile, LearningPillar, Course, Module, Enrollment
+from django.core.management.base import BaseCommand
 
+from hub.models import Course, Enrollment, LearningPillar, Module, UserProfile
 
 PILLARS = [
     {

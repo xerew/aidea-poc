@@ -1,8 +1,9 @@
+from django.contrib.auth.models import User
 from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from django.contrib.auth.models import User
-from .models import UserProfile, LearningPillar, Course, Module, Enrollment
+
+from .models import Course, Enrollment, LearningPillar, Module, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

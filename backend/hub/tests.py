@@ -147,7 +147,7 @@ class HomeViewTestCase(APITestCase):
         self.assertEqual(pillars['teach-for-ai']['progress_pct'], 0)
 
     def test_home_continue_learning_is_most_recently_accessed(self):
-        enrollment1 = Enrollment.objects.create(
+        Enrollment.objects.create(
             user=self.user, course=self.course1, progress_pct=30,
         )
         enrollment2 = Enrollment.objects.create(
