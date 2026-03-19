@@ -10,25 +10,27 @@ AIDEA POC is a Teacher AI Training Platform — a monorepo with a Django REST AP
 
 ### Backend (Django)
 
+The virtualenv is at `backend/.venv`. Use `.venv/Scripts/python` directly (or activate the venv) — `uv` and system `python` may not be on PATH in this environment.
+
 ```bash
 cd backend
-uv sync --group dev          # Install dependencies
-python manage.py migrate     # Apply migrations
-python manage.py seed        # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234)
-python manage.py runserver   # Start dev server at localhost:8000
+uv sync --group dev                      # Install / update dependencies
+.venv/Scripts/python manage.py migrate  # Apply migrations
+.venv/Scripts/python manage.py seed        # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234, demo_creator/demo1234)
+.venv/Scripts/python manage.py runserver  # Start dev server at localhost:8000
 ```
 
 **Testing:**
 ```bash
 cd backend
-coverage run manage.py test hub --verbosity=2   # Run all tests
-coverage run manage.py test hub.tests.TestFoo   # Run a single test class
+.venv/Scripts/python -m coverage run manage.py test hub --verbosity=2   # Run all tests
+.venv/Scripts/python -m coverage run manage.py test hub.tests.TestFoo   # Run a single test class
 ```
 
 **Linting:**
 ```bash
 cd backend
-ruff check .   # Line length 100; E501 ignored
+.venv/Scripts/python -m ruff check .   # Line length 100; E501 ignored
 ```
 
 **Environment:** Copy `backend/.env.example` to `backend/.env` and set `SECRET_KEY`.

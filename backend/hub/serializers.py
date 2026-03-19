@@ -3,7 +3,7 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Course, Enrollment, LearningPillar, Module, UserProfile
+from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -135,3 +135,28 @@ class PillarSummarySerializer(serializers.ModelSerializer):
         if not enrollments.exists():
             return 0
         return round(enrollments.aggregate(avg=Avg('progress_pct'))['avg'] or 0)
+
+
+class CourseAuthoringSerializer(serializers.ModelSerializer):
+    pillar = PillarSerializer(read_only=True)
+    pillar_id = serializers.PrimaryKeyRelatedField(
+        queryset=LearningPillar.objects.all(), source='pillar', write_only=True,
+    )
+    modules = ModuleSerializer(many=True, read_only=True)
+    module_count = serializers.IntegerField(source='modules.count', read_only=True)
+
+    class Meta:
+        model = Course
+        fields = [
+            'id', 'title', 'description', 'pillar', 'pillar_id', 'level',
+            'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
+        ]
+        read_only_fields = ['is_published']
+
+
+class CourseEditHistorySerializer(serializers.ModelSerializer):
+    editor_username = serializers.CharField(source='editor.username', default='(deleted user)')
+
+    class Meta:
+        model = CourseEditHistory
+        fields = ['id', 'editor_username', 'edited_at', 'changes']

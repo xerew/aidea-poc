@@ -1,16 +1,20 @@
+from django.db.models import Max
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Course, Enrollment, LearningPillar
+from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
 from .serializers import (
     AideaTokenObtainPairSerializer,
     ContinueLearningSerializer,
+    CourseAuthoringSerializer,
     CourseDetailSerializer,
     CourseListSerializer,
+    ModuleSerializer,
+    PillarSerializer,
     PillarSummarySerializer,
 )
 
@@ -31,7 +35,7 @@ class LogoutView(APIView):
 
 class CoursesView(APIView):
     def get(self, request):
-        qs = Course.objects.select_related('pillar').prefetch_related('modules')
+        qs = Course.objects.select_related('pillar').prefetch_related('modules').filter(is_published=True)
         pillar = request.query_params.get('pillar')
         level  = request.query_params.get('level')
         search = request.query_params.get('search')
@@ -48,7 +52,9 @@ class CoursesView(APIView):
 class CourseDetailView(APIView):
     def get(self, request, pk):
         try:
-            course = Course.objects.prefetch_related('modules').select_related('pillar').get(pk=pk)
+            course = Course.objects.prefetch_related('modules').select_related('pillar').get(
+                pk=pk, is_published=True,
+            )
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         serializer = CourseDetailSerializer(course, context={'request': request})
@@ -58,7 +64,7 @@ class CourseDetailView(APIView):
 class CourseEnrollView(APIView):
     def post(self, request, pk):
         try:
-            course = Course.objects.get(pk=pk)
+            course = Course.objects.get(pk=pk, is_published=True)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         enrollment, created = Enrollment.objects.get_or_create(
@@ -95,3 +101,192 @@ class HomeView(APIView):
             'continue_learning': continue_learning,
             'pillars': pillars_data,
         })
+
+
+# ── Authoring ────────────────────────────────────────────────────────────────
+
+class IsContentCreator(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated
+            and hasattr(request.user, 'profile')
+            and request.user.profile.user_type == UserProfile.UserType.CONTENT_CREATOR
+        )
+
+
+class AuthoringPillarsView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def get(self, request):
+        return Response(PillarSerializer(LearningPillar.objects.all(), many=True).data)
+
+
+class AuthoringCoursesView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def get(self, request):
+        qs = (
+            Course.objects
+            .select_related('pillar')
+            .prefetch_related('modules')
+            .order_by('pillar__order', 'title')
+        )
+        return Response(CourseAuthoringSerializer(qs, many=True).data)
+
+    def post(self, request):
+        serializer = CourseAuthoringSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        course = serializer.save()
+        CourseEditHistory.objects.create(
+            course=course,
+            editor=request.user,
+            changes={'course_created': {'title': course.title}},
+        )
+        return Response(CourseAuthoringSerializer(course).data, status=status.HTTP_201_CREATED)
+
+
+class AuthoringCourseDetailView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def _get_course(self, pk):
+        try:
+            return Course.objects.prefetch_related('modules').select_related('pillar').get(pk=pk)
+        except Course.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        course = self._get_course(pk)
+        if not course:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(CourseAuthoringSerializer(course).data)
+
+    def patch(self, request, pk):
+        course = self._get_course(pk)
+        if not course:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if course.is_published:
+            return Response({'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CourseAuthoringSerializer(course, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        changes = {}
+        for field in ['title', 'description', 'level', 'duration_hours', 'learning_outcomes']:
+            if field in serializer.validated_data:
+                old_val = getattr(course, field)
+                new_val = serializer.validated_data[field]
+                if old_val != new_val:
+                    changes[field] = {'old': old_val, 'new': new_val}
+        if 'pillar' in serializer.validated_data:
+            new_pillar = serializer.validated_data['pillar']
+            if course.pillar_id != new_pillar.id:
+                changes['pillar'] = {'old': course.pillar.name, 'new': new_pillar.name}
+
+        serializer.save()
+
+        if changes:
+            CourseEditHistory.objects.create(course=course, editor=request.user, changes=changes)
+
+        course.refresh_from_db()
+        return Response(CourseAuthoringSerializer(course).data)
+
+
+class AuthoringModuleView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if course.is_published:
+            return Response({'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ModuleSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        next_order = (
+            Module.objects.filter(course=course).aggregate(Max('order'))['order__max'] or 0
+        ) + 1
+        module = serializer.save(course=course, order=next_order)
+
+        CourseEditHistory.objects.create(
+            course=course,
+            editor=request.user,
+            changes={'module_added': {'title': module.title, 'order': module.order}},
+        )
+        return Response(ModuleSerializer(module).data, status=status.HTTP_201_CREATED)
+
+
+class AuthoringModuleDetailView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def _get_module(self, course_pk, module_pk):
+        try:
+            return Module.objects.select_related('course').get(pk=module_pk, course_id=course_pk)
+        except Module.DoesNotExist:
+            return None
+
+    def patch(self, request, pk, module_pk):
+        module = self._get_module(pk, module_pk)
+        if not module:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if module.course.is_published:
+            return Response({'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ModuleSerializer(module, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        changes = {}
+        for field in ['title', 'description', 'duration_minutes']:
+            if field in serializer.validated_data:
+                old_val = getattr(module, field)
+                new_val = serializer.validated_data[field]
+                if old_val != new_val:
+                    changes[field] = {'old': old_val, 'new': new_val}
+
+        serializer.save()
+
+        if changes:
+            CourseEditHistory.objects.create(
+                course=module.course,
+                editor=request.user,
+                changes={'module_edited': {'module_title': module.title, 'fields': changes}},
+            )
+        return Response(ModuleSerializer(module).data)
+
+    def delete(self, request, pk, module_pk):
+        module = self._get_module(pk, module_pk)
+        if not module:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if module.course.is_published:
+            return Response({'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        CourseEditHistory.objects.create(
+            course=module.course,
+            editor=request.user,
+            changes={'module_deleted': {'title': module.title, 'order': module.order}},
+        )
+        module.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AuthoringCoursePublishView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if course.is_published:
+            return Response({'detail': 'Course is already published.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        course.is_published = True
+        course.save()
+        CourseEditHistory.objects.create(
+            course=course,
+            editor=request.user,
+            changes={'course_published': {'title': course.title}},
+        )
+        return Response(CourseAuthoringSerializer(course).data)

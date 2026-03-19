@@ -1,7 +1,20 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from .views import CourseDetailView, CourseEnrollView, CoursesView, HomeView, LoginView, LogoutView
+from .views import (
+    AuthoringCourseDetailView,
+    AuthoringCoursePublishView,
+    AuthoringCoursesView,
+    AuthoringModuleDetailView,
+    AuthoringModuleView,
+    AuthoringPillarsView,
+    CourseDetailView,
+    CourseEnrollView,
+    CoursesView,
+    HomeView,
+    LoginView,
+    LogoutView,
+)
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
@@ -11,4 +24,11 @@ urlpatterns = [
     path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
     path('courses/<int:pk>/enroll/', CourseEnrollView.as_view(), name='course-enroll'),
     path('home/', HomeView.as_view(), name='home'),
+    # Authoring (content_creator only)
+    path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
+    path('authoring/courses/', AuthoringCoursesView.as_view(), name='authoring-courses'),
+    path('authoring/courses/<int:pk>/', AuthoringCourseDetailView.as_view(), name='authoring-course-detail'),
+    path('authoring/courses/<int:pk>/modules/', AuthoringModuleView.as_view(), name='authoring-module-create'),
+    path('authoring/courses/<int:pk>/modules/<int:module_pk>/', AuthoringModuleDetailView.as_view(), name='authoring-module-detail'),
+    path('authoring/courses/<int:pk>/publish/', AuthoringCoursePublishView.as_view(), name='authoring-course-publish'),
 ]

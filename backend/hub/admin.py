@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Course, Enrollment, LearningPillar, Module, UserProfile
+from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
 
 
 @admin.register(UserProfile)
@@ -26,8 +26,8 @@ class ModuleInline(admin.TabularInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'pillar']
-    list_filter = ['pillar']
+    list_display = ['title', 'pillar', 'is_published']
+    list_filter = ['pillar', 'is_published']
     search_fields = ['title']
     inlines = [ModuleInline]
 
@@ -46,3 +46,12 @@ class EnrollmentAdmin(admin.ModelAdmin):
     list_filter = ['course__pillar', 'course']
     search_fields = ['user__username', 'course__title']
     readonly_fields = ['enrolled_at', 'last_accessed_at']
+
+
+@admin.register(CourseEditHistory)
+class CourseEditHistoryAdmin(admin.ModelAdmin):
+    list_display = ['course', 'editor', 'edited_at']
+    list_filter = ['course__pillar', 'editor']
+    search_fields = ['course__title', 'editor__username']
+    readonly_fields = ['course', 'editor', 'edited_at', 'changes']
+    ordering = ['-edited_at']

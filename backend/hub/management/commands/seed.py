@@ -253,6 +253,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._seed_pillars()
         self._seed_demo_user()
+        self._seed_demo_content_creator()
         self.stdout.write(self.style.SUCCESS('Seed data created successfully.'))
 
     def _seed_pillars(self):
@@ -275,6 +276,7 @@ class Command(BaseCommand):
                         'level':             course_data.get('level', 'beginner'),
                         'duration_hours':    course_data.get('duration_hours', 0),
                         'learning_outcomes': course_data.get('learning_outcomes', []),
+                        'is_published':      True,
                     },
                 )
                 for order, (title, description, duration_minutes) in enumerate(modules_data, start=1):
@@ -327,3 +329,27 @@ class Command(BaseCommand):
 
         action = 'Created' if created else 'Already exists'
         self.stdout.write(f'  Demo user ({action}): demo_teacher / demo1234')
+
+    def _seed_demo_content_creator(self):
+        user, created = User.objects.get_or_create(
+            username='demo_creator',
+            defaults={
+                'first_name': 'Maria',
+                'last_name': 'Papadaki',
+                'email': 'maria@aidea.example.com',
+            },
+        )
+        if created:
+            user.set_password('demo1234')
+            user.save()
+
+        UserProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                'user_type': UserProfile.UserType.CONTENT_CREATOR,
+                'avatar_initials': 'MP',
+            },
+        )
+
+        action = 'Created' if created else 'Already exists'
+        self.stdout.write(f'  Demo content creator ({action}): demo_creator / demo1234')

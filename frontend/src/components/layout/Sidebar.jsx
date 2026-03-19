@@ -1,17 +1,23 @@
 import { NavLink } from 'react-router-dom'
 import { House, BookOpen, GraduationCap, BarChart2, User, PenLine } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
-const NAV_ITEMS = [
+const BASE_NAV = [
   { to: '/',          label: 'Home',              Icon: House },
   { to: '/courses',   label: 'Courses',           Icon: BookOpen },
   { to: '/learning',  label: 'My Learning',       Icon: GraduationCap },
   { to: '/analytics', label: 'Content Analytics', Icon: BarChart2 },
   { to: '/profile',   label: 'Profile',           Icon: User },
-  { to: '/authoring', label: 'Authoring',         Icon: PenLine },
 ]
 
+const AUTHORING_ITEM = { to: '/authoring', label: 'Authoring', Icon: PenLine }
+
 export default function Sidebar() {
+  const { user } = useAuth()
+  const isContentCreator = user?.profile?.user_type === 'content_creator'
+  const navItems = isContentCreator ? [...BASE_NAV, AUTHORING_ITEM] : BASE_NAV
+
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -22,7 +28,7 @@ export default function Sidebar() {
       </div>
       <nav>
         <ul>
-            {NAV_ITEMS.map(({ to, label, Icon: NavIcon }) => (
+          {navItems.map(({ to, label, Icon: NavIcon }) => (
             <li key={to}>
               <NavLink
                 to={to}

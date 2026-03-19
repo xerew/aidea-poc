@@ -41,6 +41,7 @@ class Course(models.Model):
     level              = models.CharField(max_length=20, choices=Level.choices, default=Level.BEGINNER)
     duration_hours     = models.PositiveSmallIntegerField(default=0)
     learning_outcomes  = models.JSONField(default=list, blank=True)
+    is_published       = models.BooleanField(default=False)
     created_at         = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -80,3 +81,16 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.user.username} → {self.course.title} ({self.progress_pct}%)'
+
+
+class CourseEditHistory(models.Model):
+    course    = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='edit_history')
+    editor    = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='course_edits')
+    edited_at = models.DateTimeField(auto_now_add=True)
+    changes   = models.JSONField(default=dict)
+
+    class Meta:
+        ordering = ['-edited_at']
+
+    def __str__(self):
+        return f'{self.editor} edited "{self.course}" at {self.edited_at:%Y-%m-%d %H:%M}'
