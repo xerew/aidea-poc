@@ -97,13 +97,10 @@ class HomeViewTestCase(APITestCase):
         self.module1 = Module.objects.create(title='Module 1', course=self.course1, order=1)
         self.module2 = Module.objects.create(title='Module 2', course=self.course1, order=2)
 
-        login = self.client.post(reverse('auth-login'), {
-            'username': 'teacher1', 'password': 'testpass123',
-        })
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
+        self.client.force_authenticate(user=self.user)
 
     def test_home_requires_authentication(self):
-        self.client.credentials()
+        self.client.force_authenticate(user=None)
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -195,10 +192,7 @@ class AuthoringTestCase(APITestCase):
         )
 
     def _login_as(self, user):
-        login = self.client.post(reverse('auth-login'), {
-            'username': user.username, 'password': 'testpass123',
-        })
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
+        self.client.force_authenticate(user=user)
 
 
 # ── Permission tests ──────────────────────────────────────────────────────────
@@ -304,8 +298,7 @@ class PublishedVisibilityTestCase(APITestCase):
         self.draft = Course.objects.create(
             title='Draft', pillar=self.pillar, is_published=False,
         )
-        login = self.client.post(reverse('auth-login'), {'username': 't1', 'password': 'testpass123'})
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
+        self.client.force_authenticate(user=self.teacher)
 
     def test_courses_list_excludes_unpublished(self):
         response = self.client.get(reverse('courses'))
