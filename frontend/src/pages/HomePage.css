@@ -1,0 +1,163 @@
+.home-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+/* Continue Learning Banner */
+.continue-banner {
+  background: #1f2937;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+}
+
+.continue-label {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.continue-banner h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: #fff;
+}
+
+.current-module {
+  color: #d1d5db;
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: #374151;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.dark {
+  background: #1f2937;
+}
+
+.progress-pct {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+.resume-btn {
+  background: #fff;
+  color: #1f2937;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.resume-btn:hover {
+  opacity: 0.9;
+}
+
+/* Pillars */
+.pillars-section h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 1.25rem;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.pillar-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pillar-card h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.pillar-desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pillar-progress {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.pillar-pct {
+  font-weight: 600;
+  color: #111827;
+}
+
+.pillar-card .progress-bar {
+  background: #e5e7eb;
+}
+
+.pillar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.pillar-footer a {
+  color: #111827;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pillar-footer a:hover {
+  text-decoration: underline;
+}
+
+.page-error {
+  color: #dc2626;
+}
+
+.page-loading {
+  color: #6b7280;
+}
