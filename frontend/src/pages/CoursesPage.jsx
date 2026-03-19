@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Filter } from 'lucide-react'
 import PropTypes from 'prop-types'
 import client from '../api/client'
@@ -74,12 +74,21 @@ function CourseCard({ course }) {
 }
 
 export default function CoursesPage() {
-  const [courses, setCourses]     = useState([])
-  const [pillars, setPillars]     = useState([])
-  const [pillarFilter, setPillar] = useState('')
-  const [levelFilter, setLevel]   = useState('')
-  const [search]                  = useState('')
-  const [error, setError]         = useState('')
+  const [courses, setCourses] = useState([])
+  const [pillars, setPillars] = useState([])
+  const [error, setError]     = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const pillarFilter = searchParams.get('pillar') ?? ''
+  const levelFilter  = searchParams.get('level')  ?? ''
+  const search       = searchParams.get('search') ?? ''
+
+  const setParam = (key, val) =>
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      if (val) next.set(key, val); else next.delete(key)
+      return next
+    }, { replace: true })
 
   useEffect(() => {
     client.get('/courses/')
@@ -120,7 +129,7 @@ export default function CoursesPage() {
       <div className="courses-filters">
         <Filter size={16} className="filter-icon" />
         <label>Pillar:</label>
-        <select value={pillarFilter} onChange={(e) => setPillar(e.target.value)}>
+        <select value={pillarFilter} onChange={(e) => setParam('pillar', e.target.value)}>
           <option value="">All</option>
           {pillars.map((p) => (
             <option key={p.slug} value={p.slug}>{p.name}</option>
@@ -128,7 +137,7 @@ export default function CoursesPage() {
         </select>
 
         <label>Level:</label>
-        <select value={levelFilter} onChange={(e) => setLevel(e.target.value)}>
+        <select value={levelFilter} onChange={(e) => setParam('level', e.target.value)}>
           <option value="">All</option>
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
