@@ -3,7 +3,15 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
+from .models import (
+    Course,
+    CourseEditHistory,
+    Enrollment,
+    LearningPillar,
+    Lesson,
+    Module,
+    UserProfile,
+)
 
 
 class AuthTestCase(APITestCase):
@@ -734,3 +742,249 @@ class AuthoringModuleDetailTestCase(AuthoringTestCase):
             reverse('authoring-module-detail', kwargs={'pk': self.course.pk, 'module_pk': 9999}),
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+# ── Module editor (GET with lessons) ──────────────────────────────────────────
+
+class AuthoringModuleEditorTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.lesson1 = Lesson.objects.create(
+            module=self.module1, title='Intro Video', lesson_type='video',
+            description='Watch this.', order=1, is_required=True,
+        )
+        self.lesson2 = Lesson.objects.create(
+            module=self.module1, title='Key Concepts', lesson_type='text',
+            content='Some markdown.', order=2, is_required=False,
+        )
+        self.url = reverse('authoring-module-editor', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+        })
+
+    def test_get_returns_module_with_lessons(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['title'], 'Module 1')
+        self.assertEqual(len(response.data['lessons']), 2)
+
+    def test_lessons_include_expected_fields(self):
+        response = self.client.get(self.url)
+        lesson = response.data['lessons'][0]
+        for field in ('id', 'title', 'description', 'lesson_type', 'content', 'duration_minutes', 'order', 'is_required'):
+            self.assertIn(field, lesson)
+
+    def test_lessons_ordered_by_order(self):
+        response = self.client.get(self.url)
+        orders = [lesson['order'] for lesson in response.data['lessons']]
+        self.assertEqual(orders, sorted(orders))
+
+    def test_get_nonexistent_module_returns_404(self):
+        response = self.client.get(
+            reverse('authoring-module-editor', kwargs={'pk': self.course.pk, 'module_pk': 9999}),
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_teacher_cannot_access_module_editor(self):
+        self._login_as(self.teacher)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# ── Lesson creation ───────────────────────────────────────────────────────────
+
+class AuthoringLessonCreateTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.url = reverse('authoring-lesson-create', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+        })
+        self.valid_payload = {'title': 'New Lesson', 'lesson_type': 'text'}
+
+    def test_create_lesson_returns_201(self):
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_lesson_persists_to_db(self):
+        self.client.post(self.url, self.valid_payload)
+        self.assertTrue(Lesson.objects.filter(title='New Lesson', module=self.module1).exists())
+
+    def test_create_lesson_auto_assigns_order(self):
+        Lesson.objects.create(module=self.module1, title='First', lesson_type='text', order=1)
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lesson = Lesson.objects.get(pk=response.data['id'])
+        self.assertEqual(lesson.order, 2)
+
+    def test_first_lesson_gets_order_one(self):
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.data['order'], 1)
+
+    def test_create_lesson_records_history(self):
+        self.client.post(self.url, self.valid_payload)
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('lesson_added', history.changes)
+        self.assertEqual(history.changes['lesson_added']['lesson_title'], 'New Lesson')
+
+    def test_create_lesson_on_published_course_returns_400(self):
+        self.course.is_published = True
+        self.course.save()
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_lesson_nonexistent_module_returns_404(self):
+        url = reverse('authoring-lesson-create', kwargs={'pk': self.course.pk, 'module_pk': 9999})
+        response = self.client.post(url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_create_lesson_missing_title_returns_400(self):
+        response = self.client.post(self.url, {'lesson_type': 'text'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_lesson_invalid_type_returns_400(self):
+        response = self.client.post(self.url, {'title': 'X', 'lesson_type': 'podcast'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_teacher_cannot_create_lesson(self):
+        self._login_as(self.teacher)
+        response = self.client.post(self.url, self.valid_payload)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_lesson_with_all_fields(self):
+        payload = {
+            'title': 'Full Lesson',
+            'lesson_type': 'video',
+            'description': 'A video lesson.',
+            'content': '',
+            'duration_minutes': 15,
+            'is_required': False,
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lesson = Lesson.objects.get(pk=response.data['id'])
+        self.assertEqual(lesson.duration_minutes, 15)
+        self.assertFalse(lesson.is_required)
+
+
+# ── Lesson edit / delete ──────────────────────────────────────────────────────
+
+class AuthoringLessonDetailTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.lesson = Lesson.objects.create(
+            module=self.module1, title='Intro Text', lesson_type='text',
+            description='Original desc.', content='Original content.',
+            duration_minutes=10, order=1, is_required=True,
+        )
+        self.url = reverse('authoring-lesson-detail', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk, 'lesson_pk': self.lesson.pk,
+        })
+
+    def test_patch_updates_title(self):
+        response = self.client.patch(self.url, {'title': 'Updated Title'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.title, 'Updated Title')
+
+    def test_patch_updates_content(self):
+        response = self.client.patch(self.url, {'content': '# New Markdown'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.content, '# New Markdown')
+
+    def test_patch_updates_lesson_type(self):
+        response = self.client.patch(self.url, {'lesson_type': 'quiz'})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.lesson_type, 'quiz')
+
+    def test_patch_updates_duration(self):
+        response = self.client.patch(self.url, {'duration_minutes': 30})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.duration_minutes, 30)
+
+    def test_patch_updates_is_required(self):
+        response = self.client.patch(self.url, {'is_required': False}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson.refresh_from_db()
+        self.assertFalse(self.lesson.is_required)
+
+    def test_patch_creates_history(self):
+        self.client.patch(self.url, {'title': 'Renamed Lesson'})
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('lesson_edited', history.changes)
+        self.assertIn('title', history.changes['lesson_edited']['fields'])
+
+    def test_patch_history_records_old_and_new(self):
+        self.client.patch(self.url, {'duration_minutes': 45})
+        history = CourseEditHistory.objects.get(course=self.course)
+        field_change = history.changes['lesson_edited']['fields']['duration_minutes']
+        self.assertEqual(field_change['old'], 10)
+        self.assertEqual(field_change['new'], 45)
+
+    def test_patch_with_no_changes_creates_no_history(self):
+        self.client.patch(self.url, {'title': 'Intro Text', 'duration_minutes': 10})
+        self.assertEqual(CourseEditHistory.objects.filter(course=self.course).count(), 0)
+
+    def test_patch_nonexistent_lesson_returns_404(self):
+        url = reverse('authoring-lesson-detail', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk, 'lesson_pk': 9999,
+        })
+        response = self.client.patch(url, {'title': 'X'})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_patch_lesson_on_published_course_returns_400(self):
+        self.course.is_published = True
+        self.course.save()
+        response = self.client.patch(self.url, {'title': 'Hacked'})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_patch_lesson_belonging_to_other_module_returns_404(self):
+        other_lesson = Lesson.objects.create(
+            module=self.module2, title='Other', lesson_type='text', order=1,
+        )
+        url = reverse('authoring-lesson-detail', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk, 'lesson_pk': other_lesson.pk,
+        })
+        response = self.client.patch(url, {'title': 'X'})
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_delete_removes_lesson(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Lesson.objects.filter(pk=self.lesson.pk).exists())
+
+    def test_delete_creates_history(self):
+        self.client.delete(self.url)
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('lesson_deleted', history.changes)
+        self.assertEqual(history.changes['lesson_deleted']['lesson_title'], 'Intro Text')
+
+    def test_delete_on_published_course_returns_400(self):
+        self.course.is_published = True
+        self.course.save()
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_nonexistent_lesson_returns_404(self):
+        url = reverse('authoring-lesson-detail', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk, 'lesson_pk': 9999,
+        })
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_teacher_cannot_patch_lesson(self):
+        self._login_as(self.teacher)
+        response = self.client.patch(self.url, {'title': 'Hacked'})
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_teacher_cannot_delete_lesson(self):
+        self._login_as(self.teacher)
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

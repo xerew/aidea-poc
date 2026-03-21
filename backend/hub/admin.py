@@ -1,6 +1,14 @@
 from django.contrib import admin
 
-from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
+from .models import (
+    Course,
+    CourseEditHistory,
+    Enrollment,
+    LearningPillar,
+    Lesson,
+    Module,
+    UserProfile,
+)
 
 
 @admin.register(UserProfile)
@@ -32,12 +40,28 @@ class CourseAdmin(admin.ModelAdmin):
     inlines = [ModuleInline]
 
 
+class LessonInline(admin.TabularInline):
+    model = Lesson
+    extra = 1
+    fields = ['title', 'lesson_type', 'order', 'is_required']
+    ordering = ['order']
+
+
 @admin.register(Module)
 class ModuleAdmin(admin.ModelAdmin):
     list_display = ['title', 'course', 'order']
     list_filter = ['course__pillar', 'course']
     search_fields = ['title', 'course__title']
     ordering = ['course', 'order']
+    inlines = [LessonInline]
+
+
+@admin.register(Lesson)
+class LessonAdmin(admin.ModelAdmin):
+    list_display = ['title', 'module', 'lesson_type', 'order', 'is_required']
+    list_filter = ['lesson_type', 'module__course__pillar']
+    search_fields = ['title', 'module__title']
+    ordering = ['module', 'order']
 
 
 @admin.register(Enrollment)

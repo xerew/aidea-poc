@@ -10,27 +10,26 @@ AIDEA POC is a Teacher AI Training Platform — a monorepo with a Django REST AP
 
 ### Backend (Django)
 
-The virtualenv is at `backend/.venv`. Use `.venv/Scripts/python` directly (or activate the venv) — `uv` and system `python` may not be on PATH in this environment.
+The virtualenv is at `backend/.venv`. Use `.venv/Scripts/uv.exe run` — `uv` is bundled inside the venv and is the preferred runner; system `python`/`uv` may not be on PATH.
 
 ```bash
 cd backend
-uv sync --group dev                      # Install / update dependencies
-.venv/Scripts/python manage.py migrate  # Apply migrations
-.venv/Scripts/python manage.py seed        # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234, demo_creator/demo1234)
-.venv/Scripts/python manage.py runserver  # Start dev server at localhost:8000
+.venv/Scripts/uv.exe run manage.py migrate   # Apply migrations
+.venv/Scripts/uv.exe run manage.py seed      # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234, demo_creator/demo1234)
+.venv/Scripts/uv.exe run manage.py runserver # Start dev server at localhost:8000
 ```
 
 **Testing:**
 ```bash
 cd backend
-.venv/Scripts/python -m coverage run manage.py test hub --verbosity=2   # Run all tests
-.venv/Scripts/python -m coverage run manage.py test hub.tests.TestFoo   # Run a single test class
+.venv/Scripts/uv.exe run coverage run manage.py test hub --verbosity=2   # Run all tests
+.venv/Scripts/uv.exe run coverage run manage.py test hub.tests.TestFoo   # Run a single test class
 ```
 
 **Linting:**
 ```bash
 cd backend
-.venv/Scripts/python -m ruff check .   # Line length 100; E501 ignored
+.venv/Scripts/uv.exe run ruff check .   # Line length 100; E501 ignored
 ```
 
 **Environment:** Copy `backend/.env.example` to `backend/.env` and set `SECRET_KEY`.

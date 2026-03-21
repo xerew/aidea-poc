@@ -3,7 +3,15 @@ from django.db.models import Avg
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Course, CourseEditHistory, Enrollment, LearningPillar, Module, UserProfile
+from .models import (
+    Course,
+    CourseEditHistory,
+    Enrollment,
+    LearningPillar,
+    Lesson,
+    Module,
+    UserProfile,
+)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -27,10 +35,27 @@ class AideaTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = [
+            'id', 'title', 'description', 'lesson_type',
+            'content', 'duration_minutes', 'order', 'is_required',
+        ]
+
+
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ['id', 'title', 'description', 'order', 'duration_minutes']
+
+
+class ModuleWithLessonsSerializer(serializers.ModelSerializer):
+    lessons = LessonSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Module
+        fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'lessons']
 
 
 class PillarSerializer(serializers.ModelSerializer):

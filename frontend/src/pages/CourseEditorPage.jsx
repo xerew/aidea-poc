@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock } from 'lucide-react'
+import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil } from 'lucide-react'
 import client from '../api/client'
 import './CourseEditorPage.css'
 
@@ -318,18 +318,27 @@ export default function CourseEditorPage() {
                   <span>min</span>
                 </div>
               </div>
-              {!locked && (
-                <div className="module-editor-actions">
-                  {mod.isDirty && (
-                    <button
-                      className="icon-btn icon-btn--save"
-                      onClick={() => saveModule(mod)}
-                      disabled={mod.saving}
-                      title="Save module"
-                    >
-                      <Save size={15} />
-                    </button>
-                  )}
+              <div className="module-editor-actions">
+                {!mod.isNew && (
+                  <button
+                    className="icon-btn"
+                    onClick={() => navigate(`/authoring/courses/${id}/modules/${mod.id}`)}
+                    title="Edit module lessons"
+                  >
+                    <Pencil size={15} />
+                  </button>
+                )}
+                {!locked && mod.isDirty && (
+                  <button
+                    className="icon-btn icon-btn--save"
+                    onClick={() => saveModule(mod)}
+                    disabled={mod.saving}
+                    title="Save module"
+                  >
+                    <Save size={15} />
+                  </button>
+                )}
+                {!locked && (
                   <button
                     className="icon-btn icon-btn--danger"
                     onClick={() => deleteModule(mod)}
@@ -337,8 +346,8 @@ export default function CourseEditorPage() {
                   >
                     <Trash2 size={15} />
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           ))}
         </div>
