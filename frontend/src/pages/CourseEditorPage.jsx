@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil } from 'lucide-react'
+import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil, GripVertical } from 'lucide-react'
 import client from '../api/client'
 import './CourseEditorPage.css'
 
@@ -22,6 +22,8 @@ export default function CourseEditorPage() {
   const [publishing, setPublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [error, setError] = useState('')
+  const [dragModuleId, setDragModuleId] = useState(null)
+  const [dragModuleOverId, setDragModuleOverId] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -157,6 +159,48 @@ export default function CourseEditorPage() {
     } catch { /* user can retry */ }
   }
 
+  // ── Module drag-and-drop ─────────────────────────────────────────────────
+
+  const handleModuleDragStart = (e, modId) => {
+    setDragModuleId(modId)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleModuleDragOver = (e, modId) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (modId !== dragModuleOverId) setDragModuleOverId(modId)
+  }
+
+  const handleModuleDrop = async (e, targetId) => {
+    e.preventDefault()
+    setDragModuleOverId(null)
+    if (!dragModuleId || dragModuleId === targetId) { setDragModuleId(null); return }
+
+    const fromIdx = modules.findIndex((m) => m.id === dragModuleId)
+    const toIdx = modules.findIndex((m) => m.id === targetId)
+    const reordered = [...modules]
+    reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, modules[fromIdx])
+    setModules(reordered)
+    setDragModuleId(null)
+
+    const hasNew = reordered.some((m) => m.isNew)
+    if (!hasNew) {
+      try {
+        await client.patch(
+          `/authoring/courses/${id}/modules/reorder/`,
+          { order: reordered.map((m) => m.id) },
+        )
+      } catch { /* silent */ }
+    }
+  }
+
+  const handleModuleDragEnd = () => {
+    setDragModuleId(null)
+    setDragModuleOverId(null)
+  }
+
   if (error) return <p className="page-error">{error}</p>
   if (!form)  return <p className="page-loading">Loading…</p>
 
@@ -287,9 +331,26 @@ export default function CourseEditorPage() {
       <section className="modules-section">
         <h2>Course Modules</h2>
         <div className="modules-list">
-          {modules.map((mod, idx) => (
-            <div key={mod.id} className="module-row module-row--edit">
-              <div className="module-number">{idx + 1}</div>
+          {modules.map((mod, idx) => {
+            const isModDragOver = dragModuleOverId === mod.id && dragModuleId !== mod.id
+            return (
+            <div
+              key={mod.id}
+              className={[
+                'module-row module-row--edit',
+                dragModuleId === mod.id ? 'module-row--dragging' : '',
+                isModDragOver ? 'module-row--drag-over' : '',
+              ].filter(Boolean).join(' ')}
+              draggable={!locked}
+              onDragStart={(e) => handleModuleDragStart(e, mod.id)}
+              onDragOver={(e) => handleModuleDragOver(e, mod.id)}
+              onDrop={(e) => handleModuleDrop(e, mod.id)}
+              onDragEnd={handleModuleDragEnd}
+            >
+              <div className="module-number">
+                {!locked && <GripVertical size={14} className="module-drag-handle" />}
+                {idx + 1}
+              </div>
               <div className="module-body">
                 <input
                   className="editor-module-title"
@@ -349,7 +410,7 @@ export default function CourseEditorPage() {
                 )}
               </div>
             </div>
-          ))}
+          )})}
         </div>
         {!locked && (
           <button className="add-dashed-btn" onClick={addModule}>

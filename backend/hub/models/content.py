@@ -66,6 +66,9 @@ class Lesson(models.Model):
         max_length=20, choices=LessonType.choices, default=LessonType.TEXT,
     )
     content          = models.TextField(blank=True)
+    # quiz_data structure (only used when lesson_type='quiz'):
+    # [{"question": str, "options": [{"text": str, "is_correct": bool}]}]
+    quiz_data        = models.JSONField(default=list, blank=True)
     duration_minutes = models.PositiveSmallIntegerField(default=0)
     order            = models.PositiveSmallIntegerField(default=0)
     is_required      = models.BooleanField(default=True)

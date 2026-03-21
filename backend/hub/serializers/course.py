@@ -1,61 +1,9 @@
-from django.contrib.auth.models import User
 from django.db.models import Avg
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import (
-    Course,
-    CourseEditHistory,
-    Enrollment,
-    LearningPillar,
-    Lesson,
-    Module,
-    UserProfile,
-)
+from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar
 
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['user_type', 'avatar_initials']
-
-
-class UserSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer()
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'profile']
-
-
-class AideaTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data['user'] = UserSerializer(self.user).data
-        return data
-
-
-class LessonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Lesson
-        fields = [
-            'id', 'title', 'description', 'lesson_type',
-            'content', 'duration_minutes', 'order', 'is_required',
-        ]
-
-
-class ModuleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Module
-        fields = ['id', 'title', 'description', 'order', 'duration_minutes']
-
-
-class ModuleWithLessonsSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Module
-        fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'lessons']
+from .content import ModuleSerializer
 
 
 class PillarSerializer(serializers.ModelSerializer):
@@ -153,10 +101,7 @@ class PillarSummarySerializer(serializers.ModelSerializer):
 
     def get_progress_pct(self, obj):
         user = self.context['request'].user
-        enrollments = Enrollment.objects.filter(
-            user=user,
-            course__pillar=obj,
-        )
+        enrollments = Enrollment.objects.filter(user=user, course__pillar=obj)
         if not enrollments.exists():
             return 0
         return round(enrollments.aggregate(avg=Avg('progress_pct'))['avg'] or 0)

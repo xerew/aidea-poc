@@ -988,3 +988,313 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
         self._login_as(self.teacher)
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# ── Quiz data ─────────────────────────────────────────────────────────────────
+
+VALID_QUIZ = [
+    {
+        'question': 'What is machine learning?',
+        'options': [
+            {'text': 'A type of robot',        'is_correct': False},
+            {'text': 'Learning from data',      'is_correct': True},
+            {'text': 'A programming language',  'is_correct': False},
+            {'text': 'A database system',       'is_correct': False},
+        ],
+    },
+    {
+        'question': 'Which of these are AI applications? (select all that apply)',
+        'options': [
+            {'text': 'Image recognition', 'is_correct': True},
+            {'text': 'Spell check',        'is_correct': True},
+            {'text': 'A hammer',           'is_correct': False},
+        ],
+    },
+]
+
+
+class QuizDataTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.create_url = reverse('authoring-lesson-create', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+        })
+        self.quiz_lesson = Lesson.objects.create(
+            module=self.module1, title='Knowledge Check', lesson_type='quiz',
+            order=1, quiz_data=VALID_QUIZ,
+        )
+        self.detail_url = reverse('authoring-lesson-detail', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+            'lesson_pk': self.quiz_lesson.pk,
+        })
+
+    # ── Creation ──
+
+    def test_create_quiz_lesson_with_valid_quiz_data(self):
+        payload = {'title': 'Quiz 1', 'lesson_type': 'quiz', 'quiz_data': VALID_QUIZ}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lesson = Lesson.objects.get(pk=response.data['id'])
+        self.assertEqual(len(lesson.quiz_data), 2)
+
+    def test_create_quiz_lesson_quiz_data_returned_in_response(self):
+        payload = {'title': 'Quiz 1', 'lesson_type': 'quiz', 'quiz_data': VALID_QUIZ}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(len(response.data['quiz_data']), 2)
+        self.assertEqual(response.data['quiz_data'][0]['question'], 'What is machine learning?')
+
+    def test_create_quiz_with_multiple_correct_options(self):
+        payload = {'title': 'Multi-answer Quiz', 'lesson_type': 'quiz', 'quiz_data': VALID_QUIZ}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        q2_options = response.data['quiz_data'][1]['options']
+        correct = [o for o in q2_options if o['is_correct']]
+        self.assertEqual(len(correct), 2)
+
+    def test_create_quiz_defaults_quiz_data_to_empty_list(self):
+        response = self.client.post(self.create_url, {'title': 'Empty Quiz', 'lesson_type': 'quiz'})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['quiz_data'], [])
+
+    # ── Validation ──
+
+    def test_quiz_data_not_a_list_returns_400(self):
+        payload = {'title': 'Bad', 'lesson_type': 'quiz', 'quiz_data': 'not a list'}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_quiz_data_question_not_dict_returns_400(self):
+        payload = {'title': 'Bad', 'lesson_type': 'quiz', 'quiz_data': ['not a dict']}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_quiz_data_fewer_than_two_options_returns_400(self):
+        bad_quiz = [{'question': 'Q?', 'options': [{'text': 'Only one', 'is_correct': True}]}]
+        payload = {'title': 'Bad', 'lesson_type': 'quiz', 'quiz_data': bad_quiz}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_quiz_data_is_correct_not_bool_returns_400(self):
+        bad_quiz = [{
+            'question': 'Q?',
+            'options': [
+                {'text': 'A', 'is_correct': 'yes'},
+                {'text': 'B', 'is_correct': False},
+            ],
+        }]
+        payload = {'title': 'Bad', 'lesson_type': 'quiz', 'quiz_data': bad_quiz}
+        response = self.client.post(self.create_url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    # ── Editing ──
+
+    def test_patch_quiz_data_updates_questions(self):
+        new_quiz = [{
+            'question': 'Updated question?',
+            'options': [
+                {'text': 'Yes', 'is_correct': True},
+                {'text': 'No',  'is_correct': False},
+            ],
+        }]
+        response = self.client.patch(self.detail_url, {'quiz_data': new_quiz}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.quiz_lesson.refresh_from_db()
+        self.assertEqual(len(self.quiz_lesson.quiz_data), 1)
+        self.assertEqual(self.quiz_lesson.quiz_data[0]['question'], 'Updated question?')
+
+    def test_patch_quiz_data_records_history(self):
+        new_quiz = [{
+            'question': 'New Q?',
+            'options': [
+                {'text': 'A', 'is_correct': True},
+                {'text': 'B', 'is_correct': False},
+            ],
+        }]
+        self.client.patch(self.detail_url, {'quiz_data': new_quiz}, format='json')
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('quiz_data', history.changes['lesson_edited']['fields'])
+
+    def test_module_editor_returns_quiz_data(self):
+        url = reverse('authoring-module-editor', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        quiz_lesson_data = next(
+            (lesson for lesson in response.data['lessons'] if lesson['id'] == self.quiz_lesson.pk), None,
+        )
+        self.assertIsNotNone(quiz_lesson_data)
+        self.assertIn('quiz_data', quiz_lesson_data)
+        self.assertEqual(len(quiz_lesson_data['quiz_data']), 2)
+
+
+# ── Module reorder ────────────────────────────────────────────────────────────
+
+class AuthoringModuleReorderTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.module3 = Module.objects.create(
+            title='Module 3', course=self.course, order=3, duration_minutes=20,
+        )
+        self.url = reverse('authoring-module-reorder', kwargs={'pk': self.course.pk})
+
+    def test_reorder_changes_module_orders(self):
+        new_order = [self.module3.pk, self.module1.pk, self.module2.pk]
+        response = self.client.patch(self.url, {'order': new_order}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.module1.refresh_from_db()
+        self.module2.refresh_from_db()
+        self.module3.refresh_from_db()
+        self.assertEqual(self.module3.order, 1)
+        self.assertEqual(self.module1.order, 2)
+        self.assertEqual(self.module2.order, 3)
+
+    def test_reorder_returns_updated_module_list(self):
+        new_order = [self.module2.pk, self.module3.pk, self.module1.pk]
+        response = self.client.patch(self.url, {'order': new_order}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        returned_ids = [m['id'] for m in response.data]
+        # Response is ordered by new order field
+        self.assertEqual(returned_ids, sorted(returned_ids, key=lambda mid: next(
+            i for i, pk in enumerate(new_order) if pk == mid
+        )))
+
+    def test_reorder_records_history(self):
+        new_order = [self.module2.pk, self.module1.pk, self.module3.pk]
+        self.client.patch(self.url, {'order': new_order}, format='json')
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('modules_reordered', history.changes)
+        self.assertEqual(history.changes['modules_reordered']['order'], new_order)
+
+    def test_reorder_missing_order_returns_400(self):
+        response = self.client.patch(self.url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_empty_order_returns_400(self):
+        response = self.client.patch(self.url, {'order': []}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_invalid_ids_returns_400(self):
+        response = self.client.patch(self.url, {'order': [9999, self.module1.pk]}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_module_from_other_course_returns_400(self):
+        other_course = Course.objects.create(title='Other', pillar=self.pillar1)
+        other_module = Module.objects.create(title='Other mod', course=other_course, order=1)
+        response = self.client.patch(
+            self.url, {'order': [self.module1.pk, other_module.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_on_published_course_returns_400(self):
+        self.course.is_published = True
+        self.course.save()
+        response = self.client.patch(
+            self.url, {'order': [self.module1.pk, self.module2.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_nonexistent_course_returns_404(self):
+        response = self.client.patch(
+            reverse('authoring-module-reorder', kwargs={'pk': 9999}),
+            {'order': [self.module1.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_teacher_cannot_reorder_modules(self):
+        self._login_as(self.teacher)
+        response = self.client.patch(
+            self.url, {'order': [self.module1.pk, self.module2.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+# ── Lesson reorder ────────────────────────────────────────────────────────────
+
+class AuthoringLessonReorderTestCase(AuthoringTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.creator)
+        self.lesson1 = Lesson.objects.create(
+            module=self.module1, title='Lesson 1', lesson_type='text', order=1,
+        )
+        self.lesson2 = Lesson.objects.create(
+            module=self.module1, title='Lesson 2', lesson_type='video', order=2,
+        )
+        self.lesson3 = Lesson.objects.create(
+            module=self.module1, title='Lesson 3', lesson_type='quiz', order=3,
+        )
+        self.url = reverse('authoring-lesson-reorder', kwargs={
+            'pk': self.course.pk, 'module_pk': self.module1.pk,
+        })
+
+    def test_reorder_changes_lesson_orders(self):
+        new_order = [self.lesson3.pk, self.lesson1.pk, self.lesson2.pk]
+        response = self.client.patch(self.url, {'order': new_order}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.lesson1.refresh_from_db()
+        self.lesson2.refresh_from_db()
+        self.lesson3.refresh_from_db()
+        self.assertEqual(self.lesson3.order, 1)
+        self.assertEqual(self.lesson1.order, 2)
+        self.assertEqual(self.lesson2.order, 3)
+
+    def test_reorder_returns_updated_lesson_list(self):
+        new_order = [self.lesson2.pk, self.lesson3.pk, self.lesson1.pk]
+        response = self.client.patch(self.url, {'order': new_order}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 3)
+
+    def test_reorder_records_history(self):
+        new_order = [self.lesson2.pk, self.lesson1.pk, self.lesson3.pk]
+        self.client.patch(self.url, {'order': new_order}, format='json')
+        history = CourseEditHistory.objects.get(course=self.course)
+        self.assertIn('lessons_reordered', history.changes)
+        self.assertEqual(history.changes['lessons_reordered']['order'], new_order)
+
+    def test_reorder_missing_order_returns_400(self):
+        response = self.client.patch(self.url, {}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_empty_list_returns_400(self):
+        response = self.client.patch(self.url, {'order': []}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_invalid_ids_returns_400(self):
+        response = self.client.patch(self.url, {'order': [9999, self.lesson1.pk]}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_lesson_from_other_module_returns_400(self):
+        other_lesson = Lesson.objects.create(
+            module=self.module2, title='Other', lesson_type='text', order=1,
+        )
+        response = self.client.patch(
+            self.url, {'order': [self.lesson1.pk, other_lesson.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_on_published_course_returns_400(self):
+        self.course.is_published = True
+        self.course.save()
+        response = self.client.patch(
+            self.url, {'order': [self.lesson1.pk, self.lesson2.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_reorder_nonexistent_module_returns_404(self):
+        url = f'/api/authoring/courses/{self.course.pk}/modules/9999/lessons/reorder/'
+        response = self.client.patch(url, {'order': [self.lesson1.pk]}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_teacher_cannot_reorder_lessons(self):
+        self.client.force_authenticate(user=self.teacher)
+        response = self.client.patch(
+            self.url, {'order': [self.lesson1.pk, self.lesson2.pk]}, format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

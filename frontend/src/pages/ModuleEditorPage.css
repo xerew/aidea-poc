@@ -482,3 +482,184 @@
 
 .page-error   { color: #dc2626; padding: 2rem; text-align: center; }
 .page-loading { color: var(--color-text-muted); padding: 2rem; text-align: center; }
+
+/* ── Quiz builder ─────────────────────────────────────────────────────────── */
+
+.quiz-builder {
+  background: #fefef0;
+  border: 1px solid #e8e4a0;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.quiz-builder-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 0.25rem;
+}
+
+.quiz-question {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.quiz-question-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.quiz-question-input {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.quiz-question-input:focus { border-color: var(--color-primary); }
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quiz-option-checkbox {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.quiz-option-checkbox:disabled { cursor: not-allowed; }
+
+.quiz-option-input {
+  flex: 1;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: transparent;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.quiz-option-input:focus { border-color: var(--color-primary); }
+
+/* Checked option gets a green tint */
+.quiz-option:has(.quiz-option-checkbox:checked) .quiz-option-input {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.quiz-option-remove {
+  width: 1.6rem;
+  height: 1.6rem;
+  flex-shrink: 0;
+}
+
+.quiz-add-option-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: 1px dashed var(--color-border);
+  border-radius: 9999px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  font-family: inherit;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.quiz-add-option-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.quiz-add-question-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1.5px dashed #c8c060;
+  border-radius: 9999px;
+  color: #7a6f00;
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.quiz-add-question-btn:hover {
+  border-color: #a09020;
+  color: #5a5000;
+}
+
+/* ── Validation errors ───────────────────────────────────────────────────── */
+
+.lesson-field-error {
+  font-size: 0.78rem;
+  color: #dc2626;
+  margin: 0.25rem 0 0;
+}
+
+.lesson-field-input--error,
+.lesson-field-textarea--error {
+  border-color: #dc2626 !important;
+  background: #fff5f5;
+}
+
+/* ── Drag-and-drop (lesson list) ─────────────────────────────────────────── */
+
+.me-lesson-item {
+  cursor: pointer;
+}
+
+.me-lesson-item[draggable="true"] {
+  cursor: grab;
+}
+
+.me-lesson-drag {
+  cursor: grab;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.me-lesson-item--dragging {
+  opacity: 0.4;
+}
+
+.me-lesson-item--drag-over {
+  border-top: 2px solid var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+}

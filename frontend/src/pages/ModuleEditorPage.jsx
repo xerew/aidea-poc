@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList,
-  Trash2, GripVertical, Save, Lock,
+  Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
 import './ModuleEditorPage.css'
@@ -34,20 +34,174 @@ LessonTypeIcon.propTypes = { type: PropTypes.string.isRequired, size: PropTypes.
 
 // ── Lesson editor panel ───────────────────────────────────────────────────────
 
+// ── Quiz builder ──────────────────────────────────────────────────────────────
+
+function emptyQuestion() {
+  return {
+    question: '',
+    options: [
+      { text: '', is_correct: false },
+      { text: '', is_correct: false },
+      { text: '', is_correct: false },
+      { text: '', is_correct: false },
+    ],
+  }
+}
+
+function QuizBuilder({ quizData, locked, onChange }) {
+  const questions = quizData ?? []
+
+  const updateQuestion = (qi, text) => {
+    const next = questions.map((q, i) => (i === qi ? { ...q, question: text } : q))
+    onChange(next)
+  }
+
+  const updateOptionText = (qi, oi, text) => {
+    const next = questions.map((q, i) =>
+      i === qi
+        ? { ...q, options: q.options.map((o, j) => (j === oi ? { ...o, text } : o)) }
+        : q,
+    )
+    onChange(next)
+  }
+
+  const toggleCorrect = (qi, oi) => {
+    const next = questions.map((q, i) =>
+      i === qi
+        ? { ...q, options: q.options.map((o, j) => (j === oi ? { ...o, is_correct: !o.is_correct } : o)) }
+        : q,
+    )
+    onChange(next)
+  }
+
+  const addOption = (qi) => {
+    const next = questions.map((q, i) =>
+      i === qi ? { ...q, options: [...q.options, { text: '', is_correct: false }] } : q,
+    )
+    onChange(next)
+  }
+
+  const removeOption = (qi, oi) => {
+    const next = questions.map((q, i) =>
+      i === qi ? { ...q, options: q.options.filter((_, j) => j !== oi) } : q,
+    )
+    onChange(next)
+  }
+
+  const addQuestion = () => onChange([...questions, emptyQuestion()])
+
+  const removeQuestion = (qi) => onChange(questions.filter((_, i) => i !== qi))
+
+  return (
+    <div className="quiz-builder">
+      <h3 className="quiz-builder-title">Quiz Builder</h3>
+
+      {questions.map((q, qi) => (
+        <div key={qi} className="quiz-question">
+          <div className="quiz-question-header">
+            <input
+              className="quiz-question-input"
+              value={q.question}
+              disabled={locked}
+              onChange={(e) => updateQuestion(qi, e.target.value)}
+              placeholder={`Question ${qi + 1}`}
+            />
+            {!locked && questions.length > 1 && (
+              <button
+                className="icon-btn icon-btn--danger"
+                onClick={() => removeQuestion(qi)}
+                title="Remove question"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="quiz-options">
+            {q.options.map((opt, oi) => (
+              <div key={oi} className="quiz-option">
+                <input
+                  type="checkbox"
+                  className="quiz-option-checkbox"
+                  checked={opt.is_correct}
+                  disabled={locked}
+                  onChange={() => toggleCorrect(qi, oi)}
+                  title="Mark as correct answer"
+                />
+                <input
+                  className="quiz-option-input"
+                  value={opt.text}
+                  disabled={locked}
+                  onChange={(e) => updateOptionText(qi, oi, e.target.value)}
+                  placeholder={`Option ${String.fromCharCode(65 + oi)}`}
+                />
+                {!locked && q.options.length > 2 && (
+                  <button
+                    className="icon-btn icon-btn--danger quiz-option-remove"
+                    onClick={() => removeOption(qi, oi)}
+                    title="Remove option"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {!locked && (
+            <button className="quiz-add-option-btn" onClick={() => addOption(qi)}>
+              <Plus size={13} /> Add Option
+            </button>
+          )}
+        </div>
+      ))}
+
+      {!locked && (
+        <button className="quiz-add-question-btn" onClick={addQuestion}>
+          <Plus size={14} /> Add Question
+        </button>
+      )}
+    </div>
+  )
+}
+
+QuizBuilder.propTypes = {
+  quizData: PropTypes.arrayOf(PropTypes.shape({
+    question: PropTypes.string,
+    options: PropTypes.arrayOf(PropTypes.shape({
+      text: PropTypes.string,
+      is_correct: PropTypes.bool,
+    })),
+  })).isRequired,
+  locked: PropTypes.bool.isRequired,
+  onChange: PropTypes.func.isRequired,
+}
+
+// ── Lesson shape ──────────────────────────────────────────────────────────────
+
 const lessonShape = PropTypes.shape({
   id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
   lesson_type: PropTypes.string.isRequired,
   content: PropTypes.string,
+  quiz_data: PropTypes.array,
   duration_minutes: PropTypes.number,
   is_required: PropTypes.bool,
   isDirty: PropTypes.bool,
   saving: PropTypes.bool,
 })
 
-function LessonEditor({ lesson, locked, onChange, onDelete, onSave }) {
+function FieldError({ msg }) {
+  if (!msg) return null
+  return <p className="lesson-field-error">{msg}</p>
+}
+
+FieldError.propTypes = { msg: PropTypes.string }
+
+function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
   const cfg = lessonTypeConfig(lesson.lesson_type)
+  const err = errors ?? {}
 
   return (
     <div className="lesson-editor-panel">
@@ -76,12 +230,13 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave }) {
         <div className="lesson-field">
           <label className="lesson-field-label">Lesson Title</label>
           <input
-            className="lesson-field-input"
+            className={`lesson-field-input${err.title ? ' lesson-field-input--error' : ''}`}
             value={lesson.title}
             disabled={locked}
             onChange={(e) => onChange('title', e.target.value)}
             placeholder="New Text"
           />
+          <FieldError msg={err.title} />
         </div>
 
         <div className="lesson-field">
@@ -109,6 +264,50 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave }) {
             />
             <p className="lesson-field-hint">Supports markdown formatting</p>
           </div>
+        )}
+
+        {['video', 'image', 'pdf'].includes(lesson.lesson_type) && (
+          <div className="lesson-field">
+            <label className="lesson-field-label">
+              {lesson.lesson_type === 'video' ? 'Video URL' : lesson.lesson_type === 'image' ? 'Image URL' : 'PDF URL'}
+            </label>
+            <input
+              type="url"
+              className={`lesson-field-input${err.content ? ' lesson-field-input--error' : ''}`}
+              value={lesson.content}
+              disabled={locked}
+              onChange={(e) => onChange('content', e.target.value)}
+              placeholder="https://…"
+            />
+            <FieldError msg={err.content} />
+          </div>
+        )}
+
+        {lesson.lesson_type === 'assignment' && (
+          <div className="lesson-field">
+            <label className="lesson-field-label">Assignment Instructions</label>
+            <textarea
+              className={`lesson-field-textarea lesson-field-textarea--content${err.content ? ' lesson-field-textarea--error' : ''}`}
+              value={lesson.content}
+              disabled={locked}
+              rows={6}
+              onChange={(e) => onChange('content', e.target.value)}
+              placeholder="Write the assignment instructions here…"
+            />
+            <FieldError msg={err.content} />
+            <p className="lesson-field-hint">Supports markdown formatting</p>
+          </div>
+        )}
+
+        {lesson.lesson_type === 'quiz' && (
+          <>
+            <FieldError msg={err.quiz_data} />
+            <QuizBuilder
+              quizData={lesson.quiz_data ?? []}
+              locked={locked}
+              onChange={(next) => onChange('quiz_data', next)}
+            />
+          </>
         )}
 
         <div className="lesson-field">
@@ -165,6 +364,27 @@ LessonEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  errors: PropTypes.object,
+}
+
+// ── Validation ────────────────────────────────────────────────────────────────
+
+function validateLesson(lesson) {
+  const errors = {}
+  if (!lesson.title.trim()) {
+    errors.title = 'Lesson title is required.'
+  }
+  if (['video', 'image', 'pdf'].includes(lesson.lesson_type) && !lesson.content.trim()) {
+    const label = lesson.lesson_type === 'video' ? 'Video' : lesson.lesson_type === 'image' ? 'Image' : 'PDF'
+    errors.content = `${label} URL is required.`
+  }
+  if (lesson.lesson_type === 'assignment' && !lesson.content.trim()) {
+    errors.content = 'Assignment instructions are required.'
+  }
+  if (lesson.lesson_type === 'quiz' && (!lesson.quiz_data || lesson.quiz_data.length === 0)) {
+    errors.quiz_data = 'At least one question is required.'
+  }
+  return Object.keys(errors).length ? errors : null
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
@@ -182,6 +402,11 @@ export default function ModuleEditorPage() {
   const [moduleSaving, setModuleSaving] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [error, setError] = useState('')
+  const [lessonErrors, setLessonErrors] = useState({})
+
+  // drag-and-drop state
+  const [dragId, setDragId] = useState(null)
+  const [dragOverId, setDragOverId] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -233,6 +458,7 @@ export default function ModuleEditorPage() {
       description: '',
       lesson_type: lessonType,
       content: '',
+      quiz_data: lessonType === 'quiz' ? [emptyQuestion()] : [],
       duration_minutes: 0,
       order: lessons.length + 1,
       is_required: true,
@@ -250,6 +476,7 @@ export default function ModuleEditorPage() {
       description: lesson.description,
       lesson_type: lesson.lesson_type,
       content: lesson.content,
+      quiz_data: lesson.quiz_data ?? [],
       duration_minutes: lesson.duration_minutes,
       is_required: lesson.is_required,
     }
@@ -266,6 +493,12 @@ export default function ModuleEditorPage() {
   }, [courseId, moduleId])
 
   const saveLesson = async (lesson) => {
+    const errors = validateLesson(lesson)
+    if (errors) {
+      setLessonErrors((prev) => ({ ...prev, [lesson.id]: errors }))
+      return
+    }
+    setLessonErrors((prev) => { const next = { ...prev }; delete next[lesson.id]; return next })
     setLessons((ls) => ls.map((l) => (l.id === lesson.id ? { ...l, saving: true } : l)))
     try {
       const { tempId, saved } = await saveLessonRequest(lesson)
@@ -273,6 +506,7 @@ export default function ModuleEditorPage() {
         ls.map((l) => (l.id === tempId ? { ...saved, isDirty: false, isNew: false, saving: false } : l))
       )
       setSelectedLessonId(saved.id)
+      setLessonErrors((prev) => { const next = { ...prev }; delete next[tempId]; return next })
     } catch {
       setLessons((ls) => ls.map((l) => (l.id === lesson.id ? { ...l, saving: false } : l)))
     }
@@ -283,6 +517,14 @@ export default function ModuleEditorPage() {
     setLessons((ls) =>
       ls.map((l) => (l.id === selectedLessonId ? { ...l, [field]: value, isDirty: true } : l))
     )
+    // clear validation error for this field on change
+    setLessonErrors((prev) => {
+      const errs = prev[selectedLessonId]
+      if (!errs || !errs[field]) return prev
+      const next = { ...errs }
+      delete next[field]
+      return { ...prev, [selectedLessonId]: next }
+    })
   }
 
   const deleteLesson = async (lesson) => {
@@ -298,6 +540,49 @@ export default function ModuleEditorPage() {
       setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
       setSelectedLessonId(null)
     } catch { /* user can retry */ }
+  }
+
+  // ── Drag-and-drop (lessons) ───────────────────────────────────────────────
+
+  const handleDragStart = (e, id) => {
+    setDragId(id)
+    e.dataTransfer.effectAllowed = 'move'
+  }
+
+  const handleDragOver = (e, id) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (id !== dragOverId) setDragOverId(id)
+  }
+
+  const handleDrop = async (e, targetId) => {
+    e.preventDefault()
+    setDragOverId(null)
+    if (!dragId || dragId === targetId) { setDragId(null); return }
+
+    const fromIdx = lessons.findIndex((l) => l.id === dragId)
+    const toIdx = lessons.findIndex((l) => l.id === targetId)
+    const reordered = [...lessons]
+    reordered.splice(fromIdx, 1)
+    reordered.splice(toIdx, 0, lessons[fromIdx])
+    setLessons(reordered)
+    setDragId(null)
+
+    // only persist if all lessons are saved (no unsaved temp IDs)
+    const hasNew = reordered.some((l) => l.isNew)
+    if (!hasNew) {
+      try {
+        await client.patch(
+          `/authoring/courses/${courseId}/modules/${moduleId}/lessons/reorder/`,
+          { order: reordered.map((l) => l.id) },
+        )
+      } catch { /* silent — visual order already updated */ }
+    }
+  }
+
+  const handleDragEnd = () => {
+    setDragId(null)
+    setDragOverId(null)
   }
 
   if (error) return <p className="page-error">{error}</p>
@@ -386,11 +671,22 @@ export default function ModuleEditorPage() {
             <ul className="me-lesson-list">
               {lessons.map((lesson, idx) => {
                 const cfg = lessonTypeConfig(lesson.lesson_type)
+                const isDragOver = dragOverId === lesson.id && dragId !== lesson.id
                 return (
                   <li
                     key={lesson.id}
-                    className={`me-lesson-item${selectedLessonId === lesson.id ? ' me-lesson-item--active' : ''}`}
+                    className={[
+                      'me-lesson-item',
+                      selectedLessonId === lesson.id ? 'me-lesson-item--active' : '',
+                      dragId === lesson.id ? 'me-lesson-item--dragging' : '',
+                      isDragOver ? 'me-lesson-item--drag-over' : '',
+                    ].filter(Boolean).join(' ')}
                     onClick={() => setSelectedLessonId(lesson.id)}
+                    draggable={!locked}
+                    onDragStart={(e) => handleDragStart(e, lesson.id)}
+                    onDragOver={(e) => handleDragOver(e, lesson.id)}
+                    onDrop={(e) => handleDrop(e, lesson.id)}
+                    onDragEnd={handleDragEnd}
                   >
                     <GripVertical size={14} className="me-lesson-drag" />
                     <LessonTypeIcon type={lesson.lesson_type} size={15} />
@@ -416,6 +712,7 @@ export default function ModuleEditorPage() {
               onChange={updateLessonField}
               onDelete={() => deleteLesson(selectedLesson)}
               onSave={() => saveLesson(selectedLesson)}
+              errors={lessonErrors[selectedLesson.id]}
             />
           ) : (
             <div className="me-empty-state">

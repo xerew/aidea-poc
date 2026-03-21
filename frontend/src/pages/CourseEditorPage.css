@@ -243,3 +243,31 @@
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+
+/* ── Module drag-and-drop ─────────────────────────────────────────────────── */
+
+.module-row[draggable="true"] {
+  cursor: grab;
+}
+
+.module-drag-handle {
+  color: var(--color-text-muted);
+  cursor: grab;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.module-row--dragging {
+  opacity: 0.4;
+}
+
+.module-row--drag-over {
+  border-top: 2px solid var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+}
+
+.module-number {
+  display: flex;
+  align-items: center;
+}
