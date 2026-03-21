@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 import CoursesPage from './pages/CoursesPage'
 import CourseDetailPage from './pages/CourseDetailPage'
+import LessonPage, { LearnRedirect } from './pages/LessonPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import AuthoringPage from './pages/AuthoringPage'
 import CourseEditorPage from './pages/CourseEditorPage'
@@ -32,6 +33,7 @@ export default function App() {
             <Route path="/courses"              element={<CoursesPage />} />
             <Route path="/courses/:id"          element={<CourseDetailPage />} />
             <Route path="/learning"             element={<PlaceholderPage title="My Learning" />} />
+
             <Route path="/analytics"            element={<PlaceholderPage title="Content Analytics" />} />
             <Route path="/profile"              element={<PlaceholderPage title="Profile" />} />
             <Route path="/authoring"                  element={<ContentCreatorRoute element={<AuthoringPage />} />} />
@@ -39,6 +41,9 @@ export default function App() {
             <Route path="/authoring/courses/:id"     element={<ContentCreatorRoute element={<CourseEditorPage />} />} />
             <Route path="/authoring/courses/:id/modules/:moduleId" element={<ContentCreatorRoute element={<ModuleEditorPage />} />} />
           </Route>
+          {/* Lesson player — full-page, own layout (auth handled inside component) */}
+          <Route path="/courses/:id/learn"           element={<LearnRedirect />} />
+          <Route path="/courses/:courseId/learn/:lessonId" element={<LessonPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

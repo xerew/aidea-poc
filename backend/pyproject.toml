@@ -33,6 +33,7 @@ source = ["hub"]
 omit = [
     "hub/migrations/*",
     "hub/tests.py",
+    "hub/management/commands/seed.py",
     "manage.py",
 ]
 

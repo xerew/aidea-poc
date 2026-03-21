@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .content import Course, Module
+from .content import Course, Lesson, Module
 
 
 class Enrollment(models.Model):
@@ -20,3 +20,15 @@ class Enrollment(models.Model):
 
     def __str__(self):
         return f'{self.user.username} → {self.course.title} ({self.progress_pct}%)'
+
+
+class LessonProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lesson_progress')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='progress_records')
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'lesson')
+
+    def __str__(self):
+        return f'{self.user.username} → {self.lesson.title}'

@@ -53,3 +53,23 @@ class ModuleWithLessonsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'lessons']
+
+
+class LessonLearnSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for lesson sidebar — includes per-user completion flag."""
+    is_completed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lesson
+        fields = ['id', 'title', 'lesson_type', 'duration_minutes', 'order', 'is_completed']
+
+    def get_is_completed(self, obj):
+        return obj.id in self.context.get('completed_lesson_ids', set())
+
+
+class ModuleLearnSerializer(serializers.ModelSerializer):
+    lessons = LessonLearnSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Module
+        fields = ['id', 'title', 'order', 'lessons']

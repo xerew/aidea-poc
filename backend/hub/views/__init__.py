@@ -16,7 +16,15 @@ from .authoring_module import (
     AuthoringModuleReorderView,
     AuthoringModuleView,
 )
-from .learner import CourseDetailView, CourseEnrollView, CoursesView, HomeView
+from .learner import (
+    CourseDetailView,
+    CourseEnrollView,
+    CourseLearnView,
+    CoursesView,
+    HomeView,
+    LessonCompleteView,
+    LessonDetailView,
+)
 from .permissions import IsContentCreator
 
 __all__ = [
@@ -33,8 +41,11 @@ __all__ = [
     'AuthoringPillarsView',
     'CourseDetailView',
     'CourseEnrollView',
+    'CourseLearnView',
     'CoursesView',
     'HomeView',
+    'LessonCompleteView',
+    'LessonDetailView',
     'IsContentCreator',
     'LoginView',
     'LogoutView',

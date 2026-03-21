@@ -70,7 +70,10 @@ export default function CourseDetailPage() {
           </button>
         )}
         {course.is_enrolled && (
-          <button className="enroll-btn enroll-btn--continue" onClick={() => {}}>
+          <button
+            className="enroll-btn enroll-btn--continue"
+            onClick={() => navigate(`/courses/${id}/learn`)}
+          >
             Continue
           </button>
         )}

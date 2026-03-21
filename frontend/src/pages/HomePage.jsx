@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import client from '../api/client'
 import './HomePage.css'
 
 ContinueLearningBanner.propTypes = {
   data: PropTypes.shape({
+    course_id: PropTypes.number,
     course_title: PropTypes.string,
     current_module_title: PropTypes.string,
     progress_pct: PropTypes.number,
@@ -12,6 +14,7 @@ ContinueLearningBanner.propTypes = {
 }
 
 function ContinueLearningBanner({ data }) {
+  const navigate = useNavigate()
   if (!data) return null
   return (
     <div className="continue-banner">
@@ -26,7 +29,12 @@ function ContinueLearningBanner({ data }) {
         </div>
         <span className="progress-pct">{data.progress_pct}% complete</span>
       </div>
-      <button className="resume-btn">Resume</button>
+      <button
+        className="resume-btn"
+        onClick={() => navigate(`/courses/${data.course_id}/learn`)}
+      >
+        Resume
+      </button>
     </div>
   )
 }

@@ -80,12 +80,13 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
 
 class ContinueLearningSerializer(serializers.ModelSerializer):
+    course_id = serializers.IntegerField(source='course.id')
     course_title = serializers.CharField(source='course.title')
     current_module_title = serializers.CharField(source='current_module.title', default=None)
 
     class Meta:
         model = Enrollment
-        fields = ['course_title', 'current_module_title', 'progress_pct']
+        fields = ['course_id', 'course_title', 'current_module_title', 'progress_pct']
 
 
 class PillarSummarySerializer(serializers.ModelSerializer):
