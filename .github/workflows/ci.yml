@@ -37,7 +37,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          uv run coverage run manage.py test hub --verbosity=2
+          uv run coverage run manage.py test --verbosity=2
           uv run coverage report
           uv run coverage xml -o coverage.xml
 
