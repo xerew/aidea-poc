@@ -29,11 +29,12 @@ ignore = ["E501"]
 "hub/tests.py" = ["E501"]
 
 [tool.coverage.run]
-source = ["hub"]
+source = ["hub", "analytics"]
 omit = [
     "hub/migrations/*",
     "hub/tests.py",
     "hub/management/commands/seed.py",
+    "hub/management/commands/seed_data/*",
     "manage.py",
 ]
 
