@@ -22,6 +22,7 @@ from .views import (
     LessonDetailView,
     LoginView,
     LogoutView,
+    MyLearningView,
 )
 
 urlpatterns = [
@@ -35,6 +36,7 @@ urlpatterns = [
     path('courses/<int:pk>/lessons/<int:lesson_pk>/', LessonDetailView.as_view(), name='lesson-detail'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/complete/', LessonCompleteView.as_view(), name='lesson-complete'),
     path('home/', HomeView.as_view(), name='home'),
+    path('my-learning/', MyLearningView.as_view(), name='my-learning'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/courses/', AuthoringCoursesView.as_view(), name='authoring-courses'),

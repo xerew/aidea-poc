@@ -1,43 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import client from '../api/client'
+import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import './HomePage.css'
-
-ContinueLearningBanner.propTypes = {
-  data: PropTypes.shape({
-    course_id: PropTypes.number,
-    course_title: PropTypes.string,
-    current_module_title: PropTypes.string,
-    progress_pct: PropTypes.number,
-  }),
-}
-
-function ContinueLearningBanner({ data }) {
-  const navigate = useNavigate()
-  if (!data) return null
-  return (
-    <div className="continue-banner">
-      <p className="continue-label">Continue Learning</p>
-      <h2>{data.course_title}</h2>
-      {data.current_module_title && (
-        <p className="current-module">Current: {data.current_module_title}</p>
-      )}
-      <div className="progress-row">
-        <div className="progress-bar">
-          <div className="progress-fill" style={{ width: `${data.progress_pct}%` }} />
-        </div>
-        <span className="progress-pct">{data.progress_pct}% complete</span>
-      </div>
-      <button
-        className="resume-btn"
-        onClick={() => navigate(`/courses/${data.course_id}/learn`)}
-      >
-        Resume
-      </button>
-    </div>
-  )
-}
 
 PillarCard.propTypes = {
   pillar: PropTypes.shape({

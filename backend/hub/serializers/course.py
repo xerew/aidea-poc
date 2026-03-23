@@ -108,6 +108,23 @@ class PillarSummarySerializer(serializers.ModelSerializer):
         return round(enrollments.aggregate(avg=Avg('progress_pct'))['avg'] or 0)
 
 
+class MyLearningEnrollmentSerializer(serializers.ModelSerializer):
+    course_id = serializers.IntegerField(source='course.id')
+    course_title = serializers.CharField(source='course.title')
+    pillar_name = serializers.CharField(source='course.pillar.name')
+    pillar_slug = serializers.CharField(source='course.pillar.slug')
+    module_count = serializers.IntegerField(source='course.modules.count')
+    current_module_title = serializers.CharField(source='current_module.title', default=None)
+
+    class Meta:
+        model = Enrollment
+        fields = [
+            'course_id', 'course_title', 'pillar_name', 'pillar_slug',
+            'progress_pct', 'module_count', 'last_accessed_at',
+            'current_module_title', 'enrolled_at',
+        ]
+
+
 class CourseAuthoringSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
     pillar_id = serializers.PrimaryKeyRelatedField(

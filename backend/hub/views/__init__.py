@@ -24,6 +24,7 @@ from .learner import (
     HomeView,
     LessonCompleteView,
     LessonDetailView,
+    MyLearningView,
 )
 from .permissions import IsContentCreator
 
@@ -44,6 +45,7 @@ __all__ = [
     'CourseLearnView',
     'CoursesView',
     'HomeView',
+    'MyLearningView',
     'LessonCompleteView',
     'LessonDetailView',
     'IsContentCreator',

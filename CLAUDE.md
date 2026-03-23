@@ -46,6 +46,8 @@ npm run build    # Production build (requires VITE_API_URL env var)
 
 **Environment:** Copy `frontend/.env.example` to `frontend/.env.local` and set `VITE_API_URL=http://localhost:8000/api`.
 
+**Icons:** Use `lucide-react` for all icons (`import { IconName } from 'lucide-react'`).
+
 ## Architecture
 
 ### Backend (`backend/`)
@@ -69,6 +71,7 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/courses/<id>/` — detail with modules
 - `POST /api/courses/<id>/enroll/` — enroll authenticated user
 - `GET /api/home/` — dashboard: in-progress enrollment + pillar summaries
+- `GET /api/my-learning/` — user's enrollments split into `continue_learning`, `in_progress`, `completed`
 
 **Auth:** JWT via `djangorestframework-simplejwt`. 60-min access tokens, 7-day refresh with rotation. Token blacklisting enabled for logout.
 
@@ -85,6 +88,7 @@ React 19 SPA with Vite, using react-router-dom v7 and Axios.
 **Routing** (`App.jsx`): Public route `/login`; all other routes are wrapped in `Layout` (Header + Sidebar + Footer) and require authentication.
 
 **Pages:**
+- `MyLearningPage` — continue-learning banner + in-progress and completed enrollment cards
 - `HomePage` — continue-learning banner (latest enrollment) + pillar cards with progress
 - `CoursesPage` — searchable grid with pillar/level filters
 - `CourseDetailPage` — course info, module list, enroll button, progress

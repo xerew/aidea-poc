@@ -12,6 +12,7 @@ from .course import (
     CourseDetailSerializer,
     CourseEditHistorySerializer,
     CourseListSerializer,
+    MyLearningEnrollmentSerializer,
     PillarSerializer,
     PillarSummarySerializer,
 )
@@ -23,6 +24,7 @@ __all__ = [
     'CourseDetailSerializer',
     'CourseEditHistorySerializer',
     'CourseListSerializer',
+    'MyLearningEnrollmentSerializer',
     'LessonLearnSerializer',
     'LessonSerializer',
     'ModuleLearnSerializer',

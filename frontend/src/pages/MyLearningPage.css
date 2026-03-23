@@ -1,0 +1,213 @@
+.my-learning-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ml-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Sections */
+.ml-section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 1rem;
+}
+
+/* In-Progress Cards */
+.ml-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ml-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.ml-card--progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ml-card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ml-card-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ml-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ml-pillar-badge {
+  background: rgba(16,185,129,0.12);
+  color: #059669;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.ml-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.ml-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.ml-meta-sep {
+  color: var(--color-border);
+}
+
+.ml-progress-track {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ml-progress-bar--card {
+  flex: 1;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.ml-progress-bar--card .ml-progress-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.ml-card-pct {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.ml-action-btn {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ml-action-btn:hover {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb, 30,58,138),0.04);
+}
+
+/* Completed Cards */
+.ml-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.ml-card--completed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ml-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ml-completed-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #059669;
+  background: rgba(16,185,129,0.1);
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+.ml-card-title--completed {
+  font-size: 1.05rem;
+  margin: 0.25rem 0 0;
+}
+
+.ml-completed-date {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.ml-review-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: border-color 0.15s, color 0.15s;
+  width: 100%;
+}
+
+.ml-review-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Empty State */
+.ml-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--color-text-muted);
+}
+
+.ml-empty a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.ml-empty a:hover {
+  text-decoration: underline;
+}

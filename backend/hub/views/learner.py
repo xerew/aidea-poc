@@ -9,6 +9,7 @@ from hub.serializers import (
     CourseListSerializer,
     LessonSerializer,
     ModuleLearnSerializer,
+    MyLearningEnrollmentSerializer,
     PillarSummarySerializer,
 )
 
@@ -183,6 +184,31 @@ class LessonCompleteView(APIView):
             'lesson_id': lesson.id,
             'is_completed': True,
             'progress_pct': progress_pct,
+        })
+
+
+class MyLearningView(APIView):
+    """GET /api/my-learning/ — User's enrollments split into in-progress and completed."""
+
+    def get(self, request):
+        enrollments = list(
+            Enrollment.objects
+            .filter(user=request.user)
+            .select_related('course__pillar', 'current_module')
+            .prefetch_related('course__modules')
+        )
+
+        in_progress = [e for e in enrollments if e.progress_pct < 100]
+        completed = [e for e in enrollments if e.progress_pct == 100]
+        continue_learning = in_progress[0] if in_progress else None
+
+        return Response({
+            'continue_learning': (
+                MyLearningEnrollmentSerializer(continue_learning).data
+                if continue_learning else None
+            ),
+            'in_progress': MyLearningEnrollmentSerializer(in_progress, many=True).data,
+            'completed': MyLearningEnrollmentSerializer(completed, many=True).data,
         })
 
 

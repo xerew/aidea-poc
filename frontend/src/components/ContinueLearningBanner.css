@@ -1,0 +1,78 @@
+.cl-banner {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.5rem;
+  box-shadow: var(--shadow);
+}
+
+.cl-label {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 500;
+}
+
+.cl-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: #fff;
+}
+
+.cl-next-module {
+  color: rgba(255,255,255,0.8);
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+}
+
+.cl-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.cl-progress-label {
+  color: rgba(255,255,255,0.75);
+}
+
+.cl-progress-pct {
+  color: #fff;
+  font-weight: 600;
+}
+
+.cl-progress-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.cl-progress-fill {
+  height: 100%;
+  background: var(--color-cyan);
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.cl-resume-btn {
+  background: #fff;
+  color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cl-resume-btn:hover {
+  opacity: 0.9;
+}
