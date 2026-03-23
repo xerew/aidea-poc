@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -28,6 +29,9 @@ class Course(models.Model):
     learning_outcomes  = models.JSONField(default=list, blank=True)
     is_published       = models.BooleanField(default=False)
     created_at         = models.DateTimeField(auto_now_add=True)
+    created_by         = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_courses',
+    )
 
     class Meta:
         ordering = ['pillar', 'title']

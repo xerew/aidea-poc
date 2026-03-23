@@ -52,7 +52,7 @@ npm run build    # Production build (requires VITE_API_URL env var)
 
 ### Backend (`backend/`)
 
-Single Django app `hub` under the `aidea` project. All API routes are under `/api/`.
+Two Django apps under the `aidea` project: `hub` (courses, enrollments, authoring) and `analytics` (content creator analytics — reads hub models, no own models). All API routes are under `/api/`.
 
 **Data model hierarchy:**
 ```
@@ -72,6 +72,7 @@ User (+ UserProfile) → Enrollment → Course
 - `POST /api/courses/<id>/enroll/` — enroll authenticated user
 - `GET /api/home/` — dashboard: in-progress enrollment + pillar summaries
 - `GET /api/my-learning/` — user's enrollments split into `continue_learning`, `in_progress`, `completed`
+- `GET /api/analytics/overview/` — content creator analytics: summary stats + per-course breakdown (content_creator only)
 
 **Auth:** JWT via `djangorestframework-simplejwt`. 60-min access tokens, 7-day refresh with rotation. Token blacklisting enabled for logout.
 
@@ -89,6 +90,7 @@ React 19 SPA with Vite, using react-router-dom v7 and Axios.
 
 **Pages:**
 - `MyLearningPage` — continue-learning banner + in-progress and completed enrollment cards
+- `AnalyticsPage` — content creator analytics dashboard (shows restricted message for other roles)
 - `HomePage` — continue-learning banner (latest enrollment) + pillar cards with progress
 - `CoursesPage` — searchable grid with pillar/level filters
 - `CourseDetailPage` — course info, module list, enroll button, progress

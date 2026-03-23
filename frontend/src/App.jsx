@@ -8,6 +8,7 @@ import CoursesPage from './pages/CoursesPage'
 import CourseDetailPage from './pages/CourseDetailPage'
 import LessonPage, { LearnRedirect } from './pages/LessonPage'
 import MyLearningPage from './pages/MyLearningPage'
+import AnalyticsPage from './pages/AnalyticsPage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import AuthoringPage from './pages/AuthoringPage'
 import CourseEditorPage from './pages/CourseEditorPage'
@@ -35,7 +36,7 @@ export default function App() {
             <Route path="/courses/:id"          element={<CourseDetailPage />} />
             <Route path="/learning"             element={<MyLearningPage />} />
 
-            <Route path="/analytics"            element={<PlaceholderPage title="Content Analytics" />} />
+            <Route path="/analytics"            element={<AnalyticsPage />} />
             <Route path="/profile"              element={<PlaceholderPage title="Profile" />} />
             <Route path="/authoring"                  element={<ContentCreatorRoute element={<AuthoringPage />} />} />
             <Route path="/authoring/courses/new"     element={<ContentCreatorRoute element={<CourseCreatePage />} />} />

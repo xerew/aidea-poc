@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # Local
     'hub',
+    'analytics',
 ]
 
 MIDDLEWARE = [

@@ -30,7 +30,7 @@ class AuthoringCoursesView(APIView):
     def post(self, request):
         serializer = CourseAuthoringSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        course = serializer.save()
+        course = serializer.save(created_by=request.user)
         CourseEditHistory.objects.create(
             course=course,
             editor=request.user,
