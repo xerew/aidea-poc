@@ -1,0 +1,95 @@
+# docker-compose.prod.yml
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: aidea
+      POSTGRES_USER: aidea
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      DATABASE_URL: postgresql://aidea:${POSTGRES_PASSWORD}@db:5432/aidea
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      DEBUG: "False"
+      ALLOWED_HOSTS: ${DOMAIN:-localhost}
+    volumes:
+      - static_files:/app/staticfiles
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  celery:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      DATABASE_URL: postgresql://aidea:${POSTGRES_PASSWORD}@db:5432/aidea
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: "False"
+    command: uv run celery -A aidea worker -l warning
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  celery-beat:
+    build:
+      context: ./backend
+      target: prod
+    environment:
+      DATABASE_URL: postgresql://aidea:${POSTGRES_PASSWORD}@db:5432/aidea
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: "False"
+    command: uv run celery -A aidea beat -l warning --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:?VITE_API_URL is required}
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - static_files:/srv/static
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  static_files:
+  caddy_data:
+  caddy_config:
