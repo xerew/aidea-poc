@@ -15,6 +15,7 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'django_celery_beat',
     'corsheaders',
     # Local
     'hub',
@@ -89,11 +91,37 @@ WSGI_APPLICATION = 'aidea.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database — PostgreSQL when DATABASE_URL is set, SQLite fallback for bare-metal dev
+_DB_URL = os.getenv('DATABASE_URL')
+if _DB_URL:
+    DATABASES = {'default': dj_database_url.parse(_DB_URL, conn_max_age=600)}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
+
+
+# Static files root (used by collectstatic in production)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Celery
+REDIS_URL = os.getenv('REDIS_URL', '')
+CELERY_BROKER_URL = REDIS_URL or 'memory://'
+CELERY_RESULT_BACKEND = REDIS_URL or 'cache+memory://'
+if 'test' in sys.argv or not REDIS_URL:
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True
+
+# Celery Beat — nightly recommendation recompute
+from celery.schedules import crontab  # noqa: E402
+CELERY_BEAT_SCHEDULE = {
+    'recompute-all-recommendations-nightly': {
+        'task': 'hub.tasks.recompute_all_recommendations',
+        'schedule': crontab(hour=2, minute=0),
+    },
 }
 
 
