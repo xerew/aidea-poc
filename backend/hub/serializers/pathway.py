@@ -52,7 +52,7 @@ class UserLearningPathSerializer(serializers.ModelSerializer):
         return 'advanced'
 
     def get_courses(self, obj):
-        courses = obj.path.courses.order_by('path_courses__order')
+        courses = obj.path.courses.order_by('learningpathcourse__order')
         return PathwayCourseSerializer(
             courses, many=True, context={**self.context, 'path': obj.path},
         ).data

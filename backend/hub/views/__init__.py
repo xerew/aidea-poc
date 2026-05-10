@@ -26,7 +26,10 @@ from .learner import (
     LessonDetailView,
     MyLearningView,
 )
-from .permissions import IsContentCreator
+from .onboarding import OnboardingView
+from .pathway import PathwayView
+from .permissions import IsContentCreator, IsTeacher
+from .recommendations import RecommendationsView
 
 __all__ = [
     'AuthoringCourseDetailView',
@@ -49,6 +52,10 @@ __all__ = [
     'LessonCompleteView',
     'LessonDetailView',
     'IsContentCreator',
+    'IsTeacher',
     'LoginView',
     'LogoutView',
+    'OnboardingView',
+    'PathwayView',
+    'RecommendationsView',
 ]
