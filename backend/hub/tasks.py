@@ -3,6 +3,11 @@ from celery import shared_task
 
 @shared_task
 def compute_course_embeddings(course_id: int) -> None:
+    from django.db import connection
+
+    if connection.vendor != 'postgresql':
+        return
+
     from sentence_transformers import SentenceTransformer
 
     from hub.models import Course
@@ -20,6 +25,11 @@ def compute_course_embeddings(course_id: int) -> None:
 
 @shared_task
 def compute_user_recommendations(user_id: int) -> None:
+    from django.db import connection
+
+    if connection.vendor != 'postgresql':
+        return
+
     from pgvector.django import CosineDistance
     from sentence_transformers import SentenceTransformer
     from django.contrib.auth.models import User
