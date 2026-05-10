@@ -1,0 +1,92 @@
+.onboarding-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background, #f8fafc);
+  padding: 2rem;
+}
+
+.onboarding-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 640px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.onboarding-header {
+  margin-bottom: 2rem;
+}
+
+.onboarding-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.onboarding-subtitle {
+  color: #64748b;
+  margin: 0 0 1.25rem;
+}
+
+.onboarding-progress {
+  height: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-step-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.onboarding-question {
+  margin-bottom: 2rem;
+}
+
+.onboarding-question-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.onboarding-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.onboarding-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.onboarding-option:hover {
+  border-color: #94a3b8;
+}
+
+.onboarding-option-label {
+  cursor: pointer;
+  font-size: 0.9375rem;
+}
+
+.onboarding-error {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.onboarding-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
