@@ -79,7 +79,7 @@ def compute_user_recommendations(user_id: int) -> None:
 
     CourseRecommendation.objects.filter(user=user).delete()
 
-    subject_display = profile.subject_area.replace('_', ' ') if profile.subject_area else 'general'
+    subject_display = profile.get_subject_area_display() if profile.subject_area else 'general'
     for emb in filtered:
         CourseRecommendation.objects.create(
             user=user,
