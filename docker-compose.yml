@@ -36,6 +36,7 @@ services:
       DEBUG: "True"
     volumes:
       - ./backend:/app
+      - backend_venv:/app/.venv
     ports:
       - "8000:8000"
     depends_on:
@@ -58,11 +59,14 @@ services:
       DEBUG: "True"
     volumes:
       - ./backend:/app
+      - backend_venv:/app/.venv
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+      backend:
+        condition: service_started
     command: uv run celery -A aidea worker -l info
 
   celery-beat:
@@ -76,11 +80,14 @@ services:
       DEBUG: "True"
     volumes:
       - ./backend:/app
+      - backend_venv:/app/.venv
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+      backend:
+        condition: service_started
     command: uv run celery -A aidea beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
 
   frontend:
@@ -98,3 +105,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  backend_venv:
