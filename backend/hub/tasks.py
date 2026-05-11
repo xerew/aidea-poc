@@ -30,9 +30,9 @@ def compute_user_recommendations(user_id: int) -> None:
     if connection.vendor != 'postgresql':
         return
 
+    from django.contrib.auth.models import User
     from pgvector.django import CosineDistance
     from sentence_transformers import SentenceTransformer
-    from django.contrib.auth.models import User
 
     from hub.models.enrollment import Enrollment
     from hub.models.recommendations import CourseEmbedding, CourseRecommendation

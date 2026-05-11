@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from hub.models.content import Course
 from hub.models.enrollment import Enrollment
-from hub.models.pathway import LearningPath, LearningPathCourse, UserLearningPath
+from hub.models.pathway import LearningPathCourse, UserLearningPath
 from hub.models.recommendations import CourseRecommendation
 
 
