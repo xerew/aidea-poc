@@ -8,7 +8,7 @@ from hub.models import UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['user_type', 'avatar_initials']
+        fields = ['user_type', 'avatar_initials', 'onboarding_completed']
 
 
 class UserSerializer(serializers.ModelSerializer):

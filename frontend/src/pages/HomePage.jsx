@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import client from '../api/client'
 import ContinueLearningBanner from '../components/ContinueLearningBanner'
+import { useAuth } from '../context/AuthContext'
 import './HomePage.css'
 
 PillarCard.propTypes = {
@@ -35,14 +36,35 @@ function PillarCard({ pillar }) {
 }
 
 export default function HomePage() {
+  const { user } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [recommendations, setRecommendations] = useState([])
+  const [recsLoading, setRecsLoading] = useState(false)
 
   useEffect(() => {
     client.get('/home/')
       .then((res) => setData(res.data))
       .catch(() => setError('Failed to load dashboard.'))
   }, [])
+
+  useEffect(() => {
+    if (!user?.profile?.onboarding_completed) return
+    let cancelled = false
+    const fetchRecs = async () => {
+      setRecsLoading(true)
+      try {
+        const res = await client.get('/recommendations/')
+        if (!cancelled) setRecommendations(res.data)
+      } catch {
+        // silently ignore recommendation errors
+      } finally {
+        if (!cancelled) setRecsLoading(false)
+      }
+    }
+    fetchRecs()
+    return () => { cancelled = true }
+  }, [user])
 
   if (error) return <p className="page-error">{error}</p>
   if (!data) return <p className="page-loading">Loading…</p>
@@ -58,6 +80,32 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {user?.profile?.onboarding_completed && (
+        <section className="recommendations-section">
+          <h2 className="recommendations-title">Recommended for you</h2>
+          {recsLoading ? (
+            <div className="recommendations-grid">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="rec-card rec-card-skeleton" />
+              ))}
+            </div>
+          ) : recommendations.length > 0 ? (
+            <div className="recommendations-grid">
+              {recommendations.map(rec => (
+                <div key={rec.course_id} className="rec-card">
+                  <span className="rec-pillar">{rec.pillar_name}</span>
+                  <h3 className="rec-title">{rec.title}</h3>
+                  <p className="rec-reason">{rec.reason}</p>
+                  <a href={`/courses/${rec.course_id}`} className="rec-link">
+                    Start course →
+                  </a>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      )}
     </div>
   )
 }

@@ -16,6 +16,8 @@ from .course import (
     PillarSerializer,
     PillarSummarySerializer,
 )
+from .onboarding import OnboardingSubmitSerializer
+from .pathway import RecommendationSerializer, UserLearningPathSerializer
 
 __all__ = [
     'AideaTokenObtainPairSerializer',
@@ -30,8 +32,11 @@ __all__ = [
     'ModuleLearnSerializer',
     'ModuleSerializer',
     'ModuleWithLessonsSerializer',
+    'OnboardingSubmitSerializer',
     'PillarSerializer',
     'PillarSummarySerializer',
+    'RecommendationSerializer',
+    'UserLearningPathSerializer',
     'UserProfileSerializer',
     'UserSerializer',
 ]

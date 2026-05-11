@@ -71,3 +71,19 @@ class AuthTestCase(APITestCase):
     def test_logout_requires_authentication(self):
         response = self.client.post(reverse('auth-logout'), {'refresh': 'sometoken'})
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class IsTeacherPermissionTestCase(APITestCase):
+    def setUp(self):
+        self.teacher = User.objects.create_user(username='t1', password='pass')
+        UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
+        self.creator = User.objects.create_user(username='c1', password='pass')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+
+    def test_login_includes_onboarding_completed(self):
+        response = self.client.post(reverse('auth-login'), {
+            'username': 't1', 'password': 'pass',
+        })
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('onboarding_completed', response.data['user']['profile'])
+        self.assertFalse(response.data['user']['profile']['onboarding_completed'])

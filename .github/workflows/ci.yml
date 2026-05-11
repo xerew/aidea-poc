@@ -12,11 +12,27 @@ jobs:
     name: Backend — lint · test · coverage
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: aidea_test
+          POSTGRES_USER: aidea
+          POSTGRES_PASSWORD: aidea
+        options: >-
+          --health-cmd "pg_isready -U aidea"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     env:
       DJANGO_SETTINGS_MODULE: aidea.settings
       SECRET_KEY: ci-only-secret-key-not-used-in-production
       DEBUG: "True"
       ALLOWED_HOSTS: "localhost"
+      DATABASE_URL: postgresql://aidea:aidea@localhost:5432/aidea_test
 
     defaults:
       run:
