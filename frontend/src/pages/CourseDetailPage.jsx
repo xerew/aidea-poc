@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Circle } from 'lucide-react'
 import client from '../api/client'
 import './CourseDetailPage.css'
@@ -19,6 +19,8 @@ const LEVEL_LABELS = {
 export default function CourseDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const recMeta = location.state
   const [course, setCourse] = useState(null)
   const [enrolling, setEnrolling] = useState(false)
   const [error, setError] = useState('')
@@ -35,6 +37,14 @@ export default function CourseDetailPage() {
       await client.post(`/courses/${id}/enroll/`)
       const res = await client.get(`/courses/${id}/`)
       setCourse(res.data)
+      if (recMeta?.fromRec) {
+        client.post('/recommendations/events/', {
+          course_id: Number(id),
+          event_type: 'enrolled',
+          rank: recMeta.recRank ?? 0,
+          source: recMeta.recSource ?? 'personal',
+        }).catch(() => {})
+      }
     } catch {
       setError('Enrollment failed.')
     } finally {
