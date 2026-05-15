@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useNavigate } from 'react-router-dom'
 import client from '../api/client'
 import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import { useAuth } from '../context/AuthContext'
@@ -35,11 +36,80 @@ function PillarCard({ pillar }) {
   )
 }
 
+RecCard.propTypes = {
+  rec: PropTypes.shape({
+    course_id: PropTypes.number,
+    title: PropTypes.string,
+    pillar_name: PropTypes.string,
+    reason: PropTypes.string,
+    source: PropTypes.string,
+  }),
+  rank: PropTypes.number,
+  onFireEvent: PropTypes.func,
+}
+
+function RecCard({ rec, rank, onFireEvent }) {
+  const navigate = useNavigate()
+
+  const handleClick = (e) => {
+    e.preventDefault()
+    onFireEvent('clicked', rec.course_id, rank, rec.source)
+    navigate(`/courses/${rec.course_id}`, {
+      state: { fromRec: true, recRank: rank, recSource: rec.source },
+    })
+  }
+
+  return (
+    <div className="rec-card">
+      <span className="rec-pillar">{rec.pillar_name}</span>
+      <h3 className="rec-title">{rec.title}</h3>
+      <p className="rec-reason">{rec.reason}</p>
+      <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
+        Start course →
+      </a>
+    </div>
+  )
+}
+
+CfRecCard.propTypes = {
+  rec: PropTypes.shape({
+    course_id: PropTypes.number,
+    title: PropTypes.string,
+    reason: PropTypes.string,
+    source: PropTypes.string,
+  }),
+  rank: PropTypes.number,
+  onFireEvent: PropTypes.func,
+}
+
+function CfRecCard({ rec, rank, onFireEvent }) {
+  const navigate = useNavigate()
+
+  const handleClick = (e) => {
+    e.preventDefault()
+    onFireEvent('clicked', rec.course_id, rank, rec.source)
+    navigate(`/courses/${rec.course_id}`, {
+      state: { fromRec: true, recRank: rank, recSource: rec.source },
+    })
+  }
+
+  return (
+    <div className="rec-card cf-card">
+      <h3 className="rec-title">{rec.title}</h3>
+      <p className="rec-reason cf-reason">{rec.reason}</p>
+      <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
+        View course →
+      </a>
+    </div>
+  )
+}
+
 export default function HomePage() {
   const { user } = useAuth()
-  const [data, setData] = useState(null)
-  const [error, setError] = useState('')
-  const [recommendations, setRecommendations] = useState([])
+  const [data, setData]             = useState(null)
+  const [error, setError]           = useState('')
+  const [personalRecs, setPersonal] = useState([])
+  const [cfRecs, setCf]             = useState([])
   const [recsLoading, setRecsLoading] = useState(false)
 
   useEffect(() => {
@@ -48,30 +118,51 @@ export default function HomePage() {
       .catch(() => setError('Failed to load dashboard.'))
   }, [])
 
+  const fireEvent = useCallback((eventType, courseId, rank, source) => {
+    client.post('/recommendations/events/', {
+      course_id: courseId,
+      event_type: eventType,
+      rank,
+      source,
+    }).catch(() => {})
+  }, [])
+
   useEffect(() => {
     if (!user?.profile?.onboarding_completed) return
     let cancelled = false
+
     const fetchRecs = async () => {
       setRecsLoading(true)
       try {
         const res = await client.get('/recommendations/')
-        if (!cancelled) setRecommendations(res.data)
+        if (cancelled) return
+        const all = res.data
+        const personal = all.filter((r) => r.source === 'personal')
+        const cf       = all.filter((r) => r.source === 'cf')
+        setPersonal(personal)
+        setCf(cf)
+        personal.forEach((r, i) => fireEvent('shown', r.course_id, i + 1, 'personal'))
+        cf.forEach((r, i)       => fireEvent('shown', r.course_id, i + 1, 'cf'))
       } catch {
-        // silently ignore recommendation errors
+        // silently ignore
       } finally {
         if (!cancelled) setRecsLoading(false)
       }
     }
+
     fetchRecs()
     return () => { cancelled = true }
-  }, [user])
+  }, [user, fireEvent])
 
   if (error) return <p className="page-error">{error}</p>
-  if (!data) return <p className="page-loading">Loading…</p>
+  if (!data)  return <p className="page-loading">Loading…</p>
+
+  const showRecs = user?.profile?.onboarding_completed
 
   return (
     <div className="home-page">
       <ContinueLearningBanner data={data.continue_learning} />
+
       <section className="pillars-section">
         <h2>AI Learning Pillars</h2>
         <div className="pillars-grid">
@@ -81,29 +172,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {user?.profile?.onboarding_completed && (
+      {showRecs && (
         <section className="recommendations-section">
           <h2 className="recommendations-title">Recommended for you</h2>
           {recsLoading ? (
             <div className="recommendations-grid">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="rec-card rec-card-skeleton" />
-              ))}
+              {[1, 2, 3].map((i) => <div key={i} className="rec-card rec-card-skeleton" />)}
             </div>
-          ) : recommendations.length > 0 ? (
+          ) : personalRecs.length > 0 ? (
             <div className="recommendations-grid">
-              {recommendations.map(rec => (
-                <div key={rec.course_id} className="rec-card">
-                  <span className="rec-pillar">{rec.pillar_name}</span>
-                  <h3 className="rec-title">{rec.title}</h3>
-                  <p className="rec-reason">{rec.reason}</p>
-                  <a href={`/courses/${rec.course_id}`} className="rec-link">
-                    Start course →
-                  </a>
-                </div>
+              {personalRecs.map((rec, i) => (
+                <RecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />
               ))}
             </div>
           ) : null}
+        </section>
+      )}
+
+      {showRecs && cfRecs.length > 0 && (
+        <section className="recommendations-section cf-section">
+          <h2 className="recommendations-title cf-title">Teachers like you also took</h2>
+          <div className="cf-grid">
+            {cfRecs.map((rec, i) => (
+              <CfRecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />
+            ))}
+          </div>
         </section>
       )}
     </div>

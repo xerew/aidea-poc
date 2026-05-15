@@ -180,3 +180,27 @@
 .rec-link:hover {
   text-decoration: underline;
 }
+
+.cf-section {
+  margin-top: 0;
+}
+
+.cf-title {
+  color: #16a34a;
+}
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.cf-card {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.cf-reason {
+  color: #15803d;
+  font-weight: 500;
+}
