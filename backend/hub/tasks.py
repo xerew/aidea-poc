@@ -177,6 +177,7 @@ def compute_user_recommendations(user_id: int) -> None:
         user_vec = user_vec + gamma * pillar_vec
 
     norm = np.linalg.norm(user_vec)
+    # Fallback to profile-only vector if combined sum is zero (all signals cancelled out)
     user_vec_list = (user_vec / norm).tolist() if norm > 0 else profile_vec.tolist()
 
     # ── Score and filter candidates ───────────────────────────────────────
