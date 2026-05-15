@@ -38,6 +38,11 @@ class CourseDetailView(APIView):
             )
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user.is_authenticated and hasattr(request.user, 'profile'):
+            from hub.models.recommendations import CourseView
+            CourseView.objects.create(user=request.user, course=course)
+
         serializer = CourseDetailSerializer(course, context={'request': request})
         return Response(serializer.data)
 
@@ -52,6 +57,30 @@ class CourseEnrollView(APIView):
             user=request.user,
             course=course,
         )
+
+        if created:
+            from hub.models.recommendations import (
+                CourseRecommendation, RecommendationConfig, RecommendationEvent,
+            )
+            rec = CourseRecommendation.objects.filter(
+                user=request.user, course=course,
+            ).first()
+            if rec:
+                config = RecommendationConfig.get()
+                RecommendationEvent.objects.create(
+                    user=request.user,
+                    course=course,
+                    event_type=RecommendationEvent.EventType.ENROLLED,
+                    rank=0,
+                    source=rec.source,
+                    weights_snapshot={
+                        'alpha':         config.alpha,
+                        'beta':          config.beta,
+                        'gamma':         config.gamma,
+                        'bandit_active': config.bandit_active,
+                    },
+                )
+
         return Response(
             {'enrolled': True, 'created': created},
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
