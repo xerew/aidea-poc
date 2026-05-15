@@ -21,6 +21,13 @@ class Course(models.Model):
         INTERMEDIATE = 'intermediate', 'Intermediate'
         ADVANCED     = 'advanced',     'Advanced'
 
+    class ContentFormat(models.TextChoices):
+        VIDEO       = 'video',       'Video'
+        TEXT        = 'text',        'Text'
+        VISUAL      = 'visual',      'Visual'
+        INTERACTIVE = 'interactive', 'Interactive'
+        MIXED       = 'mixed',       'Mixed'
+
     title              = models.CharField(max_length=200)
     description        = models.TextField(blank=True)
     pillar             = models.ForeignKey(LearningPillar, on_delete=models.PROTECT, related_name='courses')
@@ -31,6 +38,9 @@ class Course(models.Model):
     created_at         = models.DateTimeField(auto_now_add=True)
     created_by         = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_courses',
+    )
+    content_format     = models.CharField(
+        max_length=20, choices=ContentFormat.choices, default=ContentFormat.MIXED,
     )
 
     class Meta:
