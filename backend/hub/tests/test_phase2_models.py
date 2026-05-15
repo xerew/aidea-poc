@@ -2,7 +2,13 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from hub.models import Course, LearningPillar, UserProfile
-from hub.models.recommendations import CourseRecommendation
+from hub.models.recommendations import (
+    CourseRecommendation,
+    CourseView,
+    RecommendationConfig,
+    RecommendationEvent,
+)
+
 
 
 class UserProfileNewFieldsTest(TestCase):
@@ -50,9 +56,6 @@ class CourseRecommendationSourceFieldTest(TestCase):
             user=self.user, course=self.course, score=0.6, reason='cf test', source='cf'
         )
         self.assertEqual(rec.source, 'cf')
-
-
-from hub.models.recommendations import CourseView, RecommendationConfig, RecommendationEvent
 
 
 class RecommendationConfigTest(TestCase):
