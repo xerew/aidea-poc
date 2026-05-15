@@ -11,6 +11,7 @@ from .models import (
     Module,
     UserProfile,
 )
+from .models.recommendations import CourseView, RecommendationConfig, RecommendationEvent
 
 
 @admin.register(UserProfile)
@@ -36,8 +37,8 @@ class ModuleInline(admin.TabularInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ['title', 'pillar', 'is_published']
-    list_filter = ['pillar', 'is_published']
+    list_display = ['title', 'pillar', 'level', 'content_format', 'is_published']
+    list_filter = ['pillar', 'is_published', 'content_format']
     search_fields = ['title']
     inlines = [ModuleInline]
 
@@ -118,3 +119,43 @@ class CourseEditHistoryAdmin(admin.ModelAdmin):
     search_fields = ['course__title', 'editor__username']
     readonly_fields = ['course', 'editor', 'edited_at', 'changes']
     ordering = ['-edited_at']
+
+
+@admin.register(RecommendationConfig)
+class RecommendationConfigAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Signal weights', {
+            'fields': ['w_completed', 'w_deep', 'w_active', 'w_enrolled', 'w_abandoned', 'w_lesson', 'w_view'],
+        }),
+        ('Blend weights', {
+            'fields': ['alpha', 'beta', 'gamma', 'style_boost'],
+        }),
+        ('Bandit config', {
+            'fields': ['bandit_active', 'n_min', 'n_full', 'learning_rate',
+                       'reward_click', 'reward_enroll', 'reward_complete'],
+        }),
+    ]
+
+    def has_add_permission(self, request):
+        return not RecommendationConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(RecommendationEvent)
+class RecommendationEventAdmin(admin.ModelAdmin):
+    list_display = ['user', 'course', 'event_type', 'source', 'rank', 'created_at']
+    list_filter = ['event_type', 'source']
+    search_fields = ['user__username', 'course__title']
+    readonly_fields = ['user', 'course', 'event_type', 'rank', 'source', 'weights_snapshot', 'created_at']
+    ordering = ['-created_at']
+
+
+@admin.register(CourseView)
+class CourseViewAdmin(admin.ModelAdmin):
+    list_display = ['user', 'course', 'created_at']
+    list_filter = ['course__pillar']
+    search_fields = ['user__username', 'course__title']
+    readonly_fields = ['user', 'course', 'created_at']
+    ordering = ['-created_at']

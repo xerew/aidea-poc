@@ -122,6 +122,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'hub.tasks.recompute_all_recommendations',
         'schedule': crontab(hour=2, minute=0),
     },
+    'tune-recommendation-weights-nightly': {
+        'task': 'hub.tasks.tune_recommendation_weights',
+        'schedule': crontab(hour=3, minute=0),
+    },
 }
 
 
