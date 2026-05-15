@@ -29,7 +29,7 @@ from .learner import (
 from .onboarding import OnboardingView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsTeacher
-from .recommendations import RecommendationsView
+from .recommendations import RecommendationEventView, RecommendationsView
 
 __all__ = [
     'AuthoringCourseDetailView',
@@ -57,5 +57,6 @@ __all__ = [
     'LogoutView',
     'OnboardingView',
     'PathwayView',
+    'RecommendationEventView',
     'RecommendationsView',
 ]

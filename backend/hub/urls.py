@@ -25,6 +25,7 @@ from .views import (
     MyLearningView,
     OnboardingView,
     PathwayView,
+    RecommendationEventView,
     RecommendationsView,
 )
 
@@ -43,6 +44,7 @@ urlpatterns = [
     path('onboarding/',       OnboardingView.as_view(),       name='onboarding'),
     path('pathway/',          PathwayView.as_view(),          name='pathway'),
     path('recommendations/',  RecommendationsView.as_view(),  name='recommendations'),
+    path('recommendations/events/', RecommendationEventView.as_view(), name='recommendation-event'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/courses/', AuthoringCoursesView.as_view(), name='authoring-courses'),

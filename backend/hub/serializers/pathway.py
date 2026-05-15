@@ -76,4 +76,4 @@ class RecommendationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = CourseRecommendation
-        fields = ['course_id', 'title', 'pillar_name', 'level', 'duration_hours', 'score', 'reason']
+        fields = ['course_id', 'title', 'pillar_name', 'level', 'duration_hours', 'score', 'reason', 'source']
