@@ -13,6 +13,7 @@ import MyLearningPage from './pages/MyLearningPage'
 import PathwayPage from './pages/PathwayPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import PlaceholderPage from './pages/PlaceholderPage'
+import ProfilePage from './pages/ProfilePage'
 import AuthoringPage from './pages/AuthoringPage'
 import CourseEditorPage from './pages/CourseEditorPage'
 import CourseCreatePage from './pages/CourseCreatePage'
@@ -41,7 +42,7 @@ export default function App() {
             <Route path="/learning"             element={<MyLearningPage />} />
             <Route path="/pathway"              element={<PathwayPage />} />
             <Route path="/analytics"            element={<AnalyticsPage />} />
-            <Route path="/profile"              element={<PlaceholderPage title="Profile" />} />
+            <Route path="/profile"              element={<ProfilePage />} />
             <Route path="/authoring"                  element={<ContentCreatorRoute element={<AuthoringPage />} />} />
             <Route path="/authoring/courses/new"      element={<ContentCreatorRoute element={<CourseCreatePage />} />} />
             <Route path="/authoring/courses/:id"      element={<ContentCreatorRoute element={<CourseEditorPage />} />} />

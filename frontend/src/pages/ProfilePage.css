@@ -1,0 +1,128 @@
+.profile-page {
+  max-width: 680px;
+}
+
+.profile-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem;
+  color: var(--color-text);
+}
+
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.profile-name {
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+}
+
+.profile-username {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.prefs-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.prefs-section h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+}
+
+.prefs-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.prefs-loading {
+  color: var(--color-text-muted);
+}
+
+.prefs-group {
+  margin-bottom: 1.5rem;
+}
+
+.prefs-group h3 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.prefs-sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.prefs-checkbox-label,
+.prefs-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  padding: 0.35rem 0;
+  cursor: pointer;
+}
+
+.prefs-error {
+  color: var(--color-red, #dc2626);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+.prefs-success {
+  color: #16a34a;
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
+.prefs-save-btn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.prefs-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.prefs-save-btn:hover:not(:disabled) {
+  opacity: 0.88;
+}
