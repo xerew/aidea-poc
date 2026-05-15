@@ -29,6 +29,7 @@ from .learner import (
 from .onboarding import OnboardingView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsTeacher
+from .profile import ProfilePreferencesView
 from .recommendations import RecommendationEventView, RecommendationsView
 
 __all__ = [
@@ -57,6 +58,7 @@ __all__ = [
     'LogoutView',
     'OnboardingView',
     'PathwayView',
+    'ProfilePreferencesView',
     'RecommendationEventView',
     'RecommendationsView',
 ]
