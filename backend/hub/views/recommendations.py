@@ -2,7 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models.recommendations import CourseRecommendation, RecommendationConfig, RecommendationEvent
+from hub.models.recommendations import (
+    CourseRecommendation,
+    RecommendationConfig,
+    RecommendationEvent,
+)
 from hub.serializers.pathway import RecommendationSerializer
 from hub.views.permissions import IsTeacher
 

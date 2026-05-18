@@ -10,7 +10,6 @@ from hub.models.recommendations import (
 )
 
 
-
 class UserProfileNewFieldsTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='t1', password='pass')

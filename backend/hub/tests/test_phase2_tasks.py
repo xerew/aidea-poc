@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from hub.models import Course, LearningPillar, UserProfile
+from hub.models import UserProfile
 from hub.models.recommendations import CourseRecommendation
 from hub.tasks import compute_user_recommendations
 

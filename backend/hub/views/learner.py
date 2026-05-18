@@ -60,7 +60,9 @@ class CourseEnrollView(APIView):
 
         if created:
             from hub.models.recommendations import (
-                CourseRecommendation, RecommendationConfig, RecommendationEvent,
+                CourseRecommendation,
+                RecommendationConfig,
+                RecommendationEvent,
             )
             rec = CourseRecommendation.objects.filter(
                 user=request.user, course=course,
