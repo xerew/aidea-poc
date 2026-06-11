@@ -78,3 +78,4 @@ class LearnerActivityConfigTest(TestCase):
         config.quiz_affects_competency = True
         config.save()
         self.assertEqual(LearnerActivityConfig.objects.count(), 1)
+        self.assertEqual(config.pk, 1)
