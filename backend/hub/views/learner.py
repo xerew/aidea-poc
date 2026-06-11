@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -181,14 +182,16 @@ class LessonCompleteView(APIView):
 
     def post(self, request, pk, lesson_pk):
         try:
-            course = Course.objects.get(pk=pk, is_published=True)
-        except Course.DoesNotExist:
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            enrollment = Enrollment.objects.get(user=request.user, course=course)
+            enrollment = Enrollment.objects.select_related('course').get(
+                user=request.user, course_id=pk,
+            )
         except Enrollment.DoesNotExist:
+            # Distinguish "course not found" from "not enrolled"
+            if not Course.objects.filter(pk=pk).exists():
+                return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
             return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+
+        course = enrollment.course
 
         try:
             lesson = Lesson.objects.select_related('module').get(
@@ -209,6 +212,8 @@ class LessonCompleteView(APIView):
 
         enrollment.progress_pct = progress_pct
         enrollment.current_module = lesson.module
+        if progress_pct == 100 and enrollment.completed_at is None:
+            enrollment.completed_at = timezone.now()
         enrollment.save()
 
         return Response({

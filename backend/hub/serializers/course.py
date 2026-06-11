@@ -121,7 +121,7 @@ class MyLearningEnrollmentSerializer(serializers.ModelSerializer):
         fields = [
             'course_id', 'course_title', 'pillar_name', 'pillar_slug',
             'progress_pct', 'module_count', 'last_accessed_at',
-            'current_module_title', 'enrolled_at',
+            'current_module_title', 'enrolled_at', 'completed_at',
         ]
 
 

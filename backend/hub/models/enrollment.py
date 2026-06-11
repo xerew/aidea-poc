@@ -13,6 +13,7 @@ class Enrollment(models.Model):
     progress_pct = models.PositiveSmallIntegerField(default=0)
     enrolled_at = models.DateTimeField(auto_now_add=True)
     last_accessed_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'course')
