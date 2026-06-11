@@ -275,7 +275,7 @@ class LessonCompleteView(APIView):
                         )
                     else:
                         weight = config.quiz_weight_pass
-                    increment = int(weight)
+                    increment = round(weight)
                 else:
                     increment = 1
                 profile.competency_score = min(profile.competency_score + increment, 6)
