@@ -1,3 +1,4 @@
+from .activity import LearnerActivityConfig, LessonSession
 from .content import Course, LearningPillar, Lesson, Module
 from .enrollment import Enrollment, LessonProgress
 from .history import CourseEditHistory
@@ -18,12 +19,14 @@ __all__ = [
     'CourseRecommendation',
     'CourseView',
     'Enrollment',
-    'Lesson',
+    'LearnerActivityConfig',
     'LearningPath',
     'LearningPathCourse',
     'LearningPillar',
     'LessonProgress',
+    'LessonSession',
     'Module',
+    'Lesson',
     'RecommendationConfig',
     'RecommendationEvent',
     'UserLearningPath',

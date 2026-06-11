@@ -5,9 +5,11 @@ from .models import (
     Course,
     CourseEditHistory,
     Enrollment,
+    LearnerActivityConfig,
     LearningPillar,
     Lesson,
     LessonProgress,
+    LessonSession,
     Module,
     UserProfile,
 )
@@ -159,3 +161,30 @@ class CourseViewAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'course__title']
     readonly_fields = ['user', 'course', 'created_at']
     ordering = ['-created_at']
+
+
+@admin.register(LessonSession)
+class LessonSessionAdmin(admin.ModelAdmin):
+    list_display = ['user', 'lesson', 'started_at']
+    list_filter = ['lesson__lesson_type', 'lesson__module__course__pillar']
+    search_fields = ['user__username', 'lesson__title']
+    readonly_fields = ['user', 'lesson', 'started_at']
+    ordering = ['-started_at']
+
+
+@admin.register(LearnerActivityConfig)
+class LearnerActivityConfigAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('Quiz → Competency toggle', {
+            'fields': ['quiz_affects_competency'],
+        }),
+        ('Weights (active when toggle is on)', {
+            'fields': ['quiz_pass_threshold', 'quiz_weight_pass', 'quiz_weight_fail'],
+        }),
+    ]
+
+    def has_add_permission(self, request):
+        return not LearnerActivityConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
