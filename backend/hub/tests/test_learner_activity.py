@@ -79,3 +79,34 @@ class LearnerActivityConfigTest(TestCase):
         config.save()
         self.assertEqual(LearnerActivityConfig.objects.count(), 1)
         self.assertEqual(config.pk, 1)
+
+
+class LessonSessionOnOpenTest(TestCase):
+    def setUp(self):
+        from rest_framework.test import APIClient
+        self.user = User.objects.create_user(username='lo1', password='pass')
+        from hub.models import UserProfile
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+        pillar = LearningPillar.objects.create(name='P3', slug='p3', description='')
+        self.course = Course.objects.create(title='C3', pillar=pillar, is_published=True)
+        module = Module.objects.create(title='M3', course=self.course, order=1)
+        self.lesson = Lesson.objects.create(title='L3', module=module, order=1, is_required=True)
+        from hub.models import Enrollment
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_session_created_on_lesson_get(self):
+        from hub.models.activity import LessonSession
+        self.client.get(f'/api/courses/{self.course.pk}/lessons/{self.lesson.pk}/')
+        self.assertEqual(
+            LessonSession.objects.filter(user=self.user, lesson=self.lesson).count(), 1
+        )
+
+    def test_multiple_opens_create_multiple_sessions(self):
+        from hub.models.activity import LessonSession
+        self.client.get(f'/api/courses/{self.course.pk}/lessons/{self.lesson.pk}/')
+        self.client.get(f'/api/courses/{self.course.pk}/lessons/{self.lesson.pk}/')
+        self.assertEqual(
+            LessonSession.objects.filter(user=self.user, lesson=self.lesson).count(), 2
+        )

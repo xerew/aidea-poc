@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, Enrollment, LearningPillar, Lesson, LessonProgress
+from hub.models import Course, Enrollment, LearningPillar, Lesson, LessonProgress, LessonSession
 from hub.serializers import (
     ContinueLearningSerializer,
     CourseDetailSerializer,
@@ -155,6 +155,8 @@ class LessonDetailView(APIView):
             )
         except Lesson.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        LessonSession.objects.create(user=request.user, lesson=lesson)
 
         all_ids = list(
             Lesson.objects.filter(module__course=course)
