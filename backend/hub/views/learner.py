@@ -210,11 +210,20 @@ class LessonCompleteView(APIView):
         ).count()
         progress_pct = round((completed / total) * 100) if total > 0 else 0
 
+        just_completed = progress_pct == 100 and enrollment.completed_at is None
         enrollment.progress_pct = progress_pct
         enrollment.current_module = lesson.module
-        if progress_pct == 100 and enrollment.completed_at is None:
+        if just_completed:
             enrollment.completed_at = timezone.now()
         enrollment.save()
+
+        if just_completed and hasattr(request.user, 'profile'):
+            profile = request.user.profile
+            if profile.competency_score < 6:
+                profile.competency_score = min(profile.competency_score + 1, 6)
+                profile.save(update_fields=['competency_score'])
+                from hub.tasks import compute_user_recommendations
+                compute_user_recommendations.delay(request.user.id)
 
         return Response({
             'lesson_id': lesson.id,
