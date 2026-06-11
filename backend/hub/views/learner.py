@@ -8,7 +8,7 @@ from hub.serializers import (
     ContinueLearningSerializer,
     CourseDetailSerializer,
     CourseListSerializer,
-    LessonSerializer,
+    LessonLearnDetailSerializer,
     ModuleLearnSerializer,
     MyLearningEnrollmentSerializer,
     PillarSummarySerializer,
@@ -170,7 +170,7 @@ class LessonDetailView(APIView):
         ).exists()
 
         return Response({
-            **LessonSerializer(lesson).data,
+            **LessonLearnDetailSerializer(lesson).data,
             'module_id': lesson.module_id,
             'module_title': lesson.module.title,
             'is_completed': is_completed,
@@ -287,6 +287,7 @@ class LessonCompleteView(APIView):
             'lesson_id': lesson.id,
             'is_completed': True,
             'progress_pct': progress_pct,
+            'quiz_results': lp.quiz_answers if lesson.lesson_type == 'quiz' else None,
         })
 
 

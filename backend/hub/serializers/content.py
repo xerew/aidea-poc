@@ -41,6 +41,27 @@ class LessonSerializer(serializers.ModelSerializer):
         return value
 
 
+class LessonLearnDetailSerializer(serializers.ModelSerializer):
+    """Learner-facing lesson serializer — strips is_correct from quiz options."""
+    quiz_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Lesson
+        fields = [
+            'id', 'title', 'description', 'lesson_type',
+            'content', 'quiz_data', 'duration_minutes', 'order', 'is_required',
+        ]
+
+    def get_quiz_data(self, obj):
+        return [
+            {
+                'question': q.get('question', ''),
+                'options': [{'text': opt.get('text', '')} for opt in q.get('options', [])],
+            }
+            for q in (obj.quiz_data or [])
+        ]
+
+
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module

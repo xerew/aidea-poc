@@ -1,5 +1,6 @@
 from .auth import AideaTokenObtainPairSerializer, UserProfileSerializer, UserSerializer
 from .content import (
+    LessonLearnDetailSerializer,
     LessonLearnSerializer,
     LessonSerializer,
     ModuleLearnSerializer,
@@ -27,6 +28,7 @@ __all__ = [
     'CourseEditHistorySerializer',
     'CourseListSerializer',
     'MyLearningEnrollmentSerializer',
+    'LessonLearnDetailSerializer',
     'LessonLearnSerializer',
     'LessonSerializer',
     'ModuleLearnSerializer',
