@@ -212,7 +212,7 @@ class LessonCompleteView(APIView):
                 user=request.user, lesson=lesson,
             ).order_by('-started_at').first()
             if session:
-                lp.time_spent_seconds = int((now - session.started_at).total_seconds())
+                lp.time_spent_seconds = max(0, int((now - session.started_at).total_seconds()))
 
             quiz_answers_raw = request.data.get('quiz_answers', [])
             if lesson.lesson_type == 'quiz' and quiz_answers_raw and lesson.quiz_data:
@@ -224,6 +224,9 @@ class LessonCompleteView(APIView):
                             booleans.append(bool(options[selected].get('is_correct', False)))
                         else:
                             booleans.append(False)
+                # Pad to full question count so score denominator is always len(quiz_data)
+                while len(booleans) < len(lesson.quiz_data):
+                    booleans.append(False)
                 lp.quiz_answers = booleans
                 lp.quiz_score = sum(booleans) / len(booleans) if booleans else 0.0
 
