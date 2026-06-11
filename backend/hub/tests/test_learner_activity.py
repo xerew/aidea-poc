@@ -1,7 +1,15 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from hub.models import Course, LearningPillar, Lesson, LessonProgress, Module
+from hub.models import (
+    Course,
+    Enrollment,
+    LearningPillar,
+    Lesson,
+    LessonProgress,
+    Module,
+    UserProfile,
+)
 
 
 class LessonProgressFieldsTest(TestCase):
@@ -110,3 +118,130 @@ class LessonSessionOnOpenTest(TestCase):
         self.assertEqual(
             LessonSession.objects.filter(user=self.user, lesson=self.lesson).count(), 2
         )
+
+
+class EngagementTrackingTest(TestCase):
+    def setUp(self):
+        from rest_framework.test import APIClient
+        self.user = User.objects.create_user(username='et1', password='pass')
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+        pillar = LearningPillar.objects.create(name='P4', slug='p4', description='')
+        self.course = Course.objects.create(title='C4', pillar=pillar, is_published=True)
+        self.module = Module.objects.create(title='M4', course=self.course, order=1)
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def _lesson(self, title, lesson_type='text', quiz_data=None):
+        return Lesson.objects.create(
+            title=title,
+            module=self.module,
+            order=Lesson.objects.filter(module=self.module).count() + 1,
+            is_required=True,
+            lesson_type=lesson_type,
+            quiz_data=quiz_data or [],
+        )
+
+    def test_time_spent_computed_when_session_exists(self):
+        lesson = self._lesson('T1')
+        self.client.get(f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/', {}, format='json'
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertIsNotNone(lp.time_spent_seconds)
+        self.assertGreaterEqual(lp.time_spent_seconds, 0)
+
+    def test_time_spent_null_without_session(self):
+        lesson = self._lesson('T2')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/', {}, format='json'
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertIsNone(lp.time_spent_seconds)
+
+    def test_completed_at_set_on_first_complete(self):
+        lesson = self._lesson('T3')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/', {}, format='json'
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertIsNotNone(lp.completed_at)
+
+    def test_quiz_score_computed_server_side(self):
+        quiz_data = [
+            {'question': 'Q1', 'options': [
+                {'text': 'A', 'is_correct': False},
+                {'text': 'B', 'is_correct': True},
+            ]},
+            {'question': 'Q2', 'options': [
+                {'text': 'C', 'is_correct': True},
+                {'text': 'D', 'is_correct': False},
+            ]},
+        ]
+        lesson = self._lesson('Q1', lesson_type='quiz', quiz_data=quiz_data)
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'quiz_answers': [1, 0]},
+            format='json',
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertAlmostEqual(lp.quiz_score, 1.0)
+        self.assertEqual(lp.quiz_answers, [True, True])
+
+    def test_quiz_score_partial(self):
+        quiz_data = [
+            {'question': 'Q1', 'options': [
+                {'text': 'A', 'is_correct': False},
+                {'text': 'B', 'is_correct': True},
+            ]},
+            {'question': 'Q2', 'options': [
+                {'text': 'C', 'is_correct': True},
+                {'text': 'D', 'is_correct': False},
+            ]},
+        ]
+        lesson = self._lesson('Q2', lesson_type='quiz', quiz_data=quiz_data)
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'quiz_answers': [0, 0]},
+            format='json',
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertAlmostEqual(lp.quiz_score, 0.5)
+        self.assertEqual(lp.quiz_answers, [False, True])
+
+    def test_text_scroll_pct_stored(self):
+        lesson = self._lesson('T4', lesson_type='text')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'engagement_data': {'scroll_pct': 85}},
+            format='json',
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertEqual(lp.engagement_data.get('scroll_pct'), 85)
+
+    def test_assignment_word_count_derived(self):
+        lesson = self._lesson('A1', lesson_type='assignment')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'engagement_data': {'submission': 'hello world this is a test'}},
+            format='json',
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertEqual(lp.engagement_data.get('word_count'), 6)
+        self.assertEqual(lp.engagement_data.get('submission'), 'hello world this is a test')
+
+    def test_engagement_not_overwritten_on_repeat_complete(self):
+        lesson = self._lesson('T5', lesson_type='text')
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'engagement_data': {'scroll_pct': 50}},
+            format='json',
+        )
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
+            {'engagement_data': {'scroll_pct': 99}},
+            format='json',
+        )
+        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
+        self.assertEqual(lp.engagement_data.get('scroll_pct'), 50)

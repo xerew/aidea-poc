@@ -202,15 +202,45 @@ class LessonCompleteView(APIView):
         except Lesson.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        LessonProgress.objects.get_or_create(user=request.user, lesson=lesson)
+        lp, created = LessonProgress.objects.get_or_create(user=request.user, lesson=lesson)
+
+        if created:
+            now = timezone.now()
+            lp.completed_at = now
+
+            session = LessonSession.objects.filter(
+                user=request.user, lesson=lesson,
+            ).order_by('-started_at').first()
+            if session:
+                lp.time_spent_seconds = int((now - session.started_at).total_seconds())
+
+            quiz_answers_raw = request.data.get('quiz_answers', [])
+            if lesson.lesson_type == 'quiz' and quiz_answers_raw and lesson.quiz_data:
+                booleans = []
+                for i, selected in enumerate(quiz_answers_raw):
+                    if i < len(lesson.quiz_data):
+                        options = lesson.quiz_data[i].get('options', [])
+                        if isinstance(selected, int) and 0 <= selected < len(options):
+                            booleans.append(bool(options[selected].get('is_correct', False)))
+                        else:
+                            booleans.append(False)
+                lp.quiz_answers = booleans
+                lp.quiz_score = sum(booleans) / len(booleans) if booleans else 0.0
+
+            engagement = dict(request.data.get('engagement_data') or {})
+            if lesson.lesson_type == 'assignment' and 'submission' in engagement:
+                engagement['word_count'] = len(str(engagement['submission']).split())
+            lp.engagement_data = engagement
+
+            lp.save()
 
         total = Lesson.objects.filter(module__course=course, is_required=True).count()
-        completed = LessonProgress.objects.filter(
+        completed_count = LessonProgress.objects.filter(
             user=request.user,
             lesson__module__course=course,
             lesson__is_required=True,
         ).count()
-        progress_pct = round((completed / total) * 100) if total > 0 else 0
+        progress_pct = round((completed_count / total) * 100) if total > 0 else 0
 
         just_completed = progress_pct == 100 and enrollment.completed_at is None
         enrollment.progress_pct = progress_pct
