@@ -255,7 +255,30 @@ class LessonCompleteView(APIView):
         if just_completed and hasattr(request.user, 'profile'):
             profile = request.user.profile
             if profile.competency_score < 6:
-                profile.competency_score = min(profile.competency_score + 1, 6)
+                from hub.models.activity import LearnerActivityConfig
+                config = LearnerActivityConfig.get()
+                if config.quiz_affects_competency:
+                    quiz_scores = list(
+                        LessonProgress.objects.filter(
+                            user=request.user,
+                            lesson__module__course=course,
+                            lesson__lesson_type='quiz',
+                            quiz_score__isnull=False,
+                        ).values_list('quiz_score', flat=True)
+                    )
+                    if quiz_scores:
+                        avg = sum(quiz_scores) / len(quiz_scores)
+                        weight = (
+                            config.quiz_weight_pass
+                            if avg >= config.quiz_pass_threshold
+                            else config.quiz_weight_fail
+                        )
+                    else:
+                        weight = config.quiz_weight_pass
+                    increment = int(weight)
+                else:
+                    increment = 1
+                profile.competency_score = min(profile.competency_score + increment, 6)
                 profile.save(update_fields=['competency_score'])
                 from hub.tasks import compute_user_recommendations
                 compute_user_recommendations.delay(request.user.id)

@@ -245,3 +245,97 @@ class EngagementTrackingTest(TestCase):
         )
         lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
         self.assertEqual(lp.engagement_data.get('scroll_pct'), 50)
+
+
+class CompetencyWeightingTest(TestCase):
+    def setUp(self):
+        from rest_framework.test import APIClient
+
+        from hub.models.activity import LearnerActivityConfig
+        self.user = User.objects.create_user(username='cw1', password='pass')
+        self.profile = UserProfile.objects.create(
+            user=self.user,
+            user_type=UserProfile.UserType.TEACHER,
+            competency_score=0,
+            onboarding_completed=True,
+        )
+        pillar = LearningPillar.objects.create(name='P5', slug='p5', description='')
+        self.course = Course.objects.create(title='C5', pillar=pillar)
+        module = Module.objects.create(title='M5', course=self.course, order=1)
+        self.required_lesson = Lesson.objects.create(
+            title='RL', module=module, order=1, is_required=True, lesson_type='text',
+        )
+        self.quiz_lesson = Lesson.objects.create(
+            title='QL',
+            module=module,
+            order=2,
+            is_required=False,
+            lesson_type='quiz',
+            quiz_data=[{
+                'question': 'Q',
+                'options': [
+                    {'text': 'Right', 'is_correct': True},
+                    {'text': 'Wrong', 'is_correct': False},
+                ],
+            }],
+        )
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.config = LearnerActivityConfig.get()
+
+    def _complete_required(self):
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{self.required_lesson.pk}/complete/',
+            {}, format='json',
+        )
+
+    def _complete_quiz(self, answers):
+        self.client.post(
+            f'/api/courses/{self.course.pk}/lessons/{self.quiz_lesson.pk}/complete/',
+            {'quiz_answers': answers},
+            format='json',
+        )
+
+    def test_toggle_off_always_gives_increment_of_1(self):
+        self.config.quiz_affects_competency = False
+        self.config.save()
+        self._complete_required()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.competency_score, 1)
+
+    def test_toggle_on_pass_gives_full_increment(self):
+        self.config.quiz_affects_competency = True
+        self.config.quiz_pass_threshold = 0.7
+        self.config.quiz_weight_pass = 1.0
+        self.config.save()
+        self._complete_quiz([0])  # correct answer → score 1.0
+        self._complete_required()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.competency_score, 1)
+
+    def test_toggle_on_fail_gives_no_increment(self):
+        self.config.quiz_affects_competency = True
+        self.config.quiz_pass_threshold = 0.7
+        self.config.quiz_weight_fail = 0.5  # int(0.5) = 0 → no increment
+        self.config.save()
+        self._complete_quiz([1])  # wrong answer → score 0.0
+        self._complete_required()
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.competency_score, 0)
+
+    def test_toggle_on_no_quizzes_falls_back_to_full_increment(self):
+        pillar = LearningPillar.objects.create(name='P6', slug='p6', description='')
+        course2 = Course.objects.create(title='C6', pillar=pillar)
+        module2 = Module.objects.create(title='M6', course=course2, order=1)
+        lesson2 = Lesson.objects.create(
+            title='L6', module=module2, order=1, is_required=True, lesson_type='text',
+        )
+        Enrollment.objects.create(user=self.user, course=course2)
+        self.config.quiz_affects_competency = True
+        self.config.save()
+        self.client.post(
+            f'/api/courses/{course2.pk}/lessons/{lesson2.pk}/complete/', {}, format='json',
+        )
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.competency_score, 1)
