@@ -91,7 +91,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
             f'<td style="padding:4px 10px;border-bottom:1px solid #eee">{r.lesson.title}</td>'
             f'<td style="padding:4px 10px;border-bottom:1px solid #eee">{r.lesson.get_lesson_type_display()}</td>'
             f'<td style="padding:4px 10px;border-bottom:1px solid #eee">{"required" if r.lesson.is_required else "optional"}</td>'
-            f'<td style="padding:4px 10px;border-bottom:1px solid #eee">{r.completed_at.strftime("%Y-%m-%d %H:%M UTC")}</td>'
+            f'<td style="padding:4px 10px;border-bottom:1px solid #eee">{r.completed_at.strftime("%Y-%m-%d %H:%M UTC") if r.completed_at else "—"}</td>'
             '</tr>'
             for r in records
         )
