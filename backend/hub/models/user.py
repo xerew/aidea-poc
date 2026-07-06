@@ -28,6 +28,12 @@ class UserProfile(models.Model):
         VISUAL      = 'visual',      'Visual'
         INTERACTIVE = 'interactive', 'Interactive'
 
+    class WeeklyGoal(models.TextChoices):
+        LT1 = 'lt1', 'Under 1 hour'
+        H12 = '1_2', '1-2 hours'
+        H25 = '2_5', '2-5 hours'
+        GT5 = 'gt5', '5+ hours'
+
     user                 = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type            = models.CharField(max_length=20, choices=UserType.choices, default=UserType.TEACHER)
     avatar_initials      = models.CharField(max_length=4, blank=True)
@@ -40,6 +46,14 @@ class UserProfile(models.Model):
     learning_style       = models.CharField(
         max_length=20, choices=LearningStyle.choices, blank=True,
     )
+    school               = models.CharField(max_length=200, blank=True)
+    phone                = models.CharField(max_length=30, blank=True)
+    location             = models.CharField(max_length=200, blank=True)
+    weekly_learning_goal = models.CharField(max_length=10, choices=WeeklyGoal.choices, blank=True)
+    email_notifications  = models.BooleanField(default=True)
+    progress_reminders   = models.BooleanField(default=True)
+    profile_public       = models.BooleanField(default=False)
+    share_progress       = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.get_user_type_display()})'
