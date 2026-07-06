@@ -19,7 +19,18 @@ function UsersTab() {
 
   useEffect(() => {
     client.get('/admin/users/')
-      .then(({ data }) => { setUsers(data); setLoading(false) })
+      .then(({ data }) => {
+        const ROLE_ORDER = { admin: 0, content_creator: 1, teacher: 2 }
+        const sorted = [...data].sort((a, b) => {
+          const ro = (ROLE_ORDER[a.user_type] ?? 9) - (ROLE_ORDER[b.user_type] ?? 9)
+          if (ro !== 0) return ro
+          const name = (a.last_name || a.username).localeCompare(b.last_name || b.username)
+          if (name !== 0) return name
+          return (a.first_name || '').localeCompare(b.first_name || '')
+        })
+        setUsers(sorted)
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [])
 
@@ -62,7 +73,14 @@ function UsersTab() {
                 <td>{u.email}</td>
                 <td>
                   {isMe ? (
-                    <span className="admin-you-badge">{ROLE_LABELS[u.user_type]} · You</span>
+                    <div className="admin-role-cell">
+                      <select className="admin-role-select" value={u.user_type} disabled>
+                        <option value="teacher">Teacher</option>
+                        <option value="content_creator">Content Creator</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                      <span className="admin-you-badge">You</span>
+                    </div>
                   ) : (
                     <div className="admin-role-cell">
                       <select
@@ -93,10 +111,11 @@ function UsersTab() {
 // ── Access requests tab ───────────────────────────────────────────────────────
 
 function RequestsTab() {
-  const [requests,  setRequests]  = useState([])
-  const [loading,   setLoading]   = useState(true)
-  const [denyForms, setDenyForms] = useState({})
-  const [showPast,  setShowPast]  = useState(false)
+  const [requests,      setRequests]      = useState([])
+  const [loading,       setLoading]       = useState(true)
+  const [denyForms,     setDenyForms]     = useState({})
+  const [approveErrors, setApproveErrors] = useState({})
+  const [showPast,      setShowPast]      = useState(false)
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -109,10 +128,14 @@ function RequestsTab() {
   useEffect(() => { fetchRequests() }, [fetchRequests])
 
   const handleApprove = async (id) => {
+    setApproveErrors(prev => ({ ...prev, [id]: '' }))
     try {
       const { data } = await client.patch(`/admin/access-requests/${id}/`, { action: 'approve' })
       setRequests(prev => prev.map(r => r.id === id ? { ...r, ...data } : r))
-    } catch { /* ignore */ }
+    } catch (err) {
+      const msg = err?.response?.data?.error || 'Failed to approve.'
+      setApproveErrors(prev => ({ ...prev, [id]: msg }))
+    }
   }
 
   const openDeny = (id) =>
@@ -161,6 +184,9 @@ function RequestsTab() {
           <p className="admin-request-message">{req.message}</p>
           <div className="admin-request-actions">
             <button className="admin-approve-btn" onClick={() => handleApprove(req.id)}>Approve</button>
+            {approveErrors[req.id] && (
+              <span className="admin-feedback error">{approveErrors[req.id]}</span>
+            )}
             {!denyForms[req.id] ? (
               <button className="admin-deny-btn" onClick={() => openDeny(req.id)}>Deny</button>
             ) : (
@@ -186,10 +212,7 @@ function RequestsTab() {
                   >
                     {denyForms[req.id].submitting ? 'Denying…' : 'Confirm Deny'}
                   </button>
-                  <button
-                    style={{ background: 'none', border: '1px solid var(--color-border)', borderRadius: 'var(--radius)', padding: '0.4rem 0.75rem', cursor: 'pointer', fontSize: '0.875rem' }}
-                    onClick={() => closeDeny(req.id)}
-                  >
+                  <button className="admin-deny-cancel-btn" onClick={() => closeDeny(req.id)}>
                     Cancel
                   </button>
                 </div>
