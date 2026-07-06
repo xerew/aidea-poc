@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map } from 'lucide-react'
+import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
@@ -12,14 +12,21 @@ const BASE_NAV = [
   { to: '/profile',   label: 'Profile',           Icon: User },
 ]
 
-const AUTHORING_ITEM = { to: '/authoring', label: 'Authoring', Icon: PenLine }
+const AUTHORING_ITEM = { to: '/authoring',    label: 'Authoring', Icon: PenLine }
+const ADMIN_ITEM     = { to: '/admin/users',  label: 'Admin',     Icon: Shield  }
 
 export default function Sidebar() {
   const { user } = useAuth()
-  const isContentCreator = user?.profile?.user_type === 'content_creator'
-  const navItems = isContentCreator
-    ? [...BASE_NAV.filter(item => item.to !== '/pathway'), AUTHORING_ITEM]
-    : BASE_NAV
+  const userType = user?.profile?.user_type
+
+  let navItems
+  if (userType === 'admin') {
+    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), ADMIN_ITEM]
+  } else if (userType === 'content_creator') {
+    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), AUTHORING_ITEM]
+  } else {
+    navItems = BASE_NAV
+  }
 
   return (
     <aside className="sidebar">

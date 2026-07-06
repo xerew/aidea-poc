@@ -1,0 +1,288 @@
+.admin-page {
+  max-width: 900px;
+}
+
+.admin-page-header {
+  margin-bottom: 1.25rem;
+}
+
+.admin-page-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text);
+}
+
+/* Tabs */
+
+.admin-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 1.5rem;
+}
+
+.admin-tab-btn {
+  background: none;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.admin-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.admin-tab-btn:hover:not(.active) {
+  color: var(--color-text);
+}
+
+/* Users table */
+
+.admin-users-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.admin-users-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-users-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.admin-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.admin-role-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-role-select {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.admin-role-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-you-badge {
+  font-size: 0.75rem;
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+}
+
+.admin-feedback {
+  font-size: 0.8rem;
+}
+
+.admin-feedback.info    { color: var(--color-primary); }
+.admin-feedback.success { color: #16a34a; }
+.admin-feedback.error   { color: #dc2626; }
+
+/* Loading / empty */
+
+.admin-loading,
+.admin-empty {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 1rem 0;
+}
+
+/* Access request cards */
+
+.admin-requests {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-request-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+
+.admin-request-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin-request-name {
+  font-weight: 600;
+  margin: 0 0 0.15rem;
+  font-size: 0.9375rem;
+}
+
+.admin-request-meta {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.admin-request-message {
+  font-size: 0.875rem;
+  color: var(--color-text);
+  margin: 0 0 1rem;
+  white-space: pre-wrap;
+}
+
+.admin-request-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-approve-btn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.admin-approve-btn:hover {
+  opacity: 0.88;
+}
+
+.admin-deny-btn {
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: var(--radius);
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.admin-deny-btn:hover {
+  background: #fef2f2;
+}
+
+.admin-deny-form {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.admin-deny-form textarea {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 0.875rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.admin-deny-confirm-btn {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.45rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-deny-confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Past requests */
+
+.admin-past-section {
+  margin-top: 1.5rem;
+}
+
+.admin-past-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0;
+  margin-bottom: 0.75rem;
+}
+
+.admin-past-toggle:hover {
+  color: var(--color-text);
+}
+
+.admin-status-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+.admin-status-approved { background: #dcfce7; color: #15803d; }
+.admin-status-denied   { background: #fef2f2; color: #991b1b; }
+
+.admin-denial-reason {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0 0;
+  font-style: italic;
+}

@@ -19,6 +19,7 @@ import CourseEditorPage from './pages/CourseEditorPage'
 import CourseCreatePage from './pages/CourseCreatePage'
 import ModuleEditorPage from './pages/ModuleEditorPage'
 import RegisterPage from './pages/RegisterPage'
+import AdminPage from './pages/AdminPage'
 
 ContentCreatorRoute.propTypes = { element: PropTypes.node.isRequired }
 
@@ -26,6 +27,15 @@ function ContentCreatorRoute({ element }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
   if (user.profile?.user_type !== 'content_creator') return <Navigate to="/" replace />
+  return element
+}
+
+AdminRoute.propTypes = { element: PropTypes.node.isRequired }
+
+function AdminRoute({ element }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (user.profile?.user_type !== 'admin') return <Navigate to="/" replace />
   return element
 }
 
@@ -49,6 +59,7 @@ export default function App() {
             <Route path="/authoring/courses/new"      element={<ContentCreatorRoute element={<CourseCreatePage />} />} />
             <Route path="/authoring/courses/:id"      element={<ContentCreatorRoute element={<CourseEditorPage />} />} />
             <Route path="/authoring/courses/:id/modules/:moduleId" element={<ContentCreatorRoute element={<ModuleEditorPage />} />} />
+            <Route path="/admin/users" element={<AdminRoute element={<AdminPage />} />} />
           </Route>
           <Route path="/courses/:id/learn"                element={<LearnRedirect />} />
           <Route path="/courses/:courseId/learn/:lessonId" element={<LessonPage />} />
