@@ -46,21 +46,24 @@ class RegisterSerializer(serializers.Serializer):
         return data
 
     def create(self, validated_data):
+        from django.db import transaction
+
         validated_data.pop('confirm_password')
         password = validated_data.pop('password')
-        user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            password=password,
-        )
-        initials = (validated_data['first_name'][:1] + validated_data['last_name'][:1]).upper()
-        UserProfile.objects.create(
-            user=user,
-            user_type=UserProfile.UserType.TEACHER,
-            avatar_initials=initials,
-        )
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=validated_data['username'],
+                email=validated_data['email'],
+                first_name=validated_data['first_name'],
+                last_name=validated_data['last_name'],
+                password=password,
+            )
+            initials = (validated_data['first_name'][:1] + validated_data['last_name'][:1]).upper()
+            UserProfile.objects.create(
+                user=user,
+                user_type=UserProfile.UserType.TEACHER,
+                avatar_initials=initials,
+            )
         return user
 
 
