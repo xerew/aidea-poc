@@ -3,11 +3,6 @@ import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import './AdminPage.css'
 
-const ROLE_LABELS = {
-  teacher:         'Teacher',
-  content_creator: 'Content Creator',
-  admin:           'Admin',
-}
 
 // ── Users tab ────────────────────────────────────────────────────────────────
 
