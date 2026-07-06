@@ -6,12 +6,15 @@ const AuthContext = createContext(null)
 
 AuthProvider.propTypes = { children: PropTypes.node }
 
+const KEYS = ['access_token', 'refresh_token', 'user']
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user')
+    const stored = localStorage.getItem('user') || sessionStorage.getItem('user')
     return stored ? JSON.parse(stored) : null
   })
 
+  // Persistent login — survives tab close (localStorage)
   const login = useCallback(async (username, password) => {
     const { data } = await client.post('/auth/login/', { username, password })
     localStorage.setItem('access_token', data.access)
@@ -20,14 +23,20 @@ export function AuthProvider({ children }) {
     setUser(data.user)
   }, [])
 
+  // Session-only login — cleared when the tab closes (sessionStorage)
+  const loginSession = useCallback((data) => {
+    sessionStorage.setItem('access_token', data.access)
+    sessionStorage.setItem('refresh_token', data.refresh)
+    sessionStorage.setItem('user', JSON.stringify(data.user))
+    setUser(data.user)
+  }, [])
+
   const logout = useCallback(async () => {
-    const refresh = localStorage.getItem('refresh_token')
+    const refresh = localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token')
     try {
       await client.post('/auth/logout/', { refresh })
     } finally {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('user')
+      KEYS.forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k) })
       setUser(null)
     }
   }, [])
@@ -35,13 +44,14 @@ export function AuthProvider({ children }) {
   const updateUser = useCallback((updates) => {
     setUser(prev => {
       const updated = { ...prev, ...updates }
-      localStorage.setItem('user', JSON.stringify(updated))
+      const store = localStorage.getItem('user') ? localStorage : sessionStorage
+      store.setItem('user', JSON.stringify(updated))
       return updated
     })
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, login, loginSession, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )
