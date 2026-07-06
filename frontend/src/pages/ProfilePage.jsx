@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Check, X } from 'lucide-react'
 import {
   PasswordInput,
+  PasswordStrengthPanel,
   PASSWORD_RULES,
-  passwordStrength,
 } from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
@@ -305,7 +305,6 @@ function SecuritySection() {
 
   const allRulesMet = PASSWORD_RULES.every(r => r.test(form.new_password))
   const passwordsMatch = form.new_password && form.confirm && form.new_password === form.confirm
-  const strength = form.new_password ? passwordStrength(form.new_password) : null
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -377,34 +376,7 @@ function SecuritySection() {
               placeholder="Create a strong password" autoComplete="new-password"
             />
 
-            {form.new_password && (
-              <>
-                <div className="pw-strength-bar">
-                  <div
-                    className="pw-strength-fill"
-                    style={{
-                      width: `${(PASSWORD_RULES.filter(r => r.test(form.new_password)).length / PASSWORD_RULES.length) * 100}%`,
-                      background: strength.color,
-                    }}
-                  />
-                </div>
-                <span className="pw-strength-label" style={{ color: strength.color }}>
-                  {strength.label}
-                </span>
-              </>
-            )}
-
-            <ul className="pw-rules">
-              {PASSWORD_RULES.map(rule => {
-                const met = rule.test(form.new_password)
-                return (
-                  <li key={rule.key} className={`pw-rule ${met ? 'met' : 'unmet'}`}>
-                    {met ? <Check size={12} /> : <X size={12} />}
-                    {rule.label}
-                  </li>
-                )
-              })}
-            </ul>
+            <PasswordStrengthPanel password={form.new_password} />
           </div>
 
           <div className="profile-field">
