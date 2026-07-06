@@ -1,3 +1,9 @@
+from .access_requests import (
+    AccessRequestDetailView,
+    AccessRequestMineView,
+    AccessRequestSeenView,
+    AccessRequestView,
+)
 from .admin import (
     AdminAccessRequestListView,
     AdminAccessRequestReviewView,
@@ -44,6 +50,10 @@ from .profile import (
 from .recommendations import RecommendationEventView, RecommendationsView
 
 __all__ = [
+    'AccessRequestDetailView',
+    'AccessRequestMineView',
+    'AccessRequestSeenView',
+    'AccessRequestView',
     'AdminAccessRequestListView',
     'AdminAccessRequestReviewView',
     'AdminUserListView',

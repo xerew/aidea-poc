@@ -2,6 +2,10 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
+    AccessRequestDetailView,
+    AccessRequestMineView,
+    AccessRequestSeenView,
+    AccessRequestView,
     AdminAccessRequestListView,
     AdminAccessRequestReviewView,
     AdminUserListView,
@@ -59,6 +63,11 @@ urlpatterns = [
     path('auth/change-password/', ChangePasswordView.as_view(),      name='auth-change-password'),
     path('recommendations/',  RecommendationsView.as_view(),  name='recommendations'),
     path('recommendations/events/', RecommendationEventView.as_view(), name='recommendation-event'),
+    # Access requests (user-facing)
+    path('access-requests/mine/',         AccessRequestMineView.as_view(),   name='access-request-mine'),
+    path('access-requests/',              AccessRequestView.as_view(),       name='access-request'),
+    path('access-requests/<int:pk>/',     AccessRequestDetailView.as_view(), name='access-request-detail'),
+    path('access-requests/<int:pk>/seen/', AccessRequestSeenView.as_view(), name='access-request-seen'),
     # Admin
     path('admin/users/',                        AdminUserListView.as_view(),           name='admin-users'),
     path('admin/users/<int:pk>/role/',          AdminUserRoleView.as_view(),           name='admin-user-role'),
