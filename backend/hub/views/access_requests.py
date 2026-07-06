@@ -22,6 +22,8 @@ class AccessRequestView(APIView):
     def post(self, request):
         if request.user.access_requests.filter(status=AccessRequest.Status.PENDING).exists():
             return Response({'error': 'You already have a pending request.'}, status=400)
+        if request.user.profile.user_type != 'teacher':
+            return Response({'error': 'Only teachers may submit access requests.'}, status=400)
         message = request.data.get('message', '').strip()
         if not message:
             return Response({'error': 'message is required.'}, status=400)
