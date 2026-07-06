@@ -6,6 +6,7 @@ import './PasswordInput.css'
 
 export const PASSWORD_RULES = [
   { key: 'length', label: 'At least 8 characters',          test: (p) => p.length >= 8 },
+  { key: 'max',    label: 'No more than 128 characters',    test: (p) => p.length <= 128 },
   { key: 'upper',  label: 'One uppercase letter (A–Z)',      test: (p) => /[A-Z]/.test(p) },
   { key: 'lower',  label: 'One lowercase letter (a–z)',      test: (p) => /[a-z]/.test(p) },
   { key: 'number', label: 'One number (0–9)',                test: (p) => /\d/.test(p) },

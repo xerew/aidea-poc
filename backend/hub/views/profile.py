@@ -2,6 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.serializers.auth import _PASSWORD_RULES
 from hub.serializers.profile import (
     ProfilePersonalInfoSerializer,
     ProfilePreferencesSerializer,
@@ -61,21 +62,7 @@ class ProfileSettingsView(APIView):
 
 
 def _password_errors(password: str) -> list[str]:
-    import re
-    errors = []
-    if len(password) < 8:
-        errors.append('at least 8 characters')
-    if len(password) > 128:
-        errors.append('no more than 128 characters')
-    if not re.search(r'[A-Z]', password):
-        errors.append('at least one uppercase letter')
-    if not re.search(r'[a-z]', password):
-        errors.append('at least one lowercase letter')
-    if not re.search(r'\d', password):
-        errors.append('at least one number')
-    if not re.search(r'[^A-Za-z0-9]', password):
-        errors.append('at least one special character (!@#$%…)')
-    return errors
+    return [msg for check, msg in _PASSWORD_RULES if not check(password)]
 
 
 class ChangePasswordView(APIView):
