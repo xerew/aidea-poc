@@ -1,4 +1,9 @@
-from .auth import AideaTokenObtainPairSerializer, UserProfileSerializer, UserSerializer
+from .auth import (
+    AideaTokenObtainPairSerializer,
+    RegisterSerializer,
+    UserProfileSerializer,
+    UserSerializer,
+)
 from .content import (
     LessonLearnDetailSerializer,
     LessonLearnSerializer,
@@ -22,6 +27,7 @@ from .pathway import RecommendationSerializer, UserLearningPathSerializer
 
 __all__ = [
     'AideaTokenObtainPairSerializer',
+    'RegisterSerializer',
     'ContinueLearningSerializer',
     'CourseAuthoringSerializer',
     'CourseDetailSerializer',

@@ -1,8 +1,67 @@
+import re
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from hub.models import UserProfile
+
+_PASSWORD_RULES = [
+    (lambda p: len(p) >= 8,                         'at least 8 characters'),
+    (lambda p: len(p) <= 128,                        'no more than 128 characters'),
+    (lambda p: bool(re.search(r'[A-Z]', p)),        'at least one uppercase letter'),
+    (lambda p: bool(re.search(r'[a-z]', p)),        'at least one lowercase letter'),
+    (lambda p: bool(re.search(r'\d', p)),            'at least one number'),
+    (lambda p: bool(re.search(r'[^A-Za-z0-9]', p)), 'at least one special character'),
+]
+
+
+class RegisterSerializer(serializers.Serializer):
+    first_name       = serializers.CharField(max_length=150)
+    last_name        = serializers.CharField(max_length=150)
+    username         = serializers.CharField(max_length=150)
+    email            = serializers.EmailField()
+    password         = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError('This username is already taken.')
+        return value
+
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('An account with this email already exists.')
+        return value
+
+    def validate_password(self, value):
+        errors = [msg for check, msg in _PASSWORD_RULES if not check(value)]
+        if errors:
+            raise serializers.ValidationError(f"Password must have: {', '.join(errors)}.")
+        return value
+
+    def validate(self, data):
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
+        return data
+
+    def create(self, validated_data):
+        validated_data.pop('confirm_password')
+        password = validated_data.pop('password')
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            password=password,
+        )
+        initials = (validated_data['first_name'][:1] + validated_data['last_name'][:1]).upper()
+        UserProfile.objects.create(
+            user=user,
+            user_type=UserProfile.UserType.TEACHER,
+            avatar_initials=initials,
+        )
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

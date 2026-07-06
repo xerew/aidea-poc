@@ -13,6 +13,7 @@ from .views import (
     AuthoringModuleReorderView,
     AuthoringModuleView,
     AuthoringPillarsView,
+    ChangePasswordView,
     CourseDetailView,
     CourseEnrollView,
     CourseLearnView,
@@ -25,15 +26,19 @@ from .views import (
     MyLearningView,
     OnboardingView,
     PathwayView,
+    ProfilePersonalInfoView,
     ProfilePreferencesView,
+    ProfileSettingsView,
     RecommendationEventView,
     RecommendationsView,
+    RegisterView,
 )
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='auth-refresh'),
     path('auth/logout/', LogoutView.as_view(), name='auth-logout'),
+    path('auth/register/', RegisterView.as_view(), name='auth-register'),
     path('courses/', CoursesView.as_view(), name='courses'),
     path('courses/<int:pk>/', CourseDetailView.as_view(), name='course-detail'),
     path('courses/<int:pk>/enroll/', CourseEnrollView.as_view(), name='course-enroll'),
@@ -45,6 +50,9 @@ urlpatterns = [
     path('onboarding/',           OnboardingView.as_view(),           name='onboarding'),
     path('pathway/',              PathwayView.as_view(),              name='pathway'),
     path('profile/preferences/',  ProfilePreferencesView.as_view(),  name='profile-preferences'),
+    path('profile/info/',         ProfilePersonalInfoView.as_view(), name='profile-info'),
+    path('profile/settings/',     ProfileSettingsView.as_view(),     name='profile-settings'),
+    path('auth/change-password/', ChangePasswordView.as_view(),      name='auth-change-password'),
     path('recommendations/',  RecommendationsView.as_view(),  name='recommendations'),
     path('recommendations/events/', RecommendationEventView.as_view(), name='recommendation-event'),
     # Authoring (content_creator only)

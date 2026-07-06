@@ -1,4 +1,4 @@
-from .auth import LoginView, LogoutView
+from .auth import LoginView, LogoutView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
@@ -29,7 +29,12 @@ from .learner import (
 from .onboarding import OnboardingView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsTeacher
-from .profile import ProfilePreferencesView
+from .profile import (
+    ChangePasswordView,
+    ProfilePersonalInfoView,
+    ProfilePreferencesView,
+    ProfileSettingsView,
+)
 from .recommendations import RecommendationEventView, RecommendationsView
 
 __all__ = [
@@ -56,9 +61,13 @@ __all__ = [
     'IsTeacher',
     'LoginView',
     'LogoutView',
+    'RegisterView',
     'OnboardingView',
     'PathwayView',
+    'ChangePasswordView',
+    'ProfilePersonalInfoView',
     'ProfilePreferencesView',
+    'ProfileSettingsView',
     'RecommendationEventView',
     'RecommendationsView',
 ]
