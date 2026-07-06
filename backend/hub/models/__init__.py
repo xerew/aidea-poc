@@ -1,3 +1,4 @@
+from .access_request import AccessRequest
 from .activity import LearnerActivityConfig, LessonSession
 from .content import Course, LearningPillar, Lesson, Module
 from .enrollment import Enrollment, LessonProgress
@@ -13,6 +14,7 @@ from .recommendations import (
 from .user import UserProfile
 
 __all__ = [
+    'AccessRequest',
     'Course',
     'CourseEditHistory',
     'CourseEmbedding',
