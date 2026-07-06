@@ -7,6 +7,7 @@ import {
   PASSWORD_RULES,
 } from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
+import { useAccessRequest } from '../context/AccessRequestContext'
 import client from '../api/client'
 import './ProfilePage.css'
 
@@ -411,6 +412,138 @@ function SecuritySection() {
   )
 }
 
+// ── Content Creator Access ────────────────────────────────────────────────────
+
+function ContentCreatorAccessSection() {
+  const { user } = useAuth()
+  const { request, loading, submit, cancel } = useAccessRequest()
+  const [showForm,   setShowForm]   = useState(false)
+  const [message,    setMessage]    = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error,      setError]      = useState('')
+
+  if (user?.profile?.user_type !== 'teacher') return null
+
+  if (loading) {
+    return (
+      <section className="profile-card">
+        <h2>Content Creator Access</h2>
+        <p className="profile-loading">Loading…</p>
+      </section>
+    )
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!message.trim()) return
+    setSubmitting(true)
+    setError('')
+    try {
+      await submit(message.trim())
+      setShowForm(false)
+      setMessage('')
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Failed to submit request.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleCancel = async () => {
+    try { await cancel(request.id) } catch { /* ignore */ }
+  }
+
+  const requestForm = (
+    <form onSubmit={handleSubmit}>
+      <div className="profile-field">
+        <label htmlFor="cc-message">Why do you want Content Creator access?</label>
+        <textarea
+          id="cc-message"
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          placeholder="Describe your plans for creating courses…"
+          rows={4}
+          required
+        />
+      </div>
+      {error && <p className="profile-feedback error">{error}</p>}
+      <div className="profile-section-footer">
+        <button
+          type="button"
+          className="profile-outline-btn"
+          onClick={() => { setShowForm(false); setMessage('') }}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="profile-save-btn"
+          disabled={submitting || !message.trim()}
+        >
+          {submitting ? 'Submitting…' : 'Submit Request'}
+        </button>
+      </div>
+    </form>
+  )
+
+  return (
+    <section className="profile-card">
+      <h2>Content Creator Access</h2>
+
+      {!request && !showForm && (
+        <>
+          <p className="profile-loading">
+            Want to create and publish courses? Request access from the admin team.
+          </p>
+          <button
+            className="profile-outline-btn"
+            style={{ marginTop: '1rem' }}
+            onClick={() => setShowForm(true)}
+          >
+            Request Access
+          </button>
+        </>
+      )}
+
+      {!request && showForm && requestForm}
+
+      {request?.status === 'pending' && (
+        <>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+            <span className="cc-badge cc-badge-pending">Pending Review</span>
+            <span className="profile-loading">
+              Submitted {new Date(request.created_at).toLocaleDateString()}
+            </span>
+          </div>
+          <button className="profile-outline-btn" onClick={handleCancel}>
+            Cancel Request
+          </button>
+        </>
+      )}
+
+      {request?.status === 'denied' && (
+        <>
+          <div className="cc-denial-box">
+            <p className="cc-denial-label">Your request was denied</p>
+            <p className="cc-denial-reason">{request.denial_reason}</p>
+          </div>
+          {!showForm ? (
+            <button
+              className="profile-outline-btn"
+              style={{ marginTop: '1rem' }}
+              onClick={() => setShowForm(true)}
+            >
+              Request Again
+            </button>
+          ) : (
+            <div style={{ marginTop: '1rem' }}>{requestForm}</div>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
@@ -437,6 +570,7 @@ export default function ProfilePage() {
       <PreferencesSection />
       <PrivacySection />
       <SecuritySection />
+      <ContentCreatorAccessSection />
     </div>
   )
 }
