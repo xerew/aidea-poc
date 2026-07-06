@@ -1,12 +1,25 @@
 .profile-page {
-  max-width: 680px;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.profile-heading {
+.profile-page-header {
+  margin-bottom: 0.25rem;
+}
+
+.profile-page-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  margin: 0 0 1.5rem;
+  margin: 0 0 0.25rem;
   color: var(--color-text);
+}
+
+.profile-page-sub {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin: 0;
 }
 
 .profile-identity {
@@ -17,7 +30,6 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
-  margin-bottom: 2rem;
 }
 
 .profile-avatar {
@@ -45,84 +57,236 @@
   margin: 0;
 }
 
-.prefs-section {
+/* Cards */
+
+.profile-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
 }
 
-.prefs-section h2 {
-  font-size: 1.1rem;
+.profile-card h2 {
+  font-size: 1.0625rem;
   font-weight: 700;
-  margin: 0 0 0.4rem;
+  margin: 0 0 1.25rem;
 }
 
-.prefs-hint {
+.profile-loading {
+  color: var(--color-text-muted);
   font-size: 0.875rem;
-  color: var(--color-text-muted);
-  margin: 0 0 1.5rem;
+  margin: 0;
 }
 
-.prefs-loading {
-  color: var(--color-text-muted);
+/* Field grid */
+
+.profile-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
-.prefs-group {
-  margin-bottom: 1.5rem;
-}
-
-.prefs-group h3 {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  margin: 0 0 0.25rem;
-}
-
-.prefs-sub {
-  font-size: 0.8125rem;
-  color: var(--color-text-muted);
-  margin: 0 0 0.75rem;
-}
-
-.prefs-checkbox-label,
-.prefs-radio-label {
+.profile-field {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.profile-grid-2 .profile-field {
+  margin-bottom: 0;
+}
+
+.profile-field label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.profile-field input,
+.profile-field select {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
   font-size: 0.9rem;
-  padding: 0.35rem 0;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.profile-field input:focus,
+.profile-field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.profile-name-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-name-row input {
+  flex: 1;
+}
+
+/* Pill selector */
+
+.profile-pill-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-pill {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.profile-pill.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.profile-pill:hover:not(.active) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Toggle rows (checkboxes styled as cards) */
+
+.profile-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.profile-toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
   cursor: pointer;
 }
 
-.prefs-error {
-  color: var(--color-red, #dc2626);
-  font-size: 0.875rem;
-  margin: 0 0 0.75rem;
+.profile-toggle-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
 }
 
-.prefs-success {
-  color: #16a34a;
+.toggle-title {
+  display: block;
   font-size: 0.875rem;
-  margin: 0 0 0.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 0.15rem;
 }
 
-.prefs-save-btn {
+.toggle-sub {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Section footer */
+
+.profile-section-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.profile-save-btn {
   background: var(--color-primary);
   color: #fff;
   border: none;
   border-radius: var(--radius);
-  padding: 0.6rem 1.4rem;
-  font-size: 0.9rem;
+  padding: 0.55rem 1.4rem;
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s;
+  white-space: nowrap;
 }
 
-.prefs-save-btn:disabled {
+.profile-save-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.prefs-save-btn:hover:not(:disabled) {
+.profile-save-btn:hover:not(:disabled) {
   opacity: 0.88;
+}
+
+.profile-outline-btn {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.55rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.profile-outline-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Feedback messages */
+
+.profile-feedback {
+  font-size: 0.8125rem;
+  margin-right: auto;
+}
+
+.profile-feedback.error   { color: var(--color-red, #dc2626); }
+.profile-feedback.success { color: #16a34a; }
+.profile-feedback.info    { color: var(--color-primary); }
+
+/* Security */
+
+.profile-security-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.profile-password-form .profile-field {
+  margin-bottom: 0.75rem;
+}
+
+/* Responsive */
+
+@media (max-width: 560px) {
+  .profile-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-name-row {
+    flex-direction: column;
+  }
 }
