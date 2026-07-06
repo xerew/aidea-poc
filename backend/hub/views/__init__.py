@@ -14,6 +14,7 @@ from .auth import LoginView, LogoutView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
+    AuthoringCourseUnpublishView,
     AuthoringCoursesView,
     AuthoringPillarsView,
 )
@@ -60,6 +61,7 @@ __all__ = [
     'AdminUserRoleView',
     'AuthoringCourseDetailView',
     'AuthoringCoursePublishView',
+    'AuthoringCourseUnpublishView',
     'AuthoringCoursesView',
     'AuthoringLessonDetailView',
     'AuthoringLessonReorderView',

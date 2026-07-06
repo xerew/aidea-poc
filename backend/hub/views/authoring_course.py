@@ -104,3 +104,24 @@ class AuthoringCoursePublishView(APIView):
             changes={'course_published': {'title': course.title}},
         )
         return Response(CourseAuthoringSerializer(course).data)
+
+
+class AuthoringCourseUnpublishView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not course.is_published:
+            return Response({'detail': 'Course is not published.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        course.is_published = False
+        course.save()
+        CourseEditHistory.objects.create(
+            course=course,
+            editor=request.user,
+            changes={'course_unpublished': {'title': course.title}},
+        )
+        return Response(CourseAuthoringSerializer(course).data)
