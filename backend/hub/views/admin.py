@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.utils import timezone
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -68,9 +70,6 @@ class AdminAccessRequestReviewView(APIView):
     permission_classes = [IsAdmin]
 
     def patch(self, request, pk):
-        from django.db import transaction
-        from django.utils import timezone
-
         try:
             req = AccessRequest.objects.select_related('user__profile').get(pk=pk)
         except AccessRequest.DoesNotExist:
