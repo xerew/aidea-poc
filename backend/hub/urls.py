@@ -2,6 +2,10 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
+    AdminAccessRequestListView,
+    AdminAccessRequestReviewView,
+    AdminUserListView,
+    AdminUserRoleView,
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
     AuthoringCoursesView,
@@ -55,6 +59,11 @@ urlpatterns = [
     path('auth/change-password/', ChangePasswordView.as_view(),      name='auth-change-password'),
     path('recommendations/',  RecommendationsView.as_view(),  name='recommendations'),
     path('recommendations/events/', RecommendationEventView.as_view(), name='recommendation-event'),
+    # Admin
+    path('admin/users/',                        AdminUserListView.as_view(),           name='admin-users'),
+    path('admin/users/<int:pk>/role/',          AdminUserRoleView.as_view(),           name='admin-user-role'),
+    path('admin/access-requests/',              AdminAccessRequestListView.as_view(),  name='admin-access-requests'),
+    path('admin/access-requests/<int:pk>/',     AdminAccessRequestReviewView.as_view(), name='admin-access-request-review'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/courses/', AuthoringCoursesView.as_view(), name='authoring-courses'),

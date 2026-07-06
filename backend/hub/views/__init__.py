@@ -1,3 +1,9 @@
+from .admin import (
+    AdminAccessRequestListView,
+    AdminAccessRequestReviewView,
+    AdminUserListView,
+    AdminUserRoleView,
+)
 from .auth import LoginView, LogoutView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
@@ -38,6 +44,10 @@ from .profile import (
 from .recommendations import RecommendationEventView, RecommendationsView
 
 __all__ = [
+    'AdminAccessRequestListView',
+    'AdminAccessRequestReviewView',
+    'AdminUserListView',
+    'AdminUserRoleView',
     'AuthoringCourseDetailView',
     'AuthoringCoursePublishView',
     'AuthoringCoursesView',
