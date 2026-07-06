@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate, Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './LoginPage.css'
 
@@ -64,6 +64,10 @@ export default function LoginPage() {
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        <p className="login-signup-link">
+          Don&apos;t have an account? <Link to="/register">Create one</Link>
+        </p>
 
         <div className="login-footer">
           <img

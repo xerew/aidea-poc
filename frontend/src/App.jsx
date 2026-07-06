@@ -18,6 +18,7 @@ import AuthoringPage from './pages/AuthoringPage'
 import CourseEditorPage from './pages/CourseEditorPage'
 import CourseCreatePage from './pages/CourseCreatePage'
 import ModuleEditorPage from './pages/ModuleEditorPage'
+import RegisterPage from './pages/RegisterPage'
 
 ContentCreatorRoute.propTypes = { element: PropTypes.node.isRequired }
 
@@ -34,6 +35,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<RequireOnboarding><Layout /></RequireOnboarding>}>
             <Route index element={<HomePage />} />

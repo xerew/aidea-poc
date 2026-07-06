@@ -111,3 +111,20 @@
   text-align: center;
   line-height: 1.4;
 }
+
+.login-signup-link {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.login-signup-link a {
+  color: var(--color-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login-signup-link a:hover {
+  text-decoration: underline;
+}
