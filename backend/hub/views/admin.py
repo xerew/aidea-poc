@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
-
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +11,6 @@ from hub.serializers.admin import (
     AdminUserSerializer,
 )
 from hub.views.permissions import IsAdmin
-
 
 ROLE_ORDER = {
     UserProfile.UserType.ADMIN:           0,

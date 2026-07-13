@@ -68,10 +68,19 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
+    def get_avatar_url(self, obj):
+        if not obj.avatar:
+            return None
+        request = self.context.get('request')
+        url = obj.avatar.url
+        return request.build_absolute_uri(url) if request else url
+
     class Meta:
         model  = UserProfile
         fields = ['user_type', 'avatar_initials', 'onboarding_completed',
-                  'preferred_pillars', 'learning_style']
+                  'preferred_pillars', 'learning_style', 'gender', 'avatar_url']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -85,5 +94,5 @@ class UserSerializer(serializers.ModelSerializer):
 class AideaTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        data['user'] = UserSerializer(self.user).data
+        data['user'] = UserSerializer(self.user, context=self.context).data
         return data

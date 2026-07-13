@@ -1,8 +1,9 @@
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.serializers.auth import _PASSWORD_RULES
+from hub.serializers.auth import _PASSWORD_RULES, UserSerializer
 from hub.serializers.profile import (
     ProfilePersonalInfoSerializer,
     ProfilePreferencesSerializer,
@@ -59,6 +60,28 @@ class ProfileSettingsView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class ProfileAvatarView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        file = request.FILES.get('avatar')
+        if not file:
+            return Response({'error': 'No file provided.'}, status=status.HTTP_400_BAD_REQUEST)
+        profile = request.user.profile
+        if profile.avatar:
+            profile.avatar.delete(save=False)
+        profile.avatar = file
+        profile.save(update_fields=['avatar'])
+        return Response(UserSerializer(request.user, context={'request': request}).data)
+
+    def delete(self, request):
+        profile = request.user.profile
+        if profile.avatar:
+            profile.avatar.delete(save=False)
+            profile.save(update_fields=['avatar'])
+        return Response(UserSerializer(request.user, context={'request': request}).data)
 
 
 def _password_errors(password: str) -> list[str]:

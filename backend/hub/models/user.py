@@ -34,6 +34,11 @@ class UserProfile(models.Model):
         H25 = '2_5', '2-5 hours'
         GT5 = 'gt5', '5+ hours'
 
+    class Gender(models.TextChoices):
+        MALE           = 'male',           'Male'
+        FEMALE         = 'female',         'Female'
+        PREFER_NOT_SAY = 'prefer_not_say', 'Prefer not to say'
+
     user                 = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type            = models.CharField(max_length=20, choices=UserType.choices, default=UserType.TEACHER)
     avatar_initials      = models.CharField(max_length=4, blank=True)
@@ -54,6 +59,10 @@ class UserProfile(models.Model):
     progress_reminders   = models.BooleanField(default=True)
     profile_public       = models.BooleanField(default=False)
     share_progress       = models.BooleanField(default=False)
+    gender               = models.CharField(
+        max_length=20, choices=Gender.choices, blank=True,
+    )
+    avatar               = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.get_user_type_display()})'

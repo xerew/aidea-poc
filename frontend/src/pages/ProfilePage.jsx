@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
-import { useCallback, useEffect, useState } from 'react'
-import { Check, X } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Camera, Check, X } from 'lucide-react'
 import {
   PasswordInput,
   PasswordStrengthPanel,
@@ -41,6 +41,20 @@ const WEEKLY_GOALS = [
   { value: '2_5', label: '2-5 hours' },
   { value: 'gt5', label: '5+ hours' },
 ]
+
+const GENDER_OPTIONS = [
+  { value: '',              label: 'Select gender' },
+  { value: 'male',         label: 'Male' },
+  { value: 'female',       label: 'Female' },
+  { value: 'prefer_not_say', label: 'Prefer not to say' },
+]
+
+function getAvatarSrc(profile) {
+  if (profile?.avatar_url) return profile.avatar_url
+  if (profile?.gender === 'male') return '/images/avatars/male_avatar.jpg'
+  if (profile?.gender === 'female') return '/images/avatars/female_avatar.jpg'
+  return null
+}
 
 function useSectionSave(endpoint, method = 'patch') {
   const [saving, setSaving] = useState(false)
@@ -89,7 +103,7 @@ SaveFeedback.propTypes = {
 function PersonalInfoSection() {
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject_area: '', school: '', phone: '', location: '',
+    subject_area: '', gender: '', school: '', phone: '', location: '',
   })
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/info/')
@@ -134,6 +148,12 @@ function PersonalInfoSection() {
             <label>Subject / Department</label>
             <select value={form.subject_area} onChange={set('subject_area')}>
               {SUBJECT_AREAS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="profile-field">
+            <label>Gender</label>
+            <select value={form.gender} onChange={set('gender')}>
+              {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div className="profile-field">
@@ -544,11 +564,101 @@ function ContentCreatorAccessSection() {
   )
 }
 
+// ── Avatar with upload ────────────────────────────────────────────────────────
+
+function ProfileAvatar() {
+  const { user, updateUser } = useAuth()
+  const fileRef = useRef(null)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+
+  const avatarSrc = getAvatarSrc(user?.profile)
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setError('')
+    try {
+      const form = new FormData()
+      form.append('avatar', file)
+      const { data } = await client.post('/profile/avatar/', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      updateUser({ profile: data.profile })
+    } catch {
+      setError('Upload failed.')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  const handleRemove = async () => {
+    setUploading(true)
+    setError('')
+    try {
+      const { data } = await client.delete('/profile/avatar/')
+      updateUser({ profile: data.profile })
+    } catch {
+      setError('Failed to remove avatar.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  if (!user) return null
+
+  return (
+    <div className="profile-identity">
+      <div className="profile-avatar-wrap">
+        {avatarSrc ? (
+          <img className="profile-avatar-img" src={avatarSrc} alt="Avatar" />
+        ) : (
+          <div className="profile-avatar">{user.profile?.avatar_initials || '?'}</div>
+        )}
+        <button
+          type="button"
+          className="profile-avatar-upload-btn"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          title="Change photo"
+        >
+          <Camera size={14} />
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          className="profile-avatar-file-input"
+          onChange={handleFileChange}
+        />
+      </div>
+      <div>
+        <p className="profile-name">{user.first_name} {user.last_name}</p>
+        <p className="profile-username">@{user.username}</p>
+        {user.profile?.avatar_url && (
+          <button
+            type="button"
+            className="profile-avatar-remove-btn"
+            onClick={handleRemove}
+            disabled={uploading}
+          >
+            {uploading ? 'Removing…' : 'Remove photo'}
+          </button>
+        )}
+        {uploading && !user.profile?.avatar_url && (
+          <span className="profile-loading">Uploading…</span>
+        )}
+        {error && <span className="profile-feedback error">{error}</span>}
+      </div>
+    </div>
+  )
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
-  const { user } = useAuth()
-
   return (
     <div className="profile-page">
       <div className="profile-page-header">
@@ -556,16 +666,7 @@ export default function ProfilePage() {
         <p className="profile-page-sub">Manage your account settings and preferences</p>
       </div>
 
-      {user && (
-        <div className="profile-identity">
-          <div className="profile-avatar">{user.profile?.avatar_initials || '?'}</div>
-          <div>
-            <p className="profile-name">{user.first_name} {user.last_name}</p>
-            <p className="profile-username">@{user.username}</p>
-          </div>
-        </div>
-      )}
-
+      <ProfileAvatar />
       <PersonalInfoSection />
       <PreferencesSection />
       <PrivacySection />
