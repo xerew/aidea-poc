@@ -8,6 +8,7 @@ import {
 } from '../components/PasswordInput'
 import { useAuth } from '../context/AuthContext'
 import { useAccessRequest } from '../context/AccessRequestContext'
+import { COUNTRIES, getFlagEmoji } from '../data/countries'
 import client from '../api/client'
 import './ProfilePage.css'
 
@@ -103,7 +104,7 @@ SaveFeedback.propTypes = {
 function PersonalInfoSection() {
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject_area: '', gender: '', school: '', phone: '', location: '',
+    subject_area: '', gender: '', country: '', school: '', phone: '', location: '',
   })
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/info/')
@@ -154,6 +155,17 @@ function PersonalInfoSection() {
             <label>Gender</label>
             <select value={form.gender} onChange={set('gender')}>
               {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+          <div className="profile-field">
+            <label>Country</label>
+            <select value={form.country} onChange={set('country')}>
+              <option value="">Select country</option>
+              {COUNTRIES.map(c => (
+                <option key={c.code} value={c.code}>
+                  {getFlagEmoji(c.code)} {c.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="profile-field">

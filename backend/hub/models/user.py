@@ -62,6 +62,7 @@ class UserProfile(models.Model):
     gender               = models.CharField(
         max_length=20, choices=Gender.choices, blank=True,
     )
+    country              = models.CharField(max_length=2, blank=True)
     avatar               = models.ImageField(upload_to='avatars/', null=True, blank=True)
 
     def __str__(self):

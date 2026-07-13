@@ -8,7 +8,14 @@ import {
   PasswordStrengthPanel,
   PASSWORD_RULES,
 } from '../components/PasswordInput'
+import { COUNTRIES, getFlagEmoji } from '../data/countries'
 import './RegisterPage.css'
+
+const GENDER_OPTIONS = [
+  { value: '',        label: 'Prefer not to say' },
+  { value: 'male',   label: 'Male' },
+  { value: 'female', label: 'Female' },
+]
 
 export default function RegisterPage() {
   const { user, loginSession } = useAuth()
@@ -16,14 +23,8 @@ export default function RegisterPage() {
 
   const [form, setForm] = useState({
     first_name: '', last_name: '', username: '', email: '',
-    gender: '', password: '', confirm: '',
+    gender: '', country: '', password: '', confirm: '',
   })
-
-  const GENDER_OPTIONS = [
-    { value: '',              label: 'Prefer not to say' },
-    { value: 'male',         label: 'Male' },
-    { value: 'female',       label: 'Female' },
-  ]
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
 
@@ -49,6 +50,7 @@ export default function RegisterPage() {
         username:         form.username,
         email:            form.email,
         gender:           form.gender,
+        country:          form.country,
         password:         form.password,
         confirm_password: form.confirm,
       })
@@ -111,11 +113,24 @@ export default function RegisterPage() {
             />
           </div>
 
-          <div className="field">
-            <label htmlFor="reg-gender">Gender</label>
-            <select id="reg-gender" value={form.gender} onChange={set('gender')}>
-              {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+          <div className="register-row-2">
+            <div className="field">
+              <label htmlFor="reg-gender">Gender</label>
+              <select id="reg-gender" value={form.gender} onChange={set('gender')}>
+                {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="reg-country">Country</label>
+              <select id="reg-country" value={form.country} onChange={set('country')}>
+                <option value="">Select country</option>
+                {COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>
+                    {getFlagEmoji(c.code)} {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="field">

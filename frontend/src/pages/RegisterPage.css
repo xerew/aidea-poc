@@ -37,7 +37,8 @@
   font-size: 0.875rem;
 }
 
-.register-name-row {
+.register-name-row,
+.register-row-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
@@ -117,7 +118,8 @@
 }
 
 @media (max-width: 480px) {
-  .register-name-row {
+  .register-name-row,
+  .register-row-2 {
     grid-template-columns: 1fr;
   }
 }

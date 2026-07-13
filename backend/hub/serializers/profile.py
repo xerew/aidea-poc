@@ -38,10 +38,11 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
         choices=[('', '')] + list(UserProfile.SubjectArea.choices),
         required=False, allow_blank=True,
     )
-    gender = serializers.ChoiceField(
+    gender  = serializers.ChoiceField(
         choices=[('', '')] + list(UserProfile.Gender.choices),
         required=False, allow_blank=True,
     )
+    country  = serializers.CharField(max_length=2,   required=False, allow_blank=True)
     school   = serializers.CharField(max_length=200, required=False, allow_blank=True)
     phone    = serializers.CharField(max_length=30,  required=False, allow_blank=True)
     location = serializers.CharField(max_length=200, required=False, allow_blank=True)
@@ -54,6 +55,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'email':        user.email,
             'subject_area': instance.subject_area,
             'gender':       instance.gender,
+            'country':      instance.country,
             'school':       instance.school,
             'phone':        instance.phone,
             'location':     instance.location,
@@ -68,10 +70,11 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
 
         instance.subject_area = validated_data.get('subject_area', instance.subject_area)
         instance.gender       = validated_data.get('gender',       instance.gender)
+        instance.country      = validated_data.get('country',      instance.country)
         instance.school       = validated_data.get('school',       instance.school)
         instance.phone        = validated_data.get('phone',        instance.phone)
         instance.location     = validated_data.get('location',     instance.location)
-        instance.save(update_fields=['subject_area', 'gender', 'school', 'phone', 'location'])
+        instance.save(update_fields=['subject_area', 'gender', 'country', 'school', 'phone', 'location'])
         return instance
 
 
