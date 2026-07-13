@@ -16,8 +16,14 @@ export default function RegisterPage() {
 
   const [form, setForm] = useState({
     first_name: '', last_name: '', username: '', email: '',
-    password: '', confirm: '',
+    gender: '', password: '', confirm: '',
   })
+
+  const GENDER_OPTIONS = [
+    { value: '',              label: 'Prefer not to say' },
+    { value: 'male',         label: 'Male' },
+    { value: 'female',       label: 'Female' },
+  ]
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
 
@@ -42,6 +48,7 @@ export default function RegisterPage() {
         last_name:        form.last_name,
         username:         form.username,
         email:            form.email,
+        gender:           form.gender,
         password:         form.password,
         confirm_password: form.confirm,
       })
@@ -102,6 +109,13 @@ export default function RegisterPage() {
               onChange={set('email')} placeholder="you@school.edu" required
               autoComplete="email"
             />
+          </div>
+
+          <div className="field">
+            <label htmlFor="reg-gender">Gender</label>
+            <select id="reg-gender" value={form.gender} onChange={set('gender')}>
+              {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
           </div>
 
           <div className="field">

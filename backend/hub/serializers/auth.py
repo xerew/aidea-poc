@@ -21,6 +21,10 @@ class RegisterSerializer(serializers.Serializer):
     last_name        = serializers.CharField(max_length=150)
     username         = serializers.CharField(max_length=150)
     email            = serializers.EmailField()
+    gender           = serializers.ChoiceField(
+        choices=[('', '')] + list(UserProfile.Gender.choices),
+        required=False, allow_blank=True,
+    )
     password         = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
 
@@ -50,6 +54,7 @@ class RegisterSerializer(serializers.Serializer):
 
         validated_data.pop('confirm_password')
         password = validated_data.pop('password')
+        gender   = validated_data.pop('gender', '')
         with transaction.atomic():
             user = User.objects.create_user(
                 username=validated_data['username'],
@@ -63,6 +68,7 @@ class RegisterSerializer(serializers.Serializer):
                 user=user,
                 user_type=UserProfile.UserType.TEACHER,
                 avatar_initials=initials,
+                gender=gender,
             )
         return user
 
