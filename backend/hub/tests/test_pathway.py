@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -79,3 +80,24 @@ class PathwayGetTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
         response = self.client.get(reverse('pathway'))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class PathwaySeedOrderingTests(TestCase):
+    def test_seeded_path_courses_ordered_by_level(self):
+        from hub.management.commands.seed_data.pathways import seed_pathways
+
+        pillar = LearningPillar.objects.create(name='Teach with AI', slug='teach-with-ai', description='')
+        Course.objects.create(title='A Advanced', pillar=pillar, level='advanced',
+                               duration_hours=1, is_published=True)
+        Course.objects.create(title='B Beginner', pillar=pillar, level='beginner',
+                               duration_hours=1, is_published=True)
+        Course.objects.create(title='C Intermediate', pillar=pillar, level='intermediate',
+                               duration_hours=1, is_published=True)
+
+        seed_pathways()
+
+        path = LearningPath.objects.get(slug='beginner-foundations')
+        ordered = list(
+            LearningPathCourse.objects.filter(path=path).order_by('order').values_list('course__level', flat=True)
+        )
+        self.assertEqual(ordered, ['beginner', 'intermediate', 'advanced'])

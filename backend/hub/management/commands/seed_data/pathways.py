@@ -1,3 +1,5 @@
+from django.db.models import Case, IntegerField, Value, When
+
 from hub.models.content import Course, LearningPillar
 from hub.models.pathway import LearningPath, LearningPathCourse
 
@@ -43,8 +45,17 @@ def seed_pathways():
         except LearningPillar.DoesNotExist:
             continue
 
+        level_rank = Case(
+            When(level='beginner', then=Value(0)),
+            When(level='intermediate', then=Value(1)),
+            When(level='advanced', then=Value(2)),
+            default=Value(3),
+            output_field=IntegerField(),
+        )
         courses = list(
-            Course.objects.filter(pillar=pillar, is_published=True).order_by('title')[:5]
+            Course.objects.filter(pillar=pillar, is_published=True)
+            .annotate(level_rank=level_rank)
+            .order_by('level_rank', 'title')[:5]
         )
         LearningPathCourse.objects.filter(path=path).delete()
         for i, course in enumerate(courses):
