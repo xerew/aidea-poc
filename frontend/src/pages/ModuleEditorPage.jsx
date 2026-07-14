@@ -211,9 +211,13 @@ function LessonPreview({ lesson }) {
         ? <p className="lesson-preview-text">{lesson.content}</p>
         : <p className="lesson-preview-empty">Write content above to see the preview.</p>
     case 'video':
-      return <VideoEmbed url={lesson.content} />
+      return lesson.content
+        ? <VideoEmbed url={lesson.content} />
+        : <p className="lesson-preview-empty">Paste a video URL above to see the preview.</p>
     case 'pdf':
-      return <PdfEmbed url={lesson.content} />
+      return lesson.content
+        ? <PdfEmbed url={lesson.content} />
+        : <p className="lesson-preview-empty">Paste a PDF URL above to see the preview.</p>
     case 'image':
       return lesson.content
         ? <img src={lesson.content} alt={lesson.title} className="lesson-preview-image" />
