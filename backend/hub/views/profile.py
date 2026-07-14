@@ -10,11 +10,10 @@ from hub.serializers.profile import (
     ProfileSettingsSerializer,
 )
 from hub.tasks import compute_user_recommendations
-from hub.views.permissions import IsTeacher
 
 
 class ProfilePreferencesView(APIView):
-    permission_classes = [IsTeacher]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = ProfilePreferencesSerializer(request.user.profile)

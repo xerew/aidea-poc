@@ -77,10 +77,32 @@ class ProfilePreferencesPatchTest(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_content_creator_gets_403(self):
+    def test_content_creator_can_access_preferences(self):
         creator = User.objects.create_user(username='prof_creator', password='pass')
         UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
         login = self.client.post(reverse('auth-login'), {'username': 'prof_creator', 'password': 'pass'})
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
         response = self.client.get(reverse('profile-preferences'))
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+
+
+class CreatorPreferencesTests(APITestCase):
+    def setUp(self):
+        self.creator = User.objects.create_user(username='cc_prefs', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        login = self.client.post(reverse('auth-login'), {'username': 'cc_prefs', 'password': 'pass12345'})
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
+
+    def test_content_creator_can_read_preferences(self):
+        response = self.client.get(reverse('profile-preferences'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_content_creator_can_update_preferences(self):
+        response = self.client.patch(
+            reverse('profile-preferences'),
+            {'learning_style': 'video'},
+            format='json',
+        )
+        self.assertEqual(response.status_code, 200)
+        self.creator.profile.refresh_from_db()
+        self.assertEqual(self.creator.profile.learning_style, 'video')
