@@ -340,3 +340,16 @@ class CompletedModuleIdsTests(APITestCase):
         response = self.client.get(self._detail_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["completed_module_ids"], [self.m1.id])
+
+    def test_module_with_partial_required_lessons_not_completed(self):
+        # Two required lessons in m1: completing only one must NOT mark the module done
+        l1b = Lesson.objects.create(
+            module=self.m1, title="L1b", lesson_type="text", order=2, is_required=True,
+        )
+        LessonProgress.objects.create(user=self.user, lesson=self.l1)
+        response = self.client.get(self._detail_url())
+        self.assertEqual(response.data["completed_module_ids"], [])
+
+        LessonProgress.objects.create(user=self.user, lesson=l1b)
+        response = self.client.get(self._detail_url())
+        self.assertEqual(response.data["completed_module_ids"], [self.m1.id])
