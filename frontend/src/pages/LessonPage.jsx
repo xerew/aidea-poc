@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
+import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
 import './LessonPage.css'
 
 // ─── Lesson-type icons ───────────────────────────────────────────────────────
@@ -46,11 +47,7 @@ VideoLesson.propTypes   = { lesson: lessonShape.isRequired }
 function VideoLesson({ lesson }) {
   return (
     <div className="lp-content-card">
-      <div className="lp-video-player">
-        <Video size={48} className="lp-video-icon" />
-        <p className="lp-video-label">Video Player</p>
-        {lesson.content && <p className="lp-video-url">{lesson.content}</p>}
-      </div>
+      <VideoEmbed url={lesson.content} />
     </div>
   )
 }
@@ -92,15 +89,7 @@ PdfLesson.propTypes        = { lesson: lessonShape.isRequired }
 function PdfLesson({ lesson }) {
   return (
     <div className="lp-content-card">
-      <div className="lp-video-player">
-        <FileIcon size={48} className="lp-video-icon" />
-        <p className="lp-video-label">PDF Document</p>
-        {lesson.content && (
-          <a href={lesson.content} target="_blank" rel="noreferrer" className="lp-pdf-link">
-            Open PDF ↗
-          </a>
-        )}
-      </div>
+      <PdfEmbed url={lesson.content} />
     </div>
   )
 }
