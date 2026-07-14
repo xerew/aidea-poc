@@ -172,20 +172,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {showRecs && (
+      {showRecs && (recsLoading || personalRecs.length > 0) && (
         <section className="recommendations-section">
           <h2 className="recommendations-title">Recommended for you</h2>
           {recsLoading ? (
             <div className="recommendations-grid">
               {[1, 2, 3].map((i) => <div key={i} className="rec-card rec-card-skeleton" />)}
             </div>
-          ) : personalRecs.length > 0 ? (
+          ) : (
             <div className="recommendations-grid">
               {personalRecs.map((rec, i) => (
                 <RecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />
               ))}
             </div>
-          ) : null}
+          )}
         </section>
       )}
 
