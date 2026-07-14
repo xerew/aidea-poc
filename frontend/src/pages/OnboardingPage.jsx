@@ -122,7 +122,7 @@ export default function OnboardingPage() {
       updateUser({
         profile: { ...user.profile, onboarding_completed: true },
       })
-      navigate('/pathway')
+      navigate('/')
     } catch (err) {
       setError(err.response?.data?.detail || 'Something went wrong. Please try again.')
       setLoading(false)
