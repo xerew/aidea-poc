@@ -23,6 +23,7 @@ export default function CourseEditorPage() {
   const [author, setAuthor] = useState({ id: null, name: '' })
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
+  const [unpublishing, setUnpublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [error, setError] = useState('')
   const [dragModuleId, setDragModuleId] = useState(null)
@@ -122,6 +123,21 @@ export default function CourseEditorPage() {
       setSaveStatus('error')
     } finally {
       setPublishing(false)
+    }
+  }
+
+  // ── Unpublish ────────────────────────────────────────────────────────────
+
+  const handleUnpublish = async () => {
+    if (!window.confirm('Unpublish this course? Learners will no longer see it in the catalog.')) return
+    setUnpublishing(true)
+    try {
+      await client.post(`/authoring/courses/${id}/unpublish/`)
+      setIsPublished(false)
+    } catch {
+      setSaveStatus('error')
+    } finally {
+      setUnpublishing(false)
     }
   }
 
@@ -267,6 +283,11 @@ export default function CourseEditorPage() {
             {!isPublished && (
               <button className="enroll-btn" onClick={handlePublish} disabled={publishing}>
                 {publishing ? 'Publishing…' : 'Publish'}
+              </button>
+            )}
+            {isPublished && (isAuthor || isAdmin) && (
+              <button className="enroll-btn enroll-btn--outline" onClick={handleUnpublish} disabled={unpublishing}>
+                {unpublishing ? 'Unpublishing…' : 'Unpublish'}
               </button>
             )}
           </div>

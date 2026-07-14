@@ -239,7 +239,7 @@ function LessonPreview({ lesson }) {
         <div>
           <p className="lesson-preview-quiz-q">{first.question}</p>
           <ul className="lesson-preview-quiz-opts">
-            {first.options.filter(o => o.text).map((o, i) => <li key={i}>{o.text}</li>)}
+            {(first.options ?? []).filter(o => o.text).map((o, i) => <li key={i}>{o.text}</li>)}
           </ul>
         </div>
       )

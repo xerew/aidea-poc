@@ -35,6 +35,10 @@
   font-size: 0.85rem;
 }
 
+.media-open-link {
+  font-size: 0.85rem;
+}
+
 .media-placeholder {
   display: flex;
   flex-direction: column;
