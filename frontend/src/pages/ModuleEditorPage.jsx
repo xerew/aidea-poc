@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList,
-  Trash2, GripVertical, Save, Lock, Plus,
+  Trash2, GripVertical, Save, Lock, Plus, Upload,
 } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -249,9 +249,28 @@ function LessonPreview({ lesson }) {
   }
 }
 
-function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
+function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, errors }) {
   const cfg = lessonTypeConfig(lesson.lesson_type)
   const err = errors ?? {}
+  const [uploading, setUploading] = useState(false)
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await client.post('/authoring/upload/', fd)
+      onChange('content', res.data.url)
+      onError(null)
+    } catch (uploadErr) {
+      onError(uploadErr.response?.data?.error ?? 'Upload failed. Please try again.')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
 
   return (
     <div className="lesson-editor-panel">
@@ -330,6 +349,22 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
               placeholder="https://…"
             />
             <FieldError msg={err.content} />
+            {['pdf', 'image'].includes(lesson.lesson_type) && !locked && (
+              <div className="lesson-upload-row">
+                <span className="lesson-upload-or">or</span>
+                <label className="lesson-upload-btn">
+                  <Upload size={14} />
+                  {uploading ? 'Uploading…' : 'Upload file'}
+                  <input
+                    type="file"
+                    accept={lesson.lesson_type === 'pdf' ? '.pdf' : 'image/*'}
+                    hidden
+                    disabled={uploading}
+                    onChange={handleFileUpload}
+                  />
+                </label>
+              </div>
+            )}
           </div>
         )}
 
@@ -419,6 +454,7 @@ LessonEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
+  onError: PropTypes.func.isRequired,
   errors: PropTypes.object,
 }
 
@@ -589,6 +625,18 @@ export default function ModuleEditorPage() {
       const next = { ...errs }
       delete next[field]
       return { ...prev, [selectedLessonId]: next }
+    })
+  }
+
+  const setLessonGeneralError = (lessonId, message) => {
+    setLessonErrors((prev) => {
+      const current = prev[lessonId] ?? {}
+      if (!message) {
+        if (!('general' in current)) return prev
+        const { general: _general, ...rest } = current
+        return { ...prev, [lessonId]: rest }
+      }
+      return { ...prev, [lessonId]: { ...current, general: message } }
     })
   }
 
@@ -788,6 +836,7 @@ export default function ModuleEditorPage() {
               onChange={updateLessonField}
               onDelete={() => deleteLesson(selectedLesson)}
               onSave={() => saveLesson(selectedLesson)}
+              onError={(message) => setLessonGeneralError(selectedLesson.id, message)}
               errors={lessonErrors[selectedLesson.id]}
             />
           ) : (

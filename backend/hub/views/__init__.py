@@ -29,6 +29,7 @@ from .authoring_module import (
     AuthoringModuleReorderView,
     AuthoringModuleView,
 )
+from .authoring_upload import AuthoringUploadView
 from .learner import (
     CourseDetailView,
     CourseEnrollView,
@@ -73,6 +74,7 @@ __all__ = [
     'AuthoringModuleReorderView',
     'AuthoringModuleView',
     'AuthoringPillarsView',
+    'AuthoringUploadView',
     'CourseDetailView',
     'CourseEnrollView',
     'CourseLearnView',

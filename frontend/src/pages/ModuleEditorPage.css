@@ -625,6 +625,37 @@
   color: #5a5000;
 }
 
+/* ── Lesson file upload ──────────────────────────────────────────────────── */
+
+.lesson-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.lesson-upload-or {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.lesson-upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.lesson-upload-btn:hover {
+  background: var(--color-bg);
+}
+
 /* ── Validation errors ───────────────────────────────────────────────────── */
 
 .lesson-field-error {

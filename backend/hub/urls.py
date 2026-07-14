@@ -22,6 +22,7 @@ from .views import (
     AuthoringModuleReorderView,
     AuthoringModuleView,
     AuthoringPillarsView,
+    AuthoringUploadView,
     ChangePasswordView,
     CourseDetailView,
     CourseEnrollView,
@@ -82,6 +83,7 @@ urlpatterns = [
     path('admin/access-requests/<int:pk>/',     AdminAccessRequestReviewView.as_view(), name='admin-access-request-review'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
+    path('authoring/upload/', AuthoringUploadView.as_view(), name='authoring-upload'),
     path('authoring/courses/', AuthoringCoursesView.as_view(), name='authoring-courses'),
     path('authoring/courses/<int:pk>/', AuthoringCourseDetailView.as_view(), name='authoring-course-detail'),
     path('authoring/courses/<int:pk>/modules/', AuthoringModuleView.as_view(), name='authoring-module-create'),
