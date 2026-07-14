@@ -85,6 +85,9 @@
 
 .editor-title-input:focus { border-color: var(--color-primary); }
 
+/* Author byline */
+.course-editor-author { font-size: 0.85rem; color: #6b7280; margin-top: 0.25rem; }
+
 /* Description textarea */
 .editor-desc-input {
   font-size: 0.95rem;

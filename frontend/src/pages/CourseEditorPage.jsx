@@ -18,6 +18,7 @@ export default function CourseEditorPage() {
   const [form, setForm] = useState(null)
   const [isPublished, setIsPublished] = useState(false)
   const [modules, setModules] = useState([])
+  const [author, setAuthor] = useState({ id: null, name: '' })
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
@@ -42,6 +43,7 @@ export default function CourseEditorPage() {
           learning_outcomes: c.learning_outcomes ?? [],
         })
         setModules(c.modules.map((m) => ({ ...m, isDirty: false, isNew: false, saving: false })))
+        setAuthor({ id: c.created_by_id, name: c.created_by_name })
         setPillars(pillarsRes.data)
       })
       .catch(() => setError('Failed to load course.'))
@@ -270,6 +272,9 @@ export default function CourseEditorPage() {
         onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
         placeholder="Course title"
       />
+
+      {/* Author */}
+      {author.name && <p className="course-editor-author">Author: {author.name}</p>}
 
       {/* Description */}
       <textarea

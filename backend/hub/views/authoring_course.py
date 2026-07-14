@@ -21,7 +21,7 @@ class AuthoringCoursesView(APIView):
     def get(self, request):
         qs = (
             Course.objects
-            .select_related('pillar')
+            .select_related('pillar', 'created_by')
             .prefetch_related('modules')
             .order_by('pillar__order', 'title')
         )

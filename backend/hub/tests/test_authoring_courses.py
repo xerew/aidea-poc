@@ -355,6 +355,12 @@ class AuthoringCoursesListTestCase(AuthoringTestCase):
         self.assertIn('pillar', course_data)
         self.assertIn('slug', course_data['pillar'])
 
+    def test_authoring_course_includes_author(self):
+        res = self.client.get('/api/authoring/courses/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('created_by_name', res.data[0])
+        self.assertIn('created_by_id', res.data[0])
+
 
 # ── Authoring course detail ───────────────────────────────────────────────────
 

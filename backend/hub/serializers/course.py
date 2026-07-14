@@ -152,14 +152,22 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
     )
     modules = ModuleSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
+    created_by_id = serializers.IntegerField(source='created_by.id', read_only=True, default=None)
+    created_by_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'pillar', 'pillar_id', 'level',
             'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
+            'created_by_id', 'created_by_name',
         ]
         read_only_fields = ['is_published']
+
+    def get_created_by_name(self, obj):
+        if not obj.created_by:
+            return 'AIDEA team'
+        return obj.created_by.get_full_name() or obj.created_by.username
 
 
 class CourseEditHistorySerializer(serializers.ModelSerializer):

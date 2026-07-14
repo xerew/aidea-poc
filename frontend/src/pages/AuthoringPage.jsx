@@ -71,6 +71,7 @@ export default function AuthoringPage() {
                     <span><BookOpen size={13} /> {course.module_count} modules</span>
                     <span>{LEVEL_LABELS[course.level] ?? course.level}</span>
                   </div>
+                  <p className="course-card-author">By {course.created_by_name}</p>
                 </div>
                 <button
                   className="edit-btn"

@@ -124,6 +124,12 @@
   gap: 0.3rem;
 }
 
+.course-card-author {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0;
+}
+
 .edit-btn {
   display: inline-flex;
   align-items: center;
