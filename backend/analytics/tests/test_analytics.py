@@ -154,3 +154,23 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         self.assertEqual(response.data['summary']['completion_rate'], 0)
         self.assertEqual(response.data['summary']['quiz_attempts'], 0)
         self.assertEqual(response.data['courses'], [])
+
+    def test_unpublished_courses_counted(self):
+        Course.objects.create(
+            title='Draft course', pillar=self.pillar, level='beginner',
+            duration_hours=1, is_published=False, created_by=self.creator,
+        )
+        res = self.client.get(self.url)
+        titles = [c['title'] for c in res.data['courses']]
+        self.assertIn('Draft course', titles)
+
+    def test_other_creators_courses_excluded(self):
+        other = User.objects.create_user(username='other_creator2', password='pass12345')
+        UserProfile.objects.create(user=other, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        Course.objects.create(
+            title='Not mine', pillar=self.pillar, level='beginner',
+            duration_hours=1, is_published=True, created_by=other,
+        )
+        res = self.client.get(self.url)
+        titles = [c['title'] for c in res.data['courses']]
+        self.assertNotIn('Not mine', titles)

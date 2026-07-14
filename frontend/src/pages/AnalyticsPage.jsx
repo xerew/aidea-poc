@@ -120,7 +120,7 @@ export default function AnalyticsPage() {
         <h2 className="an-section-title">Course Completion Overview</h2>
         <div className="an-course-list">
           {data.courses.length === 0 ? (
-            <p className="an-empty">No courses created yet.</p>
+            <p className="an-empty">No courses created by you yet. Courses you create in Authoring will appear here — including drafts.</p>
           ) : (
             data.courses.map((course) => (
               <CourseRow key={course.id} course={course} />
