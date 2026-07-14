@@ -87,3 +87,24 @@ class IsTeacherPermissionTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('onboarding_completed', response.data['user']['profile'])
         self.assertFalse(response.data['user']['profile']['onboarding_completed'])
+
+
+class MeEndpointTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='me_user', password='pass12345')
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+
+    def test_me_returns_current_role(self):
+        self.client.force_authenticate(self.user)
+        res = self.client.get(reverse('auth-me'))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['profile']['user_type'], 'teacher')
+
+        self.user.profile.user_type = UserProfile.UserType.CONTENT_CREATOR
+        self.user.profile.save()
+        res = self.client.get(reverse('auth-me'))
+        self.assertEqual(res.data['profile']['user_type'], 'content_creator')
+
+    def test_me_requires_auth(self):
+        res = self.client.get(reverse('auth-me'))
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)

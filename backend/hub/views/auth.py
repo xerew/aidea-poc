@@ -21,6 +21,13 @@ class LogoutView(APIView):
         return Response({'detail': 'Logged out.'})
 
 
+class MeView(APIView):
+    """GET /api/auth/me/ — current user with fresh profile (role) data."""
+
+    def get(self, request):
+        return Response(UserSerializer(request.user, context={'request': request}).data)
+
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 

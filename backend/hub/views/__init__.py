@@ -10,7 +10,7 @@ from .admin import (
     AdminUserListView,
     AdminUserRoleView,
 )
-from .auth import LoginView, LogoutView, RegisterView
+from .auth import LoginView, LogoutView, MeView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
@@ -84,6 +84,7 @@ __all__ = [
     'IsTeacher',
     'LoginView',
     'LogoutView',
+    'MeView',
     'RegisterView',
     'OnboardingView',
     'PathwayView',

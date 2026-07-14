@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import client from '../api/client'
 
@@ -48,6 +48,21 @@ export function AuthProvider({ children }) {
       store.setItem('user', JSON.stringify(updated))
       return updated
     })
+  }, [])
+
+  // Refresh user data from the server on mount so server-side role changes
+  // (e.g. content-creator approval) propagate without re-login.
+  useEffect(() => {
+    const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token')
+    if (!token) return
+    client.get('/auth/me/')
+      .then(({ data }) => {
+        const store = localStorage.getItem('user') ? localStorage : sessionStorage
+        store.setItem('user', JSON.stringify(data))
+        setUser(data)
+      })
+      .catch(() => {}) // interceptor handles 401 → login redirect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
