@@ -177,6 +177,7 @@ STATIC_URL = 'static/'
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r'^http://localhost:\d+$',
     r'^http://127\.0\.0\.1:\d+$',
+    r'^http://\d+\.\d+\.\d+\.\d+:\d+$',  # VM IP access in dev
 ]
 
 # DRF

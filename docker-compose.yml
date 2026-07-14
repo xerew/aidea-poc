@@ -94,8 +94,9 @@ services:
     build:
       context: ./frontend
       target: dev
+    env_file: .env
     environment:
-      VITE_API_URL: http://localhost:8000/api
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api}
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
