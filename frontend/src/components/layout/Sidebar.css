@@ -54,3 +54,14 @@
   flex-shrink: 0;
   color: currentColor;
 }
+
+.sidebar-eu {
+  margin-top: auto;
+  padding: 1rem;
+}
+
+.sidebar-eu img {
+  width: 100%;
+  max-width: 180px;
+  display: block;
+}

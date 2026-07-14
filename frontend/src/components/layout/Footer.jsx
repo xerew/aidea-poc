@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-eu">
         <img
-          src="https://aideaacademy.eu/demo/wp-content/uploads/2026/03/EN-Co-funded-by-the-EU_PANTONE-300x63-1.jpg"
+          src="/images/logos/eu-cofunded.webp"
           alt="Co-funded by the European Union"
           className="footer-eu-logo"
         />

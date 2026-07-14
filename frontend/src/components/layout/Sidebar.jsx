@@ -32,7 +32,7 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-logo">
         <img
-          src="https://aideaacademy.eu/demo/wp-content/uploads/2026/01/aidea-logo-3-AIdEA-COLORED-162px.png"
+          src="/images/logos/aidea-logo.png"
           alt="AIDEA"
         />
       </div>
@@ -52,6 +52,9 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
+      <div className="sidebar-eu">
+        <img src="/images/logos/eu-cofunded.webp" alt="Co-funded by the European Union" />
+      </div>
     </aside>
   )
 }

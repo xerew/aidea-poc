@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <img
-          src="https://aideaacademy.eu/demo/wp-content/uploads/2026/01/aidea-logo-3-AIdEA-COLORED-162px.png"
+          src="/images/logos/aidea-logo.png"
           alt="AIDEA"
           className="login-logo"
         />
@@ -71,7 +71,7 @@ export default function LoginPage() {
 
         <div className="login-footer">
           <img
-            src="https://aideaacademy.eu/demo/wp-content/uploads/2026/03/EN-Co-funded-by-the-EU_PANTONE-300x63-1.jpg"
+            src="/images/logos/eu-cofunded.webp"
             alt="Co-funded by the European Union"
             className="login-eu-logo"
           />
