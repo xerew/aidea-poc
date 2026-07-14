@@ -89,8 +89,10 @@ p {
   margin: 0;
 }
 
-a {
-  color: var(--color-primary);
+@layer base {
+  a {
+    color: var(--color-primary);
+  }
 }
 
 @theme inline {
