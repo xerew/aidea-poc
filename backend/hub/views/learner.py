@@ -34,7 +34,7 @@ class CoursesView(APIView):
 class CourseDetailView(APIView):
     def get(self, request, pk):
         try:
-            course = Course.objects.prefetch_related('modules').select_related('pillar').get(
+            course = Course.objects.prefetch_related('modules__lessons').select_related('pillar').get(
                 pk=pk, is_published=True,
             )
         except Course.DoesNotExist:

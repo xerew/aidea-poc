@@ -309,3 +309,34 @@ class LessonCompleteViewTestCase(LearnerProgressBase):
         cl = response.data["continue_learning"]
         self.assertIn("course_id", cl)
         self.assertEqual(cl["course_id"], self.course.pk)
+
+
+# ── CourseDetailView completed_module_ids tests ────────────────────────────────
+
+class CompletedModuleIdsTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="mod_done", password="pass12345")
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+        pillar = LearningPillar.objects.create(name="P", slug="p", order=1)
+        self.course = Course.objects.create(
+            title="C", pillar=pillar, level="beginner", duration_hours=1, is_published=True,
+        )
+        self.m1 = Module.objects.create(course=self.course, title="M1", order=1)
+        self.m2 = Module.objects.create(course=self.course, title="M2", order=2)
+        self.l1 = Lesson.objects.create(
+            module=self.m1, title="L1", lesson_type="text", order=1, is_required=True,
+        )
+        self.l2 = Lesson.objects.create(
+            module=self.m2, title="L2", lesson_type="text", order=1, is_required=True,
+        )
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client.force_authenticate(self.user)
+
+    def _detail_url(self):
+        return reverse("course-detail", kwargs={"pk": self.course.pk})
+
+    def test_completed_module_ids(self):
+        LessonProgress.objects.create(user=self.user, lesson=self.l1)
+        response = self.client.get(self._detail_url())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["completed_module_ids"], [self.m1.id])

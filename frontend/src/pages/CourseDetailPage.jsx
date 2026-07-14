@@ -130,6 +130,7 @@ export default function CourseDetailPage() {
         <h2>Course Modules</h2>
         <div className="modules-list">
           {course.modules.map((mod) => {
+            const isCompleted = course.completed_module_ids?.includes(mod.id)
             const isCurrent = mod.id === course.current_module_id
             return (
               <div key={mod.id} className={`module-row ${isCurrent ? 'module-row--current' : ''}`}>
@@ -142,7 +143,7 @@ export default function CourseDetailPage() {
                   </p>
                 </div>
                 <div className="module-status">
-                  {isCurrent
+                  {isCompleted
                     ? <CheckCircle2 size={22} className="module-status--done" />
                     : <Circle size={22} className="module-status--empty" />
                   }

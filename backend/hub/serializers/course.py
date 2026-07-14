@@ -51,13 +51,14 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     is_enrolled = serializers.SerializerMethodField()
     progress_pct = serializers.SerializerMethodField()
     current_module_id = serializers.SerializerMethodField()
+    completed_module_ids = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'description', 'pillar', 'level', 'duration_hours',
             'learning_outcomes', 'module_count', 'modules',
-            'is_enrolled', 'progress_pct', 'current_module_id',
+            'is_enrolled', 'progress_pct', 'current_module_id', 'completed_module_ids',
         ]
 
     def _enrollment(self, obj):
@@ -77,6 +78,25 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     def get_current_module_id(self, obj):
         e = self._enrollment(obj)
         return e.current_module_id if e else None
+
+    def get_completed_module_ids(self, obj):
+        user = self.context['request'].user
+        if not user.is_authenticated:
+            return []
+        from hub.models import LessonProgress
+        completed_lesson_ids = set(
+            LessonProgress.objects.filter(
+                user=user, lesson__module__course=obj,
+            ).values_list('lesson_id', flat=True)
+        )
+        result = []
+        for module in obj.modules.all():
+            required = [
+                lesson.id for lesson in module.lessons.all() if lesson.is_required
+            ]
+            if required and all(lid in completed_lesson_ids for lid in required):
+                result.append(module.id)
+        return result
 
 
 class ContinueLearningSerializer(serializers.ModelSerializer):
