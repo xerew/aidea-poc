@@ -6,6 +6,7 @@ import {
   Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
+import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
 import './ModuleEditorPage.css'
 
 // ── Lesson type config ────────────────────────────────────────────────────────
@@ -199,6 +200,50 @@ function FieldError({ msg }) {
 
 FieldError.propTypes = { msg: PropTypes.string }
 
+// ── Lesson preview ────────────────────────────────────────────────────────────
+
+LessonPreview.propTypes = { lesson: lessonShape.isRequired }
+
+function LessonPreview({ lesson }) {
+  switch (lesson.lesson_type) {
+    case 'text':
+      return lesson.content
+        ? <p className="lesson-preview-text">{lesson.content}</p>
+        : <p className="lesson-preview-empty">Write content above to see the preview.</p>
+    case 'video':
+      return <VideoEmbed url={lesson.content} />
+    case 'pdf':
+      return <PdfEmbed url={lesson.content} />
+    case 'image':
+      return lesson.content
+        ? <img src={lesson.content} alt={lesson.title} className="lesson-preview-image" />
+        : <p className="lesson-preview-empty">Paste an image URL above to see the preview.</p>
+    case 'assignment':
+      return lesson.content
+        ? (
+          <div>
+            <h4 className="lesson-preview-subheading">Instructions</h4>
+            <p className="lesson-preview-text">{lesson.content}</p>
+          </div>
+        )
+        : <p className="lesson-preview-empty">Write instructions above to see the preview.</p>
+    case 'quiz': {
+      const first = (lesson.quiz_data ?? [])[0]
+      if (!first?.question) return <p className="lesson-preview-empty">Add a question to see the preview.</p>
+      return (
+        <div>
+          <p className="lesson-preview-quiz-q">{first.question}</p>
+          <ul className="lesson-preview-quiz-opts">
+            {first.options.filter(o => o.text).map((o, i) => <li key={i}>{o.text}</li>)}
+          </ul>
+        </div>
+      )
+    }
+    default:
+      return null
+  }
+}
+
 function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
   const cfg = lessonTypeConfig(lesson.lesson_type)
   const err = errors ?? {}
@@ -351,7 +396,10 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
 
         <div className="lesson-preview-card">
           <h3 className="lesson-preview-title">Preview</h3>
-          <p className="lesson-preview-sub">Preview how this lesson will appear to students</p>
+          <p className="lesson-preview-sub">How this lesson will appear to students</p>
+          <div className="lesson-preview-body">
+            <LessonPreview lesson={lesson} />
+          </div>
         </div>
       </div>
     </div>

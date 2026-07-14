@@ -663,3 +663,21 @@
   border-top: 2px solid var(--color-primary);
   background: color-mix(in srgb, var(--color-primary) 6%, transparent);
 }
+
+/* ── Lesson preview content ───────────────────────────────────────────────── */
+
+.lesson-preview-body {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.lesson-preview-text { white-space: pre-wrap; font-size: 0.9rem; }
+.lesson-preview-empty { color: #9ca3af; font-size: 0.85rem; font-style: italic; }
+.lesson-preview-image { max-width: 100%; border-radius: 6px; }
+.lesson-preview-subheading { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem; }
+.lesson-preview-quiz-q { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
+.lesson-preview-quiz-opts { margin: 0; padding-left: 1.25rem; font-size: 0.85rem; }
+.lesson-preview-quiz-opts li { margin-bottom: 0.25rem; }
