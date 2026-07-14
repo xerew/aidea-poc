@@ -388,6 +388,8 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, errors }) {
           </label>
         </div>
 
+        <FieldError msg={err.general} />
+
         {!locked && lesson.isDirty && (
           <button
             className="lesson-save-btn"
@@ -563,7 +565,14 @@ export default function ModuleEditorPage() {
       )
       setSelectedLessonId(saved.id)
       setLessonErrors((prev) => { const next = { ...prev }; delete next[tempId]; return next })
-    } catch {
+    } catch (err) {
+      const detail = err.response?.data?.detail
+        ?? Object.values(err.response?.data ?? {})[0]
+        ?? 'Save failed. Please try again.'
+      setLessonErrors((prev) => ({
+        ...prev,
+        [lesson.id]: { ...(prev[lesson.id] ?? {}), general: String(detail) },
+      }))
       setLessons((ls) => ls.map((l) => (l.id === lesson.id ? { ...l, saving: false } : l)))
     }
   }
@@ -595,7 +604,13 @@ export default function ModuleEditorPage() {
       )
       setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
       setSelectedLessonId(null)
-    } catch { /* user can retry */ }
+    } catch (err) {
+      const detail = err.response?.data?.detail ?? 'Delete failed. Please try again.'
+      setLessonErrors((prev) => ({
+        ...prev,
+        [lesson.id]: { ...(prev[lesson.id] ?? {}), general: String(detail) },
+      }))
+    }
   }
 
   // ── Drag-and-drop (lessons) ───────────────────────────────────────────────
