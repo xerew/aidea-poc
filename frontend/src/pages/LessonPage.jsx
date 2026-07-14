@@ -30,11 +30,16 @@ function TypeIcon({ type, size = 16 }) {
 // ─── Lesson content components ───────────────────────────────────────────────
 
 const lessonShape = PropTypes.shape({
-  id:          PropTypes.number,
-  title:       PropTypes.string,
-  content:     PropTypes.string,
-  quiz_data:   PropTypes.array,
-  lesson_type: PropTypes.string,
+  id:           PropTypes.number,
+  title:        PropTypes.string,
+  content:      PropTypes.string,
+  quiz_data:    PropTypes.array,
+  lesson_type:  PropTypes.string,
+  is_completed: PropTypes.bool,
+  quiz_review:  PropTypes.shape({
+    selected: PropTypes.array,
+    results:  PropTypes.array,
+  }),
 })
 
 VideoLesson.propTypes   = { lesson: lessonShape.isRequired }
@@ -130,13 +135,15 @@ function AssignmentLesson({ lesson, onSubmissionChange }) {
 QuizLesson.propTypes = {
   lesson:     lessonShape.isRequired,
   onComplete: PropTypes.func.isRequired,
+  courseId:   PropTypes.string.isRequired,
 }
-function QuizLesson({ lesson, onComplete }) {
+function QuizLesson({ lesson, onComplete, courseId }) {
   const questions = lesson.quiz_data ?? []
+  const review = lesson.quiz_review
+  const isReview = Boolean(lesson.is_completed && review?.selected?.length)
   const [currentIdx, setCurrentIdx] = useState(0)
-  const [answers, setAnswers] = useState({})
-  const [revealed, setRevealed] = useState(new Set())
-  const [quizResults, setQuizResults] = useState(null)
+  const [answers, setAnswers] = useState({})     // { [qIdx]: selectedOption }
+  const [feedback, setFeedback] = useState({})   // { [qIdx]: {correct, correct_index} }
 
   if (questions.length === 0) {
     return <div className="lp-content-card"><p className="lp-empty">No questions yet.</p></div>
@@ -144,54 +151,67 @@ function QuizLesson({ lesson, onComplete }) {
 
   const q = questions[currentIdx]
   const isLastQuestion = currentIdx === questions.length - 1
-  const isAnswerRevealed = revealed.has(currentIdx)
+  const answered = isReview || answers[currentIdx] !== undefined
 
-  const handleSelect = (optionIdx) => {
-    if (isAnswerRevealed) return
-    const nextAnswers = { ...answers, [currentIdx]: optionIdx }
-    setAnswers(nextAnswers)
-    const nextRevealed = new Set(revealed)
-    nextRevealed.add(currentIdx)
-    setRevealed(nextRevealed)
+  const handleSelect = async (optionIdx) => {
+    if (answered) return
+    setAnswers(prev => ({ ...prev, [currentIdx]: optionIdx }))
+    try {
+      const res = await client.post(
+        `/courses/${courseId}/lessons/${lesson.id}/quiz-check/`,
+        { question_index: currentIdx, selected: optionIdx },
+      )
+      setFeedback(prev => ({ ...prev, [currentIdx]: res.data }))
+    } catch { /* leave selected highlight only */ }
 
     if (isLastQuestion) {
-      const answersArray = questions.map((_, i) => nextAnswers[i] ?? -1)
-      setTimeout(async () => {
-        const results = await onComplete({ quiz_answers: answersArray })
-        setQuizResults(results)
-      }, 800)
-    } else {
-      setTimeout(() => setCurrentIdx(i => i + 1), 900)
+      const finalAnswers = { ...answers, [currentIdx]: optionIdx }
+      const answersArray = questions.map((_, i) => finalAnswers[i] ?? -1)
+      setTimeout(() => onComplete({ quiz_answers: answersArray }), 1200)
     }
+  }
+
+  const selectedOf = (qIdx) => isReview ? review.selected[qIdx] : answers[qIdx]
+  const resultOf   = (qIdx) => {
+    if (isReview) return { correct: review.results[qIdx], correct_index: null }
+    return feedback[qIdx] ?? null
   }
 
   const getOptionState = (optionIdx) => {
-    if (!isAnswerRevealed) return ''
-    const isSelected = answers[currentIdx] === optionIdx
-    if (quizResults) {
-      const isCorrect = quizResults[currentIdx]
-      if (isCorrect && isSelected) return 'lp-option--correct'
-      if (!isCorrect && isSelected) return 'lp-option--wrong'
+    const selected = selectedOf(currentIdx)
+    if (selected === undefined || selected === null) return ''
+    const res = resultOf(currentIdx)
+    const isSelected = selected === optionIdx
+    if (res) {
+      if (isSelected) return res.correct ? 'lp-option--correct' : 'lp-option--wrong'
+      if (res.correct_index === optionIdx) return 'lp-option--correct'
       return 'lp-option--dimmed'
     }
-    // While awaiting server response, just highlight selected
     return isSelected ? 'lp-option--selected' : 'lp-option--dimmed'
   }
 
-  const showCorrectBadge = (optionIdx) => {
-    if (!isAnswerRevealed || !quizResults) return false
-    return quizResults[currentIdx] && answers[currentIdx] === optionIdx
-  }
-
-  const showWrongBadge = (optionIdx) => {
-    if (!isAnswerRevealed || !quizResults) return false
-    return !quizResults[currentIdx] && answers[currentIdx] === optionIdx
+  const badgeFor = (optionIdx) => {
+    const selected = selectedOf(currentIdx)
+    const res = resultOf(currentIdx)
+    if (selected === undefined || selected === null || !res) return null
+    if (selected === optionIdx) {
+      return res.correct
+        ? <span className="lp-option-badge lp-option-badge--correct">✓ Correct</span>
+        : <span className="lp-option-badge lp-option-badge--wrong">✗ Incorrect</span>
+    }
+    if (!res.correct && res.correct_index === optionIdx) {
+      return <span className="lp-option-badge lp-option-badge--correct">Correct answer</span>
+    }
+    return null
   }
 
   return (
     <div className="lp-content-card lp-quiz-card">
       <div className="lp-question-block">
-        <p className="lp-question-counter">Question {currentIdx + 1} of {questions.length}</p>
+        <p className="lp-question-counter">
+          Question {currentIdx + 1} of {questions.length}
+          {isReview && ' — review'}
+        </p>
         <p className="lp-question-text">{q.question}</p>
       </div>
 
@@ -201,30 +221,30 @@ function QuizLesson({ lesson, onComplete }) {
             key={i}
             className={`lp-option lp-option--btn ${getOptionState(i)}`}
             onClick={() => handleSelect(i)}
-            disabled={isAnswerRevealed}
+            disabled={answered}
           >
             <span className="lp-option-radio" />
             <span>{opt.text}</span>
-            {showCorrectBadge(i) && (
-              <span className="lp-option-badge lp-option-badge--correct">✓ Correct</span>
-            )}
-            {showWrongBadge(i) && (
-              <span className="lp-option-badge lp-option-badge--wrong">✗ Incorrect</span>
-            )}
+            {badgeFor(i)}
           </button>
         ))}
       </div>
 
-      {isAnswerRevealed && !isLastQuestion && (
-        <div className="lp-quiz-nav">
+      <div className="lp-quiz-nav">
+        {currentIdx > 0 && (
+          <button className="lp-quiz-arrow" onClick={() => setCurrentIdx(i => i - 1)}>
+            ← Previous question
+          </button>
+        )}
+        {answered && !isLastQuestion && (
           <button
             className="lp-quiz-arrow lp-quiz-arrow--next"
             onClick={() => setCurrentIdx(i => i + 1)}
           >
             Next question →
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
@@ -233,15 +253,16 @@ LessonContent.propTypes = {
   lesson:             lessonShape.isRequired,
   onComplete:         PropTypes.func.isRequired,
   onSubmissionChange: PropTypes.func,
+  courseId:           PropTypes.string,
 }
-function LessonContent({ lesson, onComplete, onSubmissionChange }) {
+function LessonContent({ lesson, onComplete, onSubmissionChange, courseId }) {
   switch (lesson.lesson_type) {
     case 'video':      return <VideoLesson lesson={lesson} />
     case 'text':       return <TextLesson lesson={lesson} />
     case 'image':      return <ImageLesson lesson={lesson} />
     case 'pdf':        return <PdfLesson lesson={lesson} />
     case 'assignment': return <AssignmentLesson lesson={lesson} onSubmissionChange={onSubmissionChange} />
-    case 'quiz':       return <QuizLesson key={lesson.id} lesson={lesson} onComplete={onComplete} />
+    case 'quiz':       return <QuizLesson key={lesson.id} lesson={lesson} onComplete={onComplete} courseId={courseId} />
     default:           return <TextLesson lesson={lesson} />
   }
 }
@@ -441,7 +462,7 @@ export default function LessonPage() {
               </div>
 
               {/* Lesson content */}
-              <LessonContent lesson={lesson} onComplete={markComplete} onSubmissionChange={setSubmissionText} />
+              <LessonContent lesson={lesson} onComplete={markComplete} onSubmissionChange={setSubmissionText} courseId={courseId} />
 
               {/* Navigation */}
               <div className="lp-nav">

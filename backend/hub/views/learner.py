@@ -169,6 +169,15 @@ class LessonDetailView(APIView):
             user=request.user, lesson=lesson,
         ).exists()
 
+        quiz_review = None
+        if lesson.lesson_type == 'quiz' and is_completed:
+            lp = LessonProgress.objects.filter(user=request.user, lesson=lesson).first()
+            if lp and lp.quiz_answers:
+                quiz_review = {
+                    'selected': (lp.engagement_data or {}).get('quiz_selected', []),
+                    'results': lp.quiz_answers,
+                }
+
         return Response({
             **LessonLearnDetailSerializer(lesson).data,
             'module_id': lesson.module_id,
@@ -176,6 +185,36 @@ class LessonDetailView(APIView):
             'is_completed': is_completed,
             'prev_lesson_id': all_ids[idx - 1] if idx > 0 else None,
             'next_lesson_id': all_ids[idx + 1] if idx < len(all_ids) - 1 else None,
+            'quiz_review': quiz_review,
+        })
+
+
+class QuizCheckView(APIView):
+    """POST /courses/<pk>/lessons/<lesson_pk>/quiz-check/ — grade one answer, no persistence."""
+
+    def post(self, request, pk, lesson_pk):
+        if not Enrollment.objects.filter(user=request.user, course_id=pk).exists():
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            lesson = Lesson.objects.get(pk=lesson_pk, module__course_id=pk, lesson_type='quiz')
+        except Lesson.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        q_index = request.data.get('question_index')
+        selected = request.data.get('selected')
+        quiz_data = lesson.quiz_data or []
+        if not isinstance(q_index, int) or not 0 <= q_index < len(quiz_data):
+            return Response({'detail': 'Invalid question_index.'}, status=status.HTTP_400_BAD_REQUEST)
+        options = quiz_data[q_index].get('options', [])
+        if not isinstance(selected, int) or not 0 <= selected < len(options):
+            return Response({'detail': 'Invalid selected.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        correct_index = next(
+            (i for i, opt in enumerate(options) if opt.get('is_correct')), -1,
+        )
+        return Response({
+            'correct': bool(options[selected].get('is_correct', False)),
+            'correct_index': correct_index,
         })
 
 
@@ -233,6 +272,8 @@ class LessonCompleteView(APIView):
             engagement = dict(request.data.get('engagement_data') or {})
             if lesson.lesson_type == 'assignment' and 'submission' in engagement:
                 engagement['word_count'] = len(str(engagement['submission']).split())
+            if lesson.lesson_type == 'quiz' and quiz_answers_raw:
+                engagement['quiz_selected'] = quiz_answers_raw
             lp.engagement_data = engagement
 
             lp.save()

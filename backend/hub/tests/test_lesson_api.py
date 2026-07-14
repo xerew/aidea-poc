@@ -64,3 +64,48 @@ class LessonDetailSerializerTest(TestCase):
         )
         self.assertEqual(res.status_code, 200)
         self.assertIsNone(res.data['quiz_results'])
+
+
+class QuizCheckTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='quiz_user', password='pass12345')
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+        pillar = LearningPillar.objects.create(name='P', slug='pq', description='')
+        self.course = Course.objects.create(
+            title='C', pillar=pillar, level='beginner', duration_hours=1, is_published=True,
+        )
+        module = Module.objects.create(course=self.course, title='M', order=1)
+        self.quiz = Lesson.objects.create(
+            module=module, title='Q', lesson_type='quiz', order=1, is_required=True,
+            quiz_data=[{
+                'question': '1+1?',
+                'options': [
+                    {'text': '1', 'is_correct': False},
+                    {'text': '2', 'is_correct': True},
+                ],
+            }],
+        )
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.url = f'/api/courses/{self.course.id}/lessons/{self.quiz.id}/quiz-check/'
+
+    def test_correct_answer(self):
+        res = self.client.post(self.url, {'question_index': 0, 'selected': 1}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.data['correct'])
+        self.assertEqual(res.data['correct_index'], 1)
+
+    def test_wrong_answer(self):
+        res = self.client.post(self.url, {'question_index': 0, 'selected': 0}, format='json')
+        self.assertFalse(res.data['correct'])
+
+    def test_invalid_index_rejected(self):
+        res = self.client.post(self.url, {'question_index': 5, 'selected': 0}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_quiz_review_returned_after_completion(self):
+        complete_url = f'/api/courses/{self.course.id}/lessons/{self.quiz.id}/complete/'
+        self.client.post(complete_url, {'quiz_answers': [1]}, format='json')
+        res = self.client.get(f'/api/courses/{self.course.id}/lessons/{self.quiz.id}/')
+        self.assertEqual(res.data['quiz_review'], {'selected': [1], 'results': [True]})

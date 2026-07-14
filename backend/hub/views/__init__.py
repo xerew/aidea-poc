@@ -38,6 +38,7 @@ from .learner import (
     LessonCompleteView,
     LessonDetailView,
     MyLearningView,
+    QuizCheckView,
 )
 from .onboarding import OnboardingView
 from .pathway import PathwayView
@@ -80,6 +81,7 @@ __all__ = [
     'MyLearningView',
     'LessonCompleteView',
     'LessonDetailView',
+    'QuizCheckView',
     'IsContentCreator',
     'IsTeacher',
     'LoginView',
