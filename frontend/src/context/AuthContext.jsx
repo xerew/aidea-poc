@@ -62,7 +62,6 @@ export function AuthProvider({ children }) {
         setUser(data)
       })
       .catch(() => {}) // interceptor handles 401 → login redirect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
