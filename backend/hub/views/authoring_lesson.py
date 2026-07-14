@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from hub.models import CourseEditHistory, Lesson, Module
 from hub.serializers import LessonSerializer
 
-from .permissions import IsContentCreator
+from .permissions import IsContentCreator, can_edit_published
 
 
 class AuthoringLessonView(APIView):
@@ -19,9 +19,10 @@ class AuthoringLessonView(APIView):
         except Module.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        if module.course.is_published:
+        if module.course.is_published and not can_edit_published(request.user, module.course):
             return Response(
-                {'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST,
+                {'detail': 'Published courses can only be edited by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         serializer = LessonSerializer(data=request.data)
@@ -55,9 +56,10 @@ class AuthoringLessonDetailView(APIView):
         lesson = self._get_lesson(pk, module_pk, lesson_pk)
         if not lesson:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if lesson.module.course.is_published:
+        if lesson.module.course.is_published and not can_edit_published(request.user, lesson.module.course):
             return Response(
-                {'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST,
+                {'detail': 'Published courses can only be edited by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         serializer = LessonSerializer(lesson, data=request.data, partial=True)
@@ -85,9 +87,10 @@ class AuthoringLessonDetailView(APIView):
         lesson = self._get_lesson(pk, module_pk, lesson_pk)
         if not lesson:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if lesson.module.course.is_published:
+        if lesson.module.course.is_published and not can_edit_published(request.user, lesson.module.course):
             return Response(
-                {'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST,
+                {'detail': 'Published courses can only be edited by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         CourseEditHistory.objects.create(
@@ -109,9 +112,10 @@ class AuthoringLessonReorderView(APIView):
         except Module.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        if module.course.is_published:
+        if module.course.is_published and not can_edit_published(request.user, module.course):
             return Response(
-                {'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST,
+                {'detail': 'Published courses can only be edited by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         order = request.data.get('order', [])

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil, GripVertical } from 'lucide-react'
 import client from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import './CourseEditorPage.css'
 
 const PILLAR_COLOR = {
@@ -13,6 +14,7 @@ const PILLAR_COLOR = {
 export default function CourseEditorPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [pillars, setPillars] = useState([])
   const [form, setForm] = useState(null)
@@ -111,7 +113,7 @@ export default function CourseEditorPage() {
   // ── Publish ───────────────────────────────────────────────────────────────
 
   const handlePublish = async () => {
-    if (!window.confirm('Publish this course? Once published it cannot be edited or unpublished.')) return
+    if (!window.confirm('Publish this course? Learners will see it immediately. As the author you can still edit or unpublish it.')) return
     setPublishing(true)
     try {
       await client.post(`/authoring/courses/${id}/publish/`)
@@ -208,7 +210,9 @@ export default function CourseEditorPage() {
 
   const currentPillar = pillars.find((p) => p.id === form.pillar_id)
   const pillarColor = PILLAR_COLOR[currentPillar?.slug] ?? 'blue'
-  const locked = isPublished
+  const isAuthor = author.id != null && user?.id === author.id
+  const isAdmin = user?.profile?.user_type === 'admin'
+  const locked = isPublished && !isAuthor && !isAdmin
 
   return (
     <div className="course-editor">
@@ -219,9 +223,12 @@ export default function CourseEditorPage() {
       </button>
 
       {/* Published banner */}
-      {locked && (
+      {isPublished && (
         <div className="published-banner">
-          <Lock size={14} /> This course is published and can no longer be edited.
+          <Lock size={14} />
+          {locked
+            ? 'This course is published — only its author can edit it.'
+            : 'This course is published — your edits go live immediately.'}
         </div>
       )}
 
@@ -257,9 +264,11 @@ export default function CourseEditorPage() {
             <button className="enroll-btn enroll-btn--outline" onClick={handleSaveCourse} disabled={saving}>
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
-            <button className="enroll-btn" onClick={handlePublish} disabled={publishing}>
-              {publishing ? 'Publishing…' : 'Publish'}
-            </button>
+            {!isPublished && (
+              <button className="enroll-btn" onClick={handlePublish} disabled={publishing}>
+                {publishing ? 'Publishing…' : 'Publish'}
+              </button>
+            )}
           </div>
         )}
       </div>

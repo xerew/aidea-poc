@@ -219,11 +219,11 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         self.assertIn('lesson_added', history.changes)
         self.assertEqual(history.changes['lesson_added']['lesson_title'], 'New Lesson')
 
-    def test_create_lesson_on_published_course_returns_400(self):
+    def test_create_lesson_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
         response = self.client.post(self.url, self.valid_payload)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_lesson_nonexistent_module_returns_404(self):
         url = reverse('authoring-lesson-create', kwargs={'pk': self.course.pk, 'module_pk': 9999})
@@ -329,11 +329,11 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
         response = self.client.patch(url, {'title': 'X'})
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_patch_lesson_on_published_course_returns_400(self):
+    def test_patch_lesson_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
         response = self.client.patch(self.url, {'title': 'Hacked'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_patch_lesson_belonging_to_other_module_returns_404(self):
         other_lesson = Lesson.objects.create(
@@ -356,11 +356,11 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
         self.assertIn('lesson_deleted', history.changes)
         self.assertEqual(history.changes['lesson_deleted']['lesson_title'], 'Intro Text')
 
-    def test_delete_on_published_course_returns_400(self):
+    def test_delete_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_nonexistent_lesson_returns_404(self):
         url = reverse('authoring-lesson-detail', kwargs={
@@ -580,13 +580,13 @@ class AuthoringModuleReorderTestCase(AuthoringTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_reorder_on_published_course_returns_400(self):
+    def test_reorder_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
         response = self.client.patch(
             self.url, {'order': [self.module1.pk, self.module2.pk]}, format='json',
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_reorder_nonexistent_course_returns_404(self):
         response = self.client.patch(
@@ -668,13 +668,13 @@ class AuthoringLessonReorderTestCase(AuthoringTestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_reorder_on_published_course_returns_400(self):
+    def test_reorder_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
         response = self.client.patch(
             self.url, {'order': [self.lesson1.pk, self.lesson2.pk]}, format='json',
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_reorder_nonexistent_module_returns_404(self):
         url = f'/api/authoring/courses/{self.course.pk}/modules/9999/lessons/reorder/'

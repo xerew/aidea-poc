@@ -28,3 +28,10 @@ class IsAdmin(BasePermission):
             and hasattr(request.user, 'profile')
             and request.user.profile.user_type == UserProfile.UserType.ADMIN
         )
+
+
+def can_edit_published(user, course):
+    """Published courses may only be edited by their author or an admin."""
+    profile = getattr(user, 'profile', None)
+    is_admin = profile is not None and profile.user_type == UserProfile.UserType.ADMIN
+    return course.created_by_id == user.id or is_admin

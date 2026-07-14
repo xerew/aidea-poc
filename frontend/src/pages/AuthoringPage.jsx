@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BookOpen, Clock, Pencil, Plus } from 'lucide-react'
 import client from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import './AuthoringPage.css'
 
 const PILLAR_COLOR = {
@@ -14,6 +15,7 @@ const LEVEL_LABELS = { beginner: 'Beginner', intermediate: 'Intermediate', advan
 
 export default function AuthoringPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -77,7 +79,7 @@ export default function AuthoringPage() {
                   className="edit-btn"
                   onClick={() => navigate(`/authoring/courses/${course.id}`)}
                 >
-                  <Pencil size={14} /> {course.is_published ? 'View' : 'Edit'}
+                  <Pencil size={14} /> {course.is_published && course.created_by_id !== user?.id && user?.profile?.user_type !== 'admin' ? 'View' : 'Edit'}
                 </button>
               </div>
             ))}

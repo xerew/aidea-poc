@@ -6,6 +6,7 @@ import {
   Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
 import './ModuleEditorPage.css'
 
@@ -444,9 +445,11 @@ function validateLesson(lesson) {
 export default function ModuleEditorPage() {
   const { id: courseId, moduleId } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [module, setModule] = useState(null)
   const [isPublished, setIsPublished] = useState(false)
+  const [courseAuthorId, setCourseAuthorId] = useState(null)
   const [lessons, setLessons] = useState([])
   const [selectedLessonId, setSelectedLessonId] = useState(null)
   const [moduleForm, setModuleForm] = useState({ title: '', description: '' })
@@ -471,6 +474,7 @@ export default function ModuleEditorPage() {
         setModuleForm({ title: m.title, description: m.description })
         setLessons(m.lessons.map((l) => ({ ...l, isDirty: false, isNew: false, saving: false })))
         setIsPublished(courseRes.data.is_published)
+        setCourseAuthorId(courseRes.data.created_by_id)
       })
       .catch(() => setError('Failed to load module.'))
   }, [courseId, moduleId])
@@ -640,7 +644,9 @@ export default function ModuleEditorPage() {
   if (error) return <p className="page-error">{error}</p>
   if (!module) return <p className="page-loading">Loading…</p>
 
-  const locked = isPublished
+  const isAuthor = courseAuthorId != null && user?.id === courseAuthorId
+  const isAdmin = user?.profile?.user_type === 'admin'
+  const locked = isPublished && !isAuthor && !isAdmin
 
   return (
     <div className="module-editor-page">
@@ -664,9 +670,12 @@ export default function ModuleEditorPage() {
               {moduleSaving ? 'Saving…' : 'Save'}
             </button>
           )}
-          {locked && (
+          {isPublished && (
             <div className="published-banner">
-              <Lock size={14} /> Published — read only
+              <Lock size={14} />
+              {locked
+                ? 'This course is published — only its author can edit it.'
+                : 'This course is published — your edits go live immediately.'}
             </div>
           )}
         </div>

@@ -218,10 +218,10 @@ class PublishedCourseLockTestCase(AuthoringTestCase):
         self.course.is_published = True
         self.course.save()
 
-    def test_patch_published_course_returns_400(self):
+    def test_patch_published_course_returns_403(self):
         url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
         response = self.client.patch(url, {'title': 'Hacked'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_patch_published_course_does_not_change_title(self):
         url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
@@ -229,20 +229,20 @@ class PublishedCourseLockTestCase(AuthoringTestCase):
         self.course.refresh_from_db()
         self.assertEqual(self.course.title, 'Intro to AI')
 
-    def test_add_module_to_published_course_returns_400(self):
+    def test_add_module_to_published_course_returns_403(self):
         url = reverse('authoring-module-create', kwargs={'pk': self.course.pk})
         response = self.client.post(url, {'title': 'New', 'duration_minutes': 10})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_patch_module_on_published_course_returns_400(self):
+    def test_patch_module_on_published_course_returns_403(self):
         url = reverse('authoring-module-detail', kwargs={'pk': self.course.pk, 'module_pk': self.module1.pk})
         response = self.client.patch(url, {'title': 'Hacked'})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_delete_module_on_published_course_returns_400(self):
+    def test_delete_module_on_published_course_returns_403(self):
         url = reverse('authoring-module-detail', kwargs={'pk': self.course.pk, 'module_pk': self.module1.pk})
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_published_course_still_readable_in_authoring(self):
         url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
@@ -458,3 +458,31 @@ class AuthoringCourseDetailTestCase(AuthoringTestCase):
         self.client.patch(self.url, {'title': 'First edit'})
         self.client.patch(self.url, {'title': 'Second edit'})
         self.assertEqual(CourseEditHistory.objects.filter(course=self.course).count(), 2)
+
+
+# ── Published course editing (author / admin) ────────────────────────────────
+
+class PublishedCourseEditTests(APITestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(username='author_cc', password='pass12345')
+        UserProfile.objects.create(user=self.author, user_type='content_creator')
+        self.other = User.objects.create_user(username='other_cc', password='pass12345')
+        UserProfile.objects.create(user=self.other, user_type='content_creator')
+        pillar = LearningPillar.objects.create(name='P', slug='ppub', order=1)
+        self.course = Course.objects.create(
+            title='Published', pillar=pillar, level='beginner', duration_hours=1,
+            is_published=True, created_by=self.author,
+        )
+        self.url = f'/api/authoring/courses/{self.course.id}/'
+
+    def test_author_can_edit_published_course(self):
+        self.client.force_authenticate(self.author)
+        res = self.client.patch(self.url, {'title': 'Updated'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.title, 'Updated')
+
+    def test_non_author_cannot_edit_published_course(self):
+        self.client.force_authenticate(self.other)
+        res = self.client.patch(self.url, {'title': 'Nope'}, format='json')
+        self.assertEqual(res.status_code, 403)

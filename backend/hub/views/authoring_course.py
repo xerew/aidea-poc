@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseEditHistory, LearningPillar
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
 
-from .permissions import IsContentCreator
+from .permissions import IsContentCreator, can_edit_published
 
 
 class AuthoringPillarsView(APIView):
@@ -58,8 +58,11 @@ class AuthoringCourseDetailView(APIView):
         course = self._get_course(pk)
         if not course:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if course.is_published:
-            return Response({'detail': 'Published courses cannot be edited.'}, status=status.HTTP_400_BAD_REQUEST)
+        if course.is_published and not can_edit_published(request.user, course):
+            return Response(
+                {'detail': 'Published courses can only be edited by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         serializer = CourseAuthoringSerializer(course, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
