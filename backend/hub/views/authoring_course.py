@@ -119,6 +119,11 @@ class AuthoringCourseUnpublishView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         if not course.is_published:
             return Response({'detail': 'Course is not published.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not can_edit_published(request.user, course):
+            return Response(
+                {'detail': 'Published courses can only be unpublished by their author.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         course.is_published = False
         course.save()

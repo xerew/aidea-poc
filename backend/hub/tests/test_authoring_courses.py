@@ -486,3 +486,33 @@ class PublishedCourseEditTests(APITestCase):
         self.client.force_authenticate(self.other)
         res = self.client.patch(self.url, {'title': 'Nope'}, format='json')
         self.assertEqual(res.status_code, 403)
+
+
+# ── Published course unpublishing (author / admin) ────────────────────────────
+
+class PublishedCourseUnpublishTests(APITestCase):
+    def setUp(self):
+        self.author = User.objects.create_user(username='author_cc2', password='pass12345')
+        UserProfile.objects.create(user=self.author, user_type='content_creator')
+        self.other = User.objects.create_user(username='other_cc2', password='pass12345')
+        UserProfile.objects.create(user=self.other, user_type='content_creator')
+        pillar = LearningPillar.objects.create(name='P2', slug='ppub2', order=1)
+        self.course = Course.objects.create(
+            title='Published2', pillar=pillar, level='beginner', duration_hours=1,
+            is_published=True, created_by=self.author,
+        )
+        self.url = f'/api/authoring/courses/{self.course.id}/unpublish/'
+
+    def test_author_can_unpublish_published_course(self):
+        self.client.force_authenticate(self.author)
+        res = self.client.post(self.url)
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertFalse(self.course.is_published)
+
+    def test_non_author_cannot_unpublish_published_course(self):
+        self.client.force_authenticate(self.other)
+        res = self.client.post(self.url)
+        self.assertEqual(res.status_code, 403)
+        self.course.refresh_from_db()
+        self.assertTrue(self.course.is_published)
