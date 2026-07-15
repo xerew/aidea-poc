@@ -1,15 +1,16 @@
-/* Dark top navbar — theme class overrides proved unreliable in this Jazzmin
-   version, so pin it here. Matches the dark sidebar (#343a40). */
-.main-header.navbar {
-  background-color: #343a40;
+/* Dark top navbar. This Jazzmin build renders Bootstrap 5 / AdminLTE 4 markup:
+   the bar is nav.app-header#jazzy-navbar carrying a `bg-body` utility class
+   (white, with !important), and `navbar-primary` from the theme config is not
+   a real BS5 class — so the id selector + !important here is required to win. */
+#jazzy-navbar {
+  background-color: #343a40 !important;
 }
 
-.main-header.navbar .nav-link,
-.main-header.navbar .navbar-nav > .nav-item > .nav-link {
-  color: #fff;
+#jazzy-navbar .nav-link {
+  color: #fff !important;
 }
 
-.main-header.navbar .nav-link:hover,
-.main-header.navbar .nav-link:focus {
-  color: #d0d4d9;
+#jazzy-navbar .nav-link:hover,
+#jazzy-navbar .nav-link:focus {
+  color: #d0d4d9 !important;
 }
