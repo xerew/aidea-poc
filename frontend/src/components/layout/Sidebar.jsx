@@ -52,9 +52,6 @@ export default function Sidebar() {
           ))}
         </ul>
       </nav>
-      <div className="sidebar-eu">
-        <img src="/images/logos/eu-cofunded.webp" alt="Co-funded by the European Union" />
-      </div>
     </aside>
   )
 }
