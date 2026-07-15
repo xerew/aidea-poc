@@ -204,7 +204,10 @@ JAZZMIN_SETTINGS = {
     'site_title': 'AIDEA Admin',
     'site_header': 'AIDEA',
     'site_brand': 'AIDEA',
-    'site_logo': None,
+    'site_logo': 'hub/aidea-logo.png',
+    'login_logo': 'hub/aidea-logo.png',
+    # Jazzmin defaults to img-circle, which crops the wordmark
+    'site_logo_classes': 'img-fluid',
     'welcome_sign': 'AIDEA – Teacher AI Training Platform',
     'copyright': 'AIDEA by ICCS',
     'search_model': ['auth.User', 'hub.Course'],
