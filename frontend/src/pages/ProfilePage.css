@@ -124,6 +124,58 @@
   margin: 0;
 }
 
+.profile-competency {
+  margin-top: 0.6rem;
+  max-width: 260px;
+}
+
+.profile-competency-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.profile-competency-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+}
+
+.profile-competency-badge--beginner {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.profile-competency-badge--intermediate {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.profile-competency-badge--advanced {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.profile-competency-score {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.profile-competency-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.profile-competency-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-primary);
+}
+
 /* Cards */
 
 .profile-card {

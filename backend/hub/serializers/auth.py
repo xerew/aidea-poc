@@ -89,7 +89,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model  = UserProfile
         fields = ['user_type', 'avatar_initials', 'onboarding_completed',
-                  'preferred_pillars', 'learning_style', 'gender', 'country', 'avatar_url']
+                  'preferred_pillars', 'learning_style', 'gender', 'country', 'avatar_url',
+                  'competency_score']
 
 
 class UserSerializer(serializers.ModelSerializer):

@@ -108,3 +108,10 @@ class MeEndpointTests(APITestCase):
     def test_me_requires_auth(self):
         res = self.client.get(reverse('auth-me'))
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_me_includes_competency_score(self):
+        self.user.profile.competency_score = 3
+        self.user.profile.save()
+        self.client.force_authenticate(self.user)
+        res = self.client.get(reverse('auth-me'))
+        self.assertEqual(res.data['profile']['competency_score'], 3)

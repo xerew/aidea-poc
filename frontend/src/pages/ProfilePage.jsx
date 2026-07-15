@@ -576,6 +576,42 @@ function ContentCreatorAccessSection() {
   )
 }
 
+// ── AI competency ─────────────────────────────────────────────────────────────
+
+const COMPETENCY_MAX = 6
+
+function competencyLevel(score) {
+  if (score <= 2) return { label: 'Beginner', cls: 'beginner' }
+  if (score <= 4) return { label: 'Intermediate', cls: 'intermediate' }
+  return { label: 'Advanced', cls: 'advanced' }
+}
+
+function CompetencyBadge() {
+  const { user } = useAuth()
+  const profile = user?.profile
+  if (profile?.user_type !== 'teacher' || profile?.competency_score == null) return null
+
+  const score = profile.competency_score
+  const level = competencyLevel(score)
+
+  return (
+    <div className="profile-competency" title="Grows as you complete courses">
+      <div className="profile-competency-row">
+        <span className={`profile-competency-badge profile-competency-badge--${level.cls}`}>
+          {level.label}
+        </span>
+        <span className="profile-competency-score">AI Competency {score}/{COMPETENCY_MAX}</span>
+      </div>
+      <div className="profile-competency-bar">
+        <div
+          className="profile-competency-fill"
+          style={{ width: `${(score / COMPETENCY_MAX) * 100}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ── Avatar with upload ────────────────────────────────────────────────────────
 
 function ProfileAvatar() {
@@ -649,6 +685,7 @@ function ProfileAvatar() {
       <div>
         <p className="profile-name">{user.first_name} {user.last_name}</p>
         <p className="profile-username">@{user.username}</p>
+        <CompetencyBadge />
         {user.profile?.avatar_url && (
           <button
             type="button"
