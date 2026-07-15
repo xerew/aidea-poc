@@ -589,7 +589,7 @@ function competencyLevel(score) {
 function CompetencyBadge() {
   const { user } = useAuth()
   const profile = user?.profile
-  if (profile?.user_type !== 'teacher' || profile?.competency_score == null) return null
+  if (profile?.competency_score == null) return null
 
   const score = profile.competency_score
   const level = competencyLevel(score)

@@ -1,8 +1,9 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Filter } from 'lucide-react'
 import PropTypes from 'prop-types'
 import client from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import './CoursesPage.css'
 
 const PILLAR_STYLES = {
@@ -15,6 +16,12 @@ const LEVEL_LABELS = {
   beginner:     'Beginner',
   intermediate: 'Intermediate',
   advanced:     'Advanced',
+}
+
+function levelForScore(score) {
+  if (score <= 2) return 'beginner'
+  if (score <= 4) return 'intermediate'
+  return 'advanced'
 }
 
 CourseCard.propTypes = {
@@ -74,10 +81,12 @@ function CourseCard({ course }) {
 }
 
 export default function CoursesPage() {
+  const { user } = useAuth()
   const [courses, setCourses] = useState([])
   const [pillars, setPillars] = useState([])
   const [error, setError]     = useState('')
   const [searchParams, setSearchParams] = useSearchParams()
+  const levelDefaultDone = useRef(false)
 
   const pillarFilter = searchParams.get('pillar') ?? ''
   const levelFilter  = searchParams.get('level')  ?? ''
@@ -89,6 +98,18 @@ export default function CoursesPage() {
       if (val) next.set(key, val); else next.delete(key)
       return next
     }, { replace: true })
+
+  // Teachers land with the level filter pre-set to their competency level;
+  // choosing another option (incl. "All") always wins over the default.
+  useEffect(() => {
+    if (levelDefaultDone.current) return
+    const profile = user?.profile
+    if (profile?.user_type !== 'teacher' || profile?.competency_score == null) return
+    levelDefaultDone.current = true
+    if (searchParams.has('level')) return
+    setParam('level', levelForScore(profile.competency_score))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, searchParams])
 
   useEffect(() => {
     client.get('/courses/')
@@ -137,7 +158,10 @@ export default function CoursesPage() {
         </select>
 
         <label>Level:</label>
-        <select value={levelFilter} onChange={(e) => setParam('level', e.target.value)}>
+        <select
+          value={levelFilter}
+          onChange={(e) => { levelDefaultDone.current = true; setParam('level', e.target.value) }}
+        >
           <option value="">All</option>
           <option value="beginner">Beginner</option>
           <option value="intermediate">Intermediate</option>
