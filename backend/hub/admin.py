@@ -163,9 +163,18 @@ class CourseAdmin(admin.ModelAdmin):
     list_display  = ['title', 'pillar', 'level', 'content_format', 'is_published', 'created_by', 'created_at']
     list_filter   = ['pillar', 'is_published', 'level', 'content_format']
     search_fields = ['title', 'description']
-    readonly_fields = ['created_by', 'created_at']
+    readonly_fields = ['created_at']
     inlines = [ModuleInline]
     actions = ['publish_courses', 'unpublish_courses']
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Authorship drives editing rights in the app, so only content creators
+        # make sense as authors; blank = "AIDEA team".
+        if db_field.name == 'created_by':
+            kwargs['queryset'] = User.objects.filter(
+                profile__user_type=UserProfile.UserType.CONTENT_CREATOR,
+            ).order_by('username')
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     @admin.action(description='Publish selected courses')
     def publish_courses(self, request, queryset):

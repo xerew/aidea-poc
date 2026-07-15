@@ -1,0 +1,15 @@
+/* Dark top navbar — theme class overrides proved unreliable in this Jazzmin
+   version, so pin it here. Matches the dark sidebar (#343a40). */
+.main-header.navbar {
+  background-color: #343a40;
+}
+
+.main-header.navbar .nav-link,
+.main-header.navbar .navbar-nav > .nav-item > .nav-link {
+  color: #fff;
+}
+
+.main-header.navbar .nav-link:hover,
+.main-header.navbar .nav-link:focus {
+  color: #d0d4d9;
+}
