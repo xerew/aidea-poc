@@ -30,7 +30,7 @@ from .authoring_module import (
     AuthoringModuleView,
 )
 from .authoring_upload import AuthoringUploadView
-from .authoring_xlsx import AuthoringCourseExportView
+from .authoring_xlsx import AuthoringCourseExportView, AuthoringCourseImportView
 from .learner import (
     CourseDetailView,
     CourseEnrollView,
@@ -65,6 +65,7 @@ __all__ = [
     'AdminUserRoleView',
     'AuthoringCourseDetailView',
     'AuthoringCourseExportView',
+    'AuthoringCourseImportView',
     'AuthoringCoursePublishView',
     'AuthoringCourseUnpublishView',
     'AuthoringCoursesView',

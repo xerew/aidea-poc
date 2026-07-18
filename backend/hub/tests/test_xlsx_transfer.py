@@ -91,3 +91,80 @@ class ExportXlsxTests(APITestCase):
         wb = load_workbook(BytesIO(res.getvalue()))
         self.assertGreaterEqual(len(wb['Lessons'].data_validations.dataValidation), 2)
         self.assertGreaterEqual(len(wb['Course'].data_validations.dataValidation), 3)
+
+
+class ImportXlsxTests(APITestCase):
+    def setUp(self):
+        self.creator = User.objects.create_user(username='xlsx_imp', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.teacher = User.objects.create_user(username='xlsx_imp_t', password='pass12345')
+        UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
+        self.course = make_course(self.creator, title='Round Trip')
+        self.url = reverse('authoring-course-import')
+
+    def _export_bytes(self, course):
+        from io import BytesIO as B
+
+        from hub.xlsx_transfer import build_course_workbook
+        buf = B()
+        build_course_workbook(course).save(buf)
+        buf.seek(0)
+        return buf
+
+    def _post(self, buf, name='course.xlsx'):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        upload = SimpleUploadedFile(
+            name, buf.read(),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
+        return self.client.post(self.url, {'file': upload}, format='multipart')
+
+    def test_teacher_forbidden(self):
+        self.client.force_authenticate(self.teacher)
+        self.assertEqual(self._post(self._export_bytes(self.course)).status_code, 403)
+
+    def test_round_trip(self):
+        self.client.force_authenticate(self.creator)
+        res = self._post(self._export_bytes(self.course))
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        new = Course.objects.get(pk=res.data['id'])
+        self.assertEqual(new.title, 'Round Trip (imported)')  # collision with original
+        self.assertFalse(new.is_published)
+        self.assertEqual(new.created_by, self.creator)
+        self.assertEqual(new.level, self.course.level)
+        self.assertEqual(new.learning_outcomes, self.course.learning_outcomes)
+        self.assertEqual(new.modules.count(), 2)
+        m2 = new.modules.get(order=2)
+        quiz = m2.lessons.get(order=1)
+        self.assertEqual(quiz.lesson_type, 'quiz')
+        self.assertEqual(quiz.quiz_data, [{
+            'question': 'Pick two',
+            'options': [
+                {'text': 'A1', 'is_correct': True},
+                {'text': 'B1', 'is_correct': False},
+                {'text': 'C1', 'is_correct': True},
+            ],
+        }])
+        video = new.modules.get(order=1).lessons.get(order=2)
+        self.assertFalse(video.is_required)
+
+    def test_invalid_lesson_type_rejected_with_cell_ref(self):
+        from openpyxl import load_workbook
+        buf = self._export_bytes(self.course)
+        wb = load_workbook(buf)
+        wb['Lessons']['E2'] = 'vido'
+        from io import BytesIO as B
+        bad = B()
+        wb.save(bad)
+        bad.seek(0)
+        self.client.force_authenticate(self.creator)
+        res = self._post(bad)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(any('Lessons!E2' in e for e in res.data['errors']))
+        self.assertEqual(Course.objects.filter(title__startswith='Round Trip (imported').count(), 0)
+
+    def test_wrong_extension_rejected(self):
+        from io import BytesIO as B
+        self.client.force_authenticate(self.creator)
+        res = self._post(B(b'not a workbook'), name='course.csv')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
