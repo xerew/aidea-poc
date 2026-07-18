@@ -60,7 +60,7 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
   return (
     <div className="pf-overlay" onClick={onClose}>
       <div className="pf-modal" onClick={(e) => e.stopPropagation()}>
-        <button className="pf-close" aria-label="Close" onClick={onClose}><X size={18} /></button>
+        <button type="button" className="pf-close" aria-label="Close" onClick={onClose}><X size={18} /></button>
 
         {error && <p className="pf-error">{error}</p>}
 
@@ -84,6 +84,7 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
             <div className="pf-options">
               {current.options.map(opt => (
                 <button
+                  type="button"
                   key={opt.id}
                   className={`pf-option ${chosen === opt.id ? 'pf-option--selected' : ''}`}
                   onClick={() => setAnswers(prev => ({ ...prev, [current.id]: opt.id }))}
@@ -94,15 +95,15 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
             </div>
             <div className="pf-nav">
               {step > 0 && (
-                <button className="pf-btn pf-btn--ghost" onClick={() => setStep(s => s - 1)}>Back</button>
+                <button type="button" className="pf-btn pf-btn--ghost" onClick={() => setStep(s => s - 1)}>Back</button>
               )}
               {!isLast && (
-                <button className="pf-btn" disabled={chosen === undefined} onClick={() => setStep(s => s + 1)}>
+                <button type="button" className="pf-btn" disabled={chosen === undefined} onClick={() => setStep(s => s + 1)}>
                   Next
                 </button>
               )}
               {isLast && (
-                <button className="pf-btn" disabled={chosen === undefined || submitting} onClick={handleSubmit}>
+                <button type="button" className="pf-btn" disabled={chosen === undefined || submitting} onClick={handleSubmit}>
                   {submitting ? 'Working…' : 'See my result'}
                 </button>
               )}
@@ -119,7 +120,7 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
               {' '}{(STYLE_LABELS[result.learning_style] ?? result.label).toLowerCase()} courses.
               You can change it anytime in Learning Preferences.
             </p>
-            <button className="pf-btn" onClick={onClose}>Done</button>
+            <button type="button" className="pf-btn" onClick={onClose}>Done</button>
           </div>
         )}
       </div>
