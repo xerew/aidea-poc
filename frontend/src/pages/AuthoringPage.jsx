@@ -20,7 +20,7 @@ export default function AuthoringPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const importInputRef = useRef(null)
-  const [importErrors, setImportErrors] = useState([])
+  const [transferErrors, setTransferErrors] = useState({ title: '', messages: [] })
   const [importing, setImporting] = useState(false)
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function AuthoringPage() {
       link.click()
       URL.revokeObjectURL(url)
     } catch {
-      setImportErrors(['Export failed. Please try again.'])
+      setTransferErrors({ title: 'Export failed:', messages: ['Could not download the workbook. Please try again.'] })
     }
   }
 
@@ -48,7 +48,7 @@ export default function AuthoringPage() {
     const file = e.target.files?.[0]
     if (!file) return
     setImporting(true)
-    setImportErrors([])
+    setTransferErrors({ title: '', messages: [] })
     try {
       const fd = new FormData()
       fd.append('file', file)
@@ -56,7 +56,10 @@ export default function AuthoringPage() {
       navigate(`/authoring/courses/${res.data.id}`)
     } catch (err) {
       const errors = err.response?.data?.errors
-      setImportErrors(Array.isArray(errors) ? errors : ['Import failed. Please try again.'])
+      setTransferErrors({
+        title: 'Import failed — fix these and retry:',
+        messages: Array.isArray(errors) ? errors : ['Import failed. Please try again.'],
+      })
     } finally {
       setImporting(false)
       e.target.value = ''
@@ -97,15 +100,20 @@ export default function AuthoringPage() {
         </div>
       </div>
 
-      {importErrors.length > 0 && (
+      {transferErrors.messages.length > 0 && (
         <div className="authoring-import-errors">
           <div className="authoring-import-errors-head">
-            <strong>Import failed — fix these and retry:</strong>
-            <button onClick={() => setImportErrors([])}>✕</button>
+            <strong>{transferErrors.title}</strong>
+            <button
+              aria-label="Dismiss errors"
+              onClick={() => setTransferErrors({ title: '', messages: [] })}
+            >✕</button>
           </div>
           <ul>
-            {importErrors.slice(0, 20).map((msg, i) => <li key={i}>{msg}</li>)}
-            {importErrors.length > 20 && <li>…and {importErrors.length - 20} more.</li>}
+            {transferErrors.messages.slice(0, 20).map((msg, i) => <li key={i}>{msg}</li>)}
+            {transferErrors.messages.length > 20 && (
+              <li>…and {transferErrors.messages.length - 20} more.</li>
+            )}
           </ul>
         </div>
       )}

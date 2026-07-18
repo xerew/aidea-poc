@@ -169,6 +169,25 @@ class ImportXlsxTests(APITestCase):
         res = self._post(B(b'not a workbook'), name='course.csv')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_out_of_range_integers_rejected(self):
+        # PositiveSmallIntegerField caps at 32767 on Postgres; must 400, not 500
+        from io import BytesIO as B
+
+        from openpyxl import load_workbook
+        buf = self._export_bytes(self.course)
+        wb = load_workbook(buf)
+        wb['Course']['E2'] = 99999      # duration_hours over smallint max
+        wb['Lessons']['G2'] = -5        # negative duration_minutes
+        bad = B()
+        wb.save(bad)
+        bad.seek(0)
+        self.client.force_authenticate(self.creator)
+        res = self._post(bad)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(any('Course!E2' in e for e in res.data['errors']))
+        self.assertTrue(any('Lessons!G2' in e for e in res.data['errors']))
+        self.assertEqual(Course.objects.filter(title__startswith='Round Trip (imported').count(), 0)
+
     def test_corrupt_xlsx_bytes_rejected_cleanly(self):
         # Right extension, garbage bytes — must be a clean 400, not a 500
         from io import BytesIO as B

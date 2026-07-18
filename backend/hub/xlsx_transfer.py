@@ -163,13 +163,23 @@ def _rows(ws):
             yield row_num, values
 
 
+# PositiveSmallIntegerField maps to Postgres smallint: CHECK (>= 0), max 32767.
+# Values outside this range must fail phase-1 validation, not blow up the insert.
+INT_MAX = 32767
+
+
 def _as_int(value, default=0):
     if value in (None, ''):
         return default, True
+    if isinstance(value, float) and not value.is_integer():
+        return default, False
     try:
-        return int(value), True
+        number = int(value)
     except (TypeError, ValueError):
         return default, False
+    if not 0 <= number <= INT_MAX:
+        return default, False
+    return number, True
 
 
 def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
@@ -208,7 +218,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         errors.append(f'{_cell("Course", 4, row_num)}: level must be one of {sorted(levels)}.')
     duration_hours, ok = _as_int(duration_hours)
     if not ok:
-        errors.append(f'{_cell("Course", 5, row_num)}: duration_hours must be a number.')
+        errors.append(f'{_cell("Course", 5, row_num)}: duration_hours must be a whole number between 0 and 32767.')
     if content_format in (None, ''):
         content_format = Course.ContentFormat.MIXED
     elif content_format not in content_formats:
@@ -243,7 +253,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             continue
         m_minutes, ok = _as_int(m_minutes)
         if not ok:
-            errors.append(f'{_cell("Modules", 4, row_num)}: duration_minutes must be a number.')
+            errors.append(f'{_cell("Modules", 4, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
         modules[order] = {
             'order': order, 'title': m_title.strip(), 'description': m_desc or '',
             'duration_minutes': m_minutes, 'lessons': {},
@@ -274,7 +284,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             continue
         minutes, ok = _as_int(minutes)
         if not ok:
-            errors.append(f'{_cell("Lessons", 7, row_num)}: duration_minutes must be a number.')
+            errors.append(f'{_cell("Lessons", 7, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
         req_key = str(required).strip().lower() if required not in (None, '') else ''
         if req_key not in _YES_NO:
             errors.append(f'{_cell("Lessons", 8, row_num)}: required must be yes or no.')
