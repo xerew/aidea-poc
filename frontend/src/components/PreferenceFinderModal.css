@@ -1,0 +1,78 @@
+.pf-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pf-modal {
+  position: relative;
+  width: min(520px, calc(100vw - 2rem));
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.pf-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.pf-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+.pf-head h2 { font-size: 1.15rem; margin: 0; }
+.pf-head-icon { color: var(--color-primary); }
+
+.pf-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  overflow: hidden;
+  margin-bottom: 0.4rem;
+}
+.pf-progress-fill { height: 100%; background: var(--color-primary); transition: width 0.25s; }
+.pf-counter { font-size: 0.78rem; color: #6b7280; margin: 0 0 0.9rem; }
+.pf-question { font-weight: 600; margin: 0 0 0.9rem; }
+
+.pf-options { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.1rem; }
+.pf-option {
+  text-align: left;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.pf-option:hover { background: #f9fafb; }
+.pf-option--selected { border-color: var(--color-primary); background: #eef2ff; }
+
+.pf-nav { display: flex; justify-content: flex-end; gap: 0.5rem; }
+.pf-btn {
+  padding: 0.5rem 1.1rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.pf-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pf-btn--ghost { background: none; color: var(--color-primary); border: 1px solid var(--color-primary); }
+
+.pf-loading, .pf-error { padding: 1.5rem 0; text-align: center; }
+.pf-error { color: #b91c1c; }
+
+.pf-result { text-align: center; padding: 0.5rem 0; }
+.pf-result h2 { font-size: 1.2rem; margin: 0.6rem 0; }
+.pf-result-icon { color: var(--color-primary); }
+.pf-result-style { color: var(--color-primary); }
+.pf-result-sub { font-size: 0.88rem; color: #6b7280; margin-bottom: 1.1rem; }

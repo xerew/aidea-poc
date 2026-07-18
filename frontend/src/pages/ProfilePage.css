@@ -374,6 +374,22 @@
   color: var(--color-primary);
 }
 
+.profile-finder-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: -0.5rem 0 1rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px dashed var(--color-primary);
+  border-radius: 8px;
+  background: none;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.profile-finder-btn:hover { background: #eef2ff; }
+
 /* Feedback messages */
 
 .profile-feedback {

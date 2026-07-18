@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Camera, Check, X } from 'lucide-react'
+import { Camera, Check, X, Sparkles } from 'lucide-react'
 import {
   PasswordInput,
   PasswordStrengthPanel,
   PASSWORD_RULES,
 } from '../components/PasswordInput'
+import PreferenceFinderModal from '../components/PreferenceFinderModal'
 import { useAuth } from '../context/AuthContext'
 import { useAccessRequest } from '../context/AccessRequestContext'
 import { COUNTRIES, getFlagEmoji } from '../data/countries'
@@ -191,6 +192,7 @@ function PreferencesSection() {
     weekly_learning_goal: '', email_notifications: true, progress_reminders: true,
   })
   const [loading, setLoading] = useState(true)
+  const [finderOpen, setFinderOpen] = useState(false)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/preferences/')
 
   useEffect(() => {
@@ -225,6 +227,20 @@ function PreferencesSection() {
             {LEARNING_FORMATS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
+
+        <button
+          type="button"
+          className="profile-finder-btn"
+          onClick={() => setFinderOpen(true)}
+        >
+          <Sparkles size={14} /> Find your learning preference
+        </button>
+
+        <PreferenceFinderModal
+          open={finderOpen}
+          onClose={() => setFinderOpen(false)}
+          onComplete={(style) => setForm(prev => ({ ...prev, learning_style: style }))}
+        />
 
         <div className="profile-field">
           <label>Preferred Pillar</label>
