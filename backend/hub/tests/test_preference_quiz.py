@@ -70,6 +70,13 @@ class PreferenceQuizApiTests(APITestCase):
         res = self.client.post(self.url, {'answers': [{'question_id': self.q1.id, 'option_id': 999999}]}, format='json')
         self.assertEqual(res.status_code, 400)
 
+    def test_non_integer_option_id_rejected(self):
+        # Garbage types must 400 cleanly, not 500 at query time
+        res = self.client.post(self.url, {'answers': [{'question_id': self.q1.id, 'option_id': 'abc'}]}, format='json')
+        self.assertEqual(res.status_code, 400)
+        res = self.client.post(self.url, {'answers': [{'question_id': self.q1.id, 'option_id': [1]}]}, format='json')
+        self.assertEqual(res.status_code, 400)
+
     def test_two_answers_for_same_question_rejected(self):
         res = self.client.post(self.url, {'answers': [
             {'question_id': self.q1.id, 'option_id': self.q1_video.id},

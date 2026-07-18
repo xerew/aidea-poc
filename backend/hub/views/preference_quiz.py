@@ -28,8 +28,8 @@ class PreferenceQuizView(APIView):
 
         option_ids = []
         for answer in answers:
-            if not isinstance(answer, dict) or 'option_id' not in answer:
-                return Response({'error': 'each answer needs an option_id.'},
+            if not isinstance(answer, dict) or not isinstance(answer.get('option_id'), int):
+                return Response({'error': 'each answer needs an integer option_id.'},
                                 status=status.HTTP_400_BAD_REQUEST)
             option_ids.append(answer['option_id'])
 
