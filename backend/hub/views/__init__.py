@@ -45,6 +45,7 @@ from .learner import (
 from .onboarding import OnboardingView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsTeacher
+from .preference_quiz import PreferenceQuizView
 from .profile import (
     ChangePasswordView,
     ProfileAvatarView,
@@ -95,6 +96,7 @@ __all__ = [
     'RegisterView',
     'OnboardingView',
     'PathwayView',
+    'PreferenceQuizView',
     'ChangePasswordView',
     'ProfileAvatarView',
     'ProfilePersonalInfoView',

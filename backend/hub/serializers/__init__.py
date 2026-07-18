@@ -24,6 +24,7 @@ from .course import (
 )
 from .onboarding import OnboardingSubmitSerializer
 from .pathway import RecommendationSerializer, UserLearningPathSerializer
+from .preference_quiz import PreferenceOptionSerializer, PreferenceQuestionSerializer
 
 __all__ = [
     'AideaTokenObtainPairSerializer',
@@ -43,6 +44,8 @@ __all__ = [
     'OnboardingSubmitSerializer',
     'PillarSerializer',
     'PillarSummarySerializer',
+    'PreferenceOptionSerializer',
+    'PreferenceQuestionSerializer',
     'RecommendationSerializer',
     'UserLearningPathSerializer',
     'UserProfileSerializer',
