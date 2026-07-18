@@ -16,6 +16,7 @@ from hub.models import (
 from .seed_data import cohort as cohort_data
 from .seed_data import pillar_teach_about_ai, pillar_teach_for_ai, pillar_teach_with_ai
 from .seed_data.pathways import seed_pathways
+from .seed_data.preference_quiz import seed_preference_quiz
 
 PILLARS = [
     pillar_teach_with_ai.PILLAR,
@@ -30,6 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self._seed_pillars()
         seed_pathways()
+        seed_preference_quiz()
         self._seed_demo_user()
         creator = self._seed_demo_content_creator()
         self._assign_creator_courses(creator)

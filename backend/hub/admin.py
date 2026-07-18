@@ -17,6 +17,8 @@ from .models import (
     LessonProgress,
     LessonSession,
     Module,
+    PreferenceOption,
+    PreferenceQuestion,
     UserLearningPath,
     UserProfile,
 )
@@ -96,6 +98,26 @@ class UserProfileAdmin(admin.ModelAdmin):
     @admin.display(description='Email', ordering='user__email')
     def get_email(self, obj):
         return obj.user.email
+
+
+# ── Preference quiz ───────────────────────────────────────────────────────────
+
+class PreferenceOptionInline(admin.TabularInline):
+    model = PreferenceOption
+    extra = 2
+    fields = ['text', 'maps_to', 'order']
+    ordering = ['order']
+
+
+@admin.register(PreferenceQuestion)
+class PreferenceQuestionAdmin(admin.ModelAdmin):
+    list_display  = ['text', 'order', 'is_active', 'option_count']
+    list_editable = ['order', 'is_active']
+    inlines = [PreferenceOptionInline]
+
+    @admin.display(description='Options')
+    def option_count(self, obj):
+        return obj.options.count()
 
 
 # ── Access Requests ───────────────────────────────────────────────────────────
