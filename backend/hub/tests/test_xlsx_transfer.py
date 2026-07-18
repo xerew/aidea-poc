@@ -168,3 +168,11 @@ class ImportXlsxTests(APITestCase):
         self.client.force_authenticate(self.creator)
         res = self._post(B(b'not a workbook'), name='course.csv')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_corrupt_xlsx_bytes_rejected_cleanly(self):
+        # Right extension, garbage bytes — must be a clean 400, not a 500
+        from io import BytesIO as B
+        self.client.force_authenticate(self.creator)
+        res = self._post(B(b'\x00\x01garbage not a zip'), name='course.xlsx')
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('not a valid xlsx workbook', res.data['errors'][0])
