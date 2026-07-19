@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield } from 'lucide-react'
+import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
@@ -14,6 +14,7 @@ const BASE_NAV = [
 
 const AUTHORING_ITEM = { to: '/authoring',    label: 'Authoring', Icon: PenLine }
 const ADMIN_ITEM     = { to: '/admin/users',  label: 'Admin',     Icon: Shield  }
+const REVIEWS_ITEM   = { to: '/reviews',      label: 'Reviews',   Icon: ClipboardCheck }
 
 export default function Sidebar() {
   const { user } = useAuth()
@@ -21,9 +22,15 @@ export default function Sidebar() {
 
   let navItems
   if (userType === 'admin') {
-    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), ADMIN_ITEM]
+    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, ADMIN_ITEM]
   } else if (userType === 'content_creator') {
-    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), AUTHORING_ITEM]
+    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, AUTHORING_ITEM]
+  } else if (userType === 'aidea_partner') {
+    navItems = [
+      ...BASE_NAV.filter(item => ['/', '/courses'].includes(item.to)),
+      REVIEWS_ITEM,
+      ...BASE_NAV.filter(item => item.to === '/profile'),
+    ]
   } else {
     navItems = BASE_NAV
   }

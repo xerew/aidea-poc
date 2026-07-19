@@ -15,7 +15,7 @@ function UsersTab() {
   useEffect(() => {
     client.get('/admin/users/')
       .then(({ data }) => {
-        const ROLE_ORDER = { admin: 0, content_creator: 1, teacher: 2 }
+        const ROLE_ORDER = { admin: 0, content_creator: 1, aidea_partner: 2, teacher: 3 }
         const sorted = [...data].sort((a, b) => {
           const ro = (ROLE_ORDER[a.user_type] ?? 9) - (ROLE_ORDER[b.user_type] ?? 9)
           if (ro !== 0) return ro
@@ -72,6 +72,7 @@ function UsersTab() {
                       <select className="admin-role-select" value={u.user_type} disabled>
                         <option value="teacher">Teacher</option>
                         <option value="content_creator">Content Creator</option>
+                        <option value="aidea_partner">AIDEA Partner</option>
                         <option value="admin">Admin</option>
                       </select>
                       <span className="admin-you-badge">You</span>
@@ -86,6 +87,7 @@ function UsersTab() {
                       >
                         <option value="teacher">Teacher</option>
                         <option value="content_creator">Content Creator</option>
+                        <option value="aidea_partner">AIDEA Partner</option>
                         <option value="admin">Admin</option>
                       </select>
                       {fb.saving && <span className="admin-feedback info">Saving…</span>}

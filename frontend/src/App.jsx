@@ -20,6 +20,9 @@ import CourseCreatePage from './pages/CourseCreatePage'
 import ModuleEditorPage from './pages/ModuleEditorPage'
 import RegisterPage from './pages/RegisterPage'
 import AdminPage from './pages/AdminPage'
+import ReviewsPage from './pages/ReviewsPage'
+
+const REVIEWER_TYPES = ['content_creator', 'aidea_partner', 'admin']
 
 ContentCreatorRoute.propTypes = { element: PropTypes.node.isRequired }
 
@@ -36,6 +39,15 @@ function AdminRoute({ element }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
   if (user.profile?.user_type !== 'admin') return <Navigate to="/" replace />
+  return element
+}
+
+ReviewerRoute.propTypes = { element: PropTypes.node.isRequired }
+
+function ReviewerRoute({ element }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  if (!REVIEWER_TYPES.includes(user.profile?.user_type)) return <Navigate to="/" replace />
   return element
 }
 
@@ -60,6 +72,7 @@ export default function App() {
             <Route path="/authoring/courses/:id"      element={<ContentCreatorRoute element={<CourseEditorPage />} />} />
             <Route path="/authoring/courses/:id/modules/:moduleId" element={<ContentCreatorRoute element={<ModuleEditorPage />} />} />
             <Route path="/admin/users" element={<AdminRoute element={<AdminPage />} />} />
+            <Route path="/reviews" element={<ReviewerRoute element={<ReviewsPage />} />} />
           </Route>
           <Route path="/courses/:id/learn"                element={<LearnRedirect />} />
           <Route path="/courses/:courseId/learn/:lessonId" element={<LessonPage />} />

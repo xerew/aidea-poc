@@ -15,7 +15,8 @@ from hub.views.permissions import IsAdmin
 ROLE_ORDER = {
     UserProfile.UserType.ADMIN:           0,
     UserProfile.UserType.CONTENT_CREATOR: 1,
-    UserProfile.UserType.TEACHER:         2,
+    UserProfile.UserType.AIDEA_PARTNER:   2,
+    UserProfile.UserType.TEACHER:         3,
 }
 
 
