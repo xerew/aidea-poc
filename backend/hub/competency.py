@@ -16,12 +16,14 @@ def _band(score: int) -> int:
     return 2
 
 
-def apply_competency_delta(user, delta: int) -> int:
+def apply_competency_delta(user, delta: int, recompute: bool = True) -> int:
     """Apply delta to the user's competency score.
 
     Clamps to 0..6; re-assigns the learning path when the band changes in
     either direction; schedules a recommendations recompute when the score
-    actually changed. Returns the (possibly unchanged) score.
+    actually changed (pass recompute=False when the caller batches several
+    deltas and schedules one recompute itself). Returns the (possibly
+    unchanged) score.
     """
     profile = user.profile
     old = profile.competency_score
@@ -39,8 +41,9 @@ def apply_competency_delta(user, delta: int) -> int:
         if path:
             UserLearningPath.objects.update_or_create(user=user, defaults={'path': path})
 
-    from hub.tasks import compute_user_recommendations
-    compute_user_recommendations.delay(user.id)
+    if recompute:
+        from hub.tasks import compute_user_recommendations
+        compute_user_recommendations.delay(user.id)
     return new
 
 
@@ -75,6 +78,7 @@ def course_completion_delta(user, course) -> int:
             LessonProgress.objects.filter(
                 user=user,
                 lesson__module__course=course,
+                completed_at__isnull=False,
                 time_spent_seconds__isnull=False,
                 lesson__duration_minutes__gt=0,
             ).select_related('lesson')

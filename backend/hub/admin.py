@@ -340,7 +340,14 @@ class LessonSessionAdmin(admin.ModelAdmin):
 class LearnerActivityConfigAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Quiz → Competency toggle', {'fields': ['quiz_affects_competency']}),
-        ('Weights (active when toggle is on)', {'fields': ['quiz_pass_threshold', 'quiz_weight_pass', 'quiz_weight_fail']}),
+        ('Weights (active when toggle is on)', {
+            'fields': ['quiz_pass_threshold', 'quiz_weight_pass', 'quiz_weight_fail'],
+            'description': (
+                'Weights are rounded to the nearest even integer before applying '
+                '(Python round): ±0.5 rounds to 0, so a fail weight must be -1.0 '
+                'or lower to actually subtract points.'
+            ),
+        }),
         ('Decay', {'fields': ['decay_enabled', 'slow_ratio_threshold', 'slow_penalty',
                               'idle_decay_days', 'idle_decay_points']}),
     ]

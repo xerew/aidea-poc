@@ -393,10 +393,18 @@ def apply_competency_decay() -> None:
         .select_related('user__profile')
     )
     now = timezone.now()
+    decayed_user_ids = set()
     for enrollment in stale:
-        apply_competency_delta(enrollment.user, -config.idle_decay_points)
+        # Batch the recompute: one per affected user, not one per enrollment
+        apply_competency_delta(
+            enrollment.user, -config.idle_decay_points, recompute=False,
+        )
+        decayed_user_ids.add(enrollment.user_id)
         enrollment.decay_applied_at = now
         enrollment.save(update_fields=['decay_applied_at'])
+
+    for user_id in decayed_user_ids:
+        compute_user_recommendations.delay(user_id)
 
 
 @shared_task
