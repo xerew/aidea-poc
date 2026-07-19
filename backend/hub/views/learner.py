@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -241,63 +240,18 @@ class LessonCompleteView(APIView):
         except Lesson.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        lp, created = LessonProgress.objects.get_or_create(user=request.user, lesson=lesson)
-
-        if created:
-            now = timezone.now()
-            lp.completed_at = now
-
-            session = LessonSession.objects.filter(
-                user=request.user, lesson=lesson,
-            ).order_by('-started_at').first()
-            if session:
-                lp.time_spent_seconds = max(0, int((now - session.started_at).total_seconds()))
-
-            quiz_answers_raw = request.data.get('quiz_answers', [])
-            if lesson.lesson_type == 'quiz' and quiz_answers_raw and lesson.quiz_data:
-                booleans = []
-                for i, selected in enumerate(quiz_answers_raw):
-                    if i < len(lesson.quiz_data):
-                        options = lesson.quiz_data[i].get('options', [])
-                        if isinstance(selected, int) and 0 <= selected < len(options):
-                            booleans.append(bool(options[selected].get('is_correct', False)))
-                        else:
-                            booleans.append(False)
-                # Pad to full question count so score denominator is always len(quiz_data)
-                while len(booleans) < len(lesson.quiz_data):
-                    booleans.append(False)
-                lp.quiz_answers = booleans
-                lp.quiz_score = sum(booleans) / len(booleans) if booleans else 0.0
-
-            engagement = dict(request.data.get('engagement_data') or {})
-            if lesson.lesson_type == 'assignment' and 'submission' in engagement:
-                engagement['word_count'] = len(str(engagement['submission']).split())
-            if lesson.lesson_type == 'quiz' and quiz_answers_raw:
-                engagement['quiz_selected'] = quiz_answers_raw
-            lp.engagement_data = engagement
-
-            lp.save()
-
-        total = Lesson.objects.filter(module__course=course, is_required=True).count()
-        completed_count = LessonProgress.objects.filter(
-            user=request.user,
-            lesson__module__course=course,
-            lesson__is_required=True,
-        ).count()
-        progress_pct = round((completed_count / total) * 100) if total > 0 else 0
-
-        just_completed = progress_pct == 100 and enrollment.completed_at is None
-        enrollment.progress_pct = progress_pct
-        enrollment.current_module = lesson.module
-        if just_completed:
-            enrollment.completed_at = timezone.now()
-        enrollment.save()
-
-        if just_completed and hasattr(request.user, 'profile'):
-            from hub.competency import apply_competency_delta, course_completion_delta
-            apply_competency_delta(
-                request.user, course_completion_delta(request.user, course),
+        if lesson.lesson_type == 'assignment':
+            return Response(
+                {'detail': 'Assignments are completed through review.'},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+        from hub.completion import record_lesson_completion
+        lp, progress_pct = record_lesson_completion(
+            request.user, enrollment, lesson,
+            quiz_answers_raw=request.data.get('quiz_answers', []),
+            engagement_data=request.data.get('engagement_data'),
+        )
 
         return Response({
             'lesson_id': lesson.id,

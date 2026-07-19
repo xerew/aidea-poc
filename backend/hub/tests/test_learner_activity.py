@@ -220,16 +220,17 @@ class EngagementTrackingTest(TestCase):
         lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
         self.assertEqual(lp.engagement_data.get('scroll_pct'), 85)
 
+    # updated fully in assignment-review Task 3
     def test_assignment_word_count_derived(self):
+        # Assignments no longer complete via this endpoint; word-count
+        # derivation is exercised through the review-approval flow (Task 3).
         lesson = self._lesson('A1', lesson_type='assignment')
-        self.client.post(
+        res = self.client.post(
             f'/api/courses/{self.course.pk}/lessons/{lesson.pk}/complete/',
             {'engagement_data': {'submission': 'hello world this is a test'}},
             format='json',
         )
-        lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
-        self.assertEqual(lp.engagement_data.get('word_count'), 6)
-        self.assertEqual(lp.engagement_data.get('submission'), 'hello world this is a test')
+        self.assertEqual(res.status_code, 400)
 
     def test_engagement_not_overwritten_on_repeat_complete(self):
         lesson = self._lesson('T5', lesson_type='text')
