@@ -14,6 +14,7 @@ class Enrollment(models.Model):
     enrolled_at = models.DateTimeField(auto_now_add=True)
     last_accessed_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+    decay_applied_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'course')

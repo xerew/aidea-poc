@@ -24,6 +24,13 @@ class LearnerActivityConfig(models.Model):
     quiz_weight_pass        = models.FloatField(default=1.0)
     quiz_weight_fail        = models.FloatField(default=0.5)
 
+    # Decay (see docs/superpowers/specs/2026-07-19-competency-decay-design.md)
+    decay_enabled        = models.BooleanField(default=True)
+    slow_ratio_threshold = models.FloatField(default=3.0)
+    slow_penalty         = models.PositiveSmallIntegerField(default=1)
+    idle_decay_days      = models.PositiveSmallIntegerField(default=30)
+    idle_decay_points    = models.PositiveSmallIntegerField(default=1)
+
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)

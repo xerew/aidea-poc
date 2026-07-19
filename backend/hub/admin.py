@@ -341,6 +341,8 @@ class LearnerActivityConfigAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Quiz → Competency toggle', {'fields': ['quiz_affects_competency']}),
         ('Weights (active when toggle is on)', {'fields': ['quiz_pass_threshold', 'quiz_weight_pass', 'quiz_weight_fail']}),
+        ('Decay', {'fields': ['decay_enabled', 'slow_ratio_threshold', 'slow_penalty',
+                              'idle_decay_days', 'idle_decay_points']}),
     ]
 
     def has_add_permission(self, request):
