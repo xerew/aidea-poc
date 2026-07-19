@@ -130,6 +130,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'hub.tasks.tune_recommendation_weights',
         'schedule': crontab(hour=3, minute=0),
     },
+    'apply-competency-decay-nightly': {
+        'task': 'hub.tasks.apply_competency_decay',
+        'schedule': crontab(hour=4, minute=0),
+    },
 }
 
 

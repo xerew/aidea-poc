@@ -368,6 +368,38 @@ def tune_recommendation_weights() -> None:
 
 
 @shared_task
+def apply_competency_decay() -> None:
+    """Nightly: dock competency for enrollments abandoned mid-course."""
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from hub.competency import apply_competency_delta
+    from hub.models import Enrollment, LearnerActivityConfig
+
+    config = LearnerActivityConfig.get()
+    if not config.decay_enabled:
+        return
+
+    cutoff = timezone.now() - timedelta(days=config.idle_decay_days)
+    stale = (
+        Enrollment.objects
+        .filter(
+            progress_pct__gt=0,
+            progress_pct__lt=100,
+            last_accessed_at__lt=cutoff,
+            decay_applied_at__isnull=True,
+        )
+        .select_related('user__profile')
+    )
+    now = timezone.now()
+    for enrollment in stale:
+        apply_competency_delta(enrollment.user, -config.idle_decay_points)
+        enrollment.decay_applied_at = now
+        enrollment.save(update_fields=['decay_applied_at'])
+
+
+@shared_task
 def recompute_all_recommendations() -> None:
     from django.contrib.auth.models import User
 

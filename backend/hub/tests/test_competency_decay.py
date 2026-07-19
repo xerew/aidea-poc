@@ -160,3 +160,61 @@ class DecayConfigTests(TestCase):
         self.assertIsNone(e.decay_applied_at)
         e.decay_applied_at = timezone.now() - timedelta(days=1)
         e.save(update_fields=['decay_applied_at'])
+
+
+class IdleDecayTaskTests(TestCase):
+    def setUp(self):
+        _make_paths()
+        self.user = User.objects.create_user(username='idle_u', password='pass12345')
+        UserProfile.objects.create(
+            user=self.user, user_type=UserProfile.UserType.TEACHER, competency_score=3,
+        )
+        self.course, _ = _make_course_with_lesson('idle1')
+        self.enrollment = Enrollment.objects.create(
+            user=self.user, course=self.course, progress_pct=40,
+        )
+        # last_accessed_at is auto_now — backdate via queryset update
+        Enrollment.objects.filter(pk=self.enrollment.pk).update(
+            last_accessed_at=timezone.now() - timedelta(days=45),
+        )
+
+    def _refresh(self):
+        self.user.profile.refresh_from_db()
+        self.enrollment.refresh_from_db()
+
+    def test_idle_enrollment_decays_once(self):
+        from hub.tasks import apply_competency_decay
+        apply_competency_decay()
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 2)
+        self.assertIsNotNone(self.enrollment.decay_applied_at)
+
+        apply_competency_decay()  # second run: stamped, no further decay
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 2)
+
+    def test_disabled_toggle_skips(self):
+        from hub.tasks import apply_competency_decay
+        config = LearnerActivityConfig.get()
+        config.decay_enabled = False
+        config.save()
+        apply_competency_decay()
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 3)
+        self.assertIsNone(self.enrollment.decay_applied_at)
+
+    def test_fresh_and_complete_enrollments_exempt(self):
+        from hub.tasks import apply_competency_decay
+        Enrollment.objects.filter(pk=self.enrollment.pk).update(
+            last_accessed_at=timezone.now(),  # fresh again
+        )
+        apply_competency_decay()
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 3)
+
+    def test_zero_progress_exempt(self):
+        from hub.tasks import apply_competency_decay
+        Enrollment.objects.filter(pk=self.enrollment.pk).update(progress_pct=0)
+        apply_competency_decay()
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 3)
