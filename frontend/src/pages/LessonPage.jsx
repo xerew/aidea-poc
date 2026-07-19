@@ -41,6 +41,7 @@ const lessonShape = PropTypes.shape({
     selected: PropTypes.array,
     results:  PropTypes.array,
   }),
+  assignment_submission: PropTypes.object,
 })
 
 VideoLesson.propTypes   = { lesson: lessonShape.isRequired }
@@ -96,26 +97,77 @@ function PdfLesson({ lesson }) {
 
 AssignmentLesson.propTypes = {
   lesson: lessonShape.isRequired,
-  onSubmissionChange: PropTypes.func,
+  courseId: PropTypes.string.isRequired,
+  onSubmissionChange: PropTypes.func.isRequired,
 }
-function AssignmentLesson({ lesson, onSubmissionChange }) {
-  const [text, setText] = useState('')
-  const handleChange = (e) => {
-    setText(e.target.value)
-    onSubmissionChange?.(e.target.value)
+function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
+  const submission = lesson.assignment_submission
+  const [text, setText] = useState(submission?.text ?? '')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const status = submission?.status
+  const locked = status === 'pending' || status === 'approved'
+
+  const handleSubmit = async () => {
+    if (!text.trim()) { setError('Write your response before submitting.'); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      const res = await client.post(
+        `/courses/${courseId}/lessons/${lesson.id}/submit-assignment/`, { text },
+      )
+      onSubmissionChange(res.data)
+    } catch (err) {
+      setError(err.response?.data?.detail ?? 'Submission failed. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
+
   return (
     <div className="lp-content-card">
       <div className="lp-assignment-body">
         <h3 className="lp-assignment-heading">Instructions</h3>
         <p className="lp-text-content">{lesson.content || 'No instructions provided.'}</p>
+
+        {status === 'pending' && (
+          <div className="lp-assignment-banner lp-assignment-banner--pending">
+            Submitted — pending review. You will see feedback here once it is reviewed.
+          </div>
+        )}
+        {status === 'approved' && (
+          <div className="lp-assignment-banner lp-assignment-banner--approved">
+            Approved{submission.feedback ? ` — ${submission.feedback}` : ''} ✓
+          </div>
+        )}
+        {status === 'changes_requested' && (
+          <div className="lp-assignment-banner lp-assignment-banner--changes">
+            <strong>Changes requested:</strong> {submission.feedback}
+          </div>
+        )}
+
         <h3 className="lp-assignment-heading lp-assignment-heading--response">Your Response</h3>
         <textarea
           className="lp-notes-input"
           placeholder="Write your response here…"
           value={text}
-          onChange={handleChange}
+          disabled={locked || submitting}
+          onChange={(e) => setText(e.target.value)}
         />
+        {error && <p className="lp-assignment-error">{error}</p>}
+        {!locked && (
+          <button
+            type="button"
+            className="lp-complete-btn lp-assignment-submit"
+            disabled={submitting}
+            onClick={handleSubmit}
+          >
+            {submitting
+              ? 'Submitting…'
+              : status === 'changes_requested' ? 'Resubmit for review' : 'Submit for review'}
+          </button>
+        )}
       </div>
     </div>
   )
@@ -250,7 +302,7 @@ function LessonContent({ lesson, onComplete, onSubmissionChange, courseId }) {
     case 'text':       return <TextLesson lesson={lesson} />
     case 'image':      return <ImageLesson lesson={lesson} />
     case 'pdf':        return <PdfLesson lesson={lesson} />
-    case 'assignment': return <AssignmentLesson lesson={lesson} onSubmissionChange={onSubmissionChange} />
+    case 'assignment': return <AssignmentLesson lesson={lesson} courseId={courseId} onSubmissionChange={onSubmissionChange} />
     case 'quiz':       return <QuizLesson key={lesson.id} lesson={lesson} onComplete={onComplete} courseId={courseId} />
     default:           return <TextLesson lesson={lesson} />
   }
@@ -295,7 +347,6 @@ export default function LessonPage() {
   const [completing, setCompleting] = useState(false)
   const [error, setError] = useState('')
   const scrollPctRef = useRef(0)
-  const [submissionText, setSubmissionText] = useState('')
 
   // Redirect if not logged in
   useEffect(() => {
@@ -318,7 +369,7 @@ export default function LessonPage() {
   }, [courseId, lessonId])
 
   // Reset note when lesson changes
-  useEffect(() => { setNote(''); setSubmissionText(''); scrollPctRef.current = 0 }, [lessonId])
+  useEffect(() => { setNote(''); scrollPctRef.current = 0 }, [lessonId])
 
   // Track scroll percentage for text lessons
   useEffect(() => {
@@ -359,11 +410,13 @@ export default function LessonPage() {
     const payload = {}
     if (lesson?.lesson_type === 'text') {
       payload.engagement_data = { scroll_pct: scrollPctRef.current }
-    } else if (lesson?.lesson_type === 'assignment' && submissionText) {
-      payload.engagement_data = { submission: submissionText }
     }
     markComplete(payload)
-  }, [lesson, submissionText, markComplete])
+  }, [lesson, markComplete])
+
+  const handleSubmissionChange = useCallback((sub) => {
+    setLesson(prev => ({ ...prev, assignment_submission: sub }))
+  }, [])
 
   const goTo = (id) => id && navigate(`/courses/${courseId}/learn/${id}`)
 
@@ -451,7 +504,7 @@ export default function LessonPage() {
               </div>
 
               {/* Lesson content */}
-              <LessonContent lesson={lesson} onComplete={markComplete} onSubmissionChange={setSubmissionText} courseId={courseId} />
+              <LessonContent lesson={lesson} onComplete={markComplete} onSubmissionChange={handleSubmissionChange} courseId={courseId} />
 
               {/* Navigation */}
               <div className="lp-nav">
@@ -463,8 +516,8 @@ export default function LessonPage() {
                   &#8249; Previous
                 </button>
 
-                {/* Hide Mark Complete for quizzes — they auto-complete on last answer */}
-                {lesson.lesson_type !== 'quiz' && (
+                {/* Hide Mark Complete for quizzes and assignments — they complete via their own flows */}
+                {lesson.lesson_type !== 'quiz' && lesson.lesson_type !== 'assignment' && (
                   <button
                     className={`lp-complete-btn ${lesson.is_completed ? 'lp-complete-btn--done' : ''}`}
                     onClick={handleMarkComplete}
@@ -475,6 +528,13 @@ export default function LessonPage() {
                 )}
                 {lesson.lesson_type === 'quiz' && lesson.is_completed && (
                   <span className="lp-complete-btn lp-complete-btn--done">✓ Completed</span>
+                )}
+                {lesson.lesson_type === 'assignment' && lesson.is_completed && (
+                  <span className="lp-complete-btn lp-complete-btn--done">✓ Completed</span>
+                )}
+                {lesson.lesson_type === 'assignment' && !lesson.is_completed
+                  && lesson.assignment_submission?.status === 'pending' && (
+                  <span className="lp-complete-btn lp-complete-btn--disabled">Pending review</span>
                 )}
 
                 <button
