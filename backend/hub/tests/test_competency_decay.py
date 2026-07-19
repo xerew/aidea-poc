@@ -203,7 +203,7 @@ class IdleDecayTaskTests(TestCase):
         self.assertEqual(self.user.profile.competency_score, 3)
         self.assertIsNone(self.enrollment.decay_applied_at)
 
-    def test_fresh_and_complete_enrollments_exempt(self):
+    def test_fresh_enrollment_exempt(self):
         from hub.tasks import apply_competency_decay
         Enrollment.objects.filter(pk=self.enrollment.pk).update(
             last_accessed_at=timezone.now(),  # fresh again
@@ -211,6 +211,15 @@ class IdleDecayTaskTests(TestCase):
         apply_competency_decay()
         self._refresh()
         self.assertEqual(self.user.profile.competency_score, 3)
+
+    def test_completed_enrollment_exempt(self):
+        from hub.tasks import apply_competency_decay
+        # Completed long ago and idle — completion must exempt it from decay
+        Enrollment.objects.filter(pk=self.enrollment.pk).update(progress_pct=100)
+        apply_competency_decay()
+        self._refresh()
+        self.assertEqual(self.user.profile.competency_score, 3)
+        self.assertIsNone(self.enrollment.decay_applied_at)
 
     def test_zero_progress_exempt(self):
         from hub.tasks import apply_competency_decay
