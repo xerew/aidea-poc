@@ -34,6 +34,7 @@ class Command(BaseCommand):
         seed_preference_quiz()
         self._seed_demo_user()
         creator = self._seed_demo_content_creator()
+        self._seed_demo_partner()
         self._assign_creator_courses(creator)
         self._seed_teacher_cohort(creator)
         self.stdout.write(self.style.SUCCESS('Seed data created successfully.'))
@@ -152,6 +153,31 @@ class Command(BaseCommand):
 
         action = 'Created' if created else 'Already exists'
         self.stdout.write(f'  Demo content creator ({action}): demo_creator / demo1234')
+        return user
+
+    def _seed_demo_partner(self):
+        user, created = User.objects.get_or_create(
+            username='demo_partner',
+            defaults={
+                'first_name': 'Elena',
+                'last_name': 'Kostopoulou',
+                'email': 'elena@aidea.example.com',
+            },
+        )
+        if created:
+            user.set_password('demo1234')
+            user.save()
+
+        UserProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                'user_type': UserProfile.UserType.AIDEA_PARTNER,
+                'avatar_initials': 'EK',
+            },
+        )
+
+        action = 'Created' if created else 'Already exists'
+        self.stdout.write(f'  Demo AIDEA partner ({action}): demo_partner / demo1234')
         return user
 
     def _assign_creator_courses(self, creator):

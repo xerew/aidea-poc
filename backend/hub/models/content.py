@@ -56,6 +56,8 @@ class Module(models.Model):
     course           = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
     order            = models.PositiveSmallIntegerField(default=0)
     duration_minutes = models.PositiveSmallIntegerField(default=0)
+    # Stub toggle: per-module LLM assignment reviewer ("later turned on")
+    llm_review_enabled = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['order']

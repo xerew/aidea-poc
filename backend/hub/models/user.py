@@ -7,6 +7,7 @@ class UserProfile(models.Model):
         TEACHER         = 'teacher',         'Teacher'
         CONTENT_CREATOR = 'content_creator', 'Content Creator'
         ADMIN           = 'admin',           'Admin'
+        AIDEA_PARTNER   = 'aidea_partner',   'AIDEA Partner'
 
     class SubjectArea(models.TextChoices):
         STEM       = 'stem',       'STEM'

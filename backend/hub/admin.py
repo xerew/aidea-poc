@@ -6,6 +6,7 @@ from django.utils.html import format_html, mark_safe
 
 from .models import (
     AccessRequest,
+    AssignmentSubmission,
     Course,
     CourseEditHistory,
     Enrollment,
@@ -57,8 +58,8 @@ class CustomUserAdmin(BaseUserAdmin):
     def get_user_type(self, obj):
         if not hasattr(obj, 'profile'):
             return '—'
-        colours = {'admin': '#dc2626', 'content_creator': '#7c3aed', 'teacher': '#2563eb'}
-        labels = {'admin': 'Admin', 'content_creator': 'Content Creator', 'teacher': 'Teacher'}
+        colours = {'admin': '#dc2626', 'content_creator': '#7c3aed', 'teacher': '#2563eb', 'aidea_partner': '#0d9488'}
+        labels = {'admin': 'Admin', 'content_creator': 'Content Creator', 'teacher': 'Teacher', 'aidea_partner': 'AIDEA Partner'}
         ut = obj.profile.user_type
         colour = colours.get(ut, '#6b7280')
         label = labels.get(ut, ut)
@@ -283,6 +284,21 @@ class LessonProgressAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'lesson__title']
     readonly_fields = ['user', 'lesson', 'completed_at']
     ordering = ['-completed_at']
+
+    @admin.display(description='Course', ordering='lesson__module__course__title')
+    def get_course(self, obj):
+        return obj.lesson.module.course.title
+
+
+# ── Assignment Submissions ────────────────────────────────────────────────────
+
+@admin.register(AssignmentSubmission)
+class AssignmentSubmissionAdmin(admin.ModelAdmin):
+    list_display  = ['user', 'lesson', 'get_course', 'status', 'reviewed_by', 'submitted_at']
+    list_filter   = ['status']
+    search_fields = ['user__username', 'lesson__title', 'text']
+    readonly_fields = ['user', 'lesson', 'text', 'submitted_at', 'updated_at']
+    ordering = ['-submitted_at']
 
     @admin.display(description='Course', ordering='lesson__module__course__title')
     def get_course(self, obj):
