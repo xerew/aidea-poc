@@ -1,3 +1,4 @@
+from .assignments import AssignmentSubmissionSerializer, ReviewQueueSerializer
 from .auth import (
     AideaTokenObtainPairSerializer,
     RegisterSerializer,
@@ -28,7 +29,9 @@ from .preference_quiz import PreferenceOptionSerializer, PreferenceQuestionSeria
 
 __all__ = [
     'AideaTokenObtainPairSerializer',
+    'AssignmentSubmissionSerializer',
     'RegisterSerializer',
+    'ReviewQueueSerializer',
     'ContinueLearningSerializer',
     'CourseAuthoringSerializer',
     'CourseDetailSerializer',

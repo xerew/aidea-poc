@@ -10,6 +10,7 @@ from .views import (
     AdminAccessRequestReviewView,
     AdminUserListView,
     AdminUserRoleView,
+    AssignmentSubmitView,
     AuthoringCourseDetailView,
     AuthoringCourseExportView,
     AuthoringCourseImportView,
@@ -48,6 +49,8 @@ from .views import (
     RecommendationEventView,
     RecommendationsView,
     RegisterView,
+    ReviewActionView,
+    ReviewQueueView,
 )
 
 urlpatterns = [
@@ -63,6 +66,9 @@ urlpatterns = [
     path('courses/<int:pk>/lessons/<int:lesson_pk>/', LessonDetailView.as_view(), name='lesson-detail'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/complete/', LessonCompleteView.as_view(), name='lesson-complete'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/quiz-check/', QuizCheckView.as_view(), name='quiz-check'),
+    path('courses/<int:pk>/lessons/<int:lesson_pk>/submit-assignment/', AssignmentSubmitView.as_view(), name='assignment-submit'),
+    path('reviews/', ReviewQueueView.as_view(), name='review-queue'),
+    path('reviews/<int:pk>/', ReviewActionView.as_view(), name='review-action'),
     path('home/', HomeView.as_view(), name='home'),
     path('my-learning/', MyLearningView.as_view(), name='my-learning'),
     path('onboarding/',           OnboardingView.as_view(),           name='onboarding'),

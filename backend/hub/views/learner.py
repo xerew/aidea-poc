@@ -177,6 +177,14 @@ class LessonDetailView(APIView):
                     'results': lp.quiz_answers,
                 }
 
+        assignment_submission = None
+        if lesson.lesson_type == 'assignment':
+            from hub.models import AssignmentSubmission
+            from hub.serializers.assignments import AssignmentSubmissionSerializer
+            sub = AssignmentSubmission.objects.filter(user=request.user, lesson=lesson).first()
+            if sub:
+                assignment_submission = AssignmentSubmissionSerializer(sub).data
+
         return Response({
             **LessonLearnDetailSerializer(lesson).data,
             'module_id': lesson.module_id,
@@ -185,6 +193,7 @@ class LessonDetailView(APIView):
             'prev_lesson_id': all_ids[idx - 1] if idx > 0 else None,
             'next_lesson_id': all_ids[idx + 1] if idx < len(all_ids) - 1 else None,
             'quiz_review': quiz_review,
+            'assignment_submission': assignment_submission,
         })
 
 

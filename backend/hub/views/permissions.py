@@ -30,6 +30,22 @@ class IsAdmin(BasePermission):
         )
 
 
+class IsReviewer(BasePermission):
+    """Course creators, AIDEA Partners, and admins may review assignment submissions."""
+
+    def has_permission(self, request, view):
+        profile = getattr(request.user, 'profile', None)
+        return (
+            request.user.is_authenticated
+            and profile is not None
+            and profile.user_type in (
+                UserProfile.UserType.CONTENT_CREATOR,
+                UserProfile.UserType.AIDEA_PARTNER,
+                UserProfile.UserType.ADMIN,
+            )
+        )
+
+
 def can_edit_published(user, course):
     """Published courses may only be edited by their author.
 

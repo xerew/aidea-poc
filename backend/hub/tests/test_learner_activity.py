@@ -220,7 +220,6 @@ class EngagementTrackingTest(TestCase):
         lp = LessonProgress.objects.get(user=self.user, lesson=lesson)
         self.assertEqual(lp.engagement_data.get('scroll_pct'), 85)
 
-    # updated fully in assignment-review Task 3
     def test_assignment_word_count_derived(self):
         # Assignments no longer complete via this endpoint; word-count
         # derivation is exercised through the review-approval flow (Task 3).

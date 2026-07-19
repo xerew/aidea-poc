@@ -10,6 +10,7 @@ from .admin import (
     AdminUserListView,
     AdminUserRoleView,
 )
+from .assignments import AssignmentSubmitView, ReviewActionView, ReviewQueueView
 from .auth import LoginView, LogoutView, MeView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
@@ -44,7 +45,7 @@ from .learner import (
 )
 from .onboarding import OnboardingView
 from .pathway import PathwayView
-from .permissions import IsContentCreator, IsTeacher
+from .permissions import IsContentCreator, IsReviewer, IsTeacher
 from .preference_quiz import PreferenceQuizView
 from .profile import (
     ChangePasswordView,
@@ -64,6 +65,9 @@ __all__ = [
     'AdminAccessRequestReviewView',
     'AdminUserListView',
     'AdminUserRoleView',
+    'AssignmentSubmitView',
+    'ReviewActionView',
+    'ReviewQueueView',
     'AuthoringCourseDetailView',
     'AuthoringCourseExportView',
     'AuthoringCourseImportView',
@@ -89,6 +93,7 @@ __all__ = [
     'LessonDetailView',
     'QuizCheckView',
     'IsContentCreator',
+    'IsReviewer',
     'IsTeacher',
     'LoginView',
     'LogoutView',
