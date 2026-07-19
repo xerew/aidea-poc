@@ -144,6 +144,25 @@ class AssignmentFlowTests(APITestCase):
         self.enrollment.refresh_from_db()
         self.assertEqual(self.enrollment.progress_pct, 100)
 
+    def test_late_approval_does_not_regress_current_module(self):
+        # Learner submits in module 1, then advances to module 2 before review
+        module2 = Module.objects.create(course=self.course, title='M2', order=2)
+        later_lesson = Lesson.objects.create(
+            module=module2, title='Later', lesson_type='text', order=1, is_required=True,
+        )
+        self._submit()
+        self.client.post(
+            f'/api/courses/{self.course.id}/lessons/{later_lesson.id}/complete/', {}, format='json',
+        )
+        self.enrollment.refresh_from_db()
+        self.assertEqual(self.enrollment.current_module, module2)
+
+        sub = AssignmentSubmission.objects.get(user=self.learner, lesson=self.assignment)
+        self.client.force_authenticate(self.creator)
+        self.client.post(f'/api/reviews/{sub.id}/', {'action': 'approve'}, format='json')
+        self.enrollment.refresh_from_db()
+        self.assertEqual(self.enrollment.current_module, module2)  # pointer stayed forward
+
     def test_request_changes_requires_feedback_then_resubmit(self):
         self._submit()
         sub = AssignmentSubmission.objects.get(user=self.learner, lesson=self.assignment)

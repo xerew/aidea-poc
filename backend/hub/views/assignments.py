@@ -114,18 +114,22 @@ class ReviewActionView(APIView):
                     {'detail': 'The learner is no longer enrolled in this course.'},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            submission.status = AssignmentSubmission.Status.APPROVED
-            if feedback:
-                submission.feedback = feedback
-            submission.reviewed_by = request.user
-            submission.reviewed_at = timezone.now()
-            submission.save()
+            from django.db import transaction
 
             from hub.completion import record_lesson_completion
-            record_lesson_completion(
-                submission.user, enrollment, submission.lesson,
-                engagement_data={'submission': submission.text},
-            )
+            with transaction.atomic():
+                submission.status = AssignmentSubmission.Status.APPROVED
+                if feedback:
+                    submission.feedback = feedback
+                submission.reviewed_by = request.user
+                submission.reviewed_at = timezone.now()
+                submission.save()
+
+                record_lesson_completion(
+                    submission.user, enrollment, submission.lesson,
+                    engagement_data={'submission': submission.text},
+                    advance_only=True,
+                )
         elif action == 'request_changes':
             if not feedback:
                 return Response(

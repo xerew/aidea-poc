@@ -5,10 +5,15 @@ from django.utils import timezone
 from hub.models import Lesson, LessonProgress, LessonSession
 
 
-def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None, engagement_data=None):
+def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None,
+                             engagement_data=None, advance_only=False):
     """Create the LessonProgress row (first completion only) and update the
     enrollment's progress/current-module/completed-at plus the competency
-    score. Returns (lesson_progress, progress_pct)."""
+    score. Returns (lesson_progress, progress_pct).
+
+    advance_only: asynchronous callers (assignment-review approval) pass True
+    so a late approval never moves the learner's resume pointer backward.
+    """
     course = enrollment.course
     quiz_answers_raw = quiz_answers_raw or []
 
@@ -58,7 +63,12 @@ def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None, en
 
     just_completed = progress_pct == 100 and enrollment.completed_at is None
     enrollment.progress_pct = progress_pct
-    enrollment.current_module = lesson.module
+    if not (
+        advance_only
+        and enrollment.current_module is not None
+        and lesson.module.order < enrollment.current_module.order
+    ):
+        enrollment.current_module = lesson.module
     if just_completed:
         enrollment.completed_at = timezone.now()
     enrollment.save()
