@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { Users, CheckCircle, Target, Award } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import './AnalyticsPage.css'
 
 const STAT_CARDS = [
-  { key: 'total_enrollments', label: 'Total Enrollments', Icon: Users,       color: 'blue'   },
-  { key: 'completion_rate',   label: 'Completion Rate',   Icon: CheckCircle, color: 'green'  },
-  { key: 'quiz_attempts',     label: 'Quiz Attempts',     Icon: Target,      color: 'purple' },
-  { key: 'courses_created',   label: 'Courses Created',   Icon: Award,       color: 'orange' },
+  { key: 'total_enrollments', labelKey: 'analytics.stats.totalEnrollments', Icon: Users,       color: 'blue'   },
+  { key: 'completion_rate',   labelKey: 'analytics.stats.completionRate',   Icon: CheckCircle, color: 'green'  },
+  { key: 'quiz_attempts',     labelKey: 'analytics.stats.quizAttempts',     Icon: Target,      color: 'purple' },
+  { key: 'courses_created',   labelKey: 'analytics.stats.coursesCreated',   Icon: Award,       color: 'orange' },
 ]
 
 StatCard.propTypes = {
   stat: PropTypes.shape({
     key: PropTypes.string,
-    label: PropTypes.string,
+    labelKey: PropTypes.string,
     Icon: PropTypes.elementType,
     color: PropTypes.string,
   }),
@@ -23,7 +24,8 @@ StatCard.propTypes = {
 }
 
 function StatCard({ stat, value }) {
-  const { Icon, label, color } = stat
+  const { t } = useTranslation()
+  const { Icon, labelKey, color } = stat
   const display = stat.key === 'completion_rate' ? `${value}%` : value
   return (
     <div className="an-stat-card">
@@ -32,7 +34,7 @@ function StatCard({ stat, value }) {
       </div>
       <div>
         <p className="an-stat-value">{display}</p>
-        <p className="an-stat-label">{label}</p>
+        <p className="an-stat-label">{t(labelKey)}</p>
       </div>
     </div>
   )
@@ -50,28 +52,29 @@ CourseRow.propTypes = {
 }
 
 function CourseRow({ course }) {
+  const { t } = useTranslation()
   return (
     <div className="an-course-row">
       <div className="an-course-header">
         <span className="an-course-title">{course.title}</span>
-        <span className="an-course-pct">{course.completion_rate}% completed</span>
+        <span className="an-course-pct">{t('analytics.pctCompleted', { pct: course.completion_rate })}</span>
       </div>
       <div className="an-course-stats">
         <div className="an-course-stat an-course-stat--blue">
           <span className="an-course-stat-value">{course.enrolled}</span>
-          <span className="an-course-stat-label">Enrolled</span>
+          <span className="an-course-stat-label">{t('analytics.enrolled')}</span>
         </div>
         <div className="an-course-stat an-course-stat--green">
           <span className="an-course-stat-value">{course.completed}</span>
-          <span className="an-course-stat-label">Completed</span>
+          <span className="an-course-stat-label">{t('analytics.completed')}</span>
         </div>
         <div className="an-course-stat an-course-stat--orange">
           <span className="an-course-stat-value">{course.in_progress}</span>
-          <span className="an-course-stat-label">In Progress</span>
+          <span className="an-course-stat-label">{t('analytics.inProgress')}</span>
         </div>
         <div className="an-course-stat an-course-stat--purple">
-          <span className="an-course-stat-value">{course.avg_time_minutes}m</span>
-          <span className="an-course-stat-label">Avg. Time</span>
+          <span className="an-course-stat-value">{t('analytics.avgTimeValue', { minutes: course.avg_time_minutes })}</span>
+          <span className="an-course-stat-label">{t('analytics.avgTime')}</span>
         </div>
       </div>
       <div className="an-course-bar-track">
@@ -82,6 +85,7 @@ function CourseRow({ course }) {
 }
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
@@ -92,23 +96,23 @@ export default function AnalyticsPage() {
     if (!isCreator) return
     client.get('/analytics/overview/')
       .then((res) => setData(res.data))
-      .catch(() => setError('Failed to load analytics.'))
-  }, [isCreator])
+      .catch(() => setError(t('analytics.loadError')))
+  }, [isCreator, t])
 
   if (!isCreator) {
     return (
       <div className="an-restricted">
-        <p>Content Analytics is only available to content creators.</p>
+        <p>{t('analytics.restricted')}</p>
       </div>
     )
   }
 
   if (error) return <p className="page-error">{error}</p>
-  if (!data) return <p className="page-loading">Loading&hellip;</p>
+  if (!data) return <p className="page-loading">{t('common.loading')}</p>
 
   return (
     <div className="analytics-page">
-      <p className="an-subtitle">Track engagement and performance across your created courses</p>
+      <p className="an-subtitle">{t('analytics.subtitle')}</p>
 
       <div className="an-stat-grid">
         {STAT_CARDS.map((stat) => (
@@ -117,10 +121,10 @@ export default function AnalyticsPage() {
       </div>
 
       <section className="an-section">
-        <h2 className="an-section-title">Course Completion Overview</h2>
+        <h2 className="an-section-title">{t('analytics.courseCompletionOverview')}</h2>
         <div className="an-course-list">
           {data.courses.length === 0 ? (
-            <p className="an-empty">No courses created by you yet. Courses you create in Authoring will appear here — including drafts.</p>
+            <p className="an-empty">{t('analytics.empty')}</p>
           ) : (
             data.courses.map((course) => (
               <CourseRow key={course.id} course={course} />

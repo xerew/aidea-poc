@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BookOpen, Clock, Download, Pencil, Plus, Upload } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -11,9 +12,8 @@ const PILLAR_COLOR = {
   'teach-about-ai': 'green',
 }
 
-const LEVEL_LABELS = { beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' }
-
 export default function AuthoringPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const [courses, setCourses] = useState([])
@@ -23,12 +23,18 @@ export default function AuthoringPage() {
   const [transferErrors, setTransferErrors] = useState({ title: '', messages: [] })
   const [importing, setImporting] = useState(false)
 
+  const LEVEL_LABELS = {
+    beginner: t('common.level.beginner'),
+    intermediate: t('common.level.intermediate'),
+    advanced: t('common.level.advanced'),
+  }
+
   useEffect(() => {
     client.get('/authoring/courses/')
       .then((res) => setCourses(res.data))
-      .catch(() => setError('Failed to load courses. Make sure your account has Content Creator access.'))
+      .catch(() => setError(t('authoring.loadError')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   const handleExport = async (course) => {
     try {
@@ -40,7 +46,7 @@ export default function AuthoringPage() {
       link.click()
       URL.revokeObjectURL(url)
     } catch {
-      setTransferErrors({ title: 'Export failed:', messages: ['Could not download the workbook. Please try again.'] })
+      setTransferErrors({ title: t('authoring.exportFailedTitle'), messages: [t('authoring.exportFailedMsg')] })
     }
   }
 
@@ -57,8 +63,8 @@ export default function AuthoringPage() {
     } catch (err) {
       const errors = err.response?.data?.errors
       setTransferErrors({
-        title: 'Import failed — fix these and retry:',
-        messages: Array.isArray(errors) ? errors : ['Import failed. Please try again.'],
+        title: t('authoring.importFailedTitle'),
+        messages: Array.isArray(errors) ? errors : [t('authoring.importFailedMsg')],
       })
     } finally {
       setImporting(false)
@@ -67,7 +73,7 @@ export default function AuthoringPage() {
   }
 
   if (error) return <p className="page-error">{error}</p>
-  if (loading) return <p className="page-loading">Loading…</p>
+  if (loading) return <p className="page-loading">{t('common.loading')}</p>
 
   const byPillar = courses.reduce((acc, course) => {
     const key = course.pillar.id
@@ -80,15 +86,15 @@ export default function AuthoringPage() {
     <div className="authoring-page">
       <div className="authoring-header">
         <div>
-          <h1 className="authoring-title">Course Authoring</h1>
-          <p className="authoring-subtitle">Select a course to edit its content.</p>
+          <h1 className="authoring-title">{t('authoring.title')}</h1>
+          <p className="authoring-subtitle">{t('authoring.subtitle')}</p>
         </div>
         <div className="authoring-header-actions">
           <button className="new-course-btn" onClick={() => navigate('/authoring/courses/new')}>
-            <Plus size={15} /> New Course
+            <Plus size={15} /> {t('authoring.newCourse')}
           </button>
           <button className="authoring-import-btn" onClick={() => importInputRef.current?.click()} disabled={importing}>
-            <Upload size={15} /> {importing ? 'Importing…' : 'Import course'}
+            <Upload size={15} /> {importing ? t('authoring.importing') : t('authoring.importCourse')}
           </button>
           <input
             ref={importInputRef}
@@ -105,21 +111,21 @@ export default function AuthoringPage() {
           <div className="authoring-import-errors-head">
             <strong>{transferErrors.title}</strong>
             <button
-              aria-label="Dismiss errors"
+              aria-label={t('authoring.dismissErrors')}
               onClick={() => setTransferErrors({ title: '', messages: [] })}
             >✕</button>
           </div>
           <ul>
             {transferErrors.messages.slice(0, 20).map((msg, i) => <li key={i}>{msg}</li>)}
             {transferErrors.messages.length > 20 && (
-              <li>…and {transferErrors.messages.length - 20} more.</li>
+              <li>{t('authoring.moreErrors', { count: transferErrors.messages.length - 20 })}</li>
             )}
           </ul>
         </div>
       )}
 
       {courses.length === 0 && (
-        <p className="authoring-empty">No courses yet. Create your first one!</p>
+        <p className="authoring-empty">{t('authoring.empty')}</p>
       )}
 
       {Object.values(byPillar).map(({ pillar, courses: pillarCourses }) => (
@@ -134,29 +140,29 @@ export default function AuthoringPage() {
                   <div className="authoring-course-title-row">
                     <p className="authoring-course-title">{course.title}</p>
                     <span className={`status-badge ${course.is_published ? 'status-badge--published' : 'status-badge--draft'}`}>
-                      {course.is_published ? 'Published' : 'Draft'}
+                      {course.is_published ? t('authoring.published') : t('authoring.draft')}
                     </span>
                   </div>
                   <div className="authoring-course-meta">
                     <span><Clock size={13} /> {course.duration_hours}h</span>
-                    <span><BookOpen size={13} /> {course.module_count} modules</span>
+                    <span><BookOpen size={13} /> {t('common.moduleCount', { count: course.module_count })}</span>
                     <span>{LEVEL_LABELS[course.level] ?? course.level}</span>
                   </div>
-                  <p className="course-card-author">By {course.created_by_name}</p>
+                  <p className="course-card-author">{t('authoring.byAuthor', { name: course.created_by_name })}</p>
                 </div>
                 <div className="authoring-course-actions">
                   <button
                     className="edit-btn"
                     onClick={() => navigate(`/authoring/courses/${course.id}`)}
                   >
-                    <Pencil size={14} /> {course.is_published && course.created_by_id !== user?.id && user?.profile?.user_type !== 'admin' ? 'View' : 'Edit'}
+                    <Pencil size={14} /> {course.is_published && course.created_by_id !== user?.id && user?.profile?.user_type !== 'admin' ? t('authoring.view') : t('authoring.edit')}
                   </button>
                   <button
                     className="authoring-export-btn"
                     onClick={(e) => { e.stopPropagation(); handleExport(course) }}
-                    title="Export as xlsx"
+                    title={t('authoring.exportTitle')}
                   >
-                    <Download size={14} /> Export
+                    <Download size={14} /> {t('authoring.export')}
                   </button>
                 </div>
               </div>

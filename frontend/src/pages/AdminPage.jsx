@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import './AdminPage.css'
@@ -7,10 +8,18 @@ import './AdminPage.css'
 // ── Users tab ────────────────────────────────────────────────────────────────
 
 function UsersTab() {
+  const { t } = useTranslation()
   const { user: me } = useAuth()
   const [users,    setUsers]    = useState([])
   const [loading,  setLoading]  = useState(true)
   const [feedback, setFeedback] = useState({})
+
+  const ROLE_LABELS = {
+    teacher: t('admin.roles.teacher'),
+    content_creator: t('admin.roles.contentCreator'),
+    aidea_partner: t('admin.roles.aideaPartner'),
+    admin: t('admin.roles.admin'),
+  }
 
   useEffect(() => {
     client.get('/admin/users/')
@@ -37,12 +46,12 @@ function UsersTab() {
       setFeedback(prev => ({ ...prev, [userId]: { saving: false, error: '', saved: true } }))
       setTimeout(() => setFeedback(prev => ({ ...prev, [userId]: { saving: false, error: '', saved: false } })), 2000)
     } catch (err) {
-      const msg = err?.response?.data?.error || 'Failed to update.'
+      const msg = err?.response?.data?.error || t('admin.updateFailed')
       setFeedback(prev => ({ ...prev, [userId]: { saving: false, error: msg, saved: false } }))
     }
   }
 
-  if (loading) return <p className="admin-loading">Loading users…</p>
+  if (loading) return <p className="admin-loading">{t('admin.loadingUsers')}</p>
 
   return (
     <div className="admin-users-table-wrap">
@@ -50,10 +59,10 @@ function UsersTab() {
         <thead>
           <tr>
             <th></th>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
+            <th>{t('admin.columnName')}</th>
+            <th>{t('admin.columnUsername')}</th>
+            <th>{t('admin.columnEmail')}</th>
+            <th>{t('admin.columnRole')}</th>
           </tr>
         </thead>
         <tbody>
@@ -70,12 +79,12 @@ function UsersTab() {
                   {isMe ? (
                     <div className="admin-role-cell">
                       <select className="admin-role-select" value={u.user_type} disabled>
-                        <option value="teacher">Teacher</option>
-                        <option value="content_creator">Content Creator</option>
-                        <option value="aidea_partner">AIDEA Partner</option>
-                        <option value="admin">Admin</option>
+                        <option value="teacher">{ROLE_LABELS.teacher}</option>
+                        <option value="content_creator">{ROLE_LABELS.content_creator}</option>
+                        <option value="aidea_partner">{ROLE_LABELS.aidea_partner}</option>
+                        <option value="admin">{ROLE_LABELS.admin}</option>
                       </select>
-                      <span className="admin-you-badge">You</span>
+                      <span className="admin-you-badge">{t('admin.youBadge')}</span>
                     </div>
                   ) : (
                     <div className="admin-role-cell">
@@ -85,13 +94,13 @@ function UsersTab() {
                         disabled={fb.saving}
                         onChange={e => handleRoleChange(u.id, e.target.value)}
                       >
-                        <option value="teacher">Teacher</option>
-                        <option value="content_creator">Content Creator</option>
-                        <option value="aidea_partner">AIDEA Partner</option>
-                        <option value="admin">Admin</option>
+                        <option value="teacher">{ROLE_LABELS.teacher}</option>
+                        <option value="content_creator">{ROLE_LABELS.content_creator}</option>
+                        <option value="aidea_partner">{ROLE_LABELS.aidea_partner}</option>
+                        <option value="admin">{ROLE_LABELS.admin}</option>
                       </select>
-                      {fb.saving && <span className="admin-feedback info">Saving…</span>}
-                      {fb.saved  && <span className="admin-feedback success">✓ Saved</span>}
+                      {fb.saving && <span className="admin-feedback info">{t('common.saving')}</span>}
+                      {fb.saved  && <span className="admin-feedback success">{t('admin.saved')}</span>}
                       {fb.error  && <span className="admin-feedback error">{fb.error}</span>}
                     </div>
                   )}
@@ -108,6 +117,7 @@ function UsersTab() {
 // ── Access requests tab ───────────────────────────────────────────────────────
 
 function RequestsTab() {
+  const { t } = useTranslation()
   const [requests,      setRequests]      = useState([])
   const [loading,       setLoading]       = useState(true)
   const [denyForms,     setDenyForms]     = useState({})
@@ -130,7 +140,7 @@ function RequestsTab() {
       const { data } = await client.patch(`/admin/access-requests/${id}/`, { action: 'approve' })
       setRequests(prev => prev.map(r => r.id === id ? { ...r, ...data } : r))
     } catch (err) {
-      const msg = err?.response?.data?.error || 'Failed to approve.'
+      const msg = err?.response?.data?.error || t('admin.approveFailed')
       setApproveErrors(prev => ({ ...prev, [id]: msg }))
     }
   }
@@ -153,19 +163,19 @@ function RequestsTab() {
       setRequests(prev => prev.map(r => r.id === id ? { ...r, ...data } : r))
       closeDeny(id)
     } catch (err) {
-      const msg = err?.response?.data?.error || 'Failed to deny.'
+      const msg = err?.response?.data?.error || t('admin.denyFailed')
       setDenyForms(prev => ({ ...prev, [id]: { ...prev[id], submitting: false, error: msg } }))
     }
   }
 
-  if (loading) return <p className="admin-loading">Loading requests…</p>
+  if (loading) return <p className="admin-loading">{t('admin.loadingRequests')}</p>
 
   const pending = requests.filter(r => r.status === 'pending')
   const past    = requests.filter(r => r.status !== 'pending')
 
   return (
     <div className="admin-requests">
-      {pending.length === 0 && <p className="admin-empty">No pending requests.</p>}
+      {pending.length === 0 && <p className="admin-empty">{t('admin.noPendingRequests')}</p>}
 
       {pending.map(req => (
         <div key={req.id} className="admin-request-card">
@@ -180,17 +190,17 @@ function RequestsTab() {
           </div>
           <p className="admin-request-message">{req.message}</p>
           <div className="admin-request-actions">
-            <button className="admin-approve-btn" onClick={() => handleApprove(req.id)}>Approve</button>
+            <button className="admin-approve-btn" onClick={() => handleApprove(req.id)}>{t('admin.approve')}</button>
             {approveErrors[req.id] && (
               <span className="admin-feedback error">{approveErrors[req.id]}</span>
             )}
             {!denyForms[req.id] ? (
-              <button className="admin-deny-btn" onClick={() => openDeny(req.id)}>Deny</button>
+              <button className="admin-deny-btn" onClick={() => openDeny(req.id)}>{t('admin.deny')}</button>
             ) : (
               <div className="admin-deny-form">
                 <textarea
                   rows={3}
-                  placeholder="Explain why this request is denied…"
+                  placeholder={t('admin.denyPlaceholder')}
                   value={denyForms[req.id].reason}
                   onChange={e => setDenyForms(prev => ({
                     ...prev, [req.id]: { ...prev[req.id], reason: e.target.value },
@@ -207,10 +217,10 @@ function RequestsTab() {
                     disabled={denyForms[req.id].submitting || !denyForms[req.id].reason.trim()}
                     onClick={() => handleDeny(req.id)}
                   >
-                    {denyForms[req.id].submitting ? 'Denying…' : 'Confirm Deny'}
+                    {denyForms[req.id].submitting ? t('admin.denying') : t('admin.confirmDeny')}
                   </button>
                   <button className="admin-deny-cancel-btn" onClick={() => closeDeny(req.id)}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                 </div>
               </div>
@@ -222,7 +232,7 @@ function RequestsTab() {
       {past.length > 0 && (
         <div className="admin-past-section">
           <button className="admin-past-toggle" onClick={() => setShowPast(v => !v)}>
-            {showPast ? '▲' : '▼'} Past Requests ({past.length})
+            {showPast ? '▲' : '▼'} {t('admin.pastRequests', { count: past.length })}
           </button>
           {showPast && past.map(req => (
             <div key={req.id} className="admin-request-card">
@@ -232,13 +242,13 @@ function RequestsTab() {
                   <p className="admin-request-name">{req.first_name} {req.last_name}</p>
                   <p className="admin-request-meta">
                     @{req.username} · {new Date(req.created_at).toLocaleDateString()}
-                    {' '}<span className={`admin-status-badge admin-status-${req.status}`}>{req.status}</span>
+                    {' '}<span className={`admin-status-badge admin-status-${req.status}`}>{t(`admin.status.${req.status}`)}</span>
                   </p>
                 </div>
               </div>
               <p className="admin-request-message">{req.message}</p>
               {req.denial_reason && (
-                <p className="admin-denial-reason">Reason: {req.denial_reason}</p>
+                <p className="admin-denial-reason">{t('admin.reasonLabel', { reason: req.denial_reason })}</p>
               )}
             </div>
           ))}
@@ -251,24 +261,25 @@ function RequestsTab() {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
+  const { t } = useTranslation()
   const [tab, setTab] = useState('users')
   return (
     <div className="admin-page">
       <div className="admin-page-header">
-        <h1>Admin Panel</h1>
+        <h1>{t('admin.title')}</h1>
       </div>
       <div className="admin-tabs">
         <button
           className={`admin-tab-btn ${tab === 'users' ? 'active' : ''}`}
           onClick={() => setTab('users')}
         >
-          Users
+          {t('admin.usersTab')}
         </button>
         <button
           className={`admin-tab-btn ${tab === 'requests' ? 'active' : ''}`}
           onClick={() => setTab('requests')}
         >
-          Access Requests
+          {t('admin.requestsTab')}
         </button>
       </div>
       {tab === 'users' ? <UsersTab /> : <RequestsTab />}

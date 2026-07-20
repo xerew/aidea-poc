@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import client from '../api/client'
 // Reuse editor and detail styles — same class names apply
@@ -22,6 +23,7 @@ const EMPTY_FORM = {
 }
 
 export default function CourseCreatePage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [pillars, setPillars] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
@@ -53,8 +55,8 @@ export default function CourseCreatePage() {
 
   const handleCreate = async () => {
     const errs = {}
-    if (!form.title.trim()) errs.title = 'Title is required.'
-    if (!form.pillar_id) errs.pillar_id = 'Pillar is required.'
+    if (!form.title.trim()) errs.title = t('authoring.editor.titleRequired')
+    if (!form.pillar_id) errs.pillar_id = t('authoring.editor.pillarRequired')
     if (Object.keys(errs).length) { setErrors(errs); return }
 
     setSaving(true)
@@ -63,7 +65,7 @@ export default function CourseCreatePage() {
       const res = await client.post('/authoring/courses/', form)
       navigate(`/authoring/courses/${res.data.id}`)
     } catch {
-      setErrors({ submit: 'Failed to create course. Please try again.' })
+      setErrors({ submit: t('authoring.editor.createFailed') })
     } finally {
       setSaving(false)
     }
@@ -74,7 +76,7 @@ export default function CourseCreatePage() {
 
       {/* Back */}
       <button className="back-link" onClick={() => navigate('/authoring')}>
-        <ArrowLeft size={15} /> Back to Authoring
+        <ArrowLeft size={15} /> {t('authoring.editor.backToAuthoring')}
       </button>
 
       {/* Hero row */}
@@ -94,16 +96,16 @@ export default function CourseCreatePage() {
             value={form.level}
             onChange={(e) => setForm((f) => ({ ...f, level: e.target.value }))}
           >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="beginner">{t('common.level.beginner')}</option>
+            <option value="intermediate">{t('common.level.intermediate')}</option>
+            <option value="advanced">{t('common.level.advanced')}</option>
           </select>
         </div>
 
         <div className="editor-save-area">
           {errors.submit && <span className="save-msg save-msg--err">{errors.submit}</span>}
           <button className="enroll-btn" onClick={handleCreate} disabled={saving || !pillars.length}>
-            {saving ? 'Creating…' : 'Create Course'}
+            {saving ? t('authoring.editor.creating') : t('authoring.editor.createCourse')}
           </button>
         </div>
       </div>
@@ -114,7 +116,7 @@ export default function CourseCreatePage() {
           className={`editor-title-input${errors.title ? ' input--error' : ''}`}
           value={form.title}
           onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          placeholder="Course title"
+          placeholder={t('authoring.editor.courseTitlePlaceholder')}
         />
         {errors.title && <p className="field-error">{errors.title}</p>}
       </div>
@@ -125,7 +127,7 @@ export default function CourseCreatePage() {
         value={form.description}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         rows={2}
-        placeholder="Course description"
+        placeholder={t('authoring.editor.courseDescPlaceholder')}
       />
 
       {/* Duration */}
@@ -139,13 +141,13 @@ export default function CourseCreatePage() {
             min={0}
             onChange={(e) => setForm((f) => ({ ...f, duration_hours: Number(e.target.value) }))}
           />
-          hours
+          {t('authoring.editor.hours')}
         </span>
       </div>
 
       {/* Learning Outcomes */}
       <div className="outcomes-card">
-        <h2>What You&apos;ll Learn</h2>
+        <h2>{t('courseDetail.whatYoullLearn')}</h2>
         <div className="outcomes-grid">
           {form.learning_outcomes.map((outcome, i) => (
             <div key={i} className="outcome-item outcome-item--edit">
@@ -154,16 +156,16 @@ export default function CourseCreatePage() {
                 className="editor-outcome-input"
                 value={outcome}
                 onChange={(e) => updateOutcome(i, e.target.value)}
-                placeholder="Learning outcome"
+                placeholder={t('authoring.editor.outcomePlaceholder')}
               />
-              <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title="Remove">
+              <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title={t('authoring.editor.removeOutcome')}>
                 <Trash2 size={14} />
               </button>
             </div>
           ))}
         </div>
         <button className="add-dashed-btn" onClick={addOutcome}>
-          <Plus size={14} /> Add Outcome
+          <Plus size={14} /> {t('authoring.editor.addOutcome')}
         </button>
       </div>
 

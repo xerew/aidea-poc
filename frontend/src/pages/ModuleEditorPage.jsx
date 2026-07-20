@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList,
   Trash2, GripVertical, Save, Lock, Plus, Upload,
@@ -13,16 +14,16 @@ import './ModuleEditorPage.css'
 // ── Lesson type config ────────────────────────────────────────────────────────
 
 const LESSON_TYPES = [
-  { type: 'text',       label: 'Text',       Icon: FileText,     color: 'blue'   },
-  { type: 'video',      label: 'Video',      Icon: Video,        color: 'purple' },
-  { type: 'image',      label: 'Image',      Icon: Image,        color: 'green'  },
-  { type: 'quiz',       label: 'Quiz',       Icon: HelpCircle,   color: 'yellow' },
-  { type: 'pdf',        label: 'PDF',        Icon: FileDown,     color: 'red'    },
-  { type: 'assignment', label: 'Assignment', Icon: ClipboardList, color: 'indigo' },
+  { type: 'text',       Icon: FileText,     color: 'blue'   },
+  { type: 'video',      Icon: Video,        color: 'purple' },
+  { type: 'image',      Icon: Image,        color: 'green'  },
+  { type: 'quiz',       Icon: HelpCircle,   color: 'yellow' },
+  { type: 'pdf',        Icon: FileDown,     color: 'red'    },
+  { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
 ]
 
 function lessonTypeConfig(type) {
-  return LESSON_TYPES.find((t) => t.type === type) ?? LESSON_TYPES[0]
+  return LESSON_TYPES.find((lt) => lt.type === type) ?? LESSON_TYPES[0]
 }
 
 // ── Lesson icon ───────────────────────────────────────────────────────────────
@@ -51,6 +52,7 @@ function emptyQuestion() {
 }
 
 function QuizBuilder({ quizData, locked, onChange }) {
+  const { t } = useTranslation()
   const questions = quizData ?? []
 
   const updateQuestion = (qi, text) => {
@@ -96,7 +98,7 @@ function QuizBuilder({ quizData, locked, onChange }) {
 
   return (
     <div className="quiz-builder">
-      <h3 className="quiz-builder-title">Quiz Builder</h3>
+      <h3 className="quiz-builder-title">{t('authoring.moduleEditor.quizBuilderTitle')}</h3>
 
       {questions.map((q, qi) => (
         <div key={qi} className="quiz-question">
@@ -106,13 +108,13 @@ function QuizBuilder({ quizData, locked, onChange }) {
               value={q.question}
               disabled={locked}
               onChange={(e) => updateQuestion(qi, e.target.value)}
-              placeholder={`Question ${qi + 1}`}
+              placeholder={t('authoring.moduleEditor.questionPlaceholder', { number: qi + 1 })}
             />
             {!locked && questions.length > 1 && (
               <button
                 className="icon-btn icon-btn--danger"
                 onClick={() => removeQuestion(qi)}
-                title="Remove question"
+                title={t('authoring.moduleEditor.removeQuestion')}
               >
                 <Trash2 size={14} />
               </button>
@@ -128,20 +130,20 @@ function QuizBuilder({ quizData, locked, onChange }) {
                   checked={opt.is_correct}
                   disabled={locked}
                   onChange={() => toggleCorrect(qi, oi)}
-                  title="Mark as correct answer"
+                  title={t('authoring.moduleEditor.markCorrect')}
                 />
                 <input
                   className="quiz-option-input"
                   value={opt.text}
                   disabled={locked}
                   onChange={(e) => updateOptionText(qi, oi, e.target.value)}
-                  placeholder={`Option ${String.fromCharCode(65 + oi)}`}
+                  placeholder={t('authoring.moduleEditor.optionPlaceholder', { letter: String.fromCharCode(65 + oi) })}
                 />
                 {!locked && q.options.length > 2 && (
                   <button
                     className="icon-btn icon-btn--danger quiz-option-remove"
                     onClick={() => removeOption(qi, oi)}
-                    title="Remove option"
+                    title={t('authoring.moduleEditor.removeOption')}
                   >
                     <Trash2 size={12} />
                   </button>
@@ -152,7 +154,7 @@ function QuizBuilder({ quizData, locked, onChange }) {
 
           {!locked && (
             <button className="quiz-add-option-btn" onClick={() => addOption(qi)}>
-              <Plus size={13} /> Add Option
+              <Plus size={13} /> {t('authoring.moduleEditor.addOption')}
             </button>
           )}
         </div>
@@ -160,7 +162,7 @@ function QuizBuilder({ quizData, locked, onChange }) {
 
       {!locked && (
         <button className="quiz-add-question-btn" onClick={addQuestion}>
-          <Plus size={14} /> Add Question
+          <Plus size={14} /> {t('authoring.moduleEditor.addQuestion')}
         </button>
       )}
     </div>
@@ -206,35 +208,36 @@ FieldError.propTypes = { msg: PropTypes.string }
 LessonPreview.propTypes = { lesson: lessonShape.isRequired }
 
 function LessonPreview({ lesson }) {
+  const { t } = useTranslation()
   switch (lesson.lesson_type) {
     case 'text':
       return lesson.content
         ? <p className="lesson-preview-text">{lesson.content}</p>
-        : <p className="lesson-preview-empty">Write content above to see the preview.</p>
+        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
     case 'video':
       return lesson.content
         ? <VideoEmbed url={lesson.content} />
-        : <p className="lesson-preview-empty">Paste a video URL above to see the preview.</p>
+        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewVideoEmpty')}</p>
     case 'pdf':
       return lesson.content
         ? <PdfEmbed url={lesson.content} />
-        : <p className="lesson-preview-empty">Paste a PDF URL above to see the preview.</p>
+        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewPdfEmpty')}</p>
     case 'image':
       return lesson.content
         ? <img src={lesson.content} alt={lesson.title} className="lesson-preview-image" />
-        : <p className="lesson-preview-empty">Paste an image URL above to see the preview.</p>
+        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewImageEmpty')}</p>
     case 'assignment':
       return lesson.content
         ? (
           <div>
-            <h4 className="lesson-preview-subheading">Instructions</h4>
+            <h4 className="lesson-preview-subheading">{t('lesson.assignment.instructions')}</h4>
             <p className="lesson-preview-text">{lesson.content}</p>
           </div>
         )
-        : <p className="lesson-preview-empty">Write instructions above to see the preview.</p>
+        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewAssignmentEmpty')}</p>
     case 'quiz': {
       const first = (lesson.quiz_data ?? [])[0]
-      if (!first?.question) return <p className="lesson-preview-empty">Add a question to see the preview.</p>
+      if (!first?.question) return <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewQuizEmpty')}</p>
       return (
         <div>
           <p className="lesson-preview-quiz-q">{first.question}</p>
@@ -250,7 +253,9 @@ function LessonPreview({ lesson }) {
 }
 
 function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, errors }) {
+  const { t } = useTranslation()
   const cfg = lessonTypeConfig(lesson.lesson_type)
+  const typeLabel = t(`lesson.type.${lesson.lesson_type}`)
   const err = errors ?? {}
   const [uploading, setUploading] = useState(false)
 
@@ -265,7 +270,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
       onChange('content', res.data.url)
       onError(null)
     } catch (uploadErr) {
-      onError(uploadErr.response?.data?.error ?? 'Upload failed. Please try again.')
+      onError(uploadErr.response?.data?.error ?? t('authoring.moduleEditor.uploadFailed'))
     } finally {
       setUploading(false)
       e.target.value = ''
@@ -280,15 +285,15 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <cfg.Icon size={20} />
           </div>
           <div>
-            <span className="lesson-editor-editing-label">Editing {cfg.label}</span>
-            <h2 className="lesson-editor-title">Lesson Editor</h2>
+            <span className="lesson-editor-editing-label">{t('authoring.moduleEditor.editingLabel', { label: typeLabel })}</span>
+            <h2 className="lesson-editor-title">{t('authoring.moduleEditor.lessonEditorTitle')}</h2>
           </div>
         </div>
         {!locked && (
           <button
             className="icon-btn icon-btn--danger"
             onClick={onDelete}
-            title="Delete lesson"
+            title={t('authoring.moduleEditor.deleteLesson')}
           >
             <Trash2 size={16} />
           </button>
@@ -297,48 +302,48 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
 
       <div className="lesson-editor-body">
         <div className="lesson-field">
-          <label className="lesson-field-label">Lesson Title</label>
+          <label className="lesson-field-label">{t('authoring.moduleEditor.lessonTitleLabel')}</label>
           <input
             className={`lesson-field-input${err.title ? ' lesson-field-input--error' : ''}`}
             value={lesson.title}
             disabled={locked}
             onChange={(e) => onChange('title', e.target.value)}
-            placeholder="New Text"
+            placeholder={t('authoring.moduleEditor.titlePlaceholderExample')}
           />
           <FieldError msg={err.title} />
         </div>
 
         <div className="lesson-field">
-          <label className="lesson-field-label">Description</label>
+          <label className="lesson-field-label">{t('authoring.moduleEditor.descriptionLabel')}</label>
           <textarea
             className="lesson-field-textarea"
             value={lesson.description}
             disabled={locked}
             rows={3}
             onChange={(e) => onChange('description', e.target.value)}
-            placeholder="Describe what students will learn…"
+            placeholder={t('authoring.moduleEditor.descPlaceholder')}
           />
         </div>
 
         {lesson.lesson_type === 'text' && (
           <div className="lesson-field">
-            <label className="lesson-field-label">Content</label>
+            <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
             <textarea
               className="lesson-field-textarea lesson-field-textarea--content"
               value={lesson.content}
               disabled={locked}
               rows={8}
               onChange={(e) => onChange('content', e.target.value)}
-              placeholder="Write your lesson content here…"
+              placeholder={t('authoring.moduleEditor.contentPlaceholder')}
             />
-            <p className="lesson-field-hint">Supports markdown formatting</p>
+            <p className="lesson-field-hint">{t('authoring.moduleEditor.markdownHint')}</p>
           </div>
         )}
 
         {['video', 'image', 'pdf'].includes(lesson.lesson_type) && (
           <div className="lesson-field">
             <label className="lesson-field-label">
-              {lesson.lesson_type === 'video' ? 'Video URL' : lesson.lesson_type === 'image' ? 'Image URL' : 'PDF URL'}
+              {t('authoring.moduleEditor.urlLabel', { type: typeLabel })}
             </label>
             <input
               type="url"
@@ -346,15 +351,15 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
               value={lesson.content}
               disabled={locked}
               onChange={(e) => onChange('content', e.target.value)}
-              placeholder="https://…"
+              placeholder={t('authoring.moduleEditor.urlPlaceholder')}
             />
             <FieldError msg={err.content} />
             {['pdf', 'image'].includes(lesson.lesson_type) && !locked && (
               <div className="lesson-upload-row">
-                <span className="lesson-upload-or">or</span>
+                <span className="lesson-upload-or">{t('authoring.moduleEditor.uploadOr')}</span>
                 <label className="lesson-upload-btn">
                   <Upload size={14} />
-                  {uploading ? 'Uploading…' : 'Upload file'}
+                  {uploading ? t('authoring.moduleEditor.uploading') : t('authoring.moduleEditor.uploadFile')}
                   <input
                     type="file"
                     accept={lesson.lesson_type === 'pdf' ? '.pdf' : 'image/*'}
@@ -370,17 +375,17 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
 
         {lesson.lesson_type === 'assignment' && (
           <div className="lesson-field">
-            <label className="lesson-field-label">Assignment Instructions</label>
+            <label className="lesson-field-label">{t('authoring.moduleEditor.assignmentInstructionsLabel')}</label>
             <textarea
               className={`lesson-field-textarea lesson-field-textarea--content${err.content ? ' lesson-field-textarea--error' : ''}`}
               value={lesson.content}
               disabled={locked}
               rows={6}
               onChange={(e) => onChange('content', e.target.value)}
-              placeholder="Write the assignment instructions here…"
+              placeholder={t('authoring.moduleEditor.assignmentPlaceholder')}
             />
             <FieldError msg={err.content} />
-            <p className="lesson-field-hint">Supports markdown formatting</p>
+            <p className="lesson-field-hint">{t('authoring.moduleEditor.markdownHint')}</p>
           </div>
         )}
 
@@ -396,7 +401,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
         )}
 
         <div className="lesson-field">
-          <label className="lesson-field-label">Duration (estimated)</label>
+          <label className="lesson-field-label">{t('authoring.moduleEditor.durationLabel')}</label>
           <input
             className="lesson-field-input lesson-field-input--short"
             value={lesson.duration_minutes || ''}
@@ -404,7 +409,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             type="number"
             min={0}
             onChange={(e) => onChange('duration_minutes', Number(e.target.value))}
-            placeholder="e.g., 15 min"
+            placeholder={t('authoring.moduleEditor.durationPlaceholder')}
           />
         </div>
 
@@ -417,8 +422,8 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
               onChange={(e) => onChange('is_required', e.target.checked)}
             />
             <div>
-              <span className="lesson-required-title">Required lesson</span>
-              <span className="lesson-required-sub">Students must complete this to progress</span>
+              <span className="lesson-required-title">{t('authoring.moduleEditor.requiredTitle')}</span>
+              <span className="lesson-required-sub">{t('authoring.moduleEditor.requiredSub')}</span>
             </div>
           </label>
         </div>
@@ -432,13 +437,13 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             disabled={lesson.saving}
           >
             <Save size={15} />
-            {lesson.saving ? 'Saving…' : 'Save Lesson'}
+            {lesson.saving ? t('authoring.moduleEditor.savingLesson') : t('authoring.moduleEditor.saveLesson')}
           </button>
         )}
 
         <div className="lesson-preview-card">
-          <h3 className="lesson-preview-title">Preview</h3>
-          <p className="lesson-preview-sub">How this lesson will appear to students</p>
+          <h3 className="lesson-preview-title">{t('authoring.moduleEditor.previewTitle')}</h3>
+          <p className="lesson-preview-sub">{t('authoring.moduleEditor.previewSub')}</p>
           <div className="lesson-preview-body">
             <LessonPreview lesson={lesson} />
           </div>
@@ -460,20 +465,19 @@ LessonEditor.propTypes = {
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
-function validateLesson(lesson) {
+function validateLesson(lesson, t) {
   const errors = {}
   if (!lesson.title.trim()) {
-    errors.title = 'Lesson title is required.'
+    errors.title = t('authoring.moduleEditor.titleRequiredError')
   }
   if (['video', 'image', 'pdf'].includes(lesson.lesson_type) && !lesson.content.trim()) {
-    const label = lesson.lesson_type === 'video' ? 'Video' : lesson.lesson_type === 'image' ? 'Image' : 'PDF'
-    errors.content = `${label} URL is required.`
+    errors.content = t('authoring.moduleEditor.urlRequiredError', { type: t(`lesson.type.${lesson.lesson_type}`) })
   }
   if (lesson.lesson_type === 'assignment' && !lesson.content.trim()) {
-    errors.content = 'Assignment instructions are required.'
+    errors.content = t('authoring.moduleEditor.assignmentRequiredError')
   }
   if (lesson.lesson_type === 'quiz' && (!lesson.quiz_data || lesson.quiz_data.length === 0)) {
-    errors.quiz_data = 'At least one question is required.'
+    errors.quiz_data = t('authoring.moduleEditor.quizRequiredError')
   }
   return Object.keys(errors).length ? errors : null
 }
@@ -481,6 +485,7 @@ function validateLesson(lesson) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function ModuleEditorPage() {
+  const { t } = useTranslation()
   const { id: courseId, moduleId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -514,8 +519,8 @@ export default function ModuleEditorPage() {
         setIsPublished(courseRes.data.is_published)
         setCourseAuthorId(courseRes.data.created_by_id)
       })
-      .catch(() => setError('Failed to load module.'))
-  }, [courseId, moduleId])
+      .catch(() => setError(t('authoring.moduleEditor.loadError')))
+  }, [courseId, moduleId, t])
 
   const selectedLesson = lessons.find((l) => l.id === selectedLessonId) ?? null
 
@@ -545,10 +550,9 @@ export default function ModuleEditorPage() {
 
   const addLesson = async (lessonType) => {
     const tempId = `new-${Date.now()}`
-    const label = lessonTypeConfig(lessonType).label
     const newLesson = {
       id: tempId,
-      title: `New ${label}`,
+      title: t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${lessonType}`) }),
       description: '',
       lesson_type: lessonType,
       content: '',
@@ -587,7 +591,7 @@ export default function ModuleEditorPage() {
   }, [courseId, moduleId])
 
   const saveLesson = async (lesson) => {
-    const errors = validateLesson(lesson)
+    const errors = validateLesson(lesson, t)
     if (errors) {
       setLessonErrors((prev) => ({ ...prev, [lesson.id]: errors }))
       return
@@ -604,7 +608,7 @@ export default function ModuleEditorPage() {
     } catch (err) {
       const detail = err.response?.data?.detail
         ?? Object.values(err.response?.data ?? {})[0]
-        ?? 'Save failed. Please try again.'
+        ?? t('authoring.moduleEditor.saveFailedGeneric')
       setLessonErrors((prev) => ({
         ...prev,
         [lesson.id]: { ...(prev[lesson.id] ?? {}), general: String(detail) },
@@ -653,7 +657,7 @@ export default function ModuleEditorPage() {
       setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
       setSelectedLessonId(null)
     } catch (err) {
-      const detail = err.response?.data?.detail ?? 'Delete failed. Please try again.'
+      const detail = err.response?.data?.detail ?? t('authoring.moduleEditor.deleteFailedGeneric')
       setLessonErrors((prev) => ({
         ...prev,
         [lesson.id]: { ...(prev[lesson.id] ?? {}), general: String(detail) },
@@ -705,7 +709,7 @@ export default function ModuleEditorPage() {
   }
 
   if (error) return <p className="page-error">{error}</p>
-  if (!module) return <p className="page-loading">Loading…</p>
+  if (!module) return <p className="page-loading">{t('common.loading')}</p>
 
   const isAuthor = courseAuthorId != null && user?.id === courseAuthorId
   const isAdmin = user?.profile?.user_type === 'admin'
@@ -717,12 +721,12 @@ export default function ModuleEditorPage() {
       {/* Top bar */}
       <div className="module-editor-topbar">
         <button className="back-link" onClick={() => navigate(`/authoring/courses/${courseId}`)}>
-          <ArrowLeft size={15} /> Back to Course
+          <ArrowLeft size={15} /> {t('authoring.moduleEditor.backToCourse')}
         </button>
 
         <div className="module-editor-topbar-right">
-          {saveStatus === 'saved' && <span className="save-msg save-msg--ok">Saved!</span>}
-          {saveStatus === 'error' && <span className="save-msg save-msg--err">Save failed</span>}
+          {saveStatus === 'saved' && <span className="save-msg save-msg--ok">{t('authoring.editor.saved')}</span>}
+          {saveStatus === 'error' && <span className="save-msg save-msg--err">{t('authoring.editor.saveFailedShort')}</span>}
           {!locked && moduleDirty && (
             <button
               className="me-save-btn"
@@ -730,21 +734,21 @@ export default function ModuleEditorPage() {
               disabled={moduleSaving}
             >
               <Save size={15} />
-              {moduleSaving ? 'Saving…' : 'Save'}
+              {moduleSaving ? t('authoring.moduleEditor.saving') : t('authoring.moduleEditor.save')}
             </button>
           )}
           {isPublished && (
             <div className="published-banner">
               <Lock size={14} />
               {locked
-                ? 'This course is published — only its author can edit it.'
-                : 'This course is published — your edits go live immediately.'}
+                ? t('authoring.editor.publishedBannerLocked')
+                : t('authoring.editor.publishedBannerUnlocked')}
             </div>
           )}
         </div>
       </div>
 
-      <h1 className="module-editor-heading">Module Editor</h1>
+      <h1 className="module-editor-heading">{t('authoring.moduleEditor.moduleEditorHeading')}</h1>
 
       <div className="module-editor-layout">
 
@@ -752,38 +756,38 @@ export default function ModuleEditorPage() {
         <aside className="module-editor-sidebar">
 
           <div className="me-card">
-            <h2 className="me-card-title">Module Structure</h2>
-            <label className="me-label">Module Title</label>
+            <h2 className="me-card-title">{t('authoring.moduleEditor.moduleStructure')}</h2>
+            <label className="me-label">{t('authoring.moduleEditor.moduleTitleLabel')}</label>
             <input
               className="me-input"
               value={moduleForm.title}
               disabled={locked}
               onChange={(e) => handleModuleFieldChange('title', e.target.value)}
-              placeholder="Module title"
+              placeholder={t('authoring.editor.modulePlaceholder')}
             />
-            <label className="me-label" style={{ marginTop: '1rem' }}>Description</label>
+            <label className="me-label" style={{ marginTop: '1rem' }}>{t('authoring.moduleEditor.descriptionLabel')}</label>
             <textarea
               className="me-textarea"
               value={moduleForm.description}
               disabled={locked}
               rows={3}
               onChange={(e) => handleModuleFieldChange('description', e.target.value)}
-              placeholder="Module overview…"
+              placeholder={t('authoring.moduleEditor.moduleOverviewPlaceholder')}
             />
           </div>
 
           {!locked && (
             <div className="me-card">
-              <h2 className="me-card-title">Add Lesson/Activity</h2>
+              <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
               <div className="me-lesson-type-grid">
-                {LESSON_TYPES.map(({ type, label, Icon, color }) => (
+                {LESSON_TYPES.map(({ type, Icon, color }) => (
                   <button
                     key={type}
                     className={`me-type-btn me-type-btn--${color}`}
                     onClick={() => addLesson(type)}
                   >
                     <Icon size={22} />
-                    <span>{label}</span>
+                    <span>{t(`lesson.type.${type}`)}</span>
                   </button>
                 ))}
               </div>
@@ -791,10 +795,9 @@ export default function ModuleEditorPage() {
           )}
 
           <div className="me-card">
-            <h2 className="me-card-title">Lessons ({lessons.length})</h2>
+            <h2 className="me-card-title">{t('authoring.moduleEditor.lessonsCount', { count: lessons.length })}</h2>
             <ul className="me-lesson-list">
               {lessons.map((lesson, idx) => {
-                const cfg = lessonTypeConfig(lesson.lesson_type)
                 const isDragOver = dragOverId === lesson.id && dragId !== lesson.id
                 return (
                   <li
@@ -814,13 +817,13 @@ export default function ModuleEditorPage() {
                   >
                     <GripVertical size={14} className="me-lesson-drag" />
                     <LessonTypeIcon type={lesson.lesson_type} size={15} />
-                    <span className="me-lesson-title">{lesson.title || `New ${cfg.label}`}</span>
+                    <span className="me-lesson-title">{lesson.title || t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${lesson.lesson_type}`) })}</span>
                     <span className="me-lesson-order">{idx + 1}</span>
                   </li>
                 )
               })}
               {lessons.length === 0 && (
-                <li className="me-lesson-empty">No lessons yet. Add one above.</li>
+                <li className="me-lesson-empty">{t('authoring.moduleEditor.noLessons')}</li>
               )}
             </ul>
           </div>
@@ -842,7 +845,7 @@ export default function ModuleEditorPage() {
           ) : (
             <div className="me-empty-state">
               <FileText size={40} className="me-empty-icon" />
-              <p>Select a lesson from the list, or add a new one.</p>
+              <p>{t('authoring.moduleEditor.selectLessonPrompt')}</p>
             </div>
           )}
         </main>

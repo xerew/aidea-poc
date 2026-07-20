@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil, GripVertical } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -12,6 +13,7 @@ const PILLAR_COLOR = {
 }
 
 export default function CourseEditorPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -49,8 +51,8 @@ export default function CourseEditorPage() {
         setAuthor({ id: c.created_by_id, name: c.created_by_name })
         setPillars(pillarsRes.data)
       })
-      .catch(() => setError('Failed to load course.'))
-  }, [id])
+      .catch(() => setError(t('authoring.editor.loadError')))
+  }, [id, t])
 
   // ── Module API call (used by both per-module save and bulk save) ──────────
 
@@ -114,7 +116,7 @@ export default function CourseEditorPage() {
   // ── Publish ───────────────────────────────────────────────────────────────
 
   const handlePublish = async () => {
-    if (!window.confirm('Publish this course? Learners will see it immediately. As the author you can still edit or unpublish it.')) return
+    if (!window.confirm(t('authoring.editor.confirmPublish'))) return
     setPublishing(true)
     try {
       await client.post(`/authoring/courses/${id}/publish/`)
@@ -129,7 +131,7 @@ export default function CourseEditorPage() {
   // ── Unpublish ────────────────────────────────────────────────────────────
 
   const handleUnpublish = async () => {
-    if (!window.confirm('Unpublish this course? Learners will no longer see it in the catalog.')) return
+    if (!window.confirm(t('authoring.editor.confirmUnpublish'))) return
     setUnpublishing(true)
     try {
       await client.post(`/authoring/courses/${id}/unpublish/`)
@@ -222,7 +224,7 @@ export default function CourseEditorPage() {
   }
 
   if (error) return <p className="page-error">{error}</p>
-  if (!form)  return <p className="page-loading">Loading…</p>
+  if (!form)  return <p className="page-loading">{t('common.loading')}</p>
 
   const currentPillar = pillars.find((p) => p.id === form.pillar_id)
   const pillarColor = PILLAR_COLOR[currentPillar?.slug] ?? 'blue'
@@ -235,7 +237,7 @@ export default function CourseEditorPage() {
 
       {/* Back */}
       <button className="back-link" onClick={() => navigate('/authoring')}>
-        <ArrowLeft size={15} /> Back to Authoring
+        <ArrowLeft size={15} /> {t('authoring.editor.backToAuthoring')}
       </button>
 
       {/* Published banner */}
@@ -243,8 +245,8 @@ export default function CourseEditorPage() {
         <div className="published-banner">
           <Lock size={14} />
           {locked
-            ? 'This course is published — only its author can edit it.'
-            : 'This course is published — your edits go live immediately.'}
+            ? t('authoring.editor.publishedBannerLocked')
+            : t('authoring.editor.publishedBannerUnlocked')}
         </div>
       )}
 
@@ -267,27 +269,27 @@ export default function CourseEditorPage() {
             disabled={locked}
             onChange={(e) => setForm((f) => ({ ...f, level: e.target.value }))}
           >
-            <option value="beginner">Beginner</option>
-            <option value="intermediate">Intermediate</option>
-            <option value="advanced">Advanced</option>
+            <option value="beginner">{t('common.level.beginner')}</option>
+            <option value="intermediate">{t('common.level.intermediate')}</option>
+            <option value="advanced">{t('common.level.advanced')}</option>
           </select>
         </div>
 
         {!locked && (
           <div className="editor-save-area">
-            {saveStatus === 'saved' && <span className="save-msg save-msg--ok">Saved!</span>}
-            {saveStatus === 'error' && <span className="save-msg save-msg--err">Save failed</span>}
+            {saveStatus === 'saved' && <span className="save-msg save-msg--ok">{t('authoring.editor.saved')}</span>}
+            {saveStatus === 'error' && <span className="save-msg save-msg--err">{t('authoring.editor.saveFailedShort')}</span>}
             <button className="enroll-btn enroll-btn--outline" onClick={handleSaveCourse} disabled={saving}>
-              {saving ? 'Saving…' : 'Save Changes'}
+              {saving ? t('common.saving') : t('authoring.editor.saveChanges')}
             </button>
             {!isPublished && (
               <button className="enroll-btn" onClick={handlePublish} disabled={publishing}>
-                {publishing ? 'Publishing…' : 'Publish'}
+                {publishing ? t('authoring.editor.publishing') : t('authoring.editor.publish')}
               </button>
             )}
             {isPublished && (isAuthor || isAdmin) && (
               <button className="enroll-btn enroll-btn--outline" onClick={handleUnpublish} disabled={unpublishing}>
-                {unpublishing ? 'Unpublishing…' : 'Unpublish'}
+                {unpublishing ? t('authoring.editor.unpublishing') : t('authoring.editor.unpublish')}
               </button>
             )}
           </div>
@@ -300,11 +302,11 @@ export default function CourseEditorPage() {
         value={form.title}
         disabled={locked}
         onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-        placeholder="Course title"
+        placeholder={t('authoring.editor.courseTitlePlaceholder')}
       />
 
       {/* Author */}
-      {author.name && <p className="course-editor-author">Author: {author.name}</p>}
+      {author.name && <p className="course-editor-author">{t('authoring.editor.authorLabel', { name: author.name })}</p>}
 
       {/* Description */}
       <textarea
@@ -313,7 +315,7 @@ export default function CourseEditorPage() {
         disabled={locked}
         onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
         rows={2}
-        placeholder="Course description"
+        placeholder={t('authoring.editor.courseDescPlaceholder')}
       />
 
       {/* Stats */}
@@ -328,14 +330,14 @@ export default function CourseEditorPage() {
             disabled={locked}
             onChange={(e) => setForm((f) => ({ ...f, duration_hours: Number(e.target.value) }))}
           />
-          hours
+          {t('authoring.editor.hours')}
         </span>
-        <span><BookOpen size={15} /> {modules.length} modules</span>
+        <span><BookOpen size={15} /> {t('common.moduleCount', { count: modules.length })}</span>
       </div>
 
       {/* Learning Outcomes */}
       <div className="outcomes-card">
-        <h2>What You&apos;ll Learn</h2>
+        <h2>{t('courseDetail.whatYoullLearn')}</h2>
         <div className="outcomes-grid">
           {form.learning_outcomes.map((outcome, i) => (
             <div key={i} className="outcome-item outcome-item--edit">
@@ -345,10 +347,10 @@ export default function CourseEditorPage() {
                 value={outcome}
                 disabled={locked}
                 onChange={(e) => updateOutcome(i, e.target.value)}
-                placeholder="Learning outcome"
+                placeholder={t('authoring.editor.outcomePlaceholder')}
               />
               {!locked && (
-                <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title="Remove outcome">
+                <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title={t('authoring.editor.removeOutcome')}>
                   <Trash2 size={14} />
                 </button>
               )}
@@ -357,14 +359,14 @@ export default function CourseEditorPage() {
         </div>
         {!locked && (
           <button className="add-dashed-btn" onClick={addOutcome}>
-            <Plus size={14} /> Add Outcome
+            <Plus size={14} /> {t('authoring.editor.addOutcome')}
           </button>
         )}
       </div>
 
       {/* Modules */}
       <section className="modules-section">
-        <h2>Course Modules</h2>
+        <h2>{t('courseDetail.courseModules')}</h2>
         <div className="modules-list">
           {modules.map((mod, idx) => {
             const isModDragOver = dragModuleOverId === mod.id && dragModuleId !== mod.id
@@ -392,7 +394,7 @@ export default function CourseEditorPage() {
                   value={mod.title}
                   disabled={locked}
                   onChange={(e) => updateModuleField(mod.id, 'title', e.target.value)}
-                  placeholder="Module title"
+                  placeholder={t('authoring.editor.modulePlaceholder')}
                 />
                 <textarea
                   className="editor-module-desc"
@@ -400,7 +402,7 @@ export default function CourseEditorPage() {
                   disabled={locked}
                   onChange={(e) => updateModuleField(mod.id, 'description', e.target.value)}
                   rows={1}
-                  placeholder="Description (optional)"
+                  placeholder={t('authoring.editor.moduleDescPlaceholder')}
                 />
                 <div className="module-meta editor-module-meta">
                   <input
@@ -411,7 +413,7 @@ export default function CourseEditorPage() {
                     disabled={locked}
                     onChange={(e) => updateModuleField(mod.id, 'duration_minutes', Number(e.target.value))}
                   />
-                  <span>min</span>
+                  <span>{t('authoring.editor.min')}</span>
                 </div>
               </div>
               <div className="module-editor-actions">
@@ -419,7 +421,7 @@ export default function CourseEditorPage() {
                   <button
                     className="icon-btn"
                     onClick={() => navigate(`/authoring/courses/${id}/modules/${mod.id}`)}
-                    title="Edit module lessons"
+                    title={t('authoring.editor.editModuleLessons')}
                   >
                     <Pencil size={15} />
                   </button>
@@ -429,7 +431,7 @@ export default function CourseEditorPage() {
                     className="icon-btn icon-btn--save"
                     onClick={() => saveModule(mod)}
                     disabled={mod.saving}
-                    title="Save module"
+                    title={t('authoring.editor.saveModule')}
                   >
                     <Save size={15} />
                   </button>
@@ -438,7 +440,7 @@ export default function CourseEditorPage() {
                   <button
                     className="icon-btn icon-btn--danger"
                     onClick={() => deleteModule(mod)}
-                    title="Delete module"
+                    title={t('authoring.editor.deleteModule')}
                   >
                     <Trash2 size={15} />
                   </button>
@@ -449,7 +451,7 @@ export default function CourseEditorPage() {
         </div>
         {!locked && (
           <button className="add-dashed-btn" onClick={addModule}>
-            <Plus size={15} /> Add Module
+            <Plus size={15} /> {t('authoring.editor.addModule')}
           </button>
         )}
       </section>
