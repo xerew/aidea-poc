@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -9,85 +10,95 @@ import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import './OnboardingPage.css'
 
-const STEPS = [
+const STEP_DEFS = [
   {
     key: 'subject_area',
-    question: 'Which subject area do you primarily teach?',
+    i18nKey: 'subjectArea',
     type: 'radio',
     options: [
-      { value: 'stem',       label: 'STEM (Science, Technology, Engineering, Math)' },
-      { value: 'humanities', label: 'Humanities & Social Sciences' },
-      { value: 'languages',  label: 'Languages' },
-      { value: 'arts',       label: 'Arts' },
-      { value: 'general',    label: 'General / Multiple subjects' },
+      { value: 'stem',       i18nKey: 'stem' },
+      { value: 'humanities', i18nKey: 'humanities' },
+      { value: 'languages',  i18nKey: 'languages' },
+      { value: 'arts',       i18nKey: 'arts' },
+      { value: 'general',    i18nKey: 'general' },
     ],
   },
   {
     key: 'teaching_level',
-    question: 'What level do you teach?',
+    i18nKey: 'teachingLevel',
     type: 'radio',
     options: [
-      { value: 'primary',    label: 'Primary (K–6)' },
-      { value: 'secondary',  label: 'Secondary (7–12)' },
-      { value: 'higher_ed',  label: 'Higher Education' },
-      { value: 'vocational', label: 'Vocational' },
-      { value: 'adult_ed',   label: 'Adult Education' },
+      { value: 'primary',    i18nKey: 'primary' },
+      { value: 'secondary',  i18nKey: 'secondary' },
+      { value: 'higher_ed',  i18nKey: 'higherEd' },
+      { value: 'vocational', i18nKey: 'vocational' },
+      { value: 'adult_ed',   i18nKey: 'adultEd' },
     ],
   },
   {
     key: 'q3',
-    question: "You ask an AI to summarise a student's essay. It gives a confident but factually wrong summary. What do you do?",
+    i18nKey: 'q3',
     type: 'radio',
     options: [
-      { value: 'a', label: "Trust the AI — it's usually accurate" },
-      { value: 'b', label: 'Check it yourself and correct it' },
-      { value: 'c', label: 'Use a different AI tool instead' },
-      { value: 'd', label: "I wouldn't use AI for this task" },
+      { value: 'a', i18nKey: 'a' },
+      { value: 'b', i18nKey: 'b' },
+      { value: 'c', i18nKey: 'c' },
+      { value: 'd', i18nKey: 'd' },
     ],
   },
   {
     key: 'q4',
-    question: 'What does it mean when an AI model "hallucinates"?',
+    i18nKey: 'q4',
     type: 'radio',
     options: [
-      { value: 'a', label: 'The AI crashes or freezes' },
-      { value: 'b', label: 'The AI generates false information that sounds plausible' },
-      { value: 'c', label: 'The AI gives creative or unexpected responses' },
-      { value: 'd', label: "I'm not sure" },
+      { value: 'a', i18nKey: 'a' },
+      { value: 'b', i18nKey: 'b' },
+      { value: 'c', i18nKey: 'c' },
+      { value: 'd', i18nKey: 'd' },
     ],
   },
   {
     key: 'q5',
-    question: 'Which of these is the best AI prompt for generating a lesson plan?',
+    i18nKey: 'q5',
     type: 'radio',
     options: [
-      { value: 'a', label: '"Write a lesson plan"' },
-      { value: 'b', label: '"Write a 45-minute lesson plan for 14-year-olds about fractions, include 3 activities"' },
-      { value: 'c', label: '"Help me teach math"' },
-      { value: 'd', label: '"I need a lesson plan about math, make it good"' },
+      { value: 'a', i18nKey: 'a' },
+      { value: 'b', i18nKey: 'b' },
+      { value: 'c', i18nKey: 'c' },
+      { value: 'd', i18nKey: 'd' },
     ],
   },
   {
     key: 'goals',
-    question: 'What are your main learning goals? (Select all that apply)',
+    i18nKey: 'goals',
     type: 'multiselect',
     options: [
-      { value: 'save_time',        label: 'Save time on lesson planning' },
-      { value: 'teach_about_ai',   label: 'Learn to teach students about AI' },
-      { value: 'prepare_students', label: 'Prepare students for an AI-driven world' },
-      { value: 'stay_current',     label: 'Stay current with technology trends' },
-      { value: 'address_ethics',   label: 'Address ethical concerns about AI' },
+      { value: 'save_time',        i18nKey: 'saveTime' },
+      { value: 'teach_about_ai',   i18nKey: 'teachAboutAi' },
+      { value: 'prepare_students', i18nKey: 'prepareStudents' },
+      { value: 'stay_current',     i18nKey: 'stayCurrent' },
+      { value: 'address_ethics',   i18nKey: 'addressEthics' },
     ],
   },
 ]
 
 export default function OnboardingPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, updateUser } = useAuth()
   const [step, setStep]       = useState(0)
   const [answers, setAnswers] = useState({})
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
+
+  const STEPS = STEP_DEFS.map(s => ({
+    ...s,
+    question: t(`onboarding.questions.${s.i18nKey}.question`),
+    options: s.options.map(o => ({
+      ...o,
+      label: t(`onboarding.questions.${s.i18nKey}.options.${o.i18nKey}`),
+    })),
+  }))
 
   const current = STEPS[step]
   const isLast  = step === STEPS.length - 1
@@ -124,7 +135,7 @@ export default function OnboardingPage() {
       })
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.detail || 'Something went wrong. Please try again.')
+      setError(err.response?.data?.detail || t('onboarding.genericError'))
       setLoading(false)
     }
   }
@@ -133,12 +144,14 @@ export default function OnboardingPage() {
     <div className="onboarding-container">
       <div className="onboarding-card">
         <div className="onboarding-header">
-          <h1 className="onboarding-title">Welcome to AIDEA</h1>
+          <h1 className="onboarding-title">{t('onboarding.title')}</h1>
           <p className="onboarding-subtitle">
-            Let&apos;s personalise your learning path. This takes about 2 minutes.
+            {t('onboarding.subtitle')}
           </p>
           <Progress value={((step + 1) / STEPS.length) * 100} className="onboarding-progress" />
-          <span className="onboarding-step-label">Step {step + 1} of {STEPS.length}</span>
+          <span className="onboarding-step-label">
+            {t('onboarding.step', { current: step + 1, total: STEPS.length })}
+          </span>
         </div>
 
         <div className="onboarding-question">
@@ -184,17 +197,17 @@ export default function OnboardingPage() {
         <div className="onboarding-nav">
           {step > 0 && (
             <Button variant="outline" onClick={() => setStep(s => s - 1)} disabled={loading}>
-              Back
+              {t('common.back')}
             </Button>
           )}
           {!isLast && (
             <Button onClick={() => setStep(s => s + 1)} disabled={!hasAnswer}>
-              Next
+              {t('common.next')}
             </Button>
           )}
           {isLast && (
             <Button onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Building your learning path…' : 'Complete Setup'}
+              {loading ? t('onboarding.building') : t('onboarding.completeSetup')}
             </Button>
           )}
         </div>

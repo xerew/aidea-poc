@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Camera, Check, X, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   PasswordInput,
   PasswordStrengthPanel,
@@ -12,44 +13,6 @@ import { useAccessRequest } from '../context/AccessRequestContext'
 import { COUNTRIES, getFlagEmoji } from '../data/countries'
 import client from '../api/client'
 import './ProfilePage.css'
-
-const PILLARS = [
-  { value: 'teach-with-ai',  label: 'Teach with AI' },
-  { value: 'teach-for-ai',   label: 'Teach for AI' },
-  { value: 'teach-about-ai', label: 'Teach about AI' },
-]
-
-const SUBJECT_AREAS = [
-  { value: '',           label: 'Select subject area' },
-  { value: 'stem',       label: 'STEM' },
-  { value: 'humanities', label: 'Humanities' },
-  { value: 'languages',  label: 'Languages' },
-  { value: 'arts',       label: 'Arts' },
-  { value: 'general',    label: 'General / Multiple' },
-]
-
-const LEARNING_FORMATS = [
-  { value: '',            label: 'Select format' },
-  { value: 'video',       label: 'Video-based' },
-  { value: 'text',        label: 'Text / Reading' },
-  { value: 'visual',      label: 'Visual (slides, diagrams)' },
-  { value: 'interactive', label: 'Interactive (quizzes, exercises)' },
-]
-
-const WEEKLY_GOALS = [
-  { value: '',    label: 'Select goal' },
-  { value: 'lt1', label: 'Under 1 hour' },
-  { value: '1_2', label: '1-2 hours' },
-  { value: '2_5', label: '2-5 hours' },
-  { value: 'gt5', label: '5+ hours' },
-]
-
-const GENDER_OPTIONS = [
-  { value: '',              label: 'Select gender' },
-  { value: 'male',         label: 'Male' },
-  { value: 'female',       label: 'Female' },
-  { value: 'prefer_not_say', label: 'Prefer not to say' },
-]
 
 function getAvatarSrc(profile) {
   if (profile?.avatar_url) return profile.avatar_url
@@ -81,13 +44,14 @@ function useSectionSave(endpoint, method = 'patch') {
   return { saving, saved, error, setError, save }
 }
 
-function SaveFeedback({ saving, saved, error, label = 'Save' }) {
+function SaveFeedback({ saving, saved, error, label }) {
+  const { t } = useTranslation()
   return (
     <div className="profile-section-footer">
       {error && <span className="profile-feedback error">{error}</span>}
-      {saved && <span className="profile-feedback success">Saved successfully.</span>}
+      {saved && <span className="profile-feedback success">{t('common.savedSuccess')}</span>}
       <button className="profile-save-btn" type="submit" disabled={saving}>
-        {saving ? 'Saving…' : label}
+        {saving ? t('common.saving') : label}
       </button>
     </div>
   )
@@ -103,6 +67,7 @@ SaveFeedback.propTypes = {
 // ── Personal Information ──────────────────────────────────────────────────────
 
 function PersonalInfoSection() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
     subject_area: '', gender: '', country: '', school: '', phone: '', location: '',
@@ -110,12 +75,28 @@ function PersonalInfoSection() {
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/info/')
 
+  const SUBJECT_AREAS = [
+    { value: '',           label: t('profile.personalInfo.subjectOptions.select') },
+    { value: 'stem',       label: t('profile.personalInfo.subjectOptions.stem') },
+    { value: 'humanities', label: t('profile.personalInfo.subjectOptions.humanities') },
+    { value: 'languages',  label: t('profile.personalInfo.subjectOptions.languages') },
+    { value: 'arts',       label: t('profile.personalInfo.subjectOptions.arts') },
+    { value: 'general',    label: t('profile.personalInfo.subjectOptions.general') },
+  ]
+
+  const GENDER_OPTIONS = [
+    { value: '',                label: t('profile.personalInfo.genderOptions.select') },
+    { value: 'male',            label: t('profile.personalInfo.genderOptions.male') },
+    { value: 'female',          label: t('profile.personalInfo.genderOptions.female') },
+    { value: 'prefer_not_say',  label: t('profile.personalInfo.genderOptions.preferNotSay') },
+  ]
+
   useEffect(() => {
     client.get('/profile/info/')
       .then(res => setForm(res.data))
-      .catch(() => setError('Failed to load profile.'))
+      .catch(() => setError(t('profile.personalInfo.loadFailed')))
       .finally(() => setLoading(false))
-  }, [setError])
+  }, [setError, t])
 
   const set = (key) => (e) => setForm(prev => ({ ...prev, [key]: e.target.value }))
 
@@ -124,44 +105,44 @@ function PersonalInfoSection() {
     save(form)
   }
 
-  if (loading) return <section className="profile-card"><p className="profile-loading">Loading…</p></section>
+  if (loading) return <section className="profile-card"><p className="profile-loading">{t('common.loading')}</p></section>
 
   return (
     <section className="profile-card">
-      <h2>Personal Information</h2>
+      <h2>{t('profile.personalInfo.title')}</h2>
       <form onSubmit={handleSubmit}>
         <div className="profile-grid-2">
           <div className="profile-field">
-            <label>Full Name</label>
+            <label>{t('profile.personalInfo.fullName')}</label>
             <div className="profile-name-row">
-              <input value={form.first_name} onChange={set('first_name')} placeholder="First name" />
-              <input value={form.last_name}  onChange={set('last_name')}  placeholder="Last name" />
+              <input value={form.first_name} onChange={set('first_name')} placeholder={t('profile.personalInfo.firstNamePlaceholder')} />
+              <input value={form.last_name}  onChange={set('last_name')}  placeholder={t('profile.personalInfo.lastNamePlaceholder')} />
             </div>
           </div>
           <div className="profile-field">
-            <label>Email</label>
-            <input type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" />
+            <label>{t('profile.personalInfo.email')}</label>
+            <input type="email" value={form.email} onChange={set('email')} placeholder={t('profile.personalInfo.emailPlaceholder')} />
           </div>
           <div className="profile-field">
-            <label>School / Institution</label>
-            <input value={form.school} onChange={set('school')} placeholder="Your school or institution" />
+            <label>{t('profile.personalInfo.school')}</label>
+            <input value={form.school} onChange={set('school')} placeholder={t('profile.personalInfo.schoolPlaceholder')} />
           </div>
           <div className="profile-field">
-            <label>Subject / Department</label>
+            <label>{t('profile.personalInfo.subjectDepartment')}</label>
             <select value={form.subject_area} onChange={set('subject_area')}>
               {SUBJECT_AREAS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div className="profile-field">
-            <label>Gender</label>
+            <label>{t('profile.personalInfo.gender')}</label>
             <select value={form.gender} onChange={set('gender')}>
               {GENDER_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
           </div>
           <div className="profile-field">
-            <label>Country</label>
+            <label>{t('profile.personalInfo.country')}</label>
             <select value={form.country} onChange={set('country')}>
-              <option value="">Select country</option>
+              <option value="">{t('profile.personalInfo.selectCountry')}</option>
               {COUNTRIES.map(c => (
                 <option key={c.code} value={c.code}>
                   {getFlagEmoji(c.code)} {c.name}
@@ -170,15 +151,15 @@ function PersonalInfoSection() {
             </select>
           </div>
           <div className="profile-field">
-            <label>Phone Number</label>
-            <input value={form.phone} onChange={set('phone')} placeholder="+30 210 000 0000" />
+            <label>{t('profile.personalInfo.phone')}</label>
+            <input value={form.phone} onChange={set('phone')} placeholder={t('profile.personalInfo.phonePlaceholder')} />
           </div>
           <div className="profile-field">
-            <label>Location</label>
-            <input value={form.location} onChange={set('location')} placeholder="City, Country" />
+            <label>{t('profile.personalInfo.location')}</label>
+            <input value={form.location} onChange={set('location')} placeholder={t('profile.personalInfo.locationPlaceholder')} />
           </div>
         </div>
-        <SaveFeedback saving={saving} saved={saved} error={error} label="Save Changes" />
+        <SaveFeedback saving={saving} saved={saved} error={error} label={t('profile.personalInfo.saveChanges')} />
       </form>
     </section>
   )
@@ -187,6 +168,7 @@ function PersonalInfoSection() {
 // ── Learning Preferences ──────────────────────────────────────────────────────
 
 function PreferencesSection() {
+  const { t } = useTranslation()
   const [form, setForm] = useState({
     preferred_pillars: [], learning_style: '',
     weekly_learning_goal: '', email_notifications: true, progress_reminders: true,
@@ -195,12 +177,34 @@ function PreferencesSection() {
   const [finderOpen, setFinderOpen] = useState(false)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/preferences/')
 
+  const PILLARS = [
+    { value: 'teach-with-ai',  label: t('profile.preferences.pillars.teachWithAi') },
+    { value: 'teach-for-ai',   label: t('profile.preferences.pillars.teachForAi') },
+    { value: 'teach-about-ai', label: t('profile.preferences.pillars.teachAboutAi') },
+  ]
+
+  const LEARNING_FORMATS = [
+    { value: '',            label: t('profile.preferences.formatOptions.select') },
+    { value: 'video',       label: t('profile.preferences.formatOptions.video') },
+    { value: 'text',        label: t('profile.preferences.formatOptions.text') },
+    { value: 'visual',      label: t('profile.preferences.formatOptions.visual') },
+    { value: 'interactive', label: t('profile.preferences.formatOptions.interactive') },
+  ]
+
+  const WEEKLY_GOALS = [
+    { value: '',    label: t('profile.preferences.goalOptions.select') },
+    { value: 'lt1', label: t('profile.preferences.goalOptions.lt1') },
+    { value: '1_2', label: t('profile.preferences.goalOptions.1_2') },
+    { value: '2_5', label: t('profile.preferences.goalOptions.2_5') },
+    { value: 'gt5', label: t('profile.preferences.goalOptions.gt5') },
+  ]
+
   useEffect(() => {
     client.get('/profile/preferences/')
       .then(res => setForm(res.data))
-      .catch(() => setError('Failed to load preferences.'))
+      .catch(() => setError(t('profile.preferences.loadFailed')))
       .finally(() => setLoading(false))
-  }, [setError])
+  }, [setError, t])
 
   const togglePillar = (val) =>
     setForm(prev => ({
@@ -215,14 +219,14 @@ function PreferencesSection() {
     setForm(prev => ({ ...prev, [key]: value }))
   }
 
-  if (loading) return <section className="profile-card"><p className="profile-loading">Loading…</p></section>
+  if (loading) return <section className="profile-card"><p className="profile-loading">{t('common.loading')}</p></section>
 
   return (
     <section className="profile-card">
-      <h2>Learning Preferences</h2>
+      <h2>{t('profile.preferences.title')}</h2>
       <form onSubmit={(e) => { e.preventDefault(); save(form) }}>
         <div className="profile-field">
-          <label>Preferred Learning Format</label>
+          <label>{t('profile.preferences.preferredFormat')}</label>
           <select value={form.learning_style} onChange={set('learning_style')}>
             {LEARNING_FORMATS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -233,7 +237,7 @@ function PreferencesSection() {
           className="profile-finder-btn"
           onClick={() => setFinderOpen(true)}
         >
-          <Sparkles size={14} /> Find your learning preference
+          <Sparkles size={14} /> {t('profile.preferences.findPreference')}
         </button>
 
         <PreferenceFinderModal
@@ -243,7 +247,7 @@ function PreferencesSection() {
         />
 
         <div className="profile-field">
-          <label>Preferred Pillar</label>
+          <label>{t('profile.preferences.preferredPillar')}</label>
           <div className="profile-pill-group">
             {PILLARS.map(({ value, label }) => (
               <button
@@ -259,7 +263,7 @@ function PreferencesSection() {
         </div>
 
         <div className="profile-field">
-          <label>Weekly Learning Goal</label>
+          <label>{t('profile.preferences.weeklyGoal')}</label>
           <select value={form.weekly_learning_goal} onChange={set('weekly_learning_goal')}>
             {WEEKLY_GOALS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -273,8 +277,8 @@ function PreferencesSection() {
               onChange={set('email_notifications')}
             />
             <div>
-              <span className="toggle-title">Email notifications for new courses</span>
-              <span className="toggle-sub">Receive updates about new AI courses and content</span>
+              <span className="toggle-title">{t('profile.preferences.emailNotifTitle')}</span>
+              <span className="toggle-sub">{t('profile.preferences.emailNotifSub')}</span>
             </div>
           </label>
           <label className="profile-toggle-row">
@@ -284,13 +288,13 @@ function PreferencesSection() {
               onChange={set('progress_reminders')}
             />
             <div>
-              <span className="toggle-title">Progress reminders</span>
-              <span className="toggle-sub">Get weekly reminders to continue your learning</span>
+              <span className="toggle-title">{t('profile.preferences.progressRemindersTitle')}</span>
+              <span className="toggle-sub">{t('profile.preferences.progressRemindersSub')}</span>
             </div>
           </label>
         </div>
 
-        <SaveFeedback saving={saving} saved={saved} error={error} label="Save Preferences" />
+        <SaveFeedback saving={saving} saved={saved} error={error} label={t('profile.preferences.savePreferences')} />
       </form>
     </section>
   )
@@ -299,6 +303,7 @@ function PreferencesSection() {
 // ── Privacy Settings ──────────────────────────────────────────────────────────
 
 function PrivacySection() {
+  const { t } = useTranslation()
   const [form, setForm]   = useState({ profile_public: false, share_progress: false })
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/settings/')
@@ -306,35 +311,35 @@ function PrivacySection() {
   useEffect(() => {
     client.get('/profile/settings/')
       .then(res => setForm(res.data))
-      .catch(() => setError('Failed to load settings.'))
+      .catch(() => setError(t('profile.privacy.loadFailed')))
       .finally(() => setLoading(false))
-  }, [setError])
+  }, [setError, t])
 
   const set = (key) => (e) => setForm(prev => ({ ...prev, [key]: e.target.checked }))
 
-  if (loading) return <section className="profile-card"><p className="profile-loading">Loading…</p></section>
+  if (loading) return <section className="profile-card"><p className="profile-loading">{t('common.loading')}</p></section>
 
   return (
     <section className="profile-card">
-      <h2>Privacy Settings</h2>
+      <h2>{t('profile.privacy.title')}</h2>
       <form onSubmit={(e) => { e.preventDefault(); save(form) }}>
         <div className="profile-toggles">
           <label className="profile-toggle-row">
             <input type="checkbox" checked={form.profile_public} onChange={set('profile_public')} />
             <div>
-              <span className="toggle-title">Make profile public</span>
-              <span className="toggle-sub">Allow other educators to view your profile</span>
+              <span className="toggle-title">{t('profile.privacy.publicProfileTitle')}</span>
+              <span className="toggle-sub">{t('profile.privacy.publicProfileSub')}</span>
             </div>
           </label>
           <label className="profile-toggle-row">
             <input type="checkbox" checked={form.share_progress} onChange={set('share_progress')} />
             <div>
-              <span className="toggle-title">Share learning progress</span>
-              <span className="toggle-sub">Display your course progress on your profile</span>
+              <span className="toggle-title">{t('profile.privacy.shareProgressTitle')}</span>
+              <span className="toggle-sub">{t('profile.privacy.shareProgressSub')}</span>
             </div>
           </label>
         </div>
-        <SaveFeedback saving={saving} saved={saved} error={error} label="Save Settings" />
+        <SaveFeedback saving={saving} saved={saved} error={error} label={t('profile.privacy.saveSettings')} />
       </form>
     </section>
   )
@@ -343,6 +348,7 @@ function PrivacySection() {
 // ── Security ─────────────────────────────────────────────────────────────────
 
 function SecuritySection() {
+  const { t } = useTranslation()
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ old_password: '', new_password: '', confirm: '' })
   const [saving, setSaving]   = useState(false)
@@ -360,11 +366,11 @@ function SecuritySection() {
     setError('')
     setSuccess('')
     if (!allRulesMet) {
-      setError('Password does not meet all requirements.')
+      setError(t('profile.security.passwordRulesNotMet'))
       return
     }
     if (!passwordsMatch) {
-      setError('New passwords do not match.')
+      setError(t('profile.security.passwordsNoMatch'))
       return
     }
     setSaving(true)
@@ -373,11 +379,11 @@ function SecuritySection() {
         old_password: form.old_password,
         new_password: form.new_password,
       })
-      setSuccess('Password changed successfully.')
+      setSuccess(t('profile.security.changeSuccess'))
       setForm({ old_password: '', new_password: '', confirm: '' })
       setShowForm(false)
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to change password.')
+      setError(err?.response?.data?.error || t('profile.security.changeFailed'))
     } finally {
       setSaving(false)
     }
@@ -391,52 +397,52 @@ function SecuritySection() {
 
   return (
     <section className="profile-card">
-      <h2>Security</h2>
+      <h2>{t('profile.security.title')}</h2>
 
       {!showForm ? (
         <div className="profile-security-btns">
           {success && <p className="profile-feedback success">{success}</p>}
           <button className="profile-outline-btn" type="button" onClick={() => setShowForm(true)}>
-            Change Password
+            {t('profile.security.changePassword')}
           </button>
           <button
             className="profile-outline-btn"
             type="button"
-            onClick={() => setTwoFaMsg('Two-factor authentication is coming soon.')}
+            onClick={() => setTwoFaMsg(t('profile.security.twoFaComingSoon'))}
           >
-            Enable Two-Factor Authentication
+            {t('profile.security.enable2fa')}
           </button>
           {twoFaMsg && <p className="profile-feedback info">{twoFaMsg}</p>}
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="profile-password-form">
           <div className="profile-field">
-            <label>Current Password</label>
+            <label>{t('profile.security.currentPassword')}</label>
             <PasswordInput
               value={form.old_password} onChange={set('old_password')}
-              placeholder="Enter current password" autoComplete="current-password"
+              placeholder={t('profile.security.currentPasswordPlaceholder')} autoComplete="current-password"
             />
           </div>
 
           <div className="profile-field">
-            <label>New Password</label>
+            <label>{t('profile.security.newPassword')}</label>
             <PasswordInput
               value={form.new_password} onChange={set('new_password')}
-              placeholder="Create a strong password" autoComplete="new-password"
+              placeholder={t('profile.security.newPasswordPlaceholder')} autoComplete="new-password"
             />
 
             <PasswordStrengthPanel password={form.new_password} />
           </div>
 
           <div className="profile-field">
-            <label>Confirm New Password</label>
+            <label>{t('profile.security.confirmNewPassword')}</label>
             <PasswordInput
               value={form.confirm} onChange={set('confirm')}
-              placeholder="Repeat new password" autoComplete="new-password"
+              placeholder={t('profile.security.confirmNewPasswordPlaceholder')} autoComplete="new-password"
             />
             {form.confirm && (
               <span className={`pw-match-hint ${passwordsMatch ? 'met' : 'unmet'}`}>
-                {passwordsMatch ? <><Check size={12} /> Passwords match</> : <><X size={12} /> Passwords do not match</>}
+                {passwordsMatch ? <><Check size={12} /> {t('auth.password.match')}</> : <><X size={12} /> {t('auth.password.noMatch')}</>}
               </span>
             )}
           </div>
@@ -445,13 +451,13 @@ function SecuritySection() {
 
           <div className="profile-section-footer">
             <button type="button" className="profile-outline-btn" onClick={cancel}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               className="profile-save-btn" type="submit"
               disabled={saving || !allRulesMet || !passwordsMatch}
             >
-              {saving ? 'Saving…' : 'Update Password'}
+              {saving ? t('common.saving') : t('profile.security.updatePassword')}
             </button>
           </div>
         </form>
@@ -463,6 +469,7 @@ function SecuritySection() {
 // ── Content Creator Access ────────────────────────────────────────────────────
 
 function ContentCreatorAccessSection() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const { request, loading, submit, cancel } = useAccessRequest()
   const [showForm,   setShowForm]   = useState(false)
@@ -475,8 +482,8 @@ function ContentCreatorAccessSection() {
   if (loading) {
     return (
       <section className="profile-card">
-        <h2>Content Creator Access</h2>
-        <p className="profile-loading">Loading…</p>
+        <h2>{t('profile.contentCreator.title')}</h2>
+        <p className="profile-loading">{t('common.loading')}</p>
       </section>
     )
   }
@@ -491,7 +498,7 @@ function ContentCreatorAccessSection() {
       setShowForm(false)
       setMessage('')
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to submit request.')
+      setError(err?.response?.data?.error || t('profile.contentCreator.submitFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -504,12 +511,12 @@ function ContentCreatorAccessSection() {
   const requestForm = (
     <form onSubmit={handleSubmit}>
       <div className="profile-field">
-        <label htmlFor="cc-message">Why do you want Content Creator access?</label>
+        <label htmlFor="cc-message">{t('profile.contentCreator.why')}</label>
         <textarea
           id="cc-message"
           value={message}
           onChange={e => setMessage(e.target.value)}
-          placeholder="Describe your plans for creating courses…"
+          placeholder={t('profile.contentCreator.describePlaceholder')}
           rows={4}
           required
         />
@@ -521,14 +528,14 @@ function ContentCreatorAccessSection() {
           className="profile-outline-btn"
           onClick={() => { setShowForm(false); setMessage('') }}
         >
-          Cancel
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
           className="profile-save-btn"
           disabled={submitting || !message.trim()}
         >
-          {submitting ? 'Submitting…' : 'Submit Request'}
+          {submitting ? t('profile.contentCreator.submitting') : t('profile.contentCreator.submitRequest')}
         </button>
       </div>
     </form>
@@ -536,19 +543,19 @@ function ContentCreatorAccessSection() {
 
   return (
     <section className="profile-card">
-      <h2>Content Creator Access</h2>
+      <h2>{t('profile.contentCreator.title')}</h2>
 
       {!request && !showForm && (
         <>
           <p className="profile-loading">
-            Want to create and publish courses? Request access from the admin team.
+            {t('profile.contentCreator.prompt')}
           </p>
           <button
             className="profile-outline-btn"
             style={{ marginTop: '1rem' }}
             onClick={() => setShowForm(true)}
           >
-            Request Access
+            {t('profile.contentCreator.requestAccess')}
           </button>
         </>
       )}
@@ -558,13 +565,13 @@ function ContentCreatorAccessSection() {
       {request?.status === 'pending' && (
         <>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            <span className="cc-badge cc-badge-pending">Pending Review</span>
+            <span className="cc-badge cc-badge-pending">{t('profile.contentCreator.pendingReview')}</span>
             <span className="profile-loading">
-              Submitted {new Date(request.created_at).toLocaleDateString()}
+              {t('profile.contentCreator.submittedOn', { date: new Date(request.created_at).toLocaleDateString() })}
             </span>
           </div>
           <button className="profile-outline-btn" onClick={handleCancel}>
-            Cancel Request
+            {t('profile.contentCreator.cancelRequest')}
           </button>
         </>
       )}
@@ -572,7 +579,7 @@ function ContentCreatorAccessSection() {
       {request?.status === 'denied' && (
         <>
           <div className="cc-denial-box">
-            <p className="cc-denial-label">Your request was denied</p>
+            <p className="cc-denial-label">{t('profile.contentCreator.denied')}</p>
             <p className="cc-denial-reason">{request.denial_reason}</p>
           </div>
           {!showForm ? (
@@ -581,7 +588,7 @@ function ContentCreatorAccessSection() {
               style={{ marginTop: '1rem' }}
               onClick={() => setShowForm(true)}
             >
-              Request Again
+              {t('profile.contentCreator.requestAgain')}
             </button>
           ) : (
             <div style={{ marginTop: '1rem' }}>{requestForm}</div>
@@ -597,12 +604,13 @@ function ContentCreatorAccessSection() {
 const COMPETENCY_MAX = 6
 
 function competencyLevel(score) {
-  if (score <= 2) return { label: 'Beginner', cls: 'beginner' }
-  if (score <= 4) return { label: 'Intermediate', cls: 'intermediate' }
-  return { label: 'Advanced', cls: 'advanced' }
+  if (score <= 2) return { key: 'beginner', cls: 'beginner' }
+  if (score <= 4) return { key: 'intermediate', cls: 'intermediate' }
+  return { key: 'advanced', cls: 'advanced' }
 }
 
 function CompetencyBadge() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const profile = user?.profile
   if (profile?.competency_score == null) return null
@@ -611,12 +619,14 @@ function CompetencyBadge() {
   const level = competencyLevel(score)
 
   return (
-    <div className="profile-competency" title="Grows as you complete courses">
+    <div className="profile-competency" title={t('profile.competency.tooltip')}>
       <div className="profile-competency-row">
         <span className={`profile-competency-badge profile-competency-badge--${level.cls}`}>
-          {level.label}
+          {t(`profile.competency.${level.key}`)}
         </span>
-        <span className="profile-competency-score">AI Competency {score}/{COMPETENCY_MAX}</span>
+        <span className="profile-competency-score">
+          {t('profile.competency.label', { score, max: COMPETENCY_MAX })}
+        </span>
       </div>
       <div className="profile-competency-bar">
         <div
@@ -631,6 +641,7 @@ function CompetencyBadge() {
 // ── Avatar with upload ────────────────────────────────────────────────────────
 
 function ProfileAvatar() {
+  const { t } = useTranslation()
   const { user, updateUser } = useAuth()
   const fileRef = useRef(null)
   const [uploading, setUploading] = useState(false)
@@ -651,7 +662,7 @@ function ProfileAvatar() {
       })
       updateUser({ profile: data.profile })
     } catch {
-      setError('Upload failed.')
+      setError(t('profile.avatar.uploadFailed'))
     } finally {
       setUploading(false)
       e.target.value = ''
@@ -665,7 +676,7 @@ function ProfileAvatar() {
       const { data } = await client.delete('/profile/avatar/')
       updateUser({ profile: data.profile })
     } catch {
-      setError('Failed to remove avatar.')
+      setError(t('profile.avatar.removeFailed'))
     } finally {
       setUploading(false)
     }
@@ -677,7 +688,7 @@ function ProfileAvatar() {
     <div className="profile-identity">
       <div className="profile-avatar-wrap">
         {avatarSrc ? (
-          <img className="profile-avatar-img" src={avatarSrc} alt="Avatar" />
+          <img className="profile-avatar-img" src={avatarSrc} alt={t('profile.avatar.alt')} />
         ) : (
           <div className="profile-avatar">{user.profile?.avatar_initials || '?'}</div>
         )}
@@ -686,7 +697,7 @@ function ProfileAvatar() {
           className="profile-avatar-upload-btn"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
-          title="Change photo"
+          title={t('profile.avatar.changePhoto')}
         >
           <Camera size={14} />
         </button>
@@ -709,11 +720,11 @@ function ProfileAvatar() {
             onClick={handleRemove}
             disabled={uploading}
           >
-            {uploading ? 'Removing…' : 'Remove photo'}
+            {uploading ? t('profile.avatar.removing') : t('profile.avatar.removePhoto')}
           </button>
         )}
         {uploading && !user.profile?.avatar_url && (
-          <span className="profile-loading">Uploading…</span>
+          <span className="profile-loading">{t('profile.avatar.uploading')}</span>
         )}
         {error && <span className="profile-feedback error">{error}</span>}
       </div>
@@ -724,11 +735,12 @@ function ProfileAvatar() {
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const { t } = useTranslation()
   return (
     <div className="profile-page">
       <div className="profile-page-header">
-        <h1>Profile</h1>
-        <p className="profile-page-sub">Manage your account settings and preferences</p>
+        <h1>{t('profile.title')}</h1>
+        <p className="profile-page-sub">{t('profile.subtitle')}</p>
       </div>
 
       <ProfileAvatar />

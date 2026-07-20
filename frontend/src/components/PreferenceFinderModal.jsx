@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { X, Sparkles } from 'lucide-react'
+import { Trans, useTranslation } from 'react-i18next'
 import client from '../api/client'
 import './PreferenceFinderModal.css'
-
-const STYLE_LABELS = { video: 'Video', text: 'Text', visual: 'Visual', interactive: 'Interactive' }
 
 PreferenceFinderModal.propTypes = {
   open: PropTypes.bool.isRequired,
@@ -13,6 +12,13 @@ PreferenceFinderModal.propTypes = {
 }
 
 export default function PreferenceFinderModal({ open, onClose, onComplete }) {
+  const { t } = useTranslation()
+  const STYLE_LABELS = {
+    video: t('profile.finder.styles.video'),
+    text: t('profile.finder.styles.text'),
+    visual: t('profile.finder.styles.visual'),
+    interactive: t('profile.finder.styles.interactive'),
+  }
   const [questions, setQuestions] = useState(null)
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState({})   // { [questionId]: optionId }
@@ -51,35 +57,39 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
       setResult(res.data)
       onComplete(res.data.learning_style)
     } catch {
-      setError('Something went wrong saving your result. Please try again.')
+      setError(t('profile.finder.saveFailed'))
     } finally {
       setSubmitting(false)
     }
   }
 
+  const resultStyleLabel = result ? (STYLE_LABELS[result.learning_style] ?? result.label) : ''
+
   return (
     <div className="pf-overlay" onClick={onClose}>
       <div className="pf-modal" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="pf-close" aria-label="Close" onClick={onClose}><X size={18} /></button>
+        <button type="button" className="pf-close" aria-label={t('profile.finder.close')} onClick={onClose}><X size={18} /></button>
 
         {error && <p className="pf-error">{error}</p>}
 
-        {!error && !questions && <p className="pf-loading">Loading questions…</p>}
+        {!error && !questions && <p className="pf-loading">{t('profile.finder.loading')}</p>}
 
         {!error && questions && questions.length === 0 && (
-          <p className="pf-loading">No questions are configured yet. Check back soon!</p>
+          <p className="pf-loading">{t('profile.finder.noQuestions')}</p>
         )}
 
         {!error && questions && questions.length > 0 && !result && current && (
           <>
             <div className="pf-head">
               <Sparkles size={18} className="pf-head-icon" />
-              <h2>Find your learning preference</h2>
+              <h2>{t('profile.finder.title')}</h2>
             </div>
             <div className="pf-progress">
               <div className="pf-progress-fill" style={{ width: `${((step + 1) / questions.length) * 100}%` }} />
             </div>
-            <p className="pf-counter">Question {step + 1} of {questions.length}</p>
+            <p className="pf-counter">
+              {t('profile.finder.questionCounter', { current: step + 1, total: questions.length })}
+            </p>
             <p className="pf-question">{current.text}</p>
             <div className="pf-options">
               {current.options.map(opt => (
@@ -95,16 +105,16 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
             </div>
             <div className="pf-nav">
               {step > 0 && (
-                <button type="button" className="pf-btn pf-btn--ghost" onClick={() => setStep(s => s - 1)}>Back</button>
+                <button type="button" className="pf-btn pf-btn--ghost" onClick={() => setStep(s => s - 1)}>{t('common.back')}</button>
               )}
               {!isLast && (
                 <button type="button" className="pf-btn" disabled={chosen === undefined} onClick={() => setStep(s => s + 1)}>
-                  Next
+                  {t('common.next')}
                 </button>
               )}
               {isLast && (
                 <button type="button" className="pf-btn" disabled={chosen === undefined || submitting} onClick={handleSubmit}>
-                  {submitting ? 'Working…' : 'See my result'}
+                  {submitting ? t('profile.finder.working') : t('profile.finder.seeResult')}
                 </button>
               )}
             </div>
@@ -114,13 +124,17 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
         {result && (
           <div className="pf-result">
             <Sparkles size={28} className="pf-result-icon" />
-            <h2>You learn best with <span className="pf-result-style">{STYLE_LABELS[result.learning_style] ?? result.label}</span> content</h2>
+            <h2>
+              <Trans
+                i18nKey="profile.finder.resultTitle"
+                values={{ style: resultStyleLabel }}
+                components={{ styleSpan: <span className="pf-result-style" /> }}
+              />
+            </h2>
             <p className="pf-result-sub">
-              We saved this as your preferred learning format — recommendations will favour
-              {' '}{(STYLE_LABELS[result.learning_style] ?? result.label).toLowerCase()} courses.
-              You can change it anytime in Learning Preferences.
+              {t('profile.finder.resultSub', { style: resultStyleLabel.toLowerCase() })}
             </p>
-            <button type="button" className="pf-btn" onClick={onClose}>Done</button>
+            <button type="button" className="pf-btn" onClick={onClose}>{t('profile.finder.done')}</button>
           </div>
         )}
       </div>

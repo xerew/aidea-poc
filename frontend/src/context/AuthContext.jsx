@@ -31,6 +31,7 @@ export function AuthProvider({ children }) {
     sessionStorage.setItem('refresh_token', data.refresh)
     sessionStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
+    if (data.user?.profile?.language) i18n.changeLanguage(data.user.profile.language)
   }, [])
 
   const logout = useCallback(async () => {
