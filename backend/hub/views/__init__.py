@@ -50,6 +50,7 @@ from .preference_quiz import PreferenceQuizView
 from .profile import (
     ChangePasswordView,
     ProfileAvatarView,
+    ProfileLanguageView,
     ProfilePersonalInfoView,
     ProfilePreferencesView,
     ProfileSettingsView,
@@ -104,6 +105,7 @@ __all__ = [
     'PreferenceQuizView',
     'ChangePasswordView',
     'ProfileAvatarView',
+    'ProfileLanguageView',
     'ProfilePersonalInfoView',
     'ProfilePreferencesView',
     'ProfileSettingsView',

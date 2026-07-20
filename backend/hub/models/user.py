@@ -40,6 +40,17 @@ class UserProfile(models.Model):
         FEMALE         = 'female',         'Female'
         PREFER_NOT_SAY = 'prefer_not_say', 'Prefer not to say'
 
+    class Language(models.TextChoices):
+        EN = 'en', 'English'
+        EL = 'el', 'Ελληνικά'
+        FR = 'fr', 'Français'
+        ES = 'es', 'Español'
+        IT = 'it', 'Italiano'
+        FI = 'fi', 'Suomi'
+        SV = 'sv', 'Svenska'
+        NO = 'no', 'Norsk'
+        DE = 'de', 'Deutsch'
+
     user                 = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type            = models.CharField(max_length=20, choices=UserType.choices, default=UserType.TEACHER)
     avatar_initials      = models.CharField(max_length=4, blank=True)
@@ -65,6 +76,7 @@ class UserProfile(models.Model):
     )
     country              = models.CharField(max_length=2, blank=True)
     avatar               = models.ImageField(upload_to='avatars/', null=True, blank=True)
+    language             = models.CharField(max_length=5, choices=Language.choices, default=Language.EN)
 
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.get_user_type_display()})'

@@ -42,6 +42,7 @@ from .views import (
     PathwayView,
     PreferenceQuizView,
     ProfileAvatarView,
+    ProfileLanguageView,
     ProfilePersonalInfoView,
     ProfilePreferencesView,
     ProfileSettingsView,
@@ -79,6 +80,7 @@ urlpatterns = [
     path('profile/settings/',     ProfileSettingsView.as_view(),     name='profile-settings'),
     path('auth/change-password/', ChangePasswordView.as_view(),      name='auth-change-password'),
     path('profile/avatar/',       ProfileAvatarView.as_view(),       name='profile-avatar'),
+    path('profile/language/',     ProfileLanguageView.as_view(),     name='profile-language'),
     path('recommendations/',  RecommendationsView.as_view(),  name='recommendations'),
     path('recommendations/events/', RecommendationEventView.as_view(), name='recommendation-event'),
     # Access requests (user-facing)

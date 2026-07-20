@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from hub.i18n import language_for_country
 from hub.models import UserProfile
 
 _PASSWORD_RULES = [
@@ -72,6 +73,7 @@ class RegisterSerializer(serializers.Serializer):
                 avatar_initials=initials,
                 gender=gender,
                 country=country,
+                language=language_for_country(country),
             )
         return user
 
@@ -90,7 +92,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model  = UserProfile
         fields = ['user_type', 'avatar_initials', 'onboarding_completed',
                   'preferred_pillars', 'learning_style', 'gender', 'country', 'avatar_url',
-                  'competency_score']
+                  'competency_score', 'language']
 
 
 class UserSerializer(serializers.ModelSerializer):

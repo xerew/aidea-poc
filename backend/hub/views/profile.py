@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.models import UserProfile
 from hub.serializers.auth import _PASSWORD_RULES, UserSerializer
 from hub.serializers.profile import (
     ProfilePersonalInfoSerializer,
@@ -81,6 +82,19 @@ class ProfileAvatarView(APIView):
             profile.avatar.delete(save=False)
             profile.save(update_fields=['avatar'])
         return Response(UserSerializer(request.user, context={'request': request}).data)
+
+
+class ProfileLanguageView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request):
+        language = request.data.get('language')
+        valid = {c[0] for c in UserProfile.Language.choices}
+        if language not in valid:
+            return Response({'error': 'Invalid language.'}, status=status.HTTP_400_BAD_REQUEST)
+        request.user.profile.language = language
+        request.user.profile.save(update_fields=['language'])
+        return Response({'language': language})
 
 
 def _password_errors(password: str) -> list[str]:
