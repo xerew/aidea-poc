@@ -22,6 +22,7 @@ function getAvatarSrc(profile) {
 }
 
 function useSectionSave(endpoint, method = 'patch') {
+  const { t } = useTranslation()
   const [saving, setSaving] = useState(false)
   const [saved,  setSaved]  = useState(false)
   const [error,  setError]  = useState('')
@@ -35,11 +36,11 @@ function useSectionSave(endpoint, method = 'patch') {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err) {
-      setError(err?.response?.data?.error || 'Failed to save.')
+      setError(err?.response?.data?.error || t('common.saveFailed'))
     } finally {
       setSaving(false)
     }
-  }, [endpoint, method])
+  }, [endpoint, method, t])
 
   return { saving, saved, error, setError, save }
 }

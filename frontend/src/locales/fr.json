@@ -21,7 +21,8 @@
     "back": "Back",
     "next": "Next",
     "euFundedShort": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the EACEA.",
-    "euCofundedAlt": "Co-funded by the European Union"
+    "euCofundedAlt": "Co-funded by the European Union",
+    "saveFailed": "Failed to save."
   },
   "header": {
     "platform": "AI Teacher Training Platform"
