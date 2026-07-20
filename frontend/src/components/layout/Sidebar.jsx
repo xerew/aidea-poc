@@ -1,22 +1,24 @@
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
 const BASE_NAV = [
-  { to: '/',          label: 'Home',              Icon: House },
-  { to: '/courses',   label: 'Courses',           Icon: BookOpen },
-  { to: '/learning',  label: 'My Learning',       Icon: GraduationCap },
-  { to: '/pathway',   label: 'My Pathway',        Icon: Map },
-  { to: '/analytics', label: 'Content Analytics', Icon: BarChart2 },
-  { to: '/profile',   label: 'Profile',           Icon: User },
+  { to: '/',          labelKey: 'nav.home',       Icon: House },
+  { to: '/courses',   labelKey: 'nav.courses',    Icon: BookOpen },
+  { to: '/learning',  labelKey: 'nav.myLearning',  Icon: GraduationCap },
+  { to: '/pathway',   labelKey: 'nav.myPathway',   Icon: Map },
+  { to: '/analytics', labelKey: 'nav.analytics',   Icon: BarChart2 },
+  { to: '/profile',   labelKey: 'nav.profile',     Icon: User },
 ]
 
-const AUTHORING_ITEM = { to: '/authoring',    label: 'Authoring', Icon: PenLine }
-const ADMIN_ITEM     = { to: '/admin/users',  label: 'Admin',     Icon: Shield  }
-const REVIEWS_ITEM   = { to: '/reviews',      label: 'Reviews',   Icon: ClipboardCheck }
+const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: PenLine }
+const ADMIN_ITEM     = { to: '/admin/users',  labelKey: 'nav.admin',     Icon: Shield  }
+const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: ClipboardCheck }
 
 export default function Sidebar() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const userType = user?.profile?.user_type
 
@@ -45,7 +47,7 @@ export default function Sidebar() {
       </div>
       <nav>
         <ul>
-          {navItems.map(({ to, label, Icon: NavIcon }) => (
+          {navItems.map(({ to, labelKey, Icon: NavIcon }) => (
             <li key={to}>
               <NavLink
                 to={to}
@@ -53,7 +55,7 @@ export default function Sidebar() {
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
                 <NavIcon size={18} className="nav-icon" />
-                <span>{label}</span>
+                <span>{t(labelKey)}</span>
               </NavLink>
             </li>
           ))}

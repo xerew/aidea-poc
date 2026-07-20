@@ -1,6 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import './Footer.css'
 
 export default function Footer() {
+  const { t } = useTranslation()
+
   return (
     <footer className="footer">
       <div className="footer-eu">
@@ -10,9 +13,7 @@ export default function Footer() {
           className="footer-eu-logo"
         />
         <p className="footer-eu-text">
-          Funded by the European Union. Views and opinions expressed are however those of the
-          author(s) only and do not necessarily reflect those of the European Union or the European
-          Education and Culture Executive Agency (EACEA).
+          {t('footer.funded')}
         </p>
       </div>
       <div className="footer-bottom">

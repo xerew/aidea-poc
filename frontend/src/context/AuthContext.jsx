@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import client from '../api/client'
+import i18n from '../i18n'
 
 const AuthContext = createContext(null)
 
@@ -21,6 +22,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('refresh_token', data.refresh)
     localStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
+    if (data.user?.profile?.language) i18n.changeLanguage(data.user.profile.language)
   }, [])
 
   // Session-only login — cleared when the tab closes (sessionStorage)
@@ -60,6 +62,7 @@ export function AuthProvider({ children }) {
         const store = localStorage.getItem('user') ? localStorage : sessionStorage
         store.setItem('user', JSON.stringify(data))
         setUser(data)
+        if (data?.profile?.language) i18n.changeLanguage(data.profile.language)
       })
       .catch(() => {}) // interceptor handles 401 → login redirect
   }, [])

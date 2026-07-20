@@ -1,0 +1,17 @@
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.lang-switcher select {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  font-family: inherit;
+  cursor: pointer;
+}

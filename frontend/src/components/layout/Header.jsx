@@ -1,9 +1,12 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Search, ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import LanguageSwitcher from '../LanguageSwitcher'
 import './Header.css'
 
 export default function Header() {
+  const { t } = useTranslation()
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -12,12 +15,14 @@ export default function Header() {
 
   return (
     <header className="header">
-      <div className="header-title">AI Teacher Training Platform</div>
+      <div className="header-title">{t('header.platform')}</div>
 
       <div className="header-search">
         <Search size={15} className="search-icon" />
-        <input type="text" placeholder="Search courses..." />
+        <input type="text" placeholder={t('common.search')} />
       </div>
+
+      <LanguageSwitcher />
 
       <div className="header-user" onClick={() => setMenuOpen((o) => !o)}>
         <div className="avatar">{initials}</div>
@@ -28,7 +33,7 @@ export default function Header() {
 
         {menuOpen && (
           <div className="user-menu">
-            <button onClick={logout}>Sign out</button>
+            <button onClick={logout}>{t('common.signOut')}</button>
           </div>
         )}
       </div>

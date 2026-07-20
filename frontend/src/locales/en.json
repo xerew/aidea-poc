@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "myLearning": "My Learning",
+    "myPathway": "My Pathway",
+    "analytics": "Content Analytics",
+    "profile": "Profile",
+    "authoring": "Authoring",
+    "admin": "Admin",
+    "reviews": "Reviews"
+  },
+  "common": {
+    "search": "Search courses...",
+    "signOut": "Sign out",
+    "language": "Language"
+  },
+  "header": {
+    "platform": "AI Teacher Training Platform"
+  },
+  "footer": {
+    "funded": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Education and Culture Executive Agency (EACEA)."
+  }
+}
