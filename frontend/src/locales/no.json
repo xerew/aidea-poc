@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} time",
     "durationHours_other": "{{count}} timer",
     "moduleCount_one": "{{count}} modul",
-    "moduleCount_other": "{{count}} moduler"
+    "moduleCount_other": "{{count}} moduler",
+    "dismiss": "Lukk"
   },
   "header": {
     "platform": "AI-opplæringsplattform for lærere"
@@ -345,11 +346,6 @@
     "all": "Alle",
     "viewCourse": "Se kurs",
     "loadError": "Kunne ikke laste kurs.",
-    "pillarLabels": {
-      "teachWithAi": "Undervise med AI",
-      "teachForAi": "Undervise for AI",
-      "teachAboutAi": "Undervise om AI"
-    },
     "count_one": "{{count}} kurs",
     "count_other": "{{count}} kurs"
   },
@@ -623,5 +619,16 @@
     "empty": "Du har ikke opprettet noen kurs ennå. Kurs du oppretter i Kursforfatting vil vises her — inkludert utkast.",
     "restricted": "Innholdsanalyse er kun tilgjengelig for innholdsskapere.",
     "loadError": "Kunne ikke laste analysedata."
+  },
+  "media": {
+    "videoLessonTitle": "Videoleksjon",
+    "videoPlayer": "Videospiller",
+    "openVideo": "Åpne video ↗",
+    "pdfDocument": "PDF-dokument",
+    "pdfLessonTitle": "PDF-leksjon",
+    "openInNewTab": "Åpne i ny fane ↗ (hvis forhåndsvisningen ikke lastes)"
+  },
+  "layout": {
+    "denialBanner": "Forespørselen din om tilgang som innholdsskaper ble avslått: «{{reason}}»"
   }
 }

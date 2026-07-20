@@ -35,8 +35,8 @@ export default function PreferenceFinderModal({ open, onClose, onComplete }) {
     setError('')
     client.get('/preference-quiz/')
       .then(res => setQuestions(res.data))
-      .catch(() => setError('Could not load the questions. Please try again later.'))
-  }, [open])
+      .catch(() => setError(t('profile.finder.loadFailed')))
+  }, [open, t])
 
   if (!open) return null
 

@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} Stunde",
     "durationHours_other": "{{count}} Stunden",
     "moduleCount_one": "{{count}} Modul",
-    "moduleCount_other": "{{count}} Module"
+    "moduleCount_other": "{{count}} Module",
+    "dismiss": "Schließen"
   },
   "header": {
     "platform": "Fortbildungsplattform für KI im Unterricht"
@@ -345,11 +346,6 @@
     "all": "Alle",
     "viewCourse": "Kurs ansehen",
     "loadError": "Kurse konnten nicht geladen werden.",
-    "pillarLabels": {
-      "teachWithAi": "Unterrichten mit KI",
-      "teachForAi": "Vorbereiten auf KI",
-      "teachAboutAi": "Unterrichten über KI"
-    },
     "count_one": "{{count}} Kurs",
     "count_other": "{{count}} Kurse"
   },
@@ -623,5 +619,16 @@
     "empty": "Sie haben noch keine Kurse erstellt. Kurse, die Sie in der Kurserstellung anlegen, erscheinen hier — einschließlich Entwürfe.",
     "restricted": "Die Inhaltsanalyse steht nur Kurserstellenden zur Verfügung.",
     "loadError": "Analysedaten konnten nicht geladen werden."
+  },
+  "media": {
+    "videoLessonTitle": "Videolektion",
+    "videoPlayer": "Videoplayer",
+    "openVideo": "Video öffnen ↗",
+    "pdfDocument": "PDF-Dokument",
+    "pdfLessonTitle": "PDF-Lektion",
+    "openInNewTab": "In neuem Tab öffnen ↗ (falls die Vorschau nicht lädt)"
+  },
+  "layout": {
+    "denialBanner": "Ihre Anfrage für den Zugang als Content Creator wurde abgelehnt: „{{reason}}“"
   }
 }

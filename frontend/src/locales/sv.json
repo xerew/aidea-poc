@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} timme",
     "durationHours_other": "{{count}} timmar",
     "moduleCount_one": "{{count}} modul",
-    "moduleCount_other": "{{count}} moduler"
+    "moduleCount_other": "{{count}} moduler",
+    "dismiss": "Avfärda"
   },
   "header": {
     "platform": "AI-utbildningsplattform för lärare"
@@ -345,11 +346,6 @@
     "all": "Alla",
     "viewCourse": "Visa kurs",
     "loadError": "Det gick inte att läsa in kurserna.",
-    "pillarLabels": {
-      "teachWithAi": "Undervisa med AI",
-      "teachForAi": "Undervisa för AI",
-      "teachAboutAi": "Undervisa om AI"
-    },
     "count_one": "{{count}} kurs",
     "count_other": "{{count}} kurser"
   },
@@ -623,5 +619,16 @@
     "empty": "Inga kurser skapade av dig än. Kurser du skapar i Kursskapande visas här — inklusive utkast.",
     "restricted": "Innehållsanalys är endast tillgänglig för innehållsskapare.",
     "loadError": "Det gick inte att läsa in analysen."
+  },
+  "media": {
+    "videoLessonTitle": "Videolektion",
+    "videoPlayer": "Videospelare",
+    "openVideo": "Öppna video ↗",
+    "pdfDocument": "PDF-dokument",
+    "pdfLessonTitle": "PDF-lektion",
+    "openInNewTab": "Öppna i ny flik ↗ (om förhandsvisningen inte laddas)"
+  },
+  "layout": {
+    "denialBanner": "Din begäran om åtkomst som innehållsskapare avslogs: ”{{reason}}”"
   }
 }

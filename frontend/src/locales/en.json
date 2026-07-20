@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} hour",
     "durationHours_other": "{{count}} hours",
     "moduleCount_one": "{{count}} module",
-    "moduleCount_other": "{{count}} modules"
+    "moduleCount_other": "{{count}} modules",
+    "dismiss": "Dismiss"
   },
   "header": {
     "platform": "AI Teacher Training Platform"
@@ -345,11 +346,6 @@
     "all": "All",
     "viewCourse": "View Course",
     "loadError": "Failed to load courses.",
-    "pillarLabels": {
-      "teachWithAi": "Teach with AI",
-      "teachForAi": "Teach for AI",
-      "teachAboutAi": "Teach about AI"
-    },
     "count_one": "{{count}} course",
     "count_other": "{{count}} courses"
   },
@@ -623,5 +619,16 @@
     "empty": "No courses created by you yet. Courses you create in Authoring will appear here — including drafts.",
     "restricted": "Content Analytics is only available to content creators.",
     "loadError": "Failed to load analytics."
+  },
+  "media": {
+    "videoLessonTitle": "Video lesson",
+    "videoPlayer": "Video Player",
+    "openVideo": "Open video ↗",
+    "pdfDocument": "PDF Document",
+    "pdfLessonTitle": "PDF lesson",
+    "openInNewTab": "Open in new tab ↗ (if the preview does not load)"
+  },
+  "layout": {
+    "denialBanner": "Your Content Creator access request was denied: “{{reason}}”"
   }
 }

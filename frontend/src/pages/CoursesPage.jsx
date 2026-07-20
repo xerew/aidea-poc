@@ -7,12 +7,12 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import './CoursesPage.css'
 
-function pillarStyles(t) {
-  return {
-    'teach-with-ai':  { label: t('courses.pillarLabels.teachWithAi'),  color: 'blue' },
-    'teach-for-ai':   { label: t('courses.pillarLabels.teachForAi'),   color: 'purple' },
-    'teach-about-ai': { label: t('courses.pillarLabels.teachAboutAi'), color: 'green' },
-  }
+// Pillar names come from the API (content) and stay untranslated in Phase 1,
+// consistent with every other page. Only the badge colour is keyed by slug here.
+const PILLAR_COLORS = {
+  'teach-with-ai':  'blue',
+  'teach-for-ai':   'purple',
+  'teach-about-ai': 'green',
 }
 
 function levelForScore(score) {
@@ -43,13 +43,13 @@ function CourseCard({ course }) {
     intermediate: t('common.level.intermediate'),
     advanced: t('common.level.advanced'),
   }
-  const pillar = pillarStyles(t)[course.pillar.slug] ?? { label: course.pillar.name, color: 'blue' }
+  const pillarColor = PILLAR_COLORS[course.pillar.slug] ?? 'blue'
   const enrolled = course.is_enrolled
 
   return (
     <div className="course-card" onClick={() => navigate(`/courses/${course.id}`)} style={{ cursor: 'pointer' }}>
       <div className="course-card-top">
-        <span className={`pillar-badge pillar-badge--${pillar.color}`}>{pillar.label}</span>
+        <span className={`pillar-badge pillar-badge--${pillarColor}`}>{course.pillar.name}</span>
         <span className="level-label">{levelLabels[course.level] ?? course.level}</span>
       </div>
 
@@ -157,7 +157,7 @@ export default function CoursesPage() {
         <select value={pillarFilter} onChange={(e) => setParam('pillar', e.target.value)}>
           <option value="">{t('courses.all')}</option>
           {pillars.map((p) => (
-            <option key={p.slug} value={p.slug}>{pillarStyles(t)[p.slug]?.label ?? p.name}</option>
+            <option key={p.slug} value={p.slug}>{p.name}</option>
           ))}
         </select>
 

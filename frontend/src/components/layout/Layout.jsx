@@ -1,4 +1,5 @@
 import { Outlet, Navigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import { AccessRequestProvider, useAccessRequest } from '../../context/AccessRequestContext'
 import Sidebar from './Sidebar'
@@ -7,17 +8,16 @@ import Footer from './Footer'
 import './Layout.css'
 
 function DenialBanner() {
+  const { t } = useTranslation()
   const { request, dismiss } = useAccessRequest()
   if (!request || request.status !== 'denied' || request.denial_seen) return null
   return (
     <div className="denial-banner">
-      <span>
-        Your Content Creator access request was denied: &quot;{request.denial_reason}&quot;
-      </span>
+      <span>{t('layout.denialBanner', { reason: request.denial_reason })}</span>
       <button
         className="denial-banner-close"
         onClick={() => dismiss(request.id)}
-        aria-label="Dismiss"
+        aria-label={t('common.dismiss')}
       >
         ×
       </button>

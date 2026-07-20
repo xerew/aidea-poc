@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} ora",
     "durationHours_other": "{{count}} ore",
     "moduleCount_one": "{{count}} modulo",
-    "moduleCount_other": "{{count}} moduli"
+    "moduleCount_other": "{{count}} moduli",
+    "dismiss": "Ignora"
   },
   "header": {
     "platform": "Piattaforma di formazione AI per docenti"
@@ -345,11 +346,6 @@
     "all": "Tutti",
     "viewCourse": "Vedi corso",
     "loadError": "Impossibile caricare i corsi.",
-    "pillarLabels": {
-      "teachWithAi": "Insegnare con l'AI",
-      "teachForAi": "Insegnare per l'AI",
-      "teachAboutAi": "Insegnare l'AI"
-    },
     "count_one": "{{count}} corso",
     "count_other": "{{count}} corsi"
   },
@@ -623,5 +619,16 @@
     "empty": "Non hai ancora creato corsi. I corsi che crei nella sezione Creazione contenuti appariranno qui, comprese le bozze.",
     "restricted": "L'analisi dei contenuti è disponibile solo per i creatori di contenuti.",
     "loadError": "Impossibile caricare i dati analitici."
+  },
+  "media": {
+    "videoLessonTitle": "Lezione video",
+    "videoPlayer": "Lettore video",
+    "openVideo": "Apri video ↗",
+    "pdfDocument": "Documento PDF",
+    "pdfLessonTitle": "Lezione PDF",
+    "openInNewTab": "Apri in una nuova scheda ↗ (se l’anteprima non si carica)"
+  },
+  "layout": {
+    "denialBanner": "La tua richiesta di accesso come Creatore di contenuti è stata rifiutata: «{{reason}}»"
   }
 }

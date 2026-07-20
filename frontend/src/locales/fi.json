@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} tunti",
     "durationHours_other": "{{count}} tuntia",
     "moduleCount_one": "{{count}} moduuli",
-    "moduleCount_other": "{{count}} moduulia"
+    "moduleCount_other": "{{count}} moduulia",
+    "dismiss": "Hylkää"
   },
   "header": {
     "platform": "Opettajien tekoälykoulutusalusta"
@@ -345,11 +346,6 @@
     "all": "Kaikki",
     "viewCourse": "Näytä kurssi",
     "loadError": "Kurssien lataaminen epäonnistui.",
-    "pillarLabels": {
-      "teachWithAi": "Opeta tekoälyn avulla",
-      "teachForAi": "Opeta tekoälyä varten",
-      "teachAboutAi": "Opeta tekoälystä"
-    },
     "count_one": "{{count}} kurssi",
     "count_other": "{{count}} kurssia"
   },
@@ -623,5 +619,16 @@
     "empty": "Et ole vielä luonut yhtään kurssia. Sisällöntuotannossa luomasi kurssit näkyvät täällä — myös luonnokset.",
     "restricted": "Sisältöanalytiikka on käytettävissä vain sisällöntuottajille.",
     "loadError": "Analytiikan lataaminen epäonnistui."
+  },
+  "media": {
+    "videoLessonTitle": "Videotunti",
+    "videoPlayer": "Videosoitin",
+    "openVideo": "Avaa video ↗",
+    "pdfDocument": "PDF-asiakirja",
+    "pdfLessonTitle": "PDF-tunti",
+    "openInNewTab": "Avaa uudessa välilehdessä ↗ (jos esikatselu ei lataudu)"
+  },
+  "layout": {
+    "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”"
   }
 }

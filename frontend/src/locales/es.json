@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} hora",
     "durationHours_other": "{{count}} horas",
     "moduleCount_one": "{{count}} módulo",
-    "moduleCount_other": "{{count}} módulos"
+    "moduleCount_other": "{{count}} módulos",
+    "dismiss": "Descartar"
   },
   "header": {
     "platform": "Plataforma de Formación en IA para Docentes"
@@ -345,11 +346,6 @@
     "all": "Todos",
     "viewCourse": "Ver Curso",
     "loadError": "No se pudieron cargar los cursos.",
-    "pillarLabels": {
-      "teachWithAi": "Enseñar con IA",
-      "teachForAi": "Enseñar para la IA",
-      "teachAboutAi": "Enseñar sobre IA"
-    },
     "count_one": "{{count}} curso",
     "count_other": "{{count}} cursos"
   },
@@ -623,5 +619,16 @@
     "empty": "Aún no has creado ningún curso. Los cursos que crees en Creación de Contenido aparecerán aquí, incluidos los borradores.",
     "restricted": "El Análisis de Contenido solo está disponible para creadores de contenido.",
     "loadError": "No se pudieron cargar los análisis."
+  },
+  "media": {
+    "videoLessonTitle": "Lección en vídeo",
+    "videoPlayer": "Reproductor de vídeo",
+    "openVideo": "Abrir vídeo ↗",
+    "pdfDocument": "Documento PDF",
+    "pdfLessonTitle": "Lección en PDF",
+    "openInNewTab": "Abrir en una pestaña nueva ↗ (si la vista previa no carga)"
+  },
+  "layout": {
+    "denialBanner": "Tu solicitud de acceso como Creador de contenido fue rechazada: «{{reason}}»"
   }
 }

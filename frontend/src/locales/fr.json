@@ -43,7 +43,8 @@
     "durationHours_one": "{{count}} heure",
     "durationHours_other": "{{count}} heures",
     "moduleCount_one": "{{count}} module",
-    "moduleCount_other": "{{count}} modules"
+    "moduleCount_other": "{{count}} modules",
+    "dismiss": "Ignorer"
   },
   "header": {
     "platform": "Plateforme de formation des enseignants à l'IA"
@@ -345,11 +346,6 @@
     "all": "Tous",
     "viewCourse": "Voir le cours",
     "loadError": "Échec du chargement des cours.",
-    "pillarLabels": {
-      "teachWithAi": "Enseigner avec l'IA",
-      "teachForAi": "Enseigner pour l'IA",
-      "teachAboutAi": "Enseigner l'IA"
-    },
     "count_one": "{{count}} cours",
     "count_other": "{{count}} cours"
   },
@@ -623,5 +619,16 @@
     "empty": "Vous n'avez pas encore créé de cours. Les cours que vous créez dans Création de contenu apparaîtront ici — y compris les brouillons.",
     "restricted": "Les analyses de contenu sont réservées aux créateurs de contenu.",
     "loadError": "Échec du chargement des analyses."
+  },
+  "media": {
+    "videoLessonTitle": "Leçon vidéo",
+    "videoPlayer": "Lecteur vidéo",
+    "openVideo": "Ouvrir la vidéo ↗",
+    "pdfDocument": "Document PDF",
+    "pdfLessonTitle": "Leçon PDF",
+    "openInNewTab": "Ouvrir dans un nouvel onglet ↗ (si l’aperçu ne se charge pas)"
+  },
+  "layout": {
+    "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »"
   }
 }

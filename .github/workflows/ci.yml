@@ -96,6 +96,9 @@ jobs:
       - name: Lint — ESLint
         run: npm run lint
 
+      - name: Check locale parity
+        run: npm run check:locales
+
       - name: Build
         env:
           VITE_API_URL: http://localhost:8000/api
