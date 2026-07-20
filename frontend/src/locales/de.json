@@ -32,8 +32,6 @@
     "nextLabel": "Next: {{module}}",
     "resumeCourse": "Resume Course",
     "completedCheck": "✓ Completed",
-    "durationHours": "{{count}} hours",
-    "moduleCount": "{{count}} modules",
     "minutesLabel": "{{count}} min",
     "moduleLabel": "Module {{order}} — {{title}}",
     "comingSoon": "Coming soon.",
@@ -41,7 +39,11 @@
       "beginner": "Beginner",
       "intermediate": "Intermediate",
       "advanced": "Advanced"
-    }
+    },
+    "durationHours_one": "{{count}} hour",
+    "durationHours_other": "{{count}} hours",
+    "moduleCount_one": "{{count}} module",
+    "moduleCount_other": "{{count}} modules"
   },
   "header": {
     "platform": "AI Teacher Training Platform"
@@ -327,12 +329,13 @@
   "home": {
     "loadError": "Failed to load dashboard.",
     "pillarsTitle": "AI Learning Pillars",
-    "courseCount": "{{count}} courses",
     "viewCourses": "View courses →",
     "recommendedTitle": "Recommended for you",
     "startCourse": "Start course →",
     "cfTitle": "Teachers like you also took",
-    "viewCourseArrow": "View course →"
+    "viewCourseArrow": "View course →",
+    "courseCount_one": "{{count}} course",
+    "courseCount_other": "{{count}} courses"
   },
   "courses": {
     "title": "Courses",
@@ -340,14 +343,15 @@
     "pillarLabel": "Pillar:",
     "levelLabel": "Level:",
     "all": "All",
-    "count": "{{count}} courses",
     "viewCourse": "View Course",
     "loadError": "Failed to load courses.",
     "pillarLabels": {
       "teachWithAi": "Teach with AI",
       "teachForAi": "Teach for AI",
       "teachAboutAi": "Teach about AI"
-    }
+    },
+    "count_one": "{{count}} course",
+    "count_other": "{{count}} courses"
   },
   "courseDetail": {
     "loadError": "Failed to load course.",
@@ -383,7 +387,8 @@
     "emptyMessage": "You haven't enrolled in any courses yet.",
     "browseCourses": "Browse courses",
     "inProgressTitle": "In Progress",
-    "completedTitle": "Completed"
+    "completedTitle": "Completed",
+    "completedBadge": "Completed"
   },
   "pathway": {
     "loadError": "Could not load your pathway.",

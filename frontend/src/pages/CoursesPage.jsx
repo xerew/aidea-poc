@@ -157,7 +157,7 @@ export default function CoursesPage() {
         <select value={pillarFilter} onChange={(e) => setParam('pillar', e.target.value)}>
           <option value="">{t('courses.all')}</option>
           {pillars.map((p) => (
-            <option key={p.slug} value={p.slug}>{p.name}</option>
+            <option key={p.slug} value={p.slug}>{pillarStyles(t)[p.slug]?.label ?? p.name}</option>
           ))}
         </select>
 

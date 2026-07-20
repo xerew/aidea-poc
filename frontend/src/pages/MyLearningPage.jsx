@@ -90,7 +90,7 @@ function CompletedCard({ enrollment }) {
     <div className="ml-card ml-card--completed">
       <div className="ml-card-top">
         <span className="ml-pillar-badge">{enrollment.pillar_name}</span>
-        <span className="ml-completed-badge">&#x2713; {t('myLearning.completedTitle')}</span>
+        <span className="ml-completed-badge">&#x2713; {t('myLearning.completedBadge')}</span>
       </div>
       <h3 className="ml-card-title ml-card-title--completed">{enrollment.course_title}</h3>
       <p className="ml-completed-date">{t('myLearning.completedOn', { date: formatDate(enrollment.last_accessed_at) })}</p>
