@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "check:locales": "node scripts/check-locales.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
