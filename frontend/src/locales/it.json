@@ -22,7 +22,26 @@
     "next": "Next",
     "euFundedShort": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the EACEA.",
     "euCofundedAlt": "Co-funded by the European Union",
-    "saveFailed": "Failed to save."
+    "saveFailed": "Failed to save.",
+    "previous": "Previous",
+    "continue": "Continue",
+    "start": "Start",
+    "progress": "Progress",
+    "overallProgress": "Overall Progress",
+    "continueLearning": "Continue Learning",
+    "nextLabel": "Next: {{module}}",
+    "resumeCourse": "Resume Course",
+    "completedCheck": "✓ Completed",
+    "durationHours": "{{count}} hours",
+    "moduleCount": "{{count}} modules",
+    "minutesLabel": "{{count}} min",
+    "moduleLabel": "Module {{order}} — {{title}}",
+    "comingSoon": "Coming soon.",
+    "level": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
   },
   "header": {
     "platform": "AI Teacher Training Platform"
@@ -304,5 +323,116 @@
         "interactive": "Interactive"
       }
     }
+  },
+  "home": {
+    "loadError": "Failed to load dashboard.",
+    "pillarsTitle": "AI Learning Pillars",
+    "courseCount": "{{count}} courses",
+    "viewCourses": "View courses →",
+    "recommendedTitle": "Recommended for you",
+    "startCourse": "Start course →",
+    "cfTitle": "Teachers like you also took",
+    "viewCourseArrow": "View course →"
+  },
+  "courses": {
+    "title": "Courses",
+    "subtitle": "Explore our comprehensive AI training curriculum",
+    "pillarLabel": "Pillar:",
+    "levelLabel": "Level:",
+    "all": "All",
+    "count": "{{count}} courses",
+    "viewCourse": "View Course",
+    "loadError": "Failed to load courses.",
+    "pillarLabels": {
+      "teachWithAi": "Teach with AI",
+      "teachForAi": "Teach for AI",
+      "teachAboutAi": "Teach about AI"
+    }
+  },
+  "courseDetail": {
+    "loadError": "Failed to load course.",
+    "backToCourses": "Back to Courses",
+    "enrolling": "Enrolling…",
+    "enrollNow": "Enroll Now",
+    "yourProgress": "Your progress",
+    "whatYoullLearn": "What You'll Learn",
+    "courseModules": "Course Modules",
+    "enrollError": "Enrollment failed."
+  },
+  "myLearning": {
+    "subtitle": "Track your progress and continue your courses",
+    "timeAgo": {
+      "justNow": "just now",
+      "minutes_one": "{{count}} minute ago",
+      "minutes_other": "{{count}} minutes ago",
+      "hours_one": "{{count}} hour ago",
+      "hours_other": "{{count}} hours ago",
+      "days_one": "{{count}} day ago",
+      "days_other": "{{count}} days ago",
+      "months_one": "{{count}} month ago",
+      "months_other": "{{count}} months ago"
+    },
+    "lastActivity": "Last activity: {{time}}",
+    "moduleCount_one": "{{count}} module",
+    "moduleCount_other": "{{count}} modules",
+    "resume": "Resume",
+    "pctComplete": "{{pct}}% complete",
+    "completedOn": "Completed on {{date}}",
+    "reviewCourse": "Review Course",
+    "loadError": "Failed to load your learning data.",
+    "emptyMessage": "You haven't enrolled in any courses yet.",
+    "browseCourses": "Browse courses",
+    "inProgressTitle": "In Progress",
+    "completedTitle": "Completed"
+  },
+  "pathway": {
+    "loadError": "Could not load your pathway.",
+    "loading": "Loading your pathway…",
+    "completed": "{{done}} of {{total}} courses completed",
+    "durationHoursShort": "{{count}}h"
+  },
+  "lesson": {
+    "type": {
+      "video": "Video",
+      "text": "Text",
+      "quiz": "Quiz",
+      "image": "Image",
+      "pdf": "PDF",
+      "assignment": "Assignment"
+    },
+    "noContent": "No content yet.",
+    "assignment": {
+      "writeBeforeSubmit": "Write your response before submitting.",
+      "submitFailed": "Submission failed. Please try again.",
+      "instructions": "Instructions",
+      "noInstructions": "No instructions provided.",
+      "pendingBanner": "Submitted — pending review. You will see feedback here once it is reviewed.",
+      "approved": "Approved",
+      "changesRequested": "Changes requested:",
+      "yourResponse": "Your Response",
+      "responsePlaceholder": "Write your response here…",
+      "submitting": "Submitting…",
+      "resubmit": "Resubmit for review",
+      "submit": "Submit for review"
+    },
+    "quiz": {
+      "noQuestions": "No questions yet.",
+      "questionCounter": "Question {{current}} of {{total}}",
+      "reviewSuffix": " — review",
+      "correct": "✓ Correct",
+      "incorrect": "✗ Incorrect",
+      "correctAnswer": "Correct answer",
+      "previousQuestion": "← Previous question",
+      "nextQuestion": "Next question →"
+    },
+    "learnRedirectError": "Could not load course.",
+    "loadCourseError": "Failed to load course.",
+    "loadLessonError": "Failed to load lesson.",
+    "backToCourse": "Back to Course",
+    "loadingLesson": "Loading lesson…",
+    "notesPlaceholder": "Add personal notes for this lesson…",
+    "yourNotesTitle": "Your Notes",
+    "markComplete": "Mark Complete",
+    "pendingReview": "Pending review"
   }
 }

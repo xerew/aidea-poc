@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import { useAuth } from '../context/AuthContext'
@@ -17,20 +18,21 @@ PillarCard.propTypes = {
 }
 
 function PillarCard({ pillar }) {
+  const { t } = useTranslation()
   return (
     <div className="pillar-card">
       <h3>{pillar.name}</h3>
       <p className="pillar-desc">{pillar.description}</p>
       <div className="pillar-progress">
-        <span>Overall Progress</span>
+        <span>{t('common.overallProgress')}</span>
         <span className="pillar-pct">{pillar.progress_pct}%</span>
       </div>
       <div className="progress-bar">
         <div className="progress-fill dark" style={{ width: `${pillar.progress_pct}%` }} />
       </div>
       <div className="pillar-footer">
-        <span>{pillar.course_count} courses</span>
-        <a href={`/courses?pillar=${pillar.slug}`}>View courses →</a>
+        <span>{t('home.courseCount', { count: pillar.course_count })}</span>
+        <a href={`/courses?pillar=${pillar.slug}`}>{t('home.viewCourses')}</a>
       </div>
     </div>
   )
@@ -50,6 +52,7 @@ RecCard.propTypes = {
 
 function RecCard({ rec, rank, onFireEvent }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const handleClick = (e) => {
     e.preventDefault()
@@ -65,7 +68,7 @@ function RecCard({ rec, rank, onFireEvent }) {
       <h3 className="rec-title">{rec.title}</h3>
       <p className="rec-reason">{rec.reason}</p>
       <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
-        Start course →
+        {t('home.startCourse')}
       </a>
     </div>
   )
@@ -84,6 +87,7 @@ CfRecCard.propTypes = {
 
 function CfRecCard({ rec, rank, onFireEvent }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   const handleClick = (e) => {
     e.preventDefault()
@@ -98,13 +102,14 @@ function CfRecCard({ rec, rank, onFireEvent }) {
       <h3 className="rec-title">{rec.title}</h3>
       <p className="rec-reason cf-reason">{rec.reason}</p>
       <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
-        View course →
+        {t('home.viewCourseArrow')}
       </a>
     </div>
   )
 }
 
 export default function HomePage() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [data, setData]             = useState(null)
   const [error, setError]           = useState('')
@@ -115,8 +120,8 @@ export default function HomePage() {
   useEffect(() => {
     client.get('/home/')
       .then((res) => setData(res.data))
-      .catch(() => setError('Failed to load dashboard.'))
-  }, [])
+      .catch(() => setError(t('home.loadError')))
+  }, [t])
 
   const fireEvent = useCallback((eventType, courseId, rank, source) => {
     client.post('/recommendations/events/', {
@@ -155,7 +160,7 @@ export default function HomePage() {
   }, [user, fireEvent])
 
   if (error) return <p className="page-error">{error}</p>
-  if (!data)  return <p className="page-loading">Loading…</p>
+  if (!data)  return <p className="page-loading">{t('common.loading')}</p>
 
   const showRecs = user?.profile?.onboarding_completed
 
@@ -164,7 +169,7 @@ export default function HomePage() {
       <ContinueLearningBanner data={data.continue_learning} />
 
       <section className="pillars-section">
-        <h2>AI Learning Pillars</h2>
+        <h2>{t('home.pillarsTitle')}</h2>
         <div className="pillars-grid">
           {data.pillars.map((pillar) => (
             <PillarCard key={pillar.id} pillar={pillar} />
@@ -174,7 +179,7 @@ export default function HomePage() {
 
       {showRecs && (recsLoading || personalRecs.length > 0) && (
         <section className="recommendations-section">
-          <h2 className="recommendations-title">Recommended for you</h2>
+          <h2 className="recommendations-title">{t('home.recommendedTitle')}</h2>
           {recsLoading ? (
             <div className="recommendations-grid">
               {[1, 2, 3].map((i) => <div key={i} className="rec-card rec-card-skeleton" />)}
@@ -191,7 +196,7 @@ export default function HomePage() {
 
       {showRecs && cfRecs.length > 0 && (
         <section className="recommendations-section cf-section">
-          <h2 className="recommendations-title cf-title">Teachers like you also took</h2>
+          <h2 className="recommendations-title cf-title">{t('home.cfTitle')}</h2>
           <div className="cf-grid">
             {cfRecs.map((rec, i) => (
               <CfRecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />

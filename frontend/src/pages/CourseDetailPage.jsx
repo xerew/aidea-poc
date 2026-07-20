@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Circle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import './CourseDetailPage.css'
 
@@ -10,13 +11,8 @@ const PILLAR_STYLES = {
   'teach-about-ai': { color: 'green' },
 }
 
-const LEVEL_LABELS = {
-  beginner:     'Beginner',
-  intermediate: 'Intermediate',
-  advanced:     'Advanced',
-}
-
 export default function CourseDetailPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
@@ -25,11 +21,17 @@ export default function CourseDetailPage() {
   const [enrolling, setEnrolling] = useState(false)
   const [error, setError] = useState('')
 
+  const levelLabels = {
+    beginner: t('common.level.beginner'),
+    intermediate: t('common.level.intermediate'),
+    advanced: t('common.level.advanced'),
+  }
+
   useEffect(() => {
     client.get(`/courses/${id}/`)
       .then((res) => setCourse(res.data))
-      .catch(() => setError('Failed to load course.'))
-  }, [id])
+      .catch(() => setError(t('courseDetail.loadError')))
+  }, [id, t])
 
   const handleEnroll = async () => {
     setEnrolling(true)
@@ -46,14 +48,14 @@ export default function CourseDetailPage() {
         }).catch(() => {})
       }
     } catch {
-      setError('Enrollment failed.')
+      setError(t('courseDetail.enrollError'))
     } finally {
       setEnrolling(false)
     }
   }
 
   if (error)   return <p className="page-error">{error}</p>
-  if (!course) return <p className="page-loading">Loading…</p>
+  if (!course) return <p className="page-loading">{t('common.loading')}</p>
 
   const pillarStyle = PILLAR_STYLES[course.pillar.slug] ?? { color: 'blue' }
 
@@ -62,7 +64,7 @@ export default function CourseDetailPage() {
 
       {/* Back */}
       <button className="back-link" onClick={() => navigate('/courses')}>
-        <ArrowLeft size={15} /> Back to Courses
+        <ArrowLeft size={15} /> {t('courseDetail.backToCourses')}
       </button>
 
       {/* Hero */}
@@ -71,12 +73,12 @@ export default function CourseDetailPage() {
           <span className={`pillar-badge pillar-badge--${pillarStyle.color}`}>
             {course.pillar.name}
           </span>
-          <span className="level-label">{LEVEL_LABELS[course.level] ?? course.level}</span>
+          <span className="level-label">{levelLabels[course.level] ?? course.level}</span>
         </div>
 
         {!course.is_enrolled && (
           <button className="enroll-btn" onClick={handleEnroll} disabled={enrolling}>
-            {enrolling ? 'Enrolling…' : 'Enroll Now'}
+            {enrolling ? t('courseDetail.enrolling') : t('courseDetail.enrollNow')}
           </button>
         )}
         {course.is_enrolled && (
@@ -84,7 +86,7 @@ export default function CourseDetailPage() {
             className="enroll-btn enroll-btn--continue"
             onClick={() => navigate(`/courses/${id}/learn`)}
           >
-            Continue
+            {t('common.continue')}
           </button>
         )}
       </div>
@@ -93,15 +95,15 @@ export default function CourseDetailPage() {
       <p className="detail-desc">{course.description}</p>
 
       <div className="detail-stats">
-        <span><Clock size={15} /> {course.duration_hours} hours</span>
-        <span><BookOpen size={15} /> {course.module_count} modules</span>
+        <span><Clock size={15} /> {t('common.durationHours', { count: course.duration_hours })}</span>
+        <span><BookOpen size={15} /> {t('common.moduleCount', { count: course.module_count })}</span>
       </div>
 
       {/* Enrolled progress */}
       {course.is_enrolled && (
         <div className="detail-progress">
           <div className="progress-row">
-            <span>Your progress</span>
+            <span>{t('courseDetail.yourProgress')}</span>
             <span>{course.progress_pct}%</span>
           </div>
           <div className="progress-bar">
@@ -113,7 +115,7 @@ export default function CourseDetailPage() {
       {/* What You'll Learn */}
       {course.learning_outcomes?.length > 0 && (
         <div className="outcomes-card">
-          <h2>What You&apos;ll Learn</h2>
+          <h2>{t('courseDetail.whatYoullLearn')}</h2>
           <div className="outcomes-grid">
             {course.learning_outcomes.map((outcome, i) => (
               <div key={i} className="outcome-item">
@@ -127,7 +129,7 @@ export default function CourseDetailPage() {
 
       {/* Modules */}
       <section className="modules-section">
-        <h2>Course Modules</h2>
+        <h2>{t('courseDetail.courseModules')}</h2>
         <div className="modules-list">
           {course.modules.map((mod) => {
             const isCompleted = course.completed_module_ids?.includes(mod.id)
@@ -136,10 +138,10 @@ export default function CourseDetailPage() {
               <div key={mod.id} className={`module-row ${isCurrent ? 'module-row--current' : ''}`}>
                 <div className="module-number">{mod.order}</div>
                 <div className="module-body">
-                  <p className="module-title">Module {mod.order} — {mod.title}</p>
+                  <p className="module-title">{t('common.moduleLabel', { order: mod.order, title: mod.title })}</p>
                   {mod.description && <p className="module-desc">{mod.description}</p>}
                   <p className="module-meta">
-                    {mod.duration_minutes > 0 && <span>{mod.duration_minutes} min</span>}
+                    {mod.duration_minutes > 0 && <span>{t('common.minutesLabel', { count: mod.duration_minutes })}</span>}
                   </p>
                 </div>
                 <div className="module-status">

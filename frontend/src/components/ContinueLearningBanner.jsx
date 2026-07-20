@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import './ContinueLearningBanner.css'
 
 ContinueLearningBanner.propTypes = {
@@ -13,23 +14,24 @@ ContinueLearningBanner.propTypes = {
 
 export default function ContinueLearningBanner({ data }) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   if (!data) return null
   return (
     <div className="cl-banner">
-      <p className="cl-label">Continue Learning</p>
+      <p className="cl-label">{t('common.continueLearning')}</p>
       <h2 className="cl-title">{data.course_title}</h2>
       {data.current_module_title && (
-        <p className="cl-next-module">Next: {data.current_module_title}</p>
+        <p className="cl-next-module">{t('common.nextLabel', { module: data.current_module_title })}</p>
       )}
       <div className="cl-progress-row">
-        <span className="cl-progress-label">Overall Progress</span>
+        <span className="cl-progress-label">{t('common.overallProgress')}</span>
         <span className="cl-progress-pct">{data.progress_pct}%</span>
       </div>
       <div className="cl-progress-bar">
         <div className="cl-progress-fill" style={{ width: `${data.progress_pct}%` }} />
       </div>
       <button className="cl-resume-btn" onClick={() => navigate(`/courses/${data.course_id}/learn`)}>
-        Resume Course
+        {t('common.resumeCourse')}
       </button>
     </div>
   )

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,18 +18,25 @@ const STATUS_ICON = {
 }
 
 export default function PathwayPage() {
+  const { t } = useTranslation()
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
 
+  const levelLabels = {
+    beginner: t('common.level.beginner'),
+    intermediate: t('common.level.intermediate'),
+    advanced: t('common.level.advanced'),
+  }
+
   useEffect(() => {
     client.get('/pathway/')
       .then(res => setData(res.data))
-      .catch(() => setError('Could not load your pathway.'))
+      .catch(() => setError(t('pathway.loadError')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
-  if (loading) return <div className="pathway-loading">Loading your pathway…</div>
+  if (loading) return <div className="pathway-loading">{t('pathway.loading')}</div>
   if (error)   return <div className="pathway-error">{error}</div>
 
   const nextCourse  = data.courses.find(c => c.status !== 'completed')
@@ -42,14 +50,14 @@ export default function PathwayPage() {
         <div className="pathway-title-row">
           <h1 className="pathway-title">{data.path_name}</h1>
           <Badge variant={LEVEL_VARIANT[data.competency_level]}>
-            {data.competency_level.charAt(0).toUpperCase() + data.competency_level.slice(1)}
+            {levelLabels[data.competency_level] ?? data.competency_level}
           </Badge>
         </div>
         <p className="pathway-description">{data.path_description}</p>
         <div className="pathway-progress-row">
           <Progress value={progressPct} className="pathway-progress-bar" />
           <span className="pathway-progress-label">
-            {data.progress.completed} of {data.progress.total} courses completed
+            {t('pathway.completed', { done: data.progress.completed, total: data.progress.total })}
           </span>
         </div>
       </div>
@@ -70,15 +78,15 @@ export default function PathwayPage() {
                   <div className="pathway-course-meta">
                     <span>{course.pillar_name}</span>
                     <span className="pathway-meta-dot">·</span>
-                    <span>{course.duration_hours}h</span>
+                    <span>{t('pathway.durationHoursShort', { count: course.duration_hours })}</span>
                     <span className="pathway-meta-dot">·</span>
-                    <Badge variant="outline" className="pathway-level-badge">{course.level}</Badge>
+                    <Badge variant="outline" className="pathway-level-badge">{levelLabels[course.level] ?? course.level}</Badge>
                   </div>
                 </div>
                 {isNext && (
                   <Button asChild size="sm" className="pathway-cta">
                     <Link to={`/courses/${course.id}`}>
-                      {course.status === 'in_progress' ? 'Continue' : 'Start'}
+                      {course.status === 'in_progress' ? t('common.continue') : t('common.start')}
                     </Link>
                   </Button>
                 )}

@@ -2,20 +2,17 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Filter } from 'lucide-react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import './CoursesPage.css'
 
-const PILLAR_STYLES = {
-  'teach-with-ai': { label: 'Teach with AI', color: 'blue' },
-  'teach-for-ai':  { label: 'Teach for AI',  color: 'purple' },
-  'teach-about-ai':{ label: 'Teach about AI',color: 'green' },
-}
-
-const LEVEL_LABELS = {
-  beginner:     'Beginner',
-  intermediate: 'Intermediate',
-  advanced:     'Advanced',
+function pillarStyles(t) {
+  return {
+    'teach-with-ai':  { label: t('courses.pillarLabels.teachWithAi'),  color: 'blue' },
+    'teach-for-ai':   { label: t('courses.pillarLabels.teachForAi'),   color: 'purple' },
+    'teach-about-ai': { label: t('courses.pillarLabels.teachAboutAi'), color: 'green' },
+  }
 }
 
 function levelForScore(score) {
@@ -40,28 +37,34 @@ CourseCard.propTypes = {
 
 function CourseCard({ course }) {
   const navigate = useNavigate()
-  const pillar = PILLAR_STYLES[course.pillar.slug] ?? { label: course.pillar.name, color: 'blue' }
+  const { t } = useTranslation()
+  const levelLabels = {
+    beginner: t('common.level.beginner'),
+    intermediate: t('common.level.intermediate'),
+    advanced: t('common.level.advanced'),
+  }
+  const pillar = pillarStyles(t)[course.pillar.slug] ?? { label: course.pillar.name, color: 'blue' }
   const enrolled = course.is_enrolled
 
   return (
     <div className="course-card" onClick={() => navigate(`/courses/${course.id}`)} style={{ cursor: 'pointer' }}>
       <div className="course-card-top">
         <span className={`pillar-badge pillar-badge--${pillar.color}`}>{pillar.label}</span>
-        <span className="level-label">{LEVEL_LABELS[course.level] ?? course.level}</span>
+        <span className="level-label">{levelLabels[course.level] ?? course.level}</span>
       </div>
 
       <h3 className="course-title">{course.title}</h3>
       <p className="course-desc">{course.description}</p>
 
       <div className="course-meta">
-        <span>{course.duration_hours} hours</span>
-        <span>{course.module_count} modules</span>
+        <span>{t('common.durationHours', { count: course.duration_hours })}</span>
+        <span>{t('common.moduleCount', { count: course.module_count })}</span>
       </div>
 
       {enrolled && (
         <div className="course-progress">
           <div className="progress-row">
-            <span>Progress</span>
+            <span>{t('common.progress')}</span>
             <span>{course.progress_pct}%</span>
           </div>
           <div className="progress-bar">
@@ -74,13 +77,14 @@ function CourseCard({ course }) {
         className={`course-btn ${enrolled ? 'course-btn--dark' : 'course-btn--outline'}`}
         onClick={(e) => { e.stopPropagation(); navigate(`/courses/${course.id}`) }}
       >
-        {enrolled ? 'Continue' : 'View Course'}
+        {enrolled ? t('common.continue') : t('courses.viewCourse')}
       </button>
     </div>
   )
 }
 
 export default function CoursesPage() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const [courses, setCourses] = useState([])
   const [pillars, setPillars] = useState([])
@@ -125,8 +129,8 @@ export default function CoursesPage() {
         })
         setPillars(unique)
       })
-      .catch(() => setError('Failed to load courses.'))
-  }, [])
+      .catch(() => setError(t('courses.loadError')))
+  }, [t])
 
   // client-side filter for instant response
   const filtered = useMemo(() => {
@@ -143,32 +147,32 @@ export default function CoursesPage() {
   return (
     <div className="courses-page">
       <div className="courses-header">
-        <h1>Courses</h1>
-        <p className="courses-subtitle">Explore our comprehensive AI training curriculum</p>
+        <h1>{t('courses.title')}</h1>
+        <p className="courses-subtitle">{t('courses.subtitle')}</p>
       </div>
 
       <div className="courses-filters">
         <Filter size={16} className="filter-icon" />
-        <label>Pillar:</label>
+        <label>{t('courses.pillarLabel')}</label>
         <select value={pillarFilter} onChange={(e) => setParam('pillar', e.target.value)}>
-          <option value="">All</option>
+          <option value="">{t('courses.all')}</option>
           {pillars.map((p) => (
             <option key={p.slug} value={p.slug}>{p.name}</option>
           ))}
         </select>
 
-        <label>Level:</label>
+        <label>{t('courses.levelLabel')}</label>
         <select
           value={levelFilter}
           onChange={(e) => { levelDefaultDone.current = true; setParam('level', e.target.value) }}
         >
-          <option value="">All</option>
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
+          <option value="">{t('courses.all')}</option>
+          <option value="beginner">{t('common.level.beginner')}</option>
+          <option value="intermediate">{t('common.level.intermediate')}</option>
+          <option value="advanced">{t('common.level.advanced')}</option>
         </select>
 
-        <span className="courses-count">{filtered.length} courses</span>
+        <span className="courses-count">{t('courses.count', { count: filtered.length })}</span>
       </div>
 
       <div className="courses-grid">

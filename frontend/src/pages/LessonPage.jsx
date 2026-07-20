@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, CheckCircle2, Circle,
   Video, FileText, HelpCircle, Image, FileIcon, ClipboardList,
@@ -12,19 +13,24 @@ import './LessonPage.css'
 
 // ─── Lesson-type icons ───────────────────────────────────────────────────────
 
-const TYPE_META = {
-  video:      { label: 'Video',      Icon: Video },
-  text:       { label: 'Text',       Icon: FileText },
-  quiz:       { label: 'Quiz',       Icon: HelpCircle },
-  image:      { label: 'Image',      Icon: Image },
-  pdf:        { label: 'PDF',        Icon: FileIcon },
-  assignment: { label: 'Assignment', Icon: ClipboardList },
+const TYPE_ICONS = {
+  video:      Video,
+  text:       FileText,
+  quiz:       HelpCircle,
+  image:      Image,
+  pdf:        FileIcon,
+  assignment: ClipboardList,
+}
+
+function typeMetaFor(t, type) {
+  const key = TYPE_ICONS[type] ? type : 'text'
+  return { label: t(`lesson.type.${key}`), Icon: TYPE_ICONS[key] }
 }
 
 TypeIcon.propTypes = { type: PropTypes.string.isRequired, size: PropTypes.number }
 
 function TypeIcon({ type, size = 16 }) {
-  const { Icon } = TYPE_META[type] ?? TYPE_META.text
+  const Icon = TYPE_ICONS[type] ?? TYPE_ICONS.text
   return <Icon size={size} />
 }
 
@@ -55,6 +61,7 @@ function VideoLesson({ lesson }) {
 
 TextLesson.propTypes       = { lesson: lessonShape.isRequired }
 function TextLesson({ lesson }) {
+  const { t } = useTranslation()
   return (
     <div className="lp-content-card">
       {lesson.content ? (
@@ -62,7 +69,7 @@ function TextLesson({ lesson }) {
           <p className="lp-text-content">{lesson.content}</p>
         </div>
       ) : (
-        <p className="lp-empty">No content yet.</p>
+        <p className="lp-empty">{t('lesson.noContent')}</p>
       )}
     </div>
   )
@@ -70,6 +77,7 @@ function TextLesson({ lesson }) {
 
 ImageLesson.propTypes      = { lesson: lessonShape.isRequired }
 function ImageLesson({ lesson }) {
+  const { t } = useTranslation()
   return (
     <div className="lp-content-card">
       {lesson.content
@@ -77,7 +85,7 @@ function ImageLesson({ lesson }) {
         : (
           <div className="lp-video-player">
             <Image size={48} className="lp-video-icon" />
-            <p className="lp-video-label">Image</p>
+            <p className="lp-video-label">{t('lesson.type.image')}</p>
             {lesson.content && <p className="lp-video-url">{lesson.content}</p>}
           </div>
         )
@@ -101,6 +109,7 @@ AssignmentLesson.propTypes = {
   onSubmissionChange: PropTypes.func.isRequired,
 }
 function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
+  const { t } = useTranslation()
   const submission = lesson.assignment_submission
   const [text, setText] = useState(submission?.text ?? '')
   const [submitting, setSubmitting] = useState(false)
@@ -110,7 +119,7 @@ function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
   const locked = status === 'pending' || status === 'approved'
 
   const handleSubmit = async () => {
-    if (!text.trim()) { setError('Write your response before submitting.'); return }
+    if (!text.trim()) { setError(t('lesson.assignment.writeBeforeSubmit')); return }
     setSubmitting(true)
     setError('')
     try {
@@ -119,7 +128,7 @@ function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
       )
       onSubmissionChange(res.data)
     } catch (err) {
-      setError(err.response?.data?.detail ?? 'Submission failed. Please try again.')
+      setError(err.response?.data?.detail ?? t('lesson.assignment.submitFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -128,29 +137,29 @@ function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
   return (
     <div className="lp-content-card">
       <div className="lp-assignment-body">
-        <h3 className="lp-assignment-heading">Instructions</h3>
-        <p className="lp-text-content">{lesson.content || 'No instructions provided.'}</p>
+        <h3 className="lp-assignment-heading">{t('lesson.assignment.instructions')}</h3>
+        <p className="lp-text-content">{lesson.content || t('lesson.assignment.noInstructions')}</p>
 
         {status === 'pending' && (
           <div className="lp-assignment-banner lp-assignment-banner--pending">
-            Submitted — pending review. You will see feedback here once it is reviewed.
+            {t('lesson.assignment.pendingBanner')}
           </div>
         )}
         {status === 'approved' && (
           <div className="lp-assignment-banner lp-assignment-banner--approved">
-            Approved{submission.feedback ? ` — ${submission.feedback}` : ''} ✓
+            {t('lesson.assignment.approved')}{submission.feedback ? ` — ${submission.feedback}` : ''} ✓
           </div>
         )}
         {status === 'changes_requested' && (
           <div className="lp-assignment-banner lp-assignment-banner--changes">
-            <strong>Changes requested:</strong> {submission.feedback}
+            <strong>{t('lesson.assignment.changesRequested')}</strong> {submission.feedback}
           </div>
         )}
 
-        <h3 className="lp-assignment-heading lp-assignment-heading--response">Your Response</h3>
+        <h3 className="lp-assignment-heading lp-assignment-heading--response">{t('lesson.assignment.yourResponse')}</h3>
         <textarea
           className="lp-notes-input"
-          placeholder="Write your response here…"
+          placeholder={t('lesson.assignment.responsePlaceholder')}
           value={text}
           disabled={locked || submitting}
           onChange={(e) => setText(e.target.value)}
@@ -164,8 +173,8 @@ function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
             onClick={handleSubmit}
           >
             {submitting
-              ? 'Submitting…'
-              : status === 'changes_requested' ? 'Resubmit for review' : 'Submit for review'}
+              ? t('lesson.assignment.submitting')
+              : status === 'changes_requested' ? t('lesson.assignment.resubmit') : t('lesson.assignment.submit')}
           </button>
         )}
       </div>
@@ -179,6 +188,7 @@ QuizLesson.propTypes = {
   courseId:   PropTypes.string.isRequired,
 }
 function QuizLesson({ lesson, onComplete, courseId }) {
+  const { t } = useTranslation()
   const questions = lesson.quiz_data ?? []
   const review = lesson.quiz_review
   const isReview = Boolean(lesson.is_completed && review?.selected?.length)
@@ -187,7 +197,7 @@ function QuizLesson({ lesson, onComplete, courseId }) {
   const [feedback, setFeedback] = useState({})   // { [qIdx]: {correct, correct_index} }
 
   if (questions.length === 0) {
-    return <div className="lp-content-card"><p className="lp-empty">No questions yet.</p></div>
+    return <div className="lp-content-card"><p className="lp-empty">{t('lesson.quiz.noQuestions')}</p></div>
   }
 
   const q = questions[currentIdx]
@@ -237,11 +247,11 @@ function QuizLesson({ lesson, onComplete, courseId }) {
     if (selected === undefined || selected === null || !res) return null
     if (selected === optionIdx) {
       return res.correct
-        ? <span className="lp-option-badge lp-option-badge--correct">✓ Correct</span>
-        : <span className="lp-option-badge lp-option-badge--wrong">✗ Incorrect</span>
+        ? <span className="lp-option-badge lp-option-badge--correct">{t('lesson.quiz.correct')}</span>
+        : <span className="lp-option-badge lp-option-badge--wrong">{t('lesson.quiz.incorrect')}</span>
     }
     if (!res.correct && res.correct_index === optionIdx) {
-      return <span className="lp-option-badge lp-option-badge--correct">Correct answer</span>
+      return <span className="lp-option-badge lp-option-badge--correct">{t('lesson.quiz.correctAnswer')}</span>
     }
     return null
   }
@@ -250,8 +260,8 @@ function QuizLesson({ lesson, onComplete, courseId }) {
     <div className="lp-content-card lp-quiz-card">
       <div className="lp-question-block">
         <p className="lp-question-counter">
-          Question {currentIdx + 1} of {questions.length}
-          {isReview && ' — review'}
+          {t('lesson.quiz.questionCounter', { current: currentIdx + 1, total: questions.length })}
+          {isReview && t('lesson.quiz.reviewSuffix')}
         </p>
         <p className="lp-question-text">{q.question}</p>
       </div>
@@ -274,7 +284,7 @@ function QuizLesson({ lesson, onComplete, courseId }) {
       <div className="lp-quiz-nav">
         {currentIdx > 0 && (
           <button className="lp-quiz-arrow" onClick={() => setCurrentIdx(i => i - 1)}>
-            ← Previous question
+            {t('lesson.quiz.previousQuestion')}
           </button>
         )}
         {answered && !isLastQuestion && (
@@ -282,7 +292,7 @@ function QuizLesson({ lesson, onComplete, courseId }) {
             className="lp-quiz-arrow lp-quiz-arrow--next"
             onClick={() => setCurrentIdx(i => i + 1)}
           >
-            Next question →
+            {t('lesson.quiz.nextQuestion')}
           </button>
         )}
       </div>
@@ -311,6 +321,7 @@ function LessonContent({ lesson, onComplete, onSubmissionChange, courseId }) {
 // ─── Redirect component (/courses/:id/learn) ─────────────────────────────────
 
 export function LearnRedirect() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -327,16 +338,17 @@ export function LearnRedirect() {
           navigate(`/courses/${id}`, { replace: true })
         }
       })
-      .catch(() => setError('Could not load course.'))
-  }, [id, navigate, user])
+      .catch(() => setError(t('lesson.learnRedirectError')))
+  }, [id, navigate, user, t])
 
   if (error) return <p className="page-error">{error}</p>
-  return <p className="page-loading">Loading…</p>
+  return <p className="page-loading">{t('common.loading')}</p>
 }
 
 // ─── Main LessonPage ──────────────────────────────────────────────────────────
 
 export default function LessonPage() {
+  const { t } = useTranslation()
   const { courseId, lessonId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -357,16 +369,16 @@ export default function LessonPage() {
   useEffect(() => {
     client.get(`/courses/${courseId}/learn/`)
       .then(res => setCourseLearn(res.data))
-      .catch(() => setError('Failed to load course.'))
-  }, [courseId])
+      .catch(() => setError(t('lesson.loadCourseError')))
+  }, [courseId, t])
 
   // Fetch lesson whenever lessonId changes
   useEffect(() => {
     setLesson(null)
     client.get(`/courses/${courseId}/lessons/${lessonId}/`)
       .then(res => setLesson(res.data))
-      .catch(() => setError('Failed to load lesson.'))
-  }, [courseId, lessonId])
+      .catch(() => setError(t('lesson.loadLessonError')))
+  }, [courseId, lessonId, t])
 
   // Reset note when lesson changes
   useEffect(() => { setNote(''); scrollPctRef.current = 0 }, [lessonId])
@@ -422,7 +434,7 @@ export default function LessonPage() {
 
   if (error) return <p className="page-error">{error}</p>
 
-  const typeMeta = lesson ? (TYPE_META[lesson.lesson_type] ?? TYPE_META.text) : null
+  const typeMeta = lesson ? typeMetaFor(t, lesson.lesson_type) : null
 
   return (
     <div className="lp-page">
@@ -430,7 +442,7 @@ export default function LessonPage() {
       {/* Top bar */}
       <div className="lp-topbar">
         <button className="lp-back" onClick={() => navigate(`/courses/${courseId}`)}>
-          <ArrowLeft size={15} /> Back to Course
+          <ArrowLeft size={15} /> {t('lesson.backToCourse')}
         </button>
         <span className="lp-course-title">{courseLearn?.title ?? '…'}</span>
         <div />
@@ -443,7 +455,7 @@ export default function LessonPage() {
           {courseLearn?.modules.map(mod => (
             <div key={mod.id} className="lp-sidebar-module">
               <p className="lp-sidebar-module-title">
-                Module {mod.order} — {mod.title}
+                {t('common.moduleLabel', { order: mod.order, title: mod.title })}
               </p>
               {mod.lessons.map(lsn => (
                 <button
@@ -457,7 +469,7 @@ export default function LessonPage() {
                   <span className="lp-sidebar-lesson-info">
                     <span className="lp-sidebar-lesson-title">{lsn.title}</span>
                     {lsn.duration_minutes > 0 && (
-                      <span className="lp-sidebar-lesson-dur">{lsn.duration_minutes} min</span>
+                      <span className="lp-sidebar-lesson-dur">{t('common.minutesLabel', { count: lsn.duration_minutes })}</span>
                     )}
                   </span>
                   {lsn.is_completed
@@ -472,7 +484,7 @@ export default function LessonPage() {
           {courseLearn && (
             <div className="lp-sidebar-progress">
               <div className="lp-sidebar-progress-row">
-                <span>Progress</span>
+                <span>{t('common.progress')}</span>
                 <span>{courseLearn.progress_pct}%</span>
               </div>
               <div className="lp-sidebar-progress-bar">
@@ -488,7 +500,7 @@ export default function LessonPage() {
         {/* ── Main ── */}
         <main className="lp-main">
           {!lesson ? (
-            <p className="page-loading">Loading lesson…</p>
+            <p className="page-loading">{t('lesson.loadingLesson')}</p>
           ) : (
             <>
               {/* Lesson header */}
@@ -513,7 +525,7 @@ export default function LessonPage() {
                   disabled={!lesson.prev_lesson_id}
                   onClick={() => goTo(lesson.prev_lesson_id)}
                 >
-                  &#8249; Previous
+                  &#8249; {t('common.previous')}
                 </button>
 
                 {/* Hide Mark Complete for quizzes and assignments — they complete via their own flows */}
@@ -523,18 +535,18 @@ export default function LessonPage() {
                     onClick={handleMarkComplete}
                     disabled={completing || lesson.is_completed}
                   >
-                    {lesson.is_completed ? '✓ Completed' : completing ? 'Saving…' : 'Mark Complete'}
+                    {lesson.is_completed ? t('common.completedCheck') : completing ? t('common.saving') : t('lesson.markComplete')}
                   </button>
                 )}
                 {lesson.lesson_type === 'quiz' && lesson.is_completed && (
-                  <span className="lp-complete-btn lp-complete-btn--done">✓ Completed</span>
+                  <span className="lp-complete-btn lp-complete-btn--done">{t('common.completedCheck')}</span>
                 )}
                 {lesson.lesson_type === 'assignment' && lesson.is_completed && (
-                  <span className="lp-complete-btn lp-complete-btn--done">✓ Completed</span>
+                  <span className="lp-complete-btn lp-complete-btn--done">{t('common.completedCheck')}</span>
                 )}
                 {lesson.lesson_type === 'assignment' && !lesson.is_completed
                   && lesson.assignment_submission?.status === 'pending' && (
-                  <span className="lp-complete-btn lp-complete-btn--disabled">Pending review</span>
+                  <span className="lp-complete-btn lp-complete-btn--disabled">{t('lesson.pendingReview')}</span>
                 )}
 
                 <button
@@ -542,16 +554,16 @@ export default function LessonPage() {
                   disabled={!lesson.next_lesson_id}
                   onClick={() => goTo(lesson.next_lesson_id)}
                 >
-                  Next &#8250;
+                  {t('common.next')} &#8250;
                 </button>
               </div>
 
               {/* Notes */}
               <div className="lp-notes">
-                <h3 className="lp-notes-title">Your Notes</h3>
+                <h3 className="lp-notes-title">{t('lesson.yourNotesTitle')}</h3>
                 <textarea
                   className="lp-notes-input"
-                  placeholder="Add personal notes for this lesson…"
+                  placeholder={t('lesson.notesPlaceholder')}
                   value={note}
                   onChange={e => setNote(e.target.value)}
                 />
