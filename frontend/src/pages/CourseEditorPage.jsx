@@ -81,10 +81,6 @@ export default function CourseEditorPage() {
     }
   }
 
-  const outcomesForEdit = activeLang === 'original'
-    ? form.learning_outcomes
-    : form.learning_outcomes.map((_, i) => translationsData[activeLang]?.learning_outcomes?.[i] ?? '')
-
   // ── Module API call (used by both per-module save and bulk save) ──────────
 
   const saveModuleRequest = async (mod) => {
@@ -315,6 +311,10 @@ export default function CourseEditorPage() {
 
   if (error) return <p className="page-error">{error}</p>
   if (!form)  return <p className="page-loading">{t('common.loading')}</p>
+
+  const outcomesForEdit = activeLang === 'original'
+    ? form.learning_outcomes
+    : form.learning_outcomes.map((_, i) => translationsData[activeLang]?.learning_outcomes?.[i] ?? '')
 
   const currentPillar = pillars.find((p) => p.id === form.pillar_id)
   const pillarColor = PILLAR_COLOR[currentPillar?.slug] ?? 'blue'
