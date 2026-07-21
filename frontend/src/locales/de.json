@@ -551,6 +551,23 @@
       "loadError": "Modul konnte nicht geladen werden.",
       "saveFailedGeneric": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "deleteFailedGeneric": "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
+    "translate": {
+      "switchLanguage": "Language",
+      "originalTabLabel": "{{language}} (original)",
+      "viewingOriginal": "Viewing the original content",
+      "statusNone": "—",
+      "statusPending": "Pending",
+      "statusDone": "Done",
+      "statusFailed": "Failed",
+      "translateTo": "Translate to {{language}}",
+      "retranslate": "Re-translate",
+      "translating": "Translating…",
+      "translateFailed": "Translation failed. You can try again.",
+      "reconfirm": "Re-translating will overwrite any manual edits made to this language. Continue?",
+      "reviewNote": "Machine-translated — review recommended.",
+      "sourceLanguageLabel": "Source language",
+      "saveOriginalFirst": "Save this item in the original language before translating it."
     }
   },
   "reviews": {

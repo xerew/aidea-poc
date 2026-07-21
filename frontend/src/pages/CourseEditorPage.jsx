@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil, GripVertical } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { LANGUAGES } from '../i18n'
+import TranslationBar from '../components/authoring/TranslationBar'
 import './CourseEditorPage.css'
 
 const PILLAR_COLOR = {
@@ -31,6 +33,12 @@ export default function CourseEditorPage() {
   const [dragModuleId, setDragModuleId] = useState(null)
   const [dragModuleOverId, setDragModuleOverId] = useState(null)
 
+  // ── Translation state ──────────────────────────────────────────────────────
+  const [activeLang, setActiveLang] = useState('original')
+  const [translationsData, setTranslationsData] = useState({})
+  const [translationStatus, setTranslationStatus] = useState({})
+  const translating = activeLang !== 'original'
+
   useEffect(() => {
     Promise.all([
       client.get(`/authoring/courses/${id}/`),
@@ -46,7 +54,10 @@ export default function CourseEditorPage() {
           pillar_id: c.pillar.id,
           duration_hours: c.duration_hours,
           learning_outcomes: c.learning_outcomes ?? [],
+          source_language: c.source_language ?? 'en',
         })
+        setTranslationsData(c.translations ?? {})
+        setTranslationStatus(c.translation_status ?? {})
         setModules(c.modules.map((m) => ({ ...m, isDirty: false, isNew: false, saving: false })))
         setAuthor({ id: c.created_by_id, name: c.created_by_name })
         setPillars(pillarsRes.data)
@@ -54,15 +65,43 @@ export default function CourseEditorPage() {
       .catch(() => setError(t('authoring.editor.loadError')))
   }, [id, t])
 
+  // ── Language-aware course field helpers ──────────────────────────────────
+
+  const courseFieldValue = (field) =>
+    (activeLang === 'original' ? form[field] : (translationsData[activeLang]?.[field] ?? ''))
+
+  const setCourseField = (field, value) => {
+    if (activeLang === 'original') {
+      setForm((f) => ({ ...f, [field]: value }))
+    } else {
+      setTranslationsData((td) => ({
+        ...td,
+        [activeLang]: { ...(td[activeLang] ?? {}), [field]: value },
+      }))
+    }
+  }
+
+  const outcomesForEdit = activeLang === 'original'
+    ? form.learning_outcomes
+    : form.learning_outcomes.map((_, i) => translationsData[activeLang]?.learning_outcomes?.[i] ?? '')
+
   // ── Module API call (used by both per-module save and bulk save) ──────────
 
   const saveModuleRequest = async (mod) => {
-    const payload = { title: mod.title, description: mod.description, duration_minutes: mod.duration_minutes }
-    if (mod.isNew) {
-      const res = await client.post(`/authoring/courses/${id}/modules/`, payload)
+    if (activeLang === 'original') {
+      const payload = { title: mod.title, description: mod.description, duration_minutes: mod.duration_minutes }
+      if (mod.isNew) {
+        const res = await client.post(`/authoring/courses/${id}/modules/`, payload)
+        return { tempId: mod.id, saved: res.data }
+      }
+      const res = await client.patch(`/authoring/courses/${id}/modules/${mod.id}/`, payload)
       return { tempId: mod.id, saved: res.data }
     }
-    const res = await client.patch(`/authoring/courses/${id}/modules/${mod.id}/`, payload)
+    const payload = {
+      title: mod.translations?.[activeLang]?.title ?? '',
+      description: mod.translations?.[activeLang]?.description ?? '',
+    }
+    const res = await client.patch(`/authoring/courses/${id}/modules/${mod.id}/?lang=${activeLang}`, payload)
     return { tempId: mod.id, saved: res.data }
   }
 
@@ -72,7 +111,18 @@ export default function CourseEditorPage() {
     setSaving(true)
     setSaveStatus('')
     try {
-      await client.patch(`/authoring/courses/${id}/`, form)
+      if (activeLang === 'original') {
+        await client.patch(`/authoring/courses/${id}/`, form)
+      } else {
+        const payload = {
+          title: courseFieldValue('title'),
+          description: courseFieldValue('description'),
+          learning_outcomes: outcomesForEdit,
+        }
+        const res = await client.patch(`/authoring/courses/${id}/?lang=${activeLang}`, payload)
+        setTranslationsData(res.data.translations ?? {})
+        setTranslationStatus(res.data.translation_status ?? {})
+      }
 
       const dirtyModules = modules.filter((m) => m.isDirty)
       if (dirtyModules.length) {
@@ -145,12 +195,22 @@ export default function CourseEditorPage() {
 
   // ── Learning outcomes ────────────────────────────────────────────────────
 
-  const updateOutcome = (i, val) =>
-    setForm((f) => {
-      const outcomes = [...f.learning_outcomes]
-      outcomes[i] = val
-      return { ...f, learning_outcomes: outcomes }
-    })
+  const updateOutcome = (i, val) => {
+    if (activeLang === 'original') {
+      setForm((f) => {
+        const outcomes = [...f.learning_outcomes]
+        outcomes[i] = val
+        return { ...f, learning_outcomes: outcomes }
+      })
+    } else {
+      setTranslationsData((td) => {
+        const langBlob = td[activeLang] ?? {}
+        const list = form.learning_outcomes.map((_, idx) => (langBlob.learning_outcomes ?? [])[idx] ?? '')
+        list[i] = val
+        return { ...td, [activeLang]: { ...langBlob, learning_outcomes: list } }
+      })
+    }
+  }
 
   const removeOutcome = (i) =>
     setForm((f) => ({ ...f, learning_outcomes: f.learning_outcomes.filter((_, idx) => idx !== i) }))
@@ -160,10 +220,26 @@ export default function CourseEditorPage() {
 
   // ── Module list helpers ───────────────────────────────────────────────────
 
-  const updateModuleField = (moduleId, field, value) =>
-    setModules((ms) =>
-      ms.map((m) => (m.id === moduleId ? { ...m, [field]: value, isDirty: true } : m))
-    )
+  const moduleFieldValue = (mod, field) =>
+    (activeLang === 'original' ? mod[field] : (mod.translations?.[activeLang]?.[field] ?? ''))
+
+  const updateModuleField = (moduleId, field, value) => {
+    if (activeLang === 'original') {
+      setModules((ms) =>
+        ms.map((m) => (m.id === moduleId ? { ...m, [field]: value, isDirty: true } : m))
+      )
+    } else {
+      setModules((ms) =>
+        ms.map((m) => (m.id === moduleId
+          ? {
+              ...m,
+              translations: { ...m.translations, [activeLang]: { ...(m.translations?.[activeLang] ?? {}), [field]: value } },
+              isDirty: true,
+            }
+          : m))
+      )
+    }
+  }
 
   const addModule = () => {
     const tempId = `new-${Date.now()}`
@@ -223,6 +299,20 @@ export default function CourseEditorPage() {
     setDragModuleOverId(null)
   }
 
+  // ── Translation bar callbacks ─────────────────────────────────────────────
+
+  const reloadTranslations = () => {
+    client.get(`/authoring/courses/${id}/`).then((res) => {
+      const c = res.data
+      setTranslationsData(c.translations ?? {})
+      setTranslationStatus(c.translation_status ?? {})
+      setModules((ms) => ms.map((m) => {
+        const fresh = c.modules.find((cm) => cm.id === m.id)
+        return fresh ? { ...m, translations: fresh.translations } : m
+      }))
+    }).catch(() => {})
+  }
+
   if (error) return <p className="page-error">{error}</p>
   if (!form)  return <p className="page-loading">{t('common.loading')}</p>
 
@@ -250,13 +340,25 @@ export default function CourseEditorPage() {
         </div>
       )}
 
+      {/* Language switch + translate */}
+      <TranslationBar
+        courseId={id}
+        sourceLanguage={form.source_language}
+        translationStatus={translationStatus}
+        activeLang={activeLang}
+        onSelectLang={setActiveLang}
+        onStatusUpdate={setTranslationStatus}
+        onTranslated={reloadTranslations}
+        disabled={locked}
+      />
+
       {/* Hero row */}
       <div className="detail-hero">
         <div className="detail-hero-meta">
           <select
             className={`pillar-select pillar-badge pillar-badge--${pillarColor}`}
             value={form.pillar_id}
-            disabled={locked}
+            disabled={locked || translating}
             onChange={(e) => setForm((f) => ({ ...f, pillar_id: Number(e.target.value) }))}
           >
             {pillars.map((p) => (
@@ -266,12 +368,23 @@ export default function CourseEditorPage() {
           <select
             className="level-select"
             value={form.level}
-            disabled={locked}
+            disabled={locked || translating}
             onChange={(e) => setForm((f) => ({ ...f, level: e.target.value }))}
           >
             <option value="beginner">{t('common.level.beginner')}</option>
             <option value="intermediate">{t('common.level.intermediate')}</option>
             <option value="advanced">{t('common.level.advanced')}</option>
+          </select>
+          <select
+            className="level-select"
+            value={form.source_language}
+            disabled={locked || translating}
+            title={t('authoring.translate.sourceLanguageLabel')}
+            onChange={(e) => setForm((f) => ({ ...f, source_language: e.target.value }))}
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>{l.label}</option>
+            ))}
           </select>
         </div>
 
@@ -299,9 +412,9 @@ export default function CourseEditorPage() {
       {/* Title */}
       <input
         className="editor-title-input"
-        value={form.title}
+        value={courseFieldValue('title')}
         disabled={locked}
-        onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+        onChange={(e) => setCourseField('title', e.target.value)}
         placeholder={t('authoring.editor.courseTitlePlaceholder')}
       />
 
@@ -311,9 +424,9 @@ export default function CourseEditorPage() {
       {/* Description */}
       <textarea
         className="editor-desc-input"
-        value={form.description}
+        value={courseFieldValue('description')}
         disabled={locked}
-        onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+        onChange={(e) => setCourseField('description', e.target.value)}
         rows={2}
         placeholder={t('authoring.editor.courseDescPlaceholder')}
       />
@@ -327,7 +440,7 @@ export default function CourseEditorPage() {
             className="editor-inline-number"
             value={form.duration_hours}
             min={0}
-            disabled={locked}
+            disabled={locked || translating}
             onChange={(e) => setForm((f) => ({ ...f, duration_hours: Number(e.target.value) }))}
           />
           {t('authoring.editor.hours')}
@@ -339,7 +452,7 @@ export default function CourseEditorPage() {
       <div className="outcomes-card">
         <h2>{t('courseDetail.whatYoullLearn')}</h2>
         <div className="outcomes-grid">
-          {form.learning_outcomes.map((outcome, i) => (
+          {outcomesForEdit.map((outcome, i) => (
             <div key={i} className="outcome-item outcome-item--edit">
               <CheckCircle2 size={18} className="outcome-icon" />
               <input
@@ -349,7 +462,7 @@ export default function CourseEditorPage() {
                 onChange={(e) => updateOutcome(i, e.target.value)}
                 placeholder={t('authoring.editor.outcomePlaceholder')}
               />
-              {!locked && (
+              {!locked && !translating && (
                 <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title={t('authoring.editor.removeOutcome')}>
                   <Trash2 size={14} />
                 </button>
@@ -357,7 +470,7 @@ export default function CourseEditorPage() {
             </div>
           ))}
         </div>
-        {!locked && (
+        {!locked && !translating && (
           <button className="add-dashed-btn" onClick={addOutcome}>
             <Plus size={14} /> {t('authoring.editor.addOutcome')}
           </button>
@@ -378,27 +491,27 @@ export default function CourseEditorPage() {
                 dragModuleId === mod.id ? 'module-row--dragging' : '',
                 isModDragOver ? 'module-row--drag-over' : '',
               ].filter(Boolean).join(' ')}
-              draggable={!locked}
+              draggable={!locked && !translating}
               onDragStart={(e) => handleModuleDragStart(e, mod.id)}
               onDragOver={(e) => handleModuleDragOver(e, mod.id)}
               onDrop={(e) => handleModuleDrop(e, mod.id)}
               onDragEnd={handleModuleDragEnd}
             >
               <div className="module-number">
-                {!locked && <GripVertical size={14} className="module-drag-handle" />}
+                {!locked && !translating && <GripVertical size={14} className="module-drag-handle" />}
                 {idx + 1}
               </div>
               <div className="module-body">
                 <input
                   className="editor-module-title"
-                  value={mod.title}
+                  value={moduleFieldValue(mod, 'title')}
                   disabled={locked}
                   onChange={(e) => updateModuleField(mod.id, 'title', e.target.value)}
                   placeholder={t('authoring.editor.modulePlaceholder')}
                 />
                 <textarea
                   className="editor-module-desc"
-                  value={mod.description}
+                  value={moduleFieldValue(mod, 'description')}
                   disabled={locked}
                   onChange={(e) => updateModuleField(mod.id, 'description', e.target.value)}
                   rows={1}
@@ -410,7 +523,7 @@ export default function CourseEditorPage() {
                     className="editor-inline-number"
                     value={mod.duration_minutes}
                     min={0}
-                    disabled={locked}
+                    disabled={locked || translating}
                     onChange={(e) => updateModuleField(mod.id, 'duration_minutes', Number(e.target.value))}
                   />
                   <span>{t('authoring.editor.min')}</span>
@@ -436,7 +549,7 @@ export default function CourseEditorPage() {
                     <Save size={15} />
                   </button>
                 )}
-                {!locked && (
+                {!locked && !translating && (
                   <button
                     className="icon-btn icon-btn--danger"
                     onClick={() => deleteModule(mod)}
@@ -449,7 +562,7 @@ export default function CourseEditorPage() {
             </div>
           )})}
         </div>
-        {!locked && (
+        {!locked && !translating && (
           <button className="add-dashed-btn" onClick={addModule}>
             <Plus size={15} /> {t('authoring.editor.addModule')}
           </button>

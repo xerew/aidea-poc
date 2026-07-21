@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import client from '../api/client'
+import { LANGUAGES } from '../i18n'
 // Reuse editor and detail styles — same class names apply
 import './CourseDetailPage.css'
 import './CourseEditorPage.css'
@@ -20,6 +21,7 @@ const EMPTY_FORM = {
   pillar_id: null,
   duration_hours: 0,
   learning_outcomes: [],
+  source_language: 'en',
 }
 
 export default function CourseCreatePage() {
@@ -99,6 +101,16 @@ export default function CourseCreatePage() {
             <option value="beginner">{t('common.level.beginner')}</option>
             <option value="intermediate">{t('common.level.intermediate')}</option>
             <option value="advanced">{t('common.level.advanced')}</option>
+          </select>
+          <select
+            className="level-select"
+            value={form.source_language}
+            title={t('authoring.translate.sourceLanguageLabel')}
+            onChange={(e) => setForm((f) => ({ ...f, source_language: e.target.value }))}
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>{l.label}</option>
+            ))}
           </select>
         </div>
 

@@ -9,6 +9,7 @@ import {
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
+import TranslationBar from '../components/authoring/TranslationBar'
 import './ModuleEditorPage.css'
 
 // ── Lesson type config ────────────────────────────────────────────────────────
@@ -51,7 +52,31 @@ function emptyQuestion() {
   }
 }
 
-function QuizBuilder({ quizData, locked, onChange }) {
+// Merge a lesson's base quiz structure (is_correct + option/question order —
+// always authoritative) with its translated text for `lang`. Falls back to
+// blank text (not the source text) when nothing has been translated yet, so
+// translated-mode inputs never masquerade untranslated source text as a
+// translation.
+function mergedQuizData(lesson, lang) {
+  const base = lesson.quiz_data ?? []
+  if (lang === 'original') return base
+  const translated = lesson.translations?.[lang]?.quiz_data
+  if (Array.isArray(translated) && translated.length === base.length) {
+    return base.map((q, qi) => ({
+      question: translated[qi]?.question ?? '',
+      options: q.options.map((o, oi) => ({
+        text: translated[qi]?.options?.[oi]?.text ?? '',
+        is_correct: o.is_correct,
+      })),
+    }))
+  }
+  return base.map((q) => ({
+    question: '',
+    options: q.options.map((o) => ({ text: '', is_correct: o.is_correct })),
+  }))
+}
+
+function QuizBuilder({ quizData, textDisabled, structureLocked, onChange }) {
   const { t } = useTranslation()
   const questions = quizData ?? []
 
@@ -106,11 +131,11 @@ function QuizBuilder({ quizData, locked, onChange }) {
             <input
               className="quiz-question-input"
               value={q.question}
-              disabled={locked}
+              disabled={textDisabled}
               onChange={(e) => updateQuestion(qi, e.target.value)}
               placeholder={t('authoring.moduleEditor.questionPlaceholder', { number: qi + 1 })}
             />
-            {!locked && questions.length > 1 && (
+            {!structureLocked && questions.length > 1 && (
               <button
                 className="icon-btn icon-btn--danger"
                 onClick={() => removeQuestion(qi)}
@@ -128,18 +153,18 @@ function QuizBuilder({ quizData, locked, onChange }) {
                   type="checkbox"
                   className="quiz-option-checkbox"
                   checked={opt.is_correct}
-                  disabled={locked}
+                  disabled={structureLocked}
                   onChange={() => toggleCorrect(qi, oi)}
                   title={t('authoring.moduleEditor.markCorrect')}
                 />
                 <input
                   className="quiz-option-input"
                   value={opt.text}
-                  disabled={locked}
+                  disabled={textDisabled}
                   onChange={(e) => updateOptionText(qi, oi, e.target.value)}
                   placeholder={t('authoring.moduleEditor.optionPlaceholder', { letter: String.fromCharCode(65 + oi) })}
                 />
-                {!locked && q.options.length > 2 && (
+                {!structureLocked && q.options.length > 2 && (
                   <button
                     className="icon-btn icon-btn--danger quiz-option-remove"
                     onClick={() => removeOption(qi, oi)}
@@ -152,7 +177,7 @@ function QuizBuilder({ quizData, locked, onChange }) {
             ))}
           </div>
 
-          {!locked && (
+          {!structureLocked && (
             <button className="quiz-add-option-btn" onClick={() => addOption(qi)}>
               <Plus size={13} /> {t('authoring.moduleEditor.addOption')}
             </button>
@@ -160,7 +185,7 @@ function QuizBuilder({ quizData, locked, onChange }) {
         </div>
       ))}
 
-      {!locked && (
+      {!structureLocked && (
         <button className="quiz-add-question-btn" onClick={addQuestion}>
           <Plus size={14} /> {t('authoring.moduleEditor.addQuestion')}
         </button>
@@ -177,7 +202,8 @@ QuizBuilder.propTypes = {
       is_correct: PropTypes.bool,
     })),
   })).isRequired,
-  locked: PropTypes.bool.isRequired,
+  textDisabled: PropTypes.bool.isRequired,
+  structureLocked: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
 }
 
@@ -193,6 +219,7 @@ const lessonShape = PropTypes.shape({
   duration_minutes: PropTypes.number,
   is_required: PropTypes.bool,
   isDirty: PropTypes.bool,
+  isNew: PropTypes.bool,
   saving: PropTypes.bool,
 })
 
@@ -252,12 +279,19 @@ function LessonPreview({ lesson }) {
   }
 }
 
-function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, errors }) {
+function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave, onError, errors }) {
   const { t } = useTranslation()
   const cfg = lessonTypeConfig(lesson.lesson_type)
   const typeLabel = t(`lesson.type.${lesson.lesson_type}`)
   const err = errors ?? {}
   const [uploading, setUploading] = useState(false)
+
+  // A brand-new, not-yet-saved lesson has no `translations` bucket to write
+  // into — block translated-mode edits on it until it's saved in the
+  // original language.
+  const blockedNew = lesson.isNew && translating
+  const fieldsDisabled = locked || blockedNew
+  const structureLocked = locked || translating
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0]
@@ -289,7 +323,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <h2 className="lesson-editor-title">{t('authoring.moduleEditor.lessonEditorTitle')}</h2>
           </div>
         </div>
-        {!locked && (
+        {!locked && !translating && (
           <button
             className="icon-btn icon-btn--danger"
             onClick={onDelete}
@@ -301,12 +335,14 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
       </div>
 
       <div className="lesson-editor-body">
+        {blockedNew && <p className="lesson-field-hint">{t('authoring.translate.saveOriginalFirst')}</p>}
+
         <div className="lesson-field">
           <label className="lesson-field-label">{t('authoring.moduleEditor.lessonTitleLabel')}</label>
           <input
             className={`lesson-field-input${err.title ? ' lesson-field-input--error' : ''}`}
             value={lesson.title}
-            disabled={locked}
+            disabled={fieldsDisabled}
             onChange={(e) => onChange('title', e.target.value)}
             placeholder={t('authoring.moduleEditor.titlePlaceholderExample')}
           />
@@ -318,7 +354,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
           <textarea
             className="lesson-field-textarea"
             value={lesson.description}
-            disabled={locked}
+            disabled={fieldsDisabled}
             rows={3}
             onChange={(e) => onChange('description', e.target.value)}
             placeholder={t('authoring.moduleEditor.descPlaceholder')}
@@ -331,7 +367,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <textarea
               className="lesson-field-textarea lesson-field-textarea--content"
               value={lesson.content}
-              disabled={locked}
+              disabled={fieldsDisabled}
               rows={8}
               onChange={(e) => onChange('content', e.target.value)}
               placeholder={t('authoring.moduleEditor.contentPlaceholder')}
@@ -349,12 +385,12 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
               type="url"
               className={`lesson-field-input${err.content ? ' lesson-field-input--error' : ''}`}
               value={lesson.content}
-              disabled={locked}
+              disabled={fieldsDisabled}
               onChange={(e) => onChange('content', e.target.value)}
               placeholder={t('authoring.moduleEditor.urlPlaceholder')}
             />
             <FieldError msg={err.content} />
-            {['pdf', 'image'].includes(lesson.lesson_type) && !locked && (
+            {['pdf', 'image'].includes(lesson.lesson_type) && !locked && !translating && (
               <div className="lesson-upload-row">
                 <span className="lesson-upload-or">{t('authoring.moduleEditor.uploadOr')}</span>
                 <label className="lesson-upload-btn">
@@ -379,7 +415,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <textarea
               className={`lesson-field-textarea lesson-field-textarea--content${err.content ? ' lesson-field-textarea--error' : ''}`}
               value={lesson.content}
-              disabled={locked}
+              disabled={fieldsDisabled}
               rows={6}
               onChange={(e) => onChange('content', e.target.value)}
               placeholder={t('authoring.moduleEditor.assignmentPlaceholder')}
@@ -394,7 +430,8 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <FieldError msg={err.quiz_data} />
             <QuizBuilder
               quizData={lesson.quiz_data ?? []}
-              locked={locked}
+              textDisabled={fieldsDisabled}
+              structureLocked={structureLocked}
               onChange={(next) => onChange('quiz_data', next)}
             />
           </>
@@ -405,7 +442,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
           <input
             className="lesson-field-input lesson-field-input--short"
             value={lesson.duration_minutes || ''}
-            disabled={locked}
+            disabled={locked || translating}
             type="number"
             min={0}
             onChange={(e) => onChange('duration_minutes', Number(e.target.value))}
@@ -418,7 +455,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
             <input
               type="checkbox"
               checked={lesson.is_required}
-              disabled={locked}
+              disabled={locked || translating}
               onChange={(e) => onChange('is_required', e.target.checked)}
             />
             <div>
@@ -430,7 +467,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
 
         <FieldError msg={err.general} />
 
-        {!locked && lesson.isDirty && (
+        {!locked && !blockedNew && lesson.isDirty && (
           <button
             className="lesson-save-btn"
             onClick={onSave}
@@ -456,6 +493,7 @@ function LessonEditor({ lesson, locked, onChange, onDelete, onSave, onError, err
 LessonEditor.propTypes = {
   lesson: lessonShape.isRequired,
   locked: PropTypes.bool.isRequired,
+  translating: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
@@ -506,6 +544,12 @@ export default function ModuleEditorPage() {
   const [dragId, setDragId] = useState(null)
   const [dragOverId, setDragOverId] = useState(null)
 
+  // ── Translation state ──────────────────────────────────────────────────────
+  const [activeLang, setActiveLang] = useState('original')
+  const [sourceLanguage, setSourceLanguage] = useState('en')
+  const [translationStatus, setTranslationStatus] = useState({})
+  const translating = activeLang !== 'original'
+
   useEffect(() => {
     Promise.all([
       client.get(`/authoring/courses/${courseId}/modules/${moduleId}/edit/`),
@@ -518,16 +562,37 @@ export default function ModuleEditorPage() {
         setLessons(m.lessons.map((l) => ({ ...l, isDirty: false, isNew: false, saving: false })))
         setIsPublished(courseRes.data.is_published)
         setCourseAuthorId(courseRes.data.created_by_id)
+        setSourceLanguage(courseRes.data.source_language ?? 'en')
+        setTranslationStatus(courseRes.data.translation_status ?? {})
       })
       .catch(() => setError(t('authoring.moduleEditor.loadError')))
   }, [courseId, moduleId, t])
 
   const selectedLesson = lessons.find((l) => l.id === selectedLessonId) ?? null
+  const displayLesson = selectedLesson && translating
+    ? {
+        ...selectedLesson,
+        title: selectedLesson.translations?.[activeLang]?.title ?? '',
+        description: selectedLesson.translations?.[activeLang]?.description ?? '',
+        content: selectedLesson.translations?.[activeLang]?.content ?? '',
+        quiz_data: mergedQuizData(selectedLesson, activeLang),
+      }
+    : selectedLesson
 
   // ── Module fields ─────────────────────────────────────────────────────────
 
+  const moduleFieldValue = (field) =>
+    (activeLang === 'original' ? moduleForm[field] : (module?.translations?.[activeLang]?.[field] ?? ''))
+
   const handleModuleFieldChange = (field, value) => {
-    setModuleForm((f) => ({ ...f, [field]: value }))
+    if (activeLang === 'original') {
+      setModuleForm((f) => ({ ...f, [field]: value }))
+    } else {
+      setModule((m) => ({
+        ...m,
+        translations: { ...m.translations, [activeLang]: { ...(m.translations?.[activeLang] ?? {}), [field]: value } },
+      }))
+    }
     setModuleDirty(true)
   }
 
@@ -535,7 +600,16 @@ export default function ModuleEditorPage() {
     setModuleSaving(true)
     setSaveStatus('')
     try {
-      await client.patch(`/authoring/courses/${courseId}/modules/${moduleId}/`, moduleForm)
+      if (activeLang === 'original') {
+        await client.patch(`/authoring/courses/${courseId}/modules/${moduleId}/`, moduleForm)
+      } else {
+        const payload = {
+          title: module.translations?.[activeLang]?.title ?? '',
+          description: module.translations?.[activeLang]?.description ?? '',
+        }
+        const res = await client.patch(`/authoring/courses/${courseId}/modules/${moduleId}/?lang=${activeLang}`, payload)
+        setModule((m) => ({ ...m, translations: res.data.translations }))
+      }
       setModuleDirty(false)
       setSaveStatus('saved')
       setTimeout(() => setSaveStatus(''), 3000)
@@ -569,29 +643,46 @@ export default function ModuleEditorPage() {
   }
 
   const saveLessonRequest = useCallback(async (lesson) => {
-    const payload = {
-      title: lesson.title,
-      description: lesson.description,
-      lesson_type: lesson.lesson_type,
-      content: lesson.content,
-      quiz_data: lesson.quiz_data ?? [],
-      duration_minutes: lesson.duration_minutes,
-      is_required: lesson.is_required,
-    }
-    if (lesson.isNew) {
-      const res = await client.post(
-        `/authoring/courses/${courseId}/modules/${moduleId}/lessons/`, payload,
+    if (activeLang === 'original') {
+      const payload = {
+        title: lesson.title,
+        description: lesson.description,
+        lesson_type: lesson.lesson_type,
+        content: lesson.content,
+        quiz_data: lesson.quiz_data ?? [],
+        duration_minutes: lesson.duration_minutes,
+        is_required: lesson.is_required,
+      }
+      if (lesson.isNew) {
+        const res = await client.post(
+          `/authoring/courses/${courseId}/modules/${moduleId}/lessons/`, payload,
+        )
+        return { tempId: lesson.id, saved: res.data }
+      }
+      const res = await client.patch(
+        `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/`, payload,
       )
       return { tempId: lesson.id, saved: res.data }
     }
+
+    const payload = {
+      title: lesson.translations?.[activeLang]?.title ?? '',
+      description: lesson.translations?.[activeLang]?.description ?? '',
+      content: lesson.translations?.[activeLang]?.content ?? '',
+    }
+    if (lesson.lesson_type === 'quiz') {
+      payload.quiz_data = mergedQuizData(lesson, activeLang)
+    }
     const res = await client.patch(
-      `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/`, payload,
+      `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/?lang=${activeLang}`, payload,
     )
     return { tempId: lesson.id, saved: res.data }
-  }, [courseId, moduleId])
+  }, [courseId, moduleId, activeLang])
 
   const saveLesson = async (lesson) => {
-    const errors = validateLesson(lesson, t)
+    if (lesson.isNew && activeLang !== 'original') return
+
+    const errors = activeLang === 'original' ? validateLesson(lesson, t) : null
     if (errors) {
       setLessonErrors((prev) => ({ ...prev, [lesson.id]: errors }))
       return
@@ -619,9 +710,21 @@ export default function ModuleEditorPage() {
 
   const updateLessonField = (field, value) => {
     if (!selectedLessonId) return
-    setLessons((ls) =>
-      ls.map((l) => (l.id === selectedLessonId ? { ...l, [field]: value, isDirty: true } : l))
-    )
+    if (activeLang === 'original') {
+      setLessons((ls) =>
+        ls.map((l) => (l.id === selectedLessonId ? { ...l, [field]: value, isDirty: true } : l))
+      )
+    } else {
+      setLessons((ls) =>
+        ls.map((l) => (l.id === selectedLessonId
+          ? {
+              ...l,
+              translations: { ...l.translations, [activeLang]: { ...(l.translations?.[activeLang] ?? {}), [field]: value } },
+              isDirty: true,
+            }
+          : l))
+      )
+    }
     // clear validation error for this field on change
     setLessonErrors((prev) => {
       const errs = prev[selectedLessonId]
@@ -708,6 +811,23 @@ export default function ModuleEditorPage() {
     setDragOverId(null)
   }
 
+  // ── Translation bar callbacks ─────────────────────────────────────────────
+
+  const reloadTranslations = () => {
+    Promise.all([
+      client.get(`/authoring/courses/${courseId}/modules/${moduleId}/edit/`),
+      client.get(`/authoring/courses/${courseId}/`),
+    ]).then(([modRes, courseRes]) => {
+      const m = modRes.data
+      setModule(m)
+      setLessons((ls) => ls.map((l) => {
+        const fresh = m.lessons.find((fl) => fl.id === l.id)
+        return fresh ? { ...l, translations: fresh.translations } : l
+      }))
+      setTranslationStatus(courseRes.data.translation_status ?? {})
+    }).catch(() => {})
+  }
+
   if (error) return <p className="page-error">{error}</p>
   if (!module) return <p className="page-loading">{t('common.loading')}</p>
 
@@ -750,6 +870,18 @@ export default function ModuleEditorPage() {
 
       <h1 className="module-editor-heading">{t('authoring.moduleEditor.moduleEditorHeading')}</h1>
 
+      {/* Language switch + translate */}
+      <TranslationBar
+        courseId={courseId}
+        sourceLanguage={sourceLanguage}
+        translationStatus={translationStatus}
+        activeLang={activeLang}
+        onSelectLang={setActiveLang}
+        onStatusUpdate={setTranslationStatus}
+        onTranslated={reloadTranslations}
+        disabled={locked}
+      />
+
       <div className="module-editor-layout">
 
         {/* ── Left panel ── */}
@@ -760,7 +892,7 @@ export default function ModuleEditorPage() {
             <label className="me-label">{t('authoring.moduleEditor.moduleTitleLabel')}</label>
             <input
               className="me-input"
-              value={moduleForm.title}
+              value={moduleFieldValue('title')}
               disabled={locked}
               onChange={(e) => handleModuleFieldChange('title', e.target.value)}
               placeholder={t('authoring.editor.modulePlaceholder')}
@@ -768,7 +900,7 @@ export default function ModuleEditorPage() {
             <label className="me-label" style={{ marginTop: '1rem' }}>{t('authoring.moduleEditor.descriptionLabel')}</label>
             <textarea
               className="me-textarea"
-              value={moduleForm.description}
+              value={moduleFieldValue('description')}
               disabled={locked}
               rows={3}
               onChange={(e) => handleModuleFieldChange('description', e.target.value)}
@@ -776,7 +908,7 @@ export default function ModuleEditorPage() {
             />
           </div>
 
-          {!locked && (
+          {!locked && !translating && (
             <div className="me-card">
               <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
               <div className="me-lesson-type-grid">
@@ -809,7 +941,7 @@ export default function ModuleEditorPage() {
                       isDragOver ? 'me-lesson-item--drag-over' : '',
                     ].filter(Boolean).join(' ')}
                     onClick={() => setSelectedLessonId(lesson.id)}
-                    draggable={!locked}
+                    draggable={!locked && !translating}
                     onDragStart={(e) => handleDragStart(e, lesson.id)}
                     onDragOver={(e) => handleDragOver(e, lesson.id)}
                     onDrop={(e) => handleDrop(e, lesson.id)}
@@ -832,10 +964,11 @@ export default function ModuleEditorPage() {
 
         {/* ── Right panel ── */}
         <main className="module-editor-main">
-          {selectedLesson ? (
+          {displayLesson ? (
             <LessonEditor
-              lesson={selectedLesson}
+              lesson={displayLesson}
               locked={locked}
+              translating={translating}
               onChange={updateLessonField}
               onDelete={() => deleteLesson(selectedLesson)}
               onSave={() => saveLesson(selectedLesson)}
