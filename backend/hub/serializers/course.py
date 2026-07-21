@@ -4,6 +4,7 @@ from rest_framework import serializers
 from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar
 
 from .content import ModuleSerializer
+from .localize import localized, viewer_language
 
 
 class PillarSerializer(serializers.ModelSerializer):
@@ -17,6 +18,8 @@ class CourseListSerializer(serializers.ModelSerializer):
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     progress_pct = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -43,6 +46,12 @@ class CourseListSerializer(serializers.ModelSerializer):
     def get_is_enrolled(self, obj):
         return self._enrollment(obj) is not None
 
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
+
+    def get_description(self, obj):
+        return localized(obj, 'description', viewer_language(self.context))
+
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
@@ -52,6 +61,9 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     progress_pct = serializers.SerializerMethodField()
     current_module_id = serializers.SerializerMethodField()
     completed_module_ids = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    learning_outcomes = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -60,6 +72,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'learning_outcomes', 'module_count', 'modules',
             'is_enrolled', 'progress_pct', 'current_module_id', 'completed_module_ids',
         ]
+
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
+
+    def get_description(self, obj):
+        return localized(obj, 'description', viewer_language(self.context))
+
+    def get_learning_outcomes(self, obj):
+        return localized(obj, 'learning_outcomes', viewer_language(self.context))
 
     def _enrollment(self, obj):
         user = self.context['request'].user
@@ -101,12 +122,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
 class ContinueLearningSerializer(serializers.ModelSerializer):
     course_id = serializers.IntegerField(source='course.id')
-    course_title = serializers.CharField(source='course.title')
+    course_title = serializers.SerializerMethodField()
     current_module_title = serializers.CharField(source='current_module.title', default=None)
 
     class Meta:
         model = Enrollment
         fields = ['course_id', 'course_title', 'current_module_title', 'progress_pct']
+
+    def get_course_title(self, obj):
+        return localized(obj.course, 'title', viewer_language(self.context))
 
 
 class PillarSummarySerializer(serializers.ModelSerializer):
@@ -130,7 +154,7 @@ class PillarSummarySerializer(serializers.ModelSerializer):
 
 class MyLearningEnrollmentSerializer(serializers.ModelSerializer):
     course_id = serializers.IntegerField(source='course.id')
-    course_title = serializers.CharField(source='course.title')
+    course_title = serializers.SerializerMethodField()
     pillar_name = serializers.CharField(source='course.pillar.name')
     pillar_slug = serializers.CharField(source='course.pillar.slug')
     module_count = serializers.IntegerField(source='course.modules.count')
@@ -143,6 +167,9 @@ class MyLearningEnrollmentSerializer(serializers.ModelSerializer):
             'progress_pct', 'module_count', 'last_accessed_at',
             'current_module_title', 'enrolled_at', 'completed_at',
         ]
+
+    def get_course_title(self, obj):
+        return localized(obj.course, 'title', viewer_language(self.context))
 
 
 class CourseAuthoringSerializer(serializers.ModelSerializer):

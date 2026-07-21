@@ -5,15 +5,21 @@ from hub.models.enrollment import Enrollment
 from hub.models.pathway import LearningPathCourse, UserLearningPath
 from hub.models.recommendations import CourseRecommendation
 
+from .localize import localized, viewer_language
+
 
 class PathwayCourseSerializer(serializers.ModelSerializer):
     pillar_name = serializers.CharField(source='pillar.name', read_only=True)
     status      = serializers.SerializerMethodField()
     order       = serializers.SerializerMethodField()
+    title       = serializers.SerializerMethodField()
 
     class Meta:
         model  = Course
         fields = ['id', 'title', 'pillar_name', 'duration_hours', 'level', 'status', 'order']
+
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
 
     def get_status(self, obj):
         user = self.context.get('user')
@@ -69,7 +75,7 @@ class UserLearningPathSerializer(serializers.ModelSerializer):
 
 class RecommendationSerializer(serializers.ModelSerializer):
     course_id      = serializers.IntegerField(source='course.id')
-    title          = serializers.CharField(source='course.title')
+    title          = serializers.SerializerMethodField()
     pillar_name    = serializers.CharField(source='course.pillar.name')
     level          = serializers.CharField(source='course.level')
     duration_hours = serializers.IntegerField(source='course.duration_hours')
@@ -77,3 +83,6 @@ class RecommendationSerializer(serializers.ModelSerializer):
     class Meta:
         model  = CourseRecommendation
         fields = ['course_id', 'title', 'pillar_name', 'level', 'duration_hours', 'score', 'reason', 'source']
+
+    def get_title(self, obj):
+        return localized(obj.course, 'title', viewer_language(self.context))

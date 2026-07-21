@@ -114,7 +114,7 @@ class CourseLearnView(APIView):
         modules_data = ModuleLearnSerializer(
             course.modules.all(),
             many=True,
-            context={'completed_lesson_ids': completed_ids},
+            context={'completed_lesson_ids': completed_ids, 'request': request},
         ).data
 
         all_lessons = list(
@@ -186,7 +186,7 @@ class LessonDetailView(APIView):
                 assignment_submission = AssignmentSubmissionSerializer(sub).data
 
         return Response({
-            **LessonLearnDetailSerializer(lesson).data,
+            **LessonLearnDetailSerializer(lesson, context={'request': request}).data,
             'module_id': lesson.module_id,
             'module_title': lesson.module.title,
             'is_completed': is_completed,
@@ -287,11 +287,15 @@ class MyLearningView(APIView):
 
         return Response({
             'continue_learning': (
-                MyLearningEnrollmentSerializer(continue_learning).data
+                MyLearningEnrollmentSerializer(continue_learning, context={'request': request}).data
                 if continue_learning else None
             ),
-            'in_progress': MyLearningEnrollmentSerializer(in_progress, many=True).data,
-            'completed': MyLearningEnrollmentSerializer(completed, many=True).data,
+            'in_progress': MyLearningEnrollmentSerializer(
+                in_progress, many=True, context={'request': request},
+            ).data,
+            'completed': MyLearningEnrollmentSerializer(
+                completed, many=True, context={'request': request},
+            ).data,
         })
 
 
@@ -305,7 +309,7 @@ class HomeView(APIView):
         )
 
         continue_learning = (
-            ContinueLearningSerializer(latest_enrollment).data
+            ContinueLearningSerializer(latest_enrollment, context={'request': request}).data
             if latest_enrollment else None
         )
 

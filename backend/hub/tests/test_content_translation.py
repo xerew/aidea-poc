@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APITestCase
 
-from hub.models import Course, LearningPillar, Lesson, Module, UserProfile
+from hub.models import Course, Enrollment, LearningPillar, Lesson, Module, UserProfile
 
 
 class TranslationFieldsTests(TestCase):
@@ -97,3 +97,27 @@ class TranslateEndpointTests(APITestCase):
         self.course.save()
         self.client.force_authenticate(other)
         self.assertEqual(self.client.post(self.url, {'language': 'el'}, format='json').status_code, 403)
+
+
+class LearnerResolutionTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='gr_learner', password='pass12345')
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER, language='el')
+        self.pillar = LearningPillar.objects.create(name='P', slug='plr', order=1)
+        self.course = Course.objects.create(title='Original', description='OrigDesc', pillar=self.pillar,
+            level='beginner', duration_hours=1, is_published=True,
+            translations={'el': {'title': 'Πρωτότυπο'}})
+        Enrollment.objects.create(user=self.user, course=self.course)
+        self.client.force_authenticate(self.user)
+
+    def test_detail_uses_greek_title_with_english_fallback_for_description(self):
+        res = self.client.get(f'/api/courses/{self.course.id}/')
+        self.assertEqual(res.data['title'], 'Πρωτότυπο')        # translated
+        self.assertEqual(res.data['description'], 'OrigDesc')    # falls back to original
+
+    def test_english_user_sees_original(self):
+        en = User.objects.create_user(username='en_learner', password='pass12345')
+        UserProfile.objects.create(user=en, user_type=UserProfile.UserType.TEACHER, language='en')
+        self.client.force_authenticate(en)
+        res = self.client.get(f'/api/courses/{self.course.id}/')
+        self.assertEqual(res.data['title'], 'Original')

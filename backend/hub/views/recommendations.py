@@ -21,7 +21,7 @@ class RecommendationsView(APIView):
             .select_related('course__pillar')
             .order_by('-score')
         )
-        return Response(RecommendationSerializer(recs, many=True).data)
+        return Response(RecommendationSerializer(recs, many=True, context={'request': request}).data)
 
 
 class RecommendationEventView(APIView):

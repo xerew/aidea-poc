@@ -2,6 +2,8 @@ from rest_framework import serializers
 
 from hub.models import Lesson, Module
 
+from .localize import localized, viewer_language
+
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,7 +44,11 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class LessonLearnDetailSerializer(serializers.ModelSerializer):
-    """Learner-facing lesson serializer — strips is_correct from quiz options."""
+    """Learner-facing lesson serializer — resolves to the viewer's language
+    (falling back to the original) and strips is_correct from quiz options."""
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
     quiz_data = serializers.SerializerMethodField()
 
     class Meta:
@@ -52,13 +58,23 @@ class LessonLearnDetailSerializer(serializers.ModelSerializer):
             'content', 'quiz_data', 'duration_minutes', 'order', 'is_required',
         ]
 
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
+
+    def get_description(self, obj):
+        return localized(obj, 'description', viewer_language(self.context))
+
+    def get_content(self, obj):
+        return localized(obj, 'content', viewer_language(self.context))
+
     def get_quiz_data(self, obj):
+        quiz_data = localized(obj, 'quiz_data', viewer_language(self.context))
         return [
             {
                 'question': q.get('question', ''),
                 'options': [{'text': opt.get('text', '')} for opt in q.get('options', [])],
             }
-            for q in (obj.quiz_data or [])
+            for q in (quiz_data or [])
         ]
 
 
@@ -78,11 +94,15 @@ class ModuleWithLessonsSerializer(serializers.ModelSerializer):
 
 class LessonLearnSerializer(serializers.ModelSerializer):
     """Lightweight serializer for lesson sidebar — includes per-user completion flag."""
+    title = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
 
     class Meta:
         model = Lesson
         fields = ['id', 'title', 'lesson_type', 'duration_minutes', 'order', 'is_completed']
+
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
 
     def get_is_completed(self, obj):
         return obj.id in self.context.get('completed_lesson_ids', set())
@@ -90,7 +110,11 @@ class LessonLearnSerializer(serializers.ModelSerializer):
 
 class ModuleLearnSerializer(serializers.ModelSerializer):
     lessons = LessonLearnSerializer(many=True, read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Module
         fields = ['id', 'title', 'order', 'lessons']
+
+    def get_title(self, obj):
+        return localized(obj, 'title', viewer_language(self.context))
