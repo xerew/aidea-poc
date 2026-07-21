@@ -25,6 +25,15 @@ services:
       timeout: 5s
       retries: 5
 
+  ollama-tunnel:
+    build: ./docker/ollama-tunnel
+    environment:
+      SSH_REMOTE_USER: ${SSH_REMOTE_USER:-ngrammatikos}
+      SSH_REMOTE_HOST: ${SSH_REMOTE_HOST:-147.102.17.66}
+    volumes:
+      - ./docker/ollama-tunnel/keys:/keys:ro
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
@@ -34,6 +43,8 @@ services:
       DATABASE_URL: postgresql://aidea:aidea@db:5432/aidea
       REDIS_URL: redis://redis:6379/0
       DEBUG: "True"
+      OLLAMA_URL: http://ollama-tunnel:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3-translator}
     volumes:
       - ./backend:/app
       - backend_venv:/app/.venv
@@ -44,6 +55,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      ollama-tunnel:
+        condition: service_started
     command: >
       sh -c "uv run python manage.py migrate &&
              uv run python manage.py runserver 0.0.0.0:8000"
@@ -57,6 +70,8 @@ services:
       DATABASE_URL: postgresql://aidea:aidea@db:5432/aidea
       REDIS_URL: redis://redis:6379/0
       DEBUG: "True"
+      OLLAMA_URL: http://ollama-tunnel:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3-translator}
     volumes:
       - ./backend:/app
       - backend_venv:/app/.venv
@@ -66,6 +81,8 @@ services:
       redis:
         condition: service_healthy
       backend:
+        condition: service_started
+      ollama-tunnel:
         condition: service_started
     command: uv run celery -A aidea worker -l info
 
