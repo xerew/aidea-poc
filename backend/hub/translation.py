@@ -14,6 +14,11 @@ LANGUAGE_NAMES = {
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://ollama-tunnel:11434')
 OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'gemma3-translator')
 _TIMEOUT = int(os.getenv('OLLAMA_TIMEOUT', '120'))
+# Ollama validates the Host header to block DNS-rebinding, accepting only
+# localhost/127.0.0.1. When reached over the SSH tunnel the URL host is
+# `ollama-tunnel`, which Ollama rejects with 403 — so we send the Host header
+# it trusts. The tunnel forwards to 127.0.0.1 on the remote regardless.
+OLLAMA_HOST_HEADER = os.getenv('OLLAMA_HOST_HEADER', 'localhost:11434')
 
 
 class TranslationError(Exception):
@@ -24,7 +29,7 @@ def _ollama_generate(prompt: str) -> str:
     payload = json.dumps({'model': OLLAMA_MODEL, 'prompt': prompt, 'stream': False}).encode()
     req = urllib.request.Request(
         f'{OLLAMA_URL}/api/generate', data=payload,
-        headers={'Content-Type': 'application/json'},
+        headers={'Content-Type': 'application/json', 'Host': OLLAMA_HOST_HEADER},
     )
     try:
         with urllib.request.urlopen(req, timeout=_TIMEOUT) as resp:

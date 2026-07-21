@@ -1,9 +1,12 @@
+import logging
 import math
 import random
 
 from celery import shared_task
 
 from hub.translation import translate_text
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -469,6 +472,9 @@ def translate_course(course_id: int, target: str) -> None:
                 lesson.translations[target] = blob
                 lesson.save(update_fields=['translations'])
         course.translation_status[target] = 'done'
-    except TranslationError:
+    except TranslationError as exc:
+        logger.error(
+            'Translation of course %s into %s failed: %s', course_id, target, exc,
+        )
         course.translation_status[target] = 'failed'
     course.save(update_fields=['translations', 'translation_status'])
