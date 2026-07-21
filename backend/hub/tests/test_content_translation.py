@@ -121,3 +121,163 @@ class LearnerResolutionTests(APITestCase):
         self.client.force_authenticate(en)
         res = self.client.get(f'/api/courses/{self.course.id}/')
         self.assertEqual(res.data['title'], 'Original')
+
+
+class AuthoringTranslationTests(APITestCase):
+    """Task 5: authoring API exposes source_language/translations/translation_status,
+    and PATCH ?lang=<code> writes into the translations blob instead of base fields."""
+
+    def setUp(self):
+        self.creator = User.objects.create_user(username='at_cc', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.other = User.objects.create_user(username='at_other', password='pass12345')
+        UserProfile.objects.create(user=self.other, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.pillar = LearningPillar.objects.create(name='P', slug='pat', order=1)
+        self.course = Course.objects.create(
+            title='Original Title', description='Original Desc', pillar=self.pillar,
+            level='beginner', duration_hours=1, source_language='en',
+            learning_outcomes=['Outcome A'], created_by=self.creator,
+        )
+        self.module = Module.objects.create(
+            course=self.course, title='Module Title', description='Module Desc', order=1,
+        )
+        self.lesson = Lesson.objects.create(
+            module=self.module, title='Lesson Title', description='Lesson Desc',
+            content='Lesson Body', lesson_type='quiz', order=1,
+            quiz_data=[{'question': 'Q?', 'options': [
+                {'text': 'A', 'is_correct': True}, {'text': 'B', 'is_correct': False}]}],
+        )
+        self.course_url = f'/api/authoring/courses/{self.course.id}/'
+        self.module_url = f'/api/authoring/courses/{self.course.id}/modules/{self.module.id}/'
+        self.lesson_url = (
+            f'/api/authoring/courses/{self.course.id}/modules/{self.module.id}/'
+            f'lessons/{self.lesson.id}/'
+        )
+
+    # -- GET exposes translation fields -----------------------------------
+
+    def test_get_course_includes_translation_fields(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.get(self.course_url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data['source_language'], 'en')
+        self.assertEqual(res.data['translations'], {})
+        self.assertEqual(res.data['translation_status'], {})
+
+    # -- course PATCH with ?lang= writes to blob, not base fields ---------
+
+    def test_patch_course_with_lang_writes_translation_blob_only(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(f'{self.course_url}?lang=el', {'title': 'X'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.translations['el']['title'], 'X')
+        self.assertEqual(self.course.title, 'Original Title')
+
+    def test_patch_course_without_lang_edits_base_field(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(self.course_url, {'title': 'Y'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.title, 'Y')
+        self.assertEqual(self.course.translations, {})
+
+    def test_patch_course_lang_rejects_source_language(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(f'{self.course_url}?lang=en', {'title': 'X'}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_patch_course_lang_rejects_unknown_language(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(f'{self.course_url}?lang=xx', {'title': 'X'}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_setting_source_language_via_normal_patch_persists(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(self.course_url, {'source_language': 'fr'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.source_language, 'fr')
+
+    def test_lang_edit_on_published_course_scoped_to_author(self):
+        self.course.is_published = True
+        self.course.save()
+        self.client.force_authenticate(self.other)
+        res = self.client.patch(f'{self.course_url}?lang=el', {'title': 'X'}, format='json')
+        self.assertEqual(res.status_code, 403)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.translations, {})
+
+    def test_lang_edit_on_published_course_allowed_for_author(self):
+        self.course.is_published = True
+        self.course.save()
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(f'{self.course_url}?lang=el', {'title': 'X'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.translations['el']['title'], 'X')
+
+    # -- module PATCH with ?lang= ------------------------------------------
+
+    def test_patch_module_with_lang_writes_translation_blob_only(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(
+            f'{self.module_url}?lang=el', {'title': 'ModX', 'description': 'DescX'}, format='json',
+        )
+        self.assertEqual(res.status_code, 200)
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.translations['el']['title'], 'ModX')
+        self.assertEqual(self.module.translations['el']['description'], 'DescX')
+        self.assertEqual(self.module.title, 'Module Title')
+        self.assertEqual(self.module.description, 'Module Desc')
+
+    def test_patch_module_without_lang_edits_base_field(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(self.module_url, {'title': 'ModY'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.module.refresh_from_db()
+        self.assertEqual(self.module.title, 'ModY')
+        self.assertEqual(self.module.translations, {})
+
+    # -- lesson PATCH with ?lang= -------------------------------------------
+
+    def test_patch_lesson_with_lang_writes_translation_blob_only(self):
+        self.client.force_authenticate(self.creator)
+        new_quiz = [{'question': 'QX?', 'options': [
+            {'text': 'AX', 'is_correct': True}, {'text': 'BX', 'is_correct': False}]}]
+        res = self.client.patch(
+            f'{self.lesson_url}?lang=el',
+            {
+                'title': 'LesX', 'description': 'LesDescX', 'content': 'LesBodyX',
+                'quiz_data': new_quiz,
+            },
+            format='json',
+        )
+        self.assertEqual(res.status_code, 200)
+        self.lesson.refresh_from_db()
+        blob = self.lesson.translations['el']
+        self.assertEqual(blob['title'], 'LesX')
+        self.assertEqual(blob['description'], 'LesDescX')
+        self.assertEqual(blob['content'], 'LesBodyX')
+        self.assertEqual(blob['quiz_data'], new_quiz)
+        self.assertEqual(self.lesson.title, 'Lesson Title')
+        self.assertEqual(self.lesson.description, 'Lesson Desc')
+        self.assertEqual(self.lesson.content, 'Lesson Body')
+        self.assertEqual(self.lesson.quiz_data[0]['question'], 'Q?')
+
+    def test_patch_lesson_without_lang_edits_base_field(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.patch(self.lesson_url, {'title': 'LesY'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.title, 'LesY')
+        self.assertEqual(self.lesson.translations, {})
+
+    def test_lesson_lang_edit_on_published_course_scoped_to_author(self):
+        self.course.is_published = True
+        self.course.save()
+        self.client.force_authenticate(self.other)
+        res = self.client.patch(f'{self.lesson_url}?lang=el', {'title': 'LesX'}, format='json')
+        self.assertEqual(res.status_code, 403)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.translations, {})

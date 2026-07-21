@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar
 
-from .content import ModuleSerializer
+from .content import ModuleAuthoringSerializer, ModuleSerializer
 from .localize import localized, viewer_language
 
 
@@ -177,7 +177,7 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
     pillar_id = serializers.PrimaryKeyRelatedField(
         queryset=LearningPillar.objects.all(), source='pillar', write_only=True,
     )
-    modules = ModuleSerializer(many=True, read_only=True)
+    modules = ModuleAuthoringSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     created_by_id = serializers.IntegerField(source='created_by.id', read_only=True, default=None)
     created_by_name = serializers.SerializerMethodField()
@@ -188,8 +188,9 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'pillar', 'pillar_id', 'level',
             'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
             'created_by_id', 'created_by_name',
+            'source_language', 'translations', 'translation_status',
         ]
-        read_only_fields = ['is_published']
+        read_only_fields = ['is_published', 'translations', 'translation_status']
 
     def get_created_by_name(self, obj):
         if not obj.created_by:

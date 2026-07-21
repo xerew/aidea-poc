@@ -5,8 +5,11 @@ from rest_framework.views import APIView
 
 from hub.models import CourseEditHistory, Lesson, Module
 from hub.serializers import LessonSerializer
+from hub.translation import LANGUAGE_NAMES
 
 from .permissions import IsContentCreator, can_edit_published
+
+TRANSLATABLE_LESSON_FIELDS = ['title', 'description', 'content', 'quiz_data']
 
 
 class AuthoringLessonView(APIView):
@@ -61,6 +64,21 @@ class AuthoringLessonDetailView(APIView):
                 {'detail': 'Published courses can only be edited by their author.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
+
+        lang = request.query_params.get('lang')
+        if lang:
+            source_language = lesson.module.course.source_language
+            if lang not in LANGUAGE_NAMES or lang == source_language:
+                return Response(
+                    {'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST,
+                )
+            blob = dict(lesson.translations.get(lang, {}))
+            for field in TRANSLATABLE_LESSON_FIELDS:
+                if field in request.data:
+                    blob[field] = request.data[field]
+            lesson.translations[lang] = blob
+            lesson.save(update_fields=['translations'])
+            return Response(LessonSerializer(lesson).data)
 
         serializer = LessonSerializer(lesson, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)

@@ -11,7 +11,9 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'quiz_data', 'duration_minutes', 'order', 'is_required',
+            'translations',
         ]
+        read_only_fields = ['translations']
 
     def validate_quiz_data(self, value):
         """Ensure quiz_data is a valid list of questions with options."""
@@ -79,9 +81,22 @@ class LessonLearnDetailSerializer(serializers.ModelSerializer):
 
 
 class ModuleSerializer(serializers.ModelSerializer):
+    """Shared by the learner-facing CourseDetailSerializer and the authoring
+    endpoints — deliberately does NOT expose the raw `translations` blob
+    (learners only ever see fields resolved to their language)."""
+
     class Meta:
         model = Module
         fields = ['id', 'title', 'description', 'order', 'duration_minutes']
+
+
+class ModuleAuthoringSerializer(ModuleSerializer):
+    """Authoring variant of ModuleSerializer — exposes the raw translations
+    blob for the course/module editor payloads."""
+
+    class Meta(ModuleSerializer.Meta):
+        fields = [*ModuleSerializer.Meta.fields, 'translations']
+        read_only_fields = ['translations']
 
 
 class ModuleWithLessonsSerializer(serializers.ModelSerializer):
@@ -89,7 +104,10 @@ class ModuleWithLessonsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'lessons']
+        fields = [
+            'id', 'title', 'description', 'order', 'duration_minutes', 'lessons', 'translations',
+        ]
+        read_only_fields = ['translations']
 
 
 class LessonLearnSerializer(serializers.ModelSerializer):

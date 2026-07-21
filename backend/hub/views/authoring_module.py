@@ -4,9 +4,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hub.models import Course, CourseEditHistory, Module
-from hub.serializers import ModuleSerializer, ModuleWithLessonsSerializer
+from hub.serializers import ModuleAuthoringSerializer, ModuleWithLessonsSerializer
+from hub.translation import LANGUAGE_NAMES
 
 from .permissions import IsContentCreator, can_edit_published
+
+TRANSLATABLE_MODULE_FIELDS = ['title', 'description']
 
 
 class AuthoringModuleView(APIView):
@@ -24,7 +27,7 @@ class AuthoringModuleView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = ModuleSerializer(data=request.data)
+        serializer = ModuleAuthoringSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         next_order = (
             Module.objects.filter(course=course).aggregate(Max('order'))['order__max'] or 0
@@ -36,7 +39,7 @@ class AuthoringModuleView(APIView):
             editor=request.user,
             changes={'module_added': {'title': module.title, 'order': module.order}},
         )
-        return Response(ModuleSerializer(module).data, status=status.HTTP_201_CREATED)
+        return Response(ModuleAuthoringSerializer(module).data, status=status.HTTP_201_CREATED)
 
 
 class AuthoringModuleDetailView(APIView):
@@ -58,7 +61,21 @@ class AuthoringModuleDetailView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        serializer = ModuleSerializer(module, data=request.data, partial=True)
+        lang = request.query_params.get('lang')
+        if lang:
+            if lang not in LANGUAGE_NAMES or lang == module.course.source_language:
+                return Response(
+                    {'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST,
+                )
+            blob = dict(module.translations.get(lang, {}))
+            for field in TRANSLATABLE_MODULE_FIELDS:
+                if field in request.data:
+                    blob[field] = request.data[field]
+            module.translations[lang] = blob
+            module.save(update_fields=['translations'])
+            return Response(ModuleAuthoringSerializer(module).data)
+
+        serializer = ModuleAuthoringSerializer(module, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
 
         changes = {}
@@ -77,7 +94,7 @@ class AuthoringModuleDetailView(APIView):
                 editor=request.user,
                 changes={'module_edited': {'module_title': module.title, 'fields': changes}},
             )
-        return Response(ModuleSerializer(module).data)
+        return Response(ModuleAuthoringSerializer(module).data)
 
     def delete(self, request, pk, module_pk):
         module = self._get_module(pk, module_pk)
@@ -135,7 +152,7 @@ class AuthoringModuleReorderView(APIView):
             editor=request.user,
             changes={'modules_reordered': {'order': order}},
         )
-        return Response(ModuleSerializer(Module.objects.filter(course=course), many=True).data)
+        return Response(ModuleAuthoringSerializer(Module.objects.filter(course=course), many=True).data)
 
 
 class AuthoringModuleEditorView(APIView):

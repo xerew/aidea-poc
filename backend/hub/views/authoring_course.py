@@ -8,6 +8,8 @@ from hub.translation import LANGUAGE_NAMES
 
 from .permissions import IsContentCreator, can_edit_published
 
+TRANSLATABLE_COURSE_FIELDS = ['title', 'description', 'learning_outcomes']
+
 
 class AuthoringPillarsView(APIView):
     permission_classes = [IsContentCreator]
@@ -64,6 +66,20 @@ class AuthoringCourseDetailView(APIView):
                 {'detail': 'Published courses can only be edited by their author.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
+
+        lang = request.query_params.get('lang')
+        if lang:
+            if lang not in LANGUAGE_NAMES or lang == course.source_language:
+                return Response(
+                    {'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST,
+                )
+            blob = dict(course.translations.get(lang, {}))
+            for field in TRANSLATABLE_COURSE_FIELDS:
+                if field in request.data:
+                    blob[field] = request.data[field]
+            course.translations[lang] = blob
+            course.save(update_fields=['translations'])
+            return Response(CourseAuthoringSerializer(course).data)
 
         serializer = CourseAuthoringSerializer(course, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
