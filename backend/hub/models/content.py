@@ -42,6 +42,11 @@ class Course(models.Model):
     content_format     = models.CharField(
         max_length=20, choices=ContentFormat.choices, default=ContentFormat.MIXED,
     )
+    source_language     = models.CharField(max_length=5, default='en')
+    # translations: {lang_code: {"title": str, "description": str, ...}}
+    translations        = models.JSONField(default=dict, blank=True)
+    # translation_status: {lang_code: "pending"|"in_progress"|"done"|"failed"}
+    translation_status  = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['pillar', 'title']
@@ -58,6 +63,8 @@ class Module(models.Model):
     duration_minutes = models.PositiveSmallIntegerField(default=0)
     # Stub toggle: per-module LLM assignment reviewer ("later turned on")
     llm_review_enabled = models.BooleanField(default=False)
+    # translations: {lang_code: {"title": str, "description": str}}
+    translations     = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']
@@ -88,6 +95,8 @@ class Lesson(models.Model):
     duration_minutes = models.PositiveSmallIntegerField(default=0)
     order            = models.PositiveSmallIntegerField(default=0)
     is_required      = models.BooleanField(default=True)
+    # translations: {lang_code: {"title": str, "description": str, "content": str}}
+    translations     = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']
