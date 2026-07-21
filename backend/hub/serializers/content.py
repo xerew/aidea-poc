@@ -99,6 +99,25 @@ class ModuleAuthoringSerializer(ModuleSerializer):
         read_only_fields = ['translations']
 
 
+class ModuleLocalizedSerializer(serializers.ModelSerializer):
+    """Learner-facing module — title/description resolved to the viewer's
+    language with fallback to the original (used by CourseDetailSerializer)."""
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Module
+        fields = ['id', 'title', 'description', 'order', 'duration_minutes']
+
+    def get_title(self, obj):
+        from .localize import localized, viewer_language
+        return localized(obj, 'title', viewer_language(self.context))
+
+    def get_description(self, obj):
+        from .localize import localized, viewer_language
+        return localized(obj, 'description', viewer_language(self.context))
+
+
 class ModuleWithLessonsSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, read_only=True)
 

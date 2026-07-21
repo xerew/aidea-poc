@@ -458,9 +458,13 @@ def translate_course(course_id: int, target: str) -> None:
             module.translations[target] = {'title': tr(module.title), 'description': tr(module.description)}
             module.save(update_fields=['translations'])
             for lesson in module.lessons.all():
-                blob = {'title': tr(lesson.title), 'description': tr(lesson.description),
-                        'content': tr(lesson.content)}
-                if lesson.lesson_type == 'quiz':
+                blob = {'title': tr(lesson.title), 'description': tr(lesson.description)}
+                # `content` is prose only for text/assignment; for video/image/pdf
+                # it's a URL — translating it would mangle the link, so leave it
+                # to fall back to the original.
+                if lesson.lesson_type in ('text', 'assignment'):
+                    blob['content'] = tr(lesson.content)
+                elif lesson.lesson_type == 'quiz':
                     blob['quiz_data'] = tr_quiz(lesson.quiz_data)
                 lesson.translations[target] = blob
                 lesson.save(update_fields=['translations'])

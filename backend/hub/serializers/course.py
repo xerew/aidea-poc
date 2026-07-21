@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar
 
-from .content import ModuleAuthoringSerializer, ModuleSerializer
+from .content import ModuleAuthoringSerializer, ModuleLocalizedSerializer
 from .localize import localized, viewer_language
 
 
@@ -55,7 +55,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
-    modules = ModuleSerializer(many=True, read_only=True)
+    modules = ModuleLocalizedSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     is_enrolled = serializers.SerializerMethodField()
     progress_pct = serializers.SerializerMethodField()

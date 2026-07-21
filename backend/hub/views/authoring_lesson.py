@@ -75,10 +75,28 @@ class AuthoringLessonDetailView(APIView):
             # Validate a translated quiz_data through the same structural check
             # the base path uses, so a malformed blob can't be persisted.
             if 'quiz_data' in request.data:
+                translated = request.data['quiz_data']
                 try:
-                    LessonSerializer().validate_quiz_data(request.data['quiz_data'])
+                    LessonSerializer().validate_quiz_data(translated)
                 except serializers.ValidationError as exc:
                     return Response({'quiz_data': exc.detail}, status=status.HTTP_400_BAD_REQUEST)
+                # Learners see translated question/option TEXT but are graded
+                # positionally against the base quiz_data, so the translation
+                # must keep the same question and per-question option counts.
+                base = lesson.quiz_data or []
+                same_shape = (
+                    isinstance(translated, list)
+                    and len(translated) == len(base)
+                    and all(
+                        len(translated[i].get('options', [])) == len(base[i].get('options', []))
+                        for i in range(len(base))
+                    )
+                )
+                if not same_shape:
+                    return Response(
+                        {'quiz_data': 'Translated quiz must match the original question and option counts.'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
             blob = dict(lesson.translations.get(lang, {}))
             for field in TRANSLATABLE_LESSON_FIELDS:
                 if field in request.data:

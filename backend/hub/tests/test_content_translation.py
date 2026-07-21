@@ -290,3 +290,78 @@ class AuthoringTranslationTests(APITestCase):
         self.assertEqual(res.status_code, 400)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.translations, {})
+
+
+class FinalReviewFixTests(APITestCase):
+    """Whole-branch-review fixes: non-en source language, URL content, module
+    localization on course detail, and quiz-shape parity on lang edits."""
+
+    def setUp(self):
+        self.creator = User.objects.create_user(username='fr_cc', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.pillar = LearningPillar.objects.create(name='P', slug='pfr', order=1)
+
+    def test_english_learner_sees_english_translation_of_greek_course(self):
+        # Course authored in Greek, translated INTO English — an English learner
+        # must get the English translation, not the Greek source.
+        course = Course.objects.create(
+            title='Ελληνικός', description='Περιγραφή', pillar=self.pillar, level='beginner',
+            duration_hours=1, is_published=True, source_language='el',
+            translations={'en': {'title': 'English Title'}},
+        )
+        learner = User.objects.create_user(username='en_l', password='pass12345')
+        UserProfile.objects.create(user=learner, user_type=UserProfile.UserType.TEACHER, language='en')
+        self.client.force_authenticate(learner)
+        res = self.client.get(f'/api/courses/{course.id}/')
+        self.assertEqual(res.data['title'], 'English Title')          # translated
+        self.assertEqual(res.data['description'], 'Περιγραφή')          # falls back to Greek source
+
+    def test_course_detail_localizes_module_titles(self):
+        course = Course.objects.create(title='C', pillar=self.pillar, level='beginner',
+                                       duration_hours=1, is_published=True)
+        Module.objects.create(course=course, title='Orig Mod', order=1,
+                              translations={'el': {'title': 'Ενότητα'}})
+        learner = User.objects.create_user(username='gr_l', password='pass12345')
+        UserProfile.objects.create(user=learner, user_type=UserProfile.UserType.TEACHER, language='el')
+        self.client.force_authenticate(learner)
+        res = self.client.get(f'/api/courses/{course.id}/')
+        self.assertEqual(res.data['modules'][0]['title'], 'Ενότητα')
+
+    def test_url_lesson_content_not_translated(self):
+        from hub.tasks import translate_course
+        course = Course.objects.create(title='C', pillar=self.pillar, level='beginner',
+                                       duration_hours=1, source_language='en')
+        module = Module.objects.create(course=course, title='M', order=1)
+        video = Lesson.objects.create(module=module, title='V', content='https://youtu.be/abc',
+                                      lesson_type='video', order=1)
+        text = Lesson.objects.create(module=module, title='T', content='Prose body',
+                                     lesson_type='text', order=2)
+        with patch('hub.tasks.translate_text', side_effect=lambda t, s, d: f'[{d}] {t}'):
+            translate_course(course.id, 'el')
+        video.refresh_from_db()
+        text.refresh_from_db()
+        self.assertNotIn('content', video.translations['el'])          # URL left untranslated
+        self.assertEqual(text.translations['el']['content'], '[el] Prose body')
+
+    def test_lang_quiz_shape_mismatch_rejected(self):
+        course = Course.objects.create(title='C', pillar=self.pillar, level='beginner',
+                                       duration_hours=1, source_language='en', created_by=self.creator)
+        module = Module.objects.create(course=course, title='M', order=1)
+        quiz = Lesson.objects.create(module=module, title='Q', lesson_type='quiz', order=1,
+            quiz_data=[{'question': 'Q?', 'options': [
+                {'text': 'A', 'is_correct': True}, {'text': 'B', 'is_correct': False}]}])
+        url = f'/api/authoring/courses/{course.id}/modules/{module.id}/lessons/{quiz.id}/?lang=el'
+        self.client.force_authenticate(self.creator)
+        # 3 options translated where base has 2 → structurally valid but mismatched → 400
+        mismatched = [{'question': 'Ερ;', 'options': [
+            {'text': 'Α', 'is_correct': True}, {'text': 'Β', 'is_correct': False},
+            {'text': 'Γ', 'is_correct': False}]}]
+        res = self.client.patch(url, {'quiz_data': mismatched}, format='json')
+        self.assertEqual(res.status_code, 400)
+        # matching shape (2 options) → accepted
+        matched = [{'question': 'Ερ;', 'options': [
+            {'text': 'Α', 'is_correct': True}, {'text': 'Β', 'is_correct': False}]}]
+        res = self.client.patch(url, {'quiz_data': matched}, format='json')
+        self.assertEqual(res.status_code, 200)
+        quiz.refresh_from_db()
+        self.assertEqual(quiz.translations['el']['quiz_data'][0]['question'], 'Ερ;')
