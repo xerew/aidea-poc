@@ -1,5 +1,5 @@
 from django.db.models import Max
-from rest_framework import status
+from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -72,6 +72,13 @@ class AuthoringLessonDetailView(APIView):
                 return Response(
                     {'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST,
                 )
+            # Validate a translated quiz_data through the same structural check
+            # the base path uses, so a malformed blob can't be persisted.
+            if 'quiz_data' in request.data:
+                try:
+                    LessonSerializer().validate_quiz_data(request.data['quiz_data'])
+                except serializers.ValidationError as exc:
+                    return Response({'quiz_data': exc.detail}, status=status.HTTP_400_BAD_REQUEST)
             blob = dict(lesson.translations.get(lang, {}))
             for field in TRANSLATABLE_LESSON_FIELDS:
                 if field in request.data:

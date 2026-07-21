@@ -281,3 +281,12 @@ class AuthoringTranslationTests(APITestCase):
         self.assertEqual(res.status_code, 403)
         self.lesson.refresh_from_db()
         self.assertEqual(self.lesson.translations, {})
+
+    def test_lesson_lang_edit_rejects_malformed_quiz_data(self):
+        # Translated quiz_data goes through the same structural validation as the base path
+        self.client.force_authenticate(self.creator)
+        bad = [{'question': 'Q?', 'options': [{'text': 'only one'}]}]  # < 2 options
+        res = self.client.patch(f'{self.lesson_url}?lang=el', {'quiz_data': bad}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.translations, {})
