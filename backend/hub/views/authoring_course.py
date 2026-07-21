@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 
 from hub.models import Course, CourseEditHistory, LearningPillar
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
+from hub.translation import LANGUAGE_NAMES
 
 from .permissions import IsContentCreator, can_edit_published
 
@@ -133,3 +134,25 @@ class AuthoringCourseUnpublishView(APIView):
             changes={'course_unpublished': {'title': course.title}},
         )
         return Response(CourseAuthoringSerializer(course).data)
+
+
+class AuthoringCourseTranslateView(APIView):
+    permission_classes = [IsContentCreator]
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if course.is_published and not can_edit_published(request.user, course):
+            return Response({'detail': 'Only the author can translate this course.'},
+                            status=status.HTTP_403_FORBIDDEN)
+        language = request.data.get('language')
+        valid = set(LANGUAGE_NAMES) - {course.source_language}
+        if language not in valid:
+            return Response({'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST)
+        course.translation_status[language] = 'pending'
+        course.save(update_fields=['translation_status'])
+        from hub.tasks import translate_course
+        translate_course.delay(course.id, language)
+        return Response({'translation_status': course.translation_status}, status=status.HTTP_202_ACCEPTED)

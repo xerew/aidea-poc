@@ -16,6 +16,7 @@ from .authoring_course import (
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
     AuthoringCoursesView,
+    AuthoringCourseTranslateView,
     AuthoringCourseUnpublishView,
     AuthoringPillarsView,
 )
@@ -73,6 +74,7 @@ __all__ = [
     'AuthoringCourseExportView',
     'AuthoringCourseImportView',
     'AuthoringCoursePublishView',
+    'AuthoringCourseTranslateView',
     'AuthoringCourseUnpublishView',
     'AuthoringCoursesView',
     'AuthoringLessonDetailView',

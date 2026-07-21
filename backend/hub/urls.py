@@ -16,6 +16,7 @@ from .views import (
     AuthoringCourseImportView,
     AuthoringCoursePublishView,
     AuthoringCoursesView,
+    AuthoringCourseTranslateView,
     AuthoringCourseUnpublishView,
     AuthoringLessonDetailView,
     AuthoringLessonReorderView,
@@ -109,4 +110,5 @@ urlpatterns = [
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/', AuthoringLessonDetailView.as_view(), name='authoring-lesson-detail'),
     path('authoring/courses/<int:pk>/publish/', AuthoringCoursePublishView.as_view(), name='authoring-course-publish'),
     path('authoring/courses/<int:pk>/unpublish/', AuthoringCourseUnpublishView.as_view(), name='authoring-course-unpublish'),
+    path('authoring/courses/<int:pk>/translate/', AuthoringCourseTranslateView.as_view(), name='authoring-course-translate'),
 ]

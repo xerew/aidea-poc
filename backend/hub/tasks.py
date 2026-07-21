@@ -3,6 +3,8 @@ import random
 
 from celery import shared_task
 
+from hub.translation import translate_text
+
 
 @shared_task
 def compute_course_embeddings(course_id: int) -> None:
@@ -418,3 +420,51 @@ def recompute_all_recommendations() -> None:
     )
     for uid in user_ids:
         compute_user_recommendations.delay(uid)
+
+
+@shared_task
+def translate_course(course_id: int, target: str) -> None:
+    from hub.models import Course
+    from hub.translation import TranslationError
+
+    try:
+        course = Course.objects.prefetch_related('modules__lessons').get(pk=course_id)
+    except Course.DoesNotExist:
+        return
+    src = course.source_language
+
+    def tr(text):
+        return translate_text(text, src, target)
+
+    def tr_quiz(quiz_data):
+        out = []
+        for q in quiz_data or []:
+            out.append({
+                'question': tr(q.get('question', '')),
+                'options': [
+                    {'text': tr(o.get('text', '')), 'is_correct': bool(o.get('is_correct'))}
+                    for o in q.get('options', [])
+                ],
+            })
+        return out
+
+    try:
+        course.translations[target] = {
+            'title': tr(course.title),
+            'description': tr(course.description),
+            'learning_outcomes': [tr(o) for o in (course.learning_outcomes or [])],
+        }
+        for module in course.modules.all():
+            module.translations[target] = {'title': tr(module.title), 'description': tr(module.description)}
+            module.save(update_fields=['translations'])
+            for lesson in module.lessons.all():
+                blob = {'title': tr(lesson.title), 'description': tr(lesson.description),
+                        'content': tr(lesson.content)}
+                if lesson.lesson_type == 'quiz':
+                    blob['quiz_data'] = tr_quiz(lesson.quiz_data)
+                lesson.translations[target] = blob
+                lesson.save(update_fields=['translations'])
+        course.translation_status[target] = 'done'
+    except TranslationError:
+        course.translation_status[target] = 'failed'
+    course.save(update_fields=['translations', 'translation_status'])
