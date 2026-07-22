@@ -442,6 +442,8 @@
     "newCourse": "Uusi kurssi",
     "importCourse": "Tuo kurssi",
     "importing": "Tuodaan…",
+    "downloadTemplate": "Lataa malli",
+    "templateFailedMsg": "Mallin lataaminen epäonnistui. Yritä uudelleen.",
     "dismissErrors": "Hylkää virheet",
     "moreErrors": "…ja {{count}} lisää.",
     "empty": "Ei vielä kursseja. Luo ensimmäinen kurssisi!",
@@ -489,7 +491,10 @@
       "saveModule": "Tallenna moduuli",
       "deleteModule": "Poista moduuli",
       "addModule": "Lisää moduuli",
-      "loadError": "Kurssin lataaminen epäonnistui."
+      "loadError": "Kurssin lataaminen epäonnistui.",
+      "deleteCourse": "Poista kurssi",
+      "deleting": "Poistetaan…",
+      "confirmDelete": "Poistetaanko tämä kurssi pysyvästi? Kaikki moduulit, oppitunnit ja ilmoittautumiset menetetään. Tätä ei voi kumota."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Tietovisan luonti",

@@ -442,6 +442,8 @@
     "newCourse": "Ny kurs",
     "importCourse": "Importera kurs",
     "importing": "Importerar…",
+    "downloadTemplate": "Ladda ner mall",
+    "templateFailedMsg": "Det gick inte att ladda ner mallen. Försök igen.",
     "dismissErrors": "Avfärda fel",
     "moreErrors": "…och {{count}} till.",
     "empty": "Inga kurser än. Skapa din första!",
@@ -489,7 +491,10 @@
       "saveModule": "Spara modul",
       "deleteModule": "Ta bort modul",
       "addModule": "Lägg till modul",
-      "loadError": "Det gick inte att läsa in kursen."
+      "loadError": "Det gick inte att läsa in kursen.",
+      "deleteCourse": "Radera kurs",
+      "deleting": "Raderar…",
+      "confirmDelete": "Radera den här kursen permanent? Alla moduler, lektioner och anmälningar går förlorade. Detta kan inte ångras."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbyggare",

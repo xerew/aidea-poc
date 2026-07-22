@@ -28,6 +28,7 @@ export default function CourseEditorPage() {
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [unpublishing, setUnpublishing] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [error, setError] = useState('')
   const [dragModuleId, setDragModuleId] = useState(null)
@@ -186,6 +187,20 @@ export default function CourseEditorPage() {
       setSaveStatus('error')
     } finally {
       setUnpublishing(false)
+    }
+  }
+
+  // ── Delete course ────────────────────────────────────────────────────────
+
+  const handleDeleteCourse = async () => {
+    if (!window.confirm(t('authoring.editor.confirmDelete'))) return
+    setDeleting(true)
+    try {
+      await client.delete(`/authoring/courses/${id}/`)
+      navigate('/authoring')
+    } catch {
+      setSaveStatus('error')
+      setDeleting(false)
     }
   }
 
@@ -403,6 +418,11 @@ export default function CourseEditorPage() {
             {isPublished && (isAuthor || isAdmin) && (
               <button className="enroll-btn enroll-btn--outline" onClick={handleUnpublish} disabled={unpublishing}>
                 {unpublishing ? t('authoring.editor.unpublishing') : t('authoring.editor.unpublish')}
+              </button>
+            )}
+            {(isAuthor || isAdmin) && (
+              <button className="enroll-btn enroll-btn--danger" onClick={handleDeleteCourse} disabled={deleting}>
+                <Trash2 size={14} /> {deleting ? t('authoring.editor.deleting') : t('authoring.editor.deleteCourse')}
               </button>
             )}
           </div>

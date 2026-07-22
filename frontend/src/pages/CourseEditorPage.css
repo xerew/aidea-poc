@@ -28,6 +28,18 @@
 
 .enroll-btn--outline:hover:not(:disabled) { background: var(--color-bg); }
 
+/* Danger variant for Delete course */
+.enroll-btn--danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  color: #dc2626;
+  border: 1.5px solid #dc2626;
+}
+
+.enroll-btn--danger:hover:not(:disabled) { background: #fef2f2; }
+
 /* Save area next to the enroll button slot */
 .editor-save-area {
   display: flex;

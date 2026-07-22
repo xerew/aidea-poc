@@ -50,6 +50,25 @@ export default function AuthoringPage() {
     }
   }
 
+  const handleDownloadTemplate = async () => {
+    try {
+      const res = await client.get('/authoring/courses/template/', { responseType: 'blob' })
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'aidea-course-template.xlsx'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch {
+      setTransferErrors({
+        title: t('authoring.importFailedTitle'),
+        messages: [t('authoring.templateFailedMsg')],
+      })
+    }
+  }
+
   const handleImportFile = async (e) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -92,6 +111,9 @@ export default function AuthoringPage() {
         <div className="authoring-header-actions">
           <button className="new-course-btn" onClick={() => navigate('/authoring/courses/new')}>
             <Plus size={15} /> {t('authoring.newCourse')}
+          </button>
+          <button className="authoring-import-btn" onClick={handleDownloadTemplate}>
+            <Download size={15} /> {t('authoring.downloadTemplate')}
           </button>
           <button className="authoring-import-btn" onClick={() => importInputRef.current?.click()} disabled={importing}>
             <Upload size={15} /> {importing ? t('authoring.importing') : t('authoring.importCourse')}

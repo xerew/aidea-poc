@@ -57,7 +57,10 @@ def _list_validation(wb, ws, choices_col, n_choices, target_col, last_row):
     dv.add(f'{target_col}2:{target_col}{last_row}')
 
 
-def build_course_workbook(course: Course) -> Workbook:
+def build_course_workbook(course: Course | None = None) -> Workbook:
+    """Build a one-course workbook. With ``course=None`` the sheets, headers,
+    dropdowns and README are produced with no data rows — a blank import
+    template."""
     wb = Workbook()
 
     readme = wb.active
@@ -81,16 +84,17 @@ def build_course_workbook(course: Course) -> Workbook:
     # ── Course ──────────────────────────────────────────────────────────
     course_ws = wb.create_sheet('Course')
     _write_headers(course_ws, COURSE_HEADERS)
-    course_ws.append([
-        course.title,
-        course.description,
-        course.pillar.slug,
-        course.level,
-        course.duration_hours,
-        course.content_format,
-        '\n'.join(course.learning_outcomes or []),
-    ])
-    course_ws['G2'].alignment = course_ws['G2'].alignment.copy(wrap_text=True)
+    if course is not None:
+        course_ws.append([
+            course.title,
+            course.description,
+            course.pillar.slug,
+            course.level,
+            course.duration_hours,
+            course.content_format,
+            '\n'.join(course.learning_outcomes or []),
+        ])
+        course_ws['G2'].alignment = course_ws['G2'].alignment.copy(wrap_text=True)
     _list_validation(wb, course_ws, 'D', max(len(pillar_slugs), 1), 'C', 2)
     _list_validation(wb, course_ws, 'A', len(levels), 'D', 2)
     _list_validation(wb, course_ws, 'B', len(content_formats), 'F', 2)
@@ -98,7 +102,7 @@ def build_course_workbook(course: Course) -> Workbook:
     # ── Modules ─────────────────────────────────────────────────────────
     modules_ws = wb.create_sheet('Modules')
     _write_headers(modules_ws, MODULE_HEADERS)
-    modules = list(course.modules.order_by('order').prefetch_related('lessons'))
+    modules = list(course.modules.order_by('order').prefetch_related('lessons')) if course else []
     for module in modules:
         modules_ws.append([module.order, module.title, module.description, module.duration_minutes])
 

@@ -164,13 +164,27 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         titles = [c['title'] for c in res.data['courses']]
         self.assertIn('Draft course', titles)
 
-    def test_other_creators_courses_excluded(self):
+    def test_other_creators_published_courses_included(self):
+        # #11: published courses by anyone show up (platform-wide engagement),
+        # but they do NOT inflate the viewer's "courses created" count.
         other = User.objects.create_user(username='other_creator2', password='pass12345')
         UserProfile.objects.create(user=other, user_type=UserProfile.UserType.CONTENT_CREATOR)
         Course.objects.create(
-            title='Not mine', pillar=self.pillar, level='beginner',
+            title='Someone elses published', pillar=self.pillar, level='beginner',
             duration_hours=1, is_published=True, created_by=other,
         )
         res = self.client.get(self.url)
         titles = [c['title'] for c in res.data['courses']]
-        self.assertNotIn('Not mine', titles)
+        self.assertIn('Someone elses published', titles)
+        self.assertEqual(res.data['summary']['courses_created'], 2)  # still only own
+
+    def test_other_creators_unpublished_courses_excluded(self):
+        other = User.objects.create_user(username='other_creator3', password='pass12345')
+        UserProfile.objects.create(user=other, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        Course.objects.create(
+            title='Someone elses draft', pillar=self.pillar, level='beginner',
+            duration_hours=1, is_published=False, created_by=other,
+        )
+        res = self.client.get(self.url)
+        titles = [c['title'] for c in res.data['courses']]
+        self.assertNotIn('Someone elses draft', titles)

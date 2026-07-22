@@ -442,6 +442,8 @@
     "newCourse": "Neuer Kurs",
     "importCourse": "Kurs importieren",
     "importing": "Wird importiert…",
+    "downloadTemplate": "Vorlage herunterladen",
+    "templateFailedMsg": "Vorlage konnte nicht heruntergeladen werden. Bitte erneut versuchen.",
     "dismissErrors": "Fehler ausblenden",
     "moreErrors": "…und {{count}} weitere.",
     "empty": "Noch keine Kurse vorhanden. Erstellen Sie Ihren ersten Kurs!",
@@ -489,7 +491,10 @@
       "saveModule": "Modul speichern",
       "deleteModule": "Modul löschen",
       "addModule": "Modul hinzufügen",
-      "loadError": "Kurs konnte nicht geladen werden."
+      "loadError": "Kurs konnte nicht geladen werden.",
+      "deleteCourse": "Kurs löschen",
+      "deleting": "Löschen…",
+      "confirmDelete": "Diesen Kurs endgültig löschen? Alle Module, Lektionen und Einschreibungen gehen verloren. Dies kann nicht rückgängig gemacht werden."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz-Editor",

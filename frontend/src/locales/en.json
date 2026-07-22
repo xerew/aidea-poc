@@ -442,6 +442,8 @@
     "newCourse": "New Course",
     "importCourse": "Import course",
     "importing": "Importing…",
+    "downloadTemplate": "Download template",
+    "templateFailedMsg": "Could not download the template. Please try again.",
     "dismissErrors": "Dismiss errors",
     "moreErrors": "…and {{count}} more.",
     "empty": "No courses yet. Create your first one!",
@@ -489,7 +491,10 @@
       "saveModule": "Save module",
       "deleteModule": "Delete module",
       "addModule": "Add Module",
-      "loadError": "Failed to load course."
+      "loadError": "Failed to load course.",
+      "deleteCourse": "Delete course",
+      "deleting": "Deleting…",
+      "confirmDelete": "Delete this course permanently? All modules, lessons and enrollments will be lost. This cannot be undone."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz Builder",

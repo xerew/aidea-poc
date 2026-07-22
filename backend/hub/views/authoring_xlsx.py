@@ -35,6 +35,18 @@ class AuthoringCourseExportView(APIView):
         return response
 
 
+class AuthoringCourseTemplateView(APIView):
+    """GET — download a blank course workbook (headers + dropdowns, no data)."""
+    permission_classes = [IsContentCreator]
+
+    def get(self, request):
+        buffer = BytesIO()
+        build_course_workbook().save(buffer)
+        response = HttpResponse(buffer.getvalue(), content_type=XLSX_MIME)
+        response['Content-Disposition'] = 'attachment; filename="aidea-course-template.xlsx"'
+        return response
+
+
 class AuthoringCourseImportView(APIView):
     permission_classes = [IsContentCreator]
 

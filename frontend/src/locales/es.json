@@ -442,6 +442,8 @@
     "newCourse": "Nuevo Curso",
     "importCourse": "Importar curso",
     "importing": "Importando…",
+    "downloadTemplate": "Descargar plantilla",
+    "templateFailedMsg": "No se pudo descargar la plantilla. Inténtalo de nuevo.",
     "dismissErrors": "Descartar errores",
     "moreErrors": "…y {{count}} más.",
     "empty": "Aún no hay cursos. ¡Crea el primero!",
@@ -489,7 +491,10 @@
       "saveModule": "Guardar módulo",
       "deleteModule": "Eliminar módulo",
       "addModule": "Añadir Módulo",
-      "loadError": "No se pudo cargar el curso."
+      "loadError": "No se pudo cargar el curso.",
+      "deleteCourse": "Eliminar curso",
+      "deleting": "Eliminando…",
+      "confirmDelete": "¿Eliminar este curso de forma permanente? Se perderán todos los módulos, lecciones e inscripciones. No se puede deshacer."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Creador de Cuestionarios",

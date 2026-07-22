@@ -114,8 +114,11 @@
   font-size: 0.75rem;
 }
 
-.pathway-cta {
+.pathway-cta,
+.pathway-cta a,
+.pathway-cta a:visited {
   flex-shrink: 0;
+  color: #fff;
 }
 
 .pathway-loading,

@@ -93,6 +93,42 @@ class ExportXlsxTests(APITestCase):
         self.assertGreaterEqual(len(wb['Course'].data_validations.dataValidation), 3)
 
 
+class TemplateXlsxTests(APITestCase):
+    def setUp(self):
+        self.creator = User.objects.create_user(username='xlsx_tpl', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.teacher = User.objects.create_user(username='xlsx_tpl_t', password='pass12345')
+        UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
+        # A pillar must exist so the template's Choices/dropdowns have content.
+        LearningPillar.objects.get_or_create(
+            slug='teach-with-ai', defaults={'name': 'Teach with AI', 'description': 'd', 'order': 1},
+        )
+        self.url = reverse('authoring-course-template')
+
+    def test_teacher_forbidden(self):
+        self.client.force_authenticate(self.teacher)
+        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_template_is_blank_but_structured(self):
+        self.client.force_authenticate(self.creator)
+        res = self.client.get(self.url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('spreadsheetml', res['Content-Type'])
+        self.assertIn('aidea-course-template.xlsx', res['Content-Disposition'])
+
+        wb = load_workbook(BytesIO(res.getvalue()))
+        self.assertEqual(
+            set(wb.sheetnames),
+            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Choices'},
+        )
+        # Headers present, but no data rows.
+        self.assertEqual(wb['Course']['A1'].value, 'title')
+        self.assertIsNone(wb['Course']['A2'].value)
+        self.assertEqual(list(wb['Modules'].iter_rows(min_row=2, values_only=True)), [])
+        # Dropdowns still wired up.
+        self.assertGreaterEqual(len(wb['Course'].data_validations.dataValidation), 3)
+
+
 class ImportXlsxTests(APITestCase):
     def setUp(self):
         self.creator = User.objects.create_user(username='xlsx_imp', password='pass12345')

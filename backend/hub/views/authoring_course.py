@@ -104,6 +104,22 @@ class AuthoringCourseDetailView(APIView):
         course.refresh_from_db()
         return Response(CourseAuthoringSerializer(course).data)
 
+    def delete(self, request, pk):
+        course = self._get_course(pk)
+        if not course:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        # Creators can browse every published course (analytics), so deletion
+        # must stay tight: only the author may remove a course through the API.
+        # (Admins are already blocked by IsContentCreator; they delete via the
+        # Django admin instead — same boundary as can_edit_published.)
+        if course.created_by_id != request.user.id:
+            return Response(
+                {'detail': 'Only the author can delete this course.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        course.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class AuthoringCoursePublishView(APIView):
     permission_classes = [IsContentCreator]

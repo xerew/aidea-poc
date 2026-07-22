@@ -516,3 +516,54 @@ class PublishedCourseUnpublishTests(APITestCase):
         self.assertEqual(res.status_code, 403)
         self.course.refresh_from_db()
         self.assertTrue(self.course.is_published)
+
+
+class CourseDeleteTestCase(APITestCase):
+    """#32 — deleting a course is restricted to its author (or an admin)."""
+
+    def setUp(self):
+        self.author = User.objects.create_user(username='del_author', password='pass12345')
+        UserProfile.objects.create(user=self.author, user_type='content_creator')
+        self.other = User.objects.create_user(username='del_other', password='pass12345')
+        UserProfile.objects.create(user=self.other, user_type='content_creator')
+        self.admin = User.objects.create_user(username='del_admin', password='pass12345')
+        UserProfile.objects.create(user=self.admin, user_type='admin')
+        pillar = LearningPillar.objects.create(name='PDel', slug='pdel', order=1)
+        self.course = Course.objects.create(
+            title='Deletable', pillar=pillar, level='beginner', duration_hours=1,
+            created_by=self.author,
+        )
+        Module.objects.create(title='M', course=self.course, order=1)
+        self.url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
+
+    def test_author_can_delete_course(self):
+        self.client.force_authenticate(self.author)
+        res = self.client.delete(self.url)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Course.objects.filter(pk=self.course.pk).exists())
+
+    def test_admin_blocked_by_authoring_permission(self):
+        # Admins don't use the authoring API (IsContentCreator blocks them);
+        # they delete courses through the Django admin instead.
+        self.client.force_authenticate(self.admin)
+        res = self.client.delete(self.url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Course.objects.filter(pk=self.course.pk).exists())
+
+    def test_other_creator_cannot_delete_course(self):
+        self.client.force_authenticate(self.other)
+        res = self.client.delete(self.url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertTrue(Course.objects.filter(pk=self.course.pk).exists())
+
+    def test_teacher_cannot_delete_course(self):
+        teacher = User.objects.create_user(username='del_teacher', password='pass12345')
+        UserProfile.objects.create(user=teacher, user_type='teacher')
+        self.client.force_authenticate(teacher)
+        res = self.client.delete(self.url)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_missing_course_returns_404(self):
+        self.client.force_authenticate(self.author)
+        res = self.client.delete(reverse('authoring-course-detail', kwargs={'pk': 99999}))
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

@@ -478,7 +478,8 @@ function ContentCreatorAccessSection() {
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState('')
 
-  if (user?.profile?.user_type !== 'teacher') return null
+  // #7: any user without creator/admin access may request it (not just teachers).
+  if (['content_creator', 'admin'].includes(user?.profile?.user_type)) return null
 
   if (loading) {
     return (

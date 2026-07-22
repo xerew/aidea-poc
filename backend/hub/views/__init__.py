@@ -32,7 +32,11 @@ from .authoring_module import (
     AuthoringModuleView,
 )
 from .authoring_upload import AuthoringUploadView
-from .authoring_xlsx import AuthoringCourseExportView, AuthoringCourseImportView
+from .authoring_xlsx import (
+    AuthoringCourseExportView,
+    AuthoringCourseImportView,
+    AuthoringCourseTemplateView,
+)
 from .learner import (
     CourseDetailView,
     CourseEnrollView,
@@ -73,6 +77,7 @@ __all__ = [
     'AuthoringCourseDetailView',
     'AuthoringCourseExportView',
     'AuthoringCourseImportView',
+    'AuthoringCourseTemplateView',
     'AuthoringCoursePublishView',
     'AuthoringCourseTranslateView',
     'AuthoringCourseUnpublishView',

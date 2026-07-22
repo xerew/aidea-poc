@@ -442,6 +442,8 @@
     "newCourse": "Nytt kurs",
     "importCourse": "Importer kurs",
     "importing": "Importerer…",
+    "downloadTemplate": "Last ned mal",
+    "templateFailedMsg": "Kunne ikke laste ned malen. Prøv igjen.",
     "dismissErrors": "Lukk feilmeldinger",
     "moreErrors": "…og {{count}} til.",
     "empty": "Ingen kurs ennå. Lag ditt første!",
@@ -489,7 +491,10 @@
       "saveModule": "Lagre modul",
       "deleteModule": "Slett modul",
       "addModule": "Legg til modul",
-      "loadError": "Kunne ikke laste kurset."
+      "loadError": "Kunne ikke laste kurset.",
+      "deleteCourse": "Slett kurs",
+      "deleting": "Sletter…",
+      "confirmDelete": "Slette dette kurset permanent? Alle moduler, leksjoner og påmeldinger går tapt. Dette kan ikke angres."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbygger",

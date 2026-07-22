@@ -442,6 +442,8 @@
     "newCourse": "Nouveau cours",
     "importCourse": "Importer un cours",
     "importing": "Importation en cours…",
+    "downloadTemplate": "Télécharger le modèle",
+    "templateFailedMsg": "Impossible de télécharger le modèle. Veuillez réessayer.",
     "dismissErrors": "Ignorer les erreurs",
     "moreErrors": "…et {{count}} de plus.",
     "empty": "Pas encore de cours. Créez votre premier cours !",
@@ -489,7 +491,10 @@
       "saveModule": "Enregistrer le module",
       "deleteModule": "Supprimer le module",
       "addModule": "Ajouter un module",
-      "loadError": "Échec du chargement du cours."
+      "loadError": "Échec du chargement du cours.",
+      "deleteCourse": "Supprimer le cours",
+      "deleting": "Suppression…",
+      "confirmDelete": "Supprimer définitivement ce cours ? Tous les modules, leçons et inscriptions seront perdus. Cette action est irréversible."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Créateur de quiz",
