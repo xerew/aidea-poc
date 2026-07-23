@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}}m",
     "empty": "No courses created by you yet. Courses you create in Authoring will appear here — including drafts.",
     "restricted": "Content Analytics is only available to content creators.",
-    "loadError": "Failed to load analytics."
+    "loadError": "Failed to load analytics.",
+    "downloadExcel": "Download Excel",
+    "viewTeachers": "View teachers",
+    "hideTeachers": "Hide teachers",
+    "noTeachers": "No teachers enrolled yet.",
+    "minutes": "{{count}} min",
+    "avgScore": "avg {{pct}}%",
+    "chose": "chose “{{answer}}”",
+    "correctAnswer": "correct: {{answer}}",
+    "notAnswered": "not answered"
   },
   "media": {
     "videoLessonTitle": "Video lesson",

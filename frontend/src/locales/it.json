@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}}m",
     "empty": "Non hai ancora creato corsi. I corsi che crei nella sezione Creazione contenuti appariranno qui, comprese le bozze.",
     "restricted": "L'analisi dei contenuti è disponibile solo per i creatori di contenuti.",
-    "loadError": "Impossibile caricare i dati analitici."
+    "loadError": "Impossibile caricare i dati analitici.",
+    "downloadExcel": "Scarica Excel",
+    "viewTeachers": "Mostra insegnanti",
+    "hideTeachers": "Nascondi insegnanti",
+    "noTeachers": "Nessun insegnante iscritto finora.",
+    "minutes": "{{count}} min",
+    "avgScore": "media {{pct}}%",
+    "chose": "ha scelto “{{answer}}”",
+    "correctAnswer": "corretto: {{answer}}",
+    "notAnswered": "senza risposta"
   },
   "media": {
     "videoLessonTitle": "Lezione video",

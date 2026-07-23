@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}} min",
     "empty": "Inga kurser skapade av dig än. Kurser du skapar i Kursskapande visas här — inklusive utkast.",
     "restricted": "Innehållsanalys är endast tillgänglig för innehållsskapare.",
-    "loadError": "Det gick inte att läsa in analysen."
+    "loadError": "Det gick inte att läsa in analysen.",
+    "downloadExcel": "Ladda ner Excel",
+    "viewTeachers": "Visa lärare",
+    "hideTeachers": "Dölj lärare",
+    "noTeachers": "Inga lärare anmälda än.",
+    "minutes": "{{count}} min",
+    "avgScore": "snitt {{pct}}%",
+    "chose": "valde “{{answer}}”",
+    "correctAnswer": "rätt: {{answer}}",
+    "notAnswered": "ej besvarad"
   },
   "media": {
     "videoLessonTitle": "Videolektion",

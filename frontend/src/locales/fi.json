@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}} min",
     "empty": "Et ole vielä luonut yhtään kurssia. Sisällöntuotannossa luomasi kurssit näkyvät täällä — myös luonnokset.",
     "restricted": "Sisältöanalytiikka on käytettävissä vain sisällöntuottajille.",
-    "loadError": "Analytiikan lataaminen epäonnistui."
+    "loadError": "Analytiikan lataaminen epäonnistui.",
+    "downloadExcel": "Lataa Excel",
+    "viewTeachers": "Näytä opettajat",
+    "hideTeachers": "Piilota opettajat",
+    "noTeachers": "Ei vielä ilmoittautuneita opettajia.",
+    "minutes": "{{count}} min",
+    "avgScore": "ka {{pct}}%",
+    "chose": "valitsi “{{answer}}”",
+    "correctAnswer": "oikein: {{answer}}",
+    "notAnswered": "ei vastausta"
   },
   "media": {
     "videoLessonTitle": "Videotunti",

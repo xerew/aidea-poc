@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}} Min.",
     "empty": "Sie haben noch keine Kurse erstellt. Kurse, die Sie in der Kurserstellung anlegen, erscheinen hier — einschließlich Entwürfe.",
     "restricted": "Die Inhaltsanalyse steht nur Kurserstellenden zur Verfügung.",
-    "loadError": "Analysedaten konnten nicht geladen werden."
+    "loadError": "Analysedaten konnten nicht geladen werden.",
+    "downloadExcel": "Excel herunterladen",
+    "viewTeachers": "Lehrkräfte anzeigen",
+    "hideTeachers": "Lehrkräfte ausblenden",
+    "noTeachers": "Noch keine Lehrkräfte eingeschrieben.",
+    "minutes": "{{count}} Min.",
+    "avgScore": "Durchschn. {{pct}}%",
+    "chose": "wählte „{{answer}}“",
+    "correctAnswer": "richtig: {{answer}}",
+    "notAnswered": "nicht beantwortet"
   },
   "media": {
     "videoLessonTitle": "Videolektion",

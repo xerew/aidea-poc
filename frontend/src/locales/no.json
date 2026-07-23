@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}} min",
     "empty": "Du har ikke opprettet noen kurs ennå. Kurs du oppretter i Kursforfatting vil vises her — inkludert utkast.",
     "restricted": "Innholdsanalyse er kun tilgjengelig for innholdsskapere.",
-    "loadError": "Kunne ikke laste analysedata."
+    "loadError": "Kunne ikke laste analysedata.",
+    "downloadExcel": "Last ned Excel",
+    "viewTeachers": "Vis lærere",
+    "hideTeachers": "Skjul lærere",
+    "noTeachers": "Ingen lærere påmeldt ennå.",
+    "minutes": "{{count}} min",
+    "avgScore": "snitt {{pct}}%",
+    "chose": "valgte “{{answer}}”",
+    "correctAnswer": "riktig: {{answer}}",
+    "notAnswered": "ikke besvart"
   },
   "media": {
     "videoLessonTitle": "Videoleksjon",

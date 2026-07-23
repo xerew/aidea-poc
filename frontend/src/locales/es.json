@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}}m",
     "empty": "Aún no has creado ningún curso. Los cursos que crees en Creación de Contenido aparecerán aquí, incluidos los borradores.",
     "restricted": "El Análisis de Contenido solo está disponible para creadores de contenido.",
-    "loadError": "No se pudieron cargar los análisis."
+    "loadError": "No se pudieron cargar los análisis.",
+    "downloadExcel": "Descargar Excel",
+    "viewTeachers": "Ver docentes",
+    "hideTeachers": "Ocultar docentes",
+    "noTeachers": "Aún no hay docentes inscritos.",
+    "minutes": "{{count}} min",
+    "avgScore": "prom. {{pct}}%",
+    "chose": "eligió “{{answer}}”",
+    "correctAnswer": "correcto: {{answer}}",
+    "notAnswered": "sin responder"
   },
   "media": {
     "videoLessonTitle": "Lección en vídeo",

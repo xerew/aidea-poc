@@ -652,7 +652,16 @@
     "avgTimeValue": "{{minutes}} min",
     "empty": "Vous n'avez pas encore créé de cours. Les cours que vous créez dans Création de contenu apparaîtront ici — y compris les brouillons.",
     "restricted": "Les analyses de contenu sont réservées aux créateurs de contenu.",
-    "loadError": "Échec du chargement des analyses."
+    "loadError": "Échec du chargement des analyses.",
+    "downloadExcel": "Télécharger Excel",
+    "viewTeachers": "Voir les enseignants",
+    "hideTeachers": "Masquer les enseignants",
+    "noTeachers": "Aucun enseignant inscrit pour l'instant.",
+    "minutes": "{{count}} min",
+    "avgScore": "moy. {{pct}}%",
+    "chose": "a choisi “{{answer}}”",
+    "correctAnswer": "correct : {{answer}}",
+    "notAnswered": "sans réponse"
   },
   "media": {
     "videoLessonTitle": "Leçon vidéo",

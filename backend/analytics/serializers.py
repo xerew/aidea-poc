@@ -10,10 +10,20 @@ class CourseAnalyticsSerializer(serializers.ModelSerializer):
     in_progress = serializers.SerializerMethodField()
     completion_rate = serializers.SerializerMethodField()
     avg_time_minutes = serializers.SerializerMethodField()
+    owned = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'enrolled', 'completed', 'in_progress', 'completion_rate', 'avg_time_minutes']
+        fields = [
+            'id', 'title', 'enrolled', 'completed', 'in_progress',
+            'completion_rate', 'avg_time_minutes', 'owned',
+        ]
+
+    def get_owned(self, obj):
+        # Whether the requesting creator authored this course — the per-teacher
+        # drill-down is only available for their own courses.
+        request = self.context.get('request')
+        return bool(request and obj.created_by_id == request.user.id)
 
     def _enrollments(self, obj):
         cache = self.context.setdefault('_enrollment_cache', {})
