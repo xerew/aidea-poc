@@ -178,7 +178,8 @@
           "addressEthics": "Address ethical concerns about AI"
         }
       }
-    }
+    },
+    "selectSubject": "Select your subject"
   },
   "profile": {
     "title": "Profile",
@@ -494,7 +495,9 @@
       "loadError": "Failed to load course.",
       "deleteCourse": "Delete course",
       "deleting": "Deleting…",
-      "confirmDelete": "Delete this course permanently? All modules, lessons and enrollments will be lost. This cannot be undone."
+      "confirmDelete": "Delete this course permanently? All modules, lessons and enrollments will be lost. This cannot be undone.",
+      "subjectsLabel": "Subjects",
+      "subjectsHint": "Which teachers is this course for? Select all that apply."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz Builder",

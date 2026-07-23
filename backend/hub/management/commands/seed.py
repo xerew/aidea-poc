@@ -10,6 +10,7 @@ from hub.models import (
     Lesson,
     LessonProgress,
     Module,
+    Subject,
     UserProfile,
 )
 
@@ -24,11 +25,20 @@ PILLARS = [
     pillar_teach_about_ai.PILLAR,
 ]
 
+# Subjects rotated across the demo teacher cohort so recommendations,
+# analytics and CF peer-matching have some variety to work with.
+COHORT_SUBJECT_SLUGS = [
+    'mathematics', 'physics', 'biology', 'history',
+    'languages', 'computer-science', 'arts', 'geography',
+]
+
 
 class Command(BaseCommand):
     help = 'Seed the database with learning pillars, courses, modules, lessons, and demo users.'
 
     def handle(self, *args, **options):
+        # Subjects are created by migration 0026; cache them for tagging below.
+        self.subjects = {s.slug: s for s in Subject.objects.all()}
         self._seed_pillars()
         seed_pathways()
         seed_preference_quiz()
@@ -62,6 +72,11 @@ class Command(BaseCommand):
                         'is_published':      True,
                     },
                 )
+                # These are AI-pedagogy courses relevant to any teacher, so tag
+                # them General/All. Creators can narrow this per course in the UI.
+                general = self.subjects.get('general')
+                if general:
+                    course.subjects.set([general])
                 total_lessons = 0
                 for order, module_data in enumerate(modules_data, start=1):
                     lessons_data = module_data.pop('lessons', [])
@@ -111,6 +126,7 @@ class Command(BaseCommand):
             defaults={
                 'user_type': UserProfile.UserType.TEACHER,
                 'avatar_initials': 'NG',
+                'subject': self.subjects.get('mathematics'),
             },
         )
 
@@ -235,7 +251,7 @@ class Command(BaseCommand):
 
     def _seed_teacher_cohort(self, creator):
         cohort_users = []
-        for username, first, last, initials in cohort_data.COHORT:
+        for idx, (username, first, last, initials) in enumerate(cohort_data.COHORT):
             user, created = User.objects.get_or_create(
                 username=username,
                 defaults={'first_name': first, 'last_name': last},
@@ -243,9 +259,14 @@ class Command(BaseCommand):
             if created:
                 user.set_password('demo1234')
                 user.save()
+            subject_slug = COHORT_SUBJECT_SLUGS[idx % len(COHORT_SUBJECT_SLUGS)]
             UserProfile.objects.update_or_create(
                 user=user,
-                defaults={'user_type': UserProfile.UserType.TEACHER, 'avatar_initials': initials},
+                defaults={
+                    'user_type': UserProfile.UserType.TEACHER,
+                    'avatar_initials': initials,
+                    'subject': self.subjects.get(subject_slug),
+                },
             )
             cohort_users.append(user)
 

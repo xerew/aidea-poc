@@ -83,6 +83,8 @@ class AuthoringCourseImportView(APIView):
                 is_published=False,
                 created_by=request.user,
             )
+            if payload.get('subjects'):
+                course.subjects.set(payload['subjects'])
             for module_data in payload['modules']:
                 module = Module.objects.create(
                     course=course,

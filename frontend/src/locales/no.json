@@ -178,7 +178,8 @@
           "addressEthics": "Ta opp etiske spørsmål knyttet til AI"
         }
       }
-    }
+    },
+    "selectSubject": "Velg faget ditt"
   },
   "profile": {
     "title": "Profil",
@@ -494,7 +495,9 @@
       "loadError": "Kunne ikke laste kurset.",
       "deleteCourse": "Slett kurs",
       "deleting": "Sletter…",
-      "confirmDelete": "Slette dette kurset permanent? Alle moduler, leksjoner og påmeldinger går tapt. Dette kan ikke angres."
+      "confirmDelete": "Slette dette kurset permanent? Alle moduler, leksjoner og påmeldinger går tapt. Dette kan ikke angres.",
+      "subjectsLabel": "Fag",
+      "subjectsHint": "Hvilke lærere er dette kurset for? Velg alle som passer."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbygger",

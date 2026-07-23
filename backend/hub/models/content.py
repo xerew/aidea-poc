@@ -42,6 +42,7 @@ class Course(models.Model):
     content_format     = models.CharField(
         max_length=20, choices=ContentFormat.choices, default=ContentFormat.MIXED,
     )
+    subjects           = models.ManyToManyField('hub.Subject', blank=True, related_name='courses')
     source_language     = models.CharField(max_length=5, default='en')
     # translations: {lang_code: {"title": str, "description": str, ...}}
     translations        = models.JSONField(default=dict, blank=True)

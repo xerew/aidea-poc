@@ -9,13 +9,6 @@ class UserProfile(models.Model):
         ADMIN           = 'admin',           'Admin'
         AIDEA_PARTNER   = 'aidea_partner',   'AIDEA Partner'
 
-    class SubjectArea(models.TextChoices):
-        STEM       = 'stem',       'STEM'
-        HUMANITIES = 'humanities', 'Humanities'
-        LANGUAGES  = 'languages',  'Languages'
-        ARTS       = 'arts',       'Arts'
-        GENERAL    = 'general',    'General / Multiple'
-
     class TeachingLevel(models.TextChoices):
         PRIMARY    = 'primary',    'Primary (K-6)'
         SECONDARY  = 'secondary',  'Secondary (7-12)'
@@ -55,7 +48,9 @@ class UserProfile(models.Model):
     user_type            = models.CharField(max_length=20, choices=UserType.choices, default=UserType.TEACHER)
     avatar_initials      = models.CharField(max_length=4, blank=True)
     competency_score     = models.PositiveSmallIntegerField(default=0)
-    subject_area         = models.CharField(max_length=20, choices=SubjectArea.choices, blank=True)
+    subject              = models.ForeignKey(
+        'hub.Subject', on_delete=models.SET_NULL, null=True, blank=True, related_name='teachers',
+    )
     teaching_level       = models.CharField(max_length=20, choices=TeachingLevel.choices, blank=True)
     goals                = models.JSONField(default=list, blank=True)
     onboarding_completed = models.BooleanField(default=False)

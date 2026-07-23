@@ -6,6 +6,7 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { LANGUAGES } from '../i18n'
 import TranslationBar from '../components/authoring/TranslationBar'
+import SubjectPicker from '../components/authoring/SubjectPicker'
 import './CourseEditorPage.css'
 
 const PILLAR_COLOR = {
@@ -21,6 +22,7 @@ export default function CourseEditorPage() {
   const { user } = useAuth()
 
   const [pillars, setPillars] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [form, setForm] = useState(null)
   const [isPublished, setIsPublished] = useState(false)
   const [modules, setModules] = useState([])
@@ -44,8 +46,9 @@ export default function CourseEditorPage() {
     Promise.all([
       client.get(`/authoring/courses/${id}/`),
       client.get('/authoring/pillars/'),
+      client.get('/subjects/'),
     ])
-      .then(([courseRes, pillarsRes]) => {
+      .then(([courseRes, pillarsRes, subjectsRes]) => {
         const c = courseRes.data
         setIsPublished(c.is_published)
         setForm({
@@ -56,12 +59,14 @@ export default function CourseEditorPage() {
           duration_hours: c.duration_hours,
           learning_outcomes: c.learning_outcomes ?? [],
           source_language: c.source_language ?? 'en',
+          subject_ids: (c.subjects ?? []).map((s) => s.id),
         })
         setTranslationsData(c.translations ?? {})
         setTranslationStatus(c.translation_status ?? {})
         setModules(c.modules.map((m) => ({ ...m, isDirty: false, isNew: false, saving: false })))
         setAuthor({ id: c.created_by_id, name: c.created_by_name })
         setPillars(pillarsRes.data)
+        setSubjects(subjectsRes.data)
       })
       .catch(() => setError(t('authoring.editor.loadError')))
   }, [id, t])
@@ -496,6 +501,18 @@ export default function CourseEditorPage() {
           </button>
         )}
       </div>
+
+      {/* Subjects (source language only — subjects aren't translated) */}
+      {!translating && (
+        <div className="outcomes-card">
+          <SubjectPicker
+            subjects={subjects}
+            selectedIds={form.subject_ids ?? []}
+            onChange={(ids) => setForm((f) => ({ ...f, subject_ids: ids }))}
+            disabled={locked}
+          />
+        </div>
+      )}
 
       {/* Modules */}
       <section className="modules-section">

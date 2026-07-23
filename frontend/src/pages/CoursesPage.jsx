@@ -32,6 +32,7 @@ CourseCard.propTypes = {
     is_enrolled: PropTypes.bool,
     progress_pct: PropTypes.number,
     pillar: PropTypes.shape({ slug: PropTypes.string, name: PropTypes.string }),
+    subjects: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.number, name: PropTypes.string })),
   }),
 }
 
@@ -55,6 +56,14 @@ function CourseCard({ course }) {
 
       <h3 className="course-title">{course.title}</h3>
       <p className="course-desc">{course.description}</p>
+
+      {course.subjects?.length > 0 && (
+        <div className="course-subjects">
+          {course.subjects.slice(0, 3).map((s) => (
+            <span key={s.id} className="subject-tag">{s.name}</span>
+          ))}
+        </div>
+      )}
 
       <div className="course-meta">
         <span>{t('common.durationHours', { count: course.duration_hours })}</span>

@@ -178,7 +178,8 @@
           "addressEthics": "Hantera etiska frågor kring AI"
         }
       }
-    }
+    },
+    "selectSubject": "Välj ditt ämne"
   },
   "profile": {
     "title": "Profil",
@@ -494,7 +495,9 @@
       "loadError": "Det gick inte att läsa in kursen.",
       "deleteCourse": "Radera kurs",
       "deleting": "Raderar…",
-      "confirmDelete": "Radera den här kursen permanent? Alla moduler, lektioner och anmälningar går förlorade. Detta kan inte ångras."
+      "confirmDelete": "Radera den här kursen permanent? Alla moduler, lektioner och anmälningar går förlorade. Detta kan inte ångras.",
+      "subjectsLabel": "Ämnen",
+      "subjectsHint": "Vilka lärare är kursen för? Välj alla som gäller."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbyggare",

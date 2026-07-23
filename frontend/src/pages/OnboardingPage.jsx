@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -12,16 +12,9 @@ import './OnboardingPage.css'
 
 const STEP_DEFS = [
   {
-    key: 'subject_area',
+    key: 'subject',
     i18nKey: 'subjectArea',
-    type: 'radio',
-    options: [
-      { value: 'stem',       i18nKey: 'stem' },
-      { value: 'humanities', i18nKey: 'humanities' },
-      { value: 'languages',  i18nKey: 'languages' },
-      { value: 'arts',       i18nKey: 'arts' },
-      { value: 'general',    i18nKey: 'general' },
-    ],
+    type: 'subject',
   },
   {
     key: 'teaching_level',
@@ -88,13 +81,18 @@ export default function OnboardingPage() {
   const { user, updateUser } = useAuth()
   const [step, setStep]       = useState(0)
   const [answers, setAnswers] = useState({})
+  const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
+
+  useEffect(() => {
+    client.get('/subjects/').then(res => setSubjects(res.data)).catch(() => {})
+  }, [])
 
   const STEPS = STEP_DEFS.map(s => ({
     ...s,
     question: t(`onboarding.questions.${s.i18nKey}.question`),
-    options: s.options.map(o => ({
+    options: (s.options || []).map(o => ({
       ...o,
       label: t(`onboarding.questions.${s.i18nKey}.options.${o.i18nKey}`),
     })),
@@ -125,7 +123,7 @@ export default function OnboardingPage() {
     setError('')
     try {
       await client.post('/onboarding/', {
-        subject_area:   answers.subject_area,
+        subject:        answers.subject,
         teaching_level: answers.teaching_level,
         answers:        { q3: answers.q3, q4: answers.q4, q5: answers.q5 },
         goals:          answers.goals || [],
@@ -172,6 +170,19 @@ export default function OnboardingPage() {
                 </div>
               ))}
             </RadioGroup>
+          )}
+
+          {current.type === 'subject' && (
+            <select
+              className="onboarding-select"
+              value={answers.subject || ''}
+              onChange={e => setAnswers(prev => ({ ...prev, subject: e.target.value }))}
+            >
+              <option value="" disabled>{t('onboarding.selectSubject')}</option>
+              {subjects.map(s => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
           )}
 
           {current.type === 'multiselect' && (

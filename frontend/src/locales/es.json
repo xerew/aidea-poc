@@ -178,7 +178,8 @@
           "addressEthics": "Abordar preocupaciones éticas sobre la IA"
         }
       }
-    }
+    },
+    "selectSubject": "Selecciona tu asignatura"
   },
   "profile": {
     "title": "Perfil",
@@ -494,7 +495,9 @@
       "loadError": "No se pudo cargar el curso.",
       "deleteCourse": "Eliminar curso",
       "deleting": "Eliminando…",
-      "confirmDelete": "¿Eliminar este curso de forma permanente? Se perderán todos los módulos, lecciones e inscripciones. No se puede deshacer."
+      "confirmDelete": "¿Eliminar este curso de forma permanente? Se perderán todos los módulos, lecciones e inscripciones. No se puede deshacer.",
+      "subjectsLabel": "Asignaturas",
+      "subjectsHint": "¿Para qué docentes es este curso? Selecciona todas las que correspondan."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Creador de Cuestionarios",

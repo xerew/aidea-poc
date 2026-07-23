@@ -20,6 +20,7 @@ from .models import (
     Module,
     PreferenceOption,
     PreferenceQuestion,
+    Subject,
     UserLearningPath,
     UserProfile,
 )
@@ -40,7 +41,7 @@ class UserProfileInline(admin.StackedInline):
     fields = [
         'user_type', 'gender', 'country',
         'avatar_initials', 'competency_score', 'onboarding_completed',
-        'subject_area', 'school', 'phone', 'location',
+        'subject', 'school', 'phone', 'location',
         'preferred_pillars', 'learning_style', 'weekly_learning_goal',
         'email_notifications', 'progress_reminders', 'profile_public', 'share_progress',
     ]
@@ -83,7 +84,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     readonly_fields = ['avatar_initials', 'competency_score']
     fieldsets = [
         ('Identity', {'fields': ['user', 'user_type', 'avatar_initials', 'competency_score']}),
-        ('Personal', {'fields': ['gender', 'country', 'subject_area', 'teaching_level', 'school', 'phone', 'location', 'goals']}),
+        ('Personal', {'fields': ['gender', 'country', 'subject', 'teaching_level', 'school', 'phone', 'location', 'goals']}),
         ('Learning', {'fields': ['preferred_pillars', 'learning_style', 'weekly_learning_goal', 'onboarding_completed']}),
         ('Notifications', {'fields': ['email_notifications', 'progress_reminders', 'profile_public', 'share_progress']}),
     ]
@@ -165,6 +166,16 @@ class AccessRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'{count} request(s) denied.', messages.WARNING)
 
 
+# ── Subjects ──────────────────────────────────────────────────────────────────
+
+@admin.register(Subject)
+class SubjectAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'slug', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ['name']}
+
+
 # ── Learning Pillars & Courses ────────────────────────────────────────────────
 
 @admin.register(LearningPillar)
@@ -184,9 +195,10 @@ class ModuleInline(admin.TabularInline):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display  = ['title', 'pillar', 'level', 'content_format', 'is_published', 'created_by', 'created_at']
-    list_filter   = ['pillar', 'is_published', 'level', 'content_format']
+    list_filter   = ['pillar', 'is_published', 'level', 'content_format', 'subjects']
     search_fields = ['title', 'description']
     readonly_fields = ['created_at']
+    filter_horizontal = ['subjects']
     inlines = [ModuleInline]
     actions = ['publish_courses', 'unpublish_courses']
 

@@ -4,10 +4,10 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from hub.models import Course, LearningPillar, Lesson
+from hub.models import Course, LearningPillar, Lesson, Subject
 
 COURSE_HEADERS = ['title', 'description', 'pillar_slug', 'level',
-                  'duration_hours', 'content_format', 'learning_outcomes']
+                  'duration_hours', 'content_format', 'learning_outcomes', 'subjects']
 MODULE_HEADERS = ['order', 'title', 'description', 'duration_minutes']
 LESSON_HEADERS = ['module_order', 'order', 'title', 'description',
                   'lesson_type', 'content', 'duration_minutes', 'required']
@@ -26,7 +26,9 @@ README_LINES = [
     'Sheets:',
     '  Course  - exactly one row (row 2). pillar_slug, level and content_format',
     '            offer dropdowns. learning_outcomes: one outcome per line in the cell',
-    '            (Alt+Enter inside Excel).',
+    '            (Alt+Enter inside Excel). subjects: comma-separated subject slugs',
+    '            (e.g. physics,astronomy) from the hidden Choices sheet; leave blank',
+    '            for none.',
     '  Modules - one row per module. "order" must be a unique positive number.',
     '  Lessons - one row per lesson. module_order refers to the Modules sheet.',
     '            lesson_type and required offer dropdowns.',
@@ -75,8 +77,9 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     content_formats = [c[0] for c in Course.ContentFormat.choices]
     lesson_types    = [c[0] for c in Lesson.LessonType.choices]
     pillar_slugs    = list(LearningPillar.objects.values_list('slug', flat=True))
+    subject_slugs   = list(Subject.objects.filter(is_active=True).values_list('slug', flat=True))
     yes_no          = ['yes', 'no']
-    for col, values in enumerate([levels, content_formats, lesson_types, pillar_slugs, yes_no], start=1):
+    for col, values in enumerate([levels, content_formats, lesson_types, pillar_slugs, yes_no, subject_slugs], start=1):
         for row, value in enumerate(values, start=1):
             choices.cell(row=row, column=col, value=value)
     choices.sheet_state = 'hidden'
@@ -93,6 +96,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
             course.duration_hours,
             course.content_format,
             '\n'.join(course.learning_outcomes or []),
+            ','.join(course.subjects.values_list('slug', flat=True)),
         ])
         course_ws['G2'].alignment = course_ws['G2'].alignment.copy(wrap_text=True)
     _list_validation(wb, course_ws, 'D', max(len(pillar_slugs), 1), 'C', 2)
@@ -205,6 +209,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
     content_formats = {c[0] for c in Course.ContentFormat.choices}
     lesson_types    = {c[0] for c in Lesson.LessonType.choices}
     pillar_by_slug  = {p.slug: p for p in LearningPillar.objects.all()}
+    subject_by_slug = {s.slug: s for s in Subject.objects.filter(is_active=True)}
 
     # ── Course sheet ────────────────────────────────────────────────────
     course_rows = list(_rows(wb['Course']))
@@ -212,7 +217,17 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         return None, ['Course!A2: course row is missing.']
     row_num, values = course_rows[0]
     values = list(values) + [None] * (len(COURSE_HEADERS) - len(values))
-    title, description, pillar_slug, level, duration_hours, content_format, outcomes = values[:7]
+    title, description, pillar_slug, level, duration_hours, content_format, outcomes, subjects = values[:8]
+
+    subject_objs = []
+    for token in str(subjects or '').replace(';', ',').replace('\n', ',').split(','):
+        slug = token.strip().lower()
+        if not slug:
+            continue
+        if slug not in subject_by_slug:
+            errors.append(f'{_cell("Course", 8, row_num)}: unknown subject slug {slug!r}.')
+        else:
+            subject_objs.append(subject_by_slug[slug])
 
     if not (title or '').strip():
         errors.append(f'{_cell("Course", 1, row_num)}: title is required.')
@@ -238,6 +253,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         'learning_outcomes': [
             line.strip() for line in str(outcomes or '').splitlines() if line.strip()
         ],
+        'subjects': subject_objs,
     }
 
     # ── Modules sheet ───────────────────────────────────────────────────

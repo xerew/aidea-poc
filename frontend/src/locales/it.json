@@ -178,7 +178,8 @@
           "addressEthics": "Affrontare le preoccupazioni etiche legate all'AI"
         }
       }
-    }
+    },
+    "selectSubject": "Seleziona la tua materia"
   },
   "profile": {
     "title": "Profilo",
@@ -494,7 +495,9 @@
       "loadError": "Impossibile caricare il corso.",
       "deleteCourse": "Elimina corso",
       "deleting": "Eliminazione…",
-      "confirmDelete": "Eliminare definitivamente questo corso? Tutti i moduli, le lezioni e le iscrizioni andranno persi. L'operazione è irreversibile."
+      "confirmDelete": "Eliminare definitivamente questo corso? Tutti i moduli, le lezioni e le iscrizioni andranno persi. L'operazione è irreversibile.",
+      "subjectsLabel": "Materie",
+      "subjectsHint": "A quali insegnanti è rivolto questo corso? Seleziona tutte quelle pertinenti."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Creazione quiz",

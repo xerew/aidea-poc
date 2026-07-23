@@ -8,6 +8,11 @@ from hub.translation import translate_text
 
 logger = logging.getLogger(__name__)
 
+# Multiplicative nudge for courses whose subjects match the teacher's subject
+# (or the catch-all General/All). Kept as a fixed constant here; the
+# recommendations rework (#24) may move signal tuning into RecommendationConfig.
+SUBJECT_MATCH_BOOST = 1.2
+
 
 @shared_task
 def compute_course_embeddings(course_id: int) -> None:
@@ -23,7 +28,8 @@ def compute_course_embeddings(course_id: int) -> None:
 
     course = Course.objects.get(pk=course_id)
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    text = f"{course.title} {course.description}"
+    subjects = ' '.join(course.subjects.values_list('name', flat=True))
+    text = f"{course.title} {course.description} {subjects}".strip()
     embedding = model.encode(text).tolist()
     CourseEmbedding.objects.update_or_create(
         course=course,
@@ -79,7 +85,7 @@ def compute_user_recommendations(user_id: int) -> None:
 
     # ── Signal ①: Profile vector ──────────────────────────────────────────
     goals_str = ', '.join(profile.goals) if profile.goals else 'general'
-    subject   = profile.get_subject_area_display() if profile.subject_area else 'general'
+    subject   = profile.subject.name if profile.subject else 'general'
     level_str = profile.get_teaching_level_display() if profile.teaching_level else 'unknown'
     profile_text = (
         f"{subject} teacher, {level_str}, "
@@ -193,11 +199,17 @@ def compute_user_recommendations(user_id: int) -> None:
     candidates = (
         CourseEmbedding.objects
         .select_related('course__pillar')
+        .prefetch_related('course__subjects')
         .exclude(course_id__in=enrolled_ids)
         .filter(course__is_published=True)
         .annotate(distance=CosineDistance('embedding', user_vec_list))
         .order_by('distance')[:20]
     )
+
+    # A course tagged with the teacher's subject (or the catch-all General/All)
+    # is nudged up. Deeper signal-weight tuning lives in the recommendations
+    # rework (#24); this is a light, fixed alignment boost.
+    teacher_subject_slug = profile.subject.slug if profile.subject else None
 
     filtered = []
     for emb in candidates:
@@ -206,6 +218,10 @@ def compute_user_recommendations(user_id: int) -> None:
         similarity = max(0.0, 1.0 - float(emb.distance))
         if profile.learning_style and emb.course.content_format == profile.learning_style:
             similarity *= config.style_boost
+        if teacher_subject_slug:
+            course_subject_slugs = {s.slug for s in emb.course.subjects.all()}
+            if teacher_subject_slug in course_subject_slugs or 'general' in course_subject_slugs:
+                similarity *= SUBJECT_MATCH_BOOST
         filtered.append((emb.course, similarity))
         if len(filtered) >= 5:
             break
@@ -213,7 +229,7 @@ def compute_user_recommendations(user_id: int) -> None:
     # ── Write personal recommendations ───────────────────────────────────
     CourseRecommendation.objects.filter(user=user, source='personal').delete()
 
-    subject_display = profile.get_subject_area_display() if profile.subject_area else 'general'
+    subject_display = profile.subject.name if profile.subject else 'general'
     level_name = ('beginner', 'intermediate', 'advanced')[level_num]
     for course, similarity in filtered:
         CourseRecommendation.objects.create(
@@ -256,7 +272,7 @@ def compute_cf_recommendations(user_id: int) -> None:
     peer_ids = list(
         UserProfile.objects
         .filter(
-            subject_area=profile.subject_area,
+            subject=profile.subject,
             teaching_level=profile.teaching_level,
             onboarding_completed=True,
             **band_filter,
@@ -289,7 +305,7 @@ def compute_cf_recommendations(user_id: int) -> None:
 
     CourseRecommendation.objects.filter(user=user, source='cf').delete()
 
-    subject_display = profile.get_subject_area_display() if profile.subject_area else 'teachers'
+    subject_display = profile.subject.name if profile.subject else 'teachers'
     for item in top_courses:
         pct = round(item['n'] / group_size * 100)
         CourseRecommendation.objects.create(

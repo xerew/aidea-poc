@@ -178,7 +178,8 @@
           "addressEthics": "Aborder les questions éthiques liées à l'IA"
         }
       }
-    }
+    },
+    "selectSubject": "Sélectionnez votre matière"
   },
   "profile": {
     "title": "Profil",
@@ -494,7 +495,9 @@
       "loadError": "Échec du chargement du cours.",
       "deleteCourse": "Supprimer le cours",
       "deleting": "Suppression…",
-      "confirmDelete": "Supprimer définitivement ce cours ? Tous les modules, leçons et inscriptions seront perdus. Cette action est irréversible."
+      "confirmDelete": "Supprimer définitivement ce cours ? Tous les modules, leçons et inscriptions seront perdus. Cette action est irréversible.",
+      "subjectsLabel": "Matières",
+      "subjectsHint": "À quels enseignants ce cours s'adresse-t-il ? Sélectionnez tout ce qui s'applique."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Créateur de quiz",

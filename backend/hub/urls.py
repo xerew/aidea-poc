@@ -54,6 +54,7 @@ from .views import (
     RegisterView,
     ReviewActionView,
     ReviewQueueView,
+    SubjectsView,
 )
 
 urlpatterns = [
@@ -77,6 +78,7 @@ urlpatterns = [
     path('onboarding/',           OnboardingView.as_view(),           name='onboarding'),
     path('pathway/',              PathwayView.as_view(),              name='pathway'),
     path('preference-quiz/',      PreferenceQuizView.as_view(),      name='preference-quiz'),
+    path('subjects/',             SubjectsView.as_view(),             name='subjects'),
     path('profile/preferences/',  ProfilePreferencesView.as_view(),  name='profile-preferences'),
     path('profile/info/',         ProfilePersonalInfoView.as_view(), name='profile-info'),
     path('profile/settings/',     ProfileSettingsView.as_view(),     name='profile-settings'),

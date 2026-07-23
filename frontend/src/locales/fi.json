@@ -178,7 +178,8 @@
           "addressEthics": "Käsittele tekoälyyn liittyviä eettisiä kysymyksiä"
         }
       }
-    }
+    },
+    "selectSubject": "Valitse oppiaineesi"
   },
   "profile": {
     "title": "Profiili",
@@ -494,7 +495,9 @@
       "loadError": "Kurssin lataaminen epäonnistui.",
       "deleteCourse": "Poista kurssi",
       "deleting": "Poistetaan…",
-      "confirmDelete": "Poistetaanko tämä kurssi pysyvästi? Kaikki moduulit, oppitunnit ja ilmoittautumiset menetetään. Tätä ei voi kumota."
+      "confirmDelete": "Poistetaanko tämä kurssi pysyvästi? Kaikki moduulit, oppitunnit ja ilmoittautumiset menetetään. Tätä ei voi kumota.",
+      "subjectsLabel": "Oppiaineet",
+      "subjectsHint": "Keille opettajille tämä kurssi on tarkoitettu? Valitse kaikki sopivat."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Tietovisan luonti",

@@ -249,3 +249,19 @@
 
 .module-status--done  { color: #16a34a; }
 .module-status--empty { color: var(--color-border); }
+
+/* Subject tags */
+.detail-subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.subject-tag {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.75rem;
+  font-weight: 500;
+}

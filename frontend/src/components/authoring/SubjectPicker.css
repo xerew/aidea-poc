@@ -1,0 +1,44 @@
+.subject-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.subject-picker-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin: 0;
+}
+
+.subject-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.subject-chip {
+  padding: 0.35rem 0.8rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text, #1e293b);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.subject-chip:hover:not(:disabled) {
+  border-color: #94a3b8;
+}
+
+.subject-chip--on {
+  background: #1e3a8a;
+  border-color: #1e3a8a;
+  color: #fff;
+}
+
+.subject-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

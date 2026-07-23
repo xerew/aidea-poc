@@ -184,6 +184,33 @@ class ImportXlsxTests(APITestCase):
         video = new.modules.get(order=1).lessons.get(order=2)
         self.assertFalse(video.is_required)
 
+    def test_round_trip_preserves_subjects(self):
+        from hub.models import Subject
+        physics = Subject.objects.get(slug='physics')
+        astronomy = Subject.objects.get(slug='astronomy')
+        self.course.subjects.set([physics, astronomy])
+        self.client.force_authenticate(self.creator)
+        res = self._post(self._export_bytes(self.course))
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        new = Course.objects.get(pk=res.data['id'])
+        self.assertEqual(
+            set(new.subjects.values_list('slug', flat=True)), {'physics', 'astronomy'},
+        )
+
+    def test_unknown_subject_slug_rejected(self):
+        from openpyxl import load_workbook
+        buf = self._export_bytes(self.course)
+        wb = load_workbook(buf)
+        wb['Course']['H2'] = 'not-a-subject'
+        from io import BytesIO as B
+        out = B()
+        wb.save(out)
+        out.seek(0)
+        self.client.force_authenticate(self.creator)
+        res = self._post(out)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(any('unknown subject' in e.lower() for e in res.data['errors']))
+
     def test_invalid_lesson_type_rejected_with_cell_ref(self):
         from openpyxl import load_workbook
         buf = self._export_bytes(self.course)

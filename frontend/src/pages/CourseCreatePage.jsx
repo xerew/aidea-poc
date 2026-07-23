@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import client from '../api/client'
 import { LANGUAGES } from '../i18n'
+import SubjectPicker from '../components/authoring/SubjectPicker'
 // Reuse editor and detail styles — same class names apply
 import './CourseDetailPage.css'
 import './CourseEditorPage.css'
@@ -22,12 +23,14 @@ const EMPTY_FORM = {
   duration_hours: 0,
   learning_outcomes: [],
   source_language: 'en',
+  subject_ids: [],
 }
 
 export default function CourseCreatePage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [pillars, setPillars] = useState([])
+  const [subjects, setSubjects] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState({})
@@ -37,6 +40,7 @@ export default function CourseCreatePage() {
       setPillars(res.data)
       if (res.data.length) setForm((f) => ({ ...f, pillar_id: res.data[0].id }))
     })
+    client.get('/subjects/').then((res) => setSubjects(res.data)).catch(() => {})
   }, [])
 
   const currentPillar = pillars.find((p) => p.id === form.pillar_id)
@@ -179,6 +183,15 @@ export default function CourseCreatePage() {
         <button className="add-dashed-btn" onClick={addOutcome}>
           <Plus size={14} /> {t('authoring.editor.addOutcome')}
         </button>
+      </div>
+
+      {/* Subjects */}
+      <div className="outcomes-card">
+        <SubjectPicker
+          subjects={subjects}
+          selectedIds={form.subject_ids}
+          onChange={(ids) => setForm((f) => ({ ...f, subject_ids: ids }))}
+        />
       </div>
 
     </div>

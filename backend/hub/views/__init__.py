@@ -61,6 +61,7 @@ from .profile import (
     ProfileSettingsView,
 )
 from .recommendations import RecommendationEventView, RecommendationsView
+from .subjects import SubjectsView
 
 __all__ = [
     'AccessRequestDetailView',
@@ -110,6 +111,7 @@ __all__ = [
     'OnboardingView',
     'PathwayView',
     'PreferenceQuizView',
+    'SubjectsView',
     'ChangePasswordView',
     'ProfileAvatarView',
     'ProfileLanguageView',

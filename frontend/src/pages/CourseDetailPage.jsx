@@ -94,6 +94,14 @@ export default function CourseDetailPage() {
       <h1 className="detail-title">{course.title}</h1>
       <p className="detail-desc">{course.description}</p>
 
+      {course.subjects?.length > 0 && (
+        <div className="detail-subjects">
+          {course.subjects.map((s) => (
+            <span key={s.id} className="subject-tag">{s.name}</span>
+          ))}
+        </div>
+      )}
+
       <div className="detail-stats">
         <span><Clock size={15} /> {t('common.durationHours', { count: course.duration_hours })}</span>
         <span><BookOpen size={15} /> {t('common.moduleCount', { count: course.module_count })}</span>

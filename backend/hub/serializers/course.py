@@ -1,7 +1,7 @@
 from django.db.models import Avg
 from rest_framework import serializers
 
-from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar
+from hub.models import Course, CourseEditHistory, Enrollment, LearningPillar, Subject
 
 from .content import ModuleAuthoringSerializer, ModuleLocalizedSerializer
 from .localize import localized, viewer_language
@@ -13,8 +13,15 @@ class PillarSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug']
 
 
+class SubjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subject
+        fields = ['id', 'name', 'slug']
+
+
 class CourseListSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
+    subjects = SubjectSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     progress_pct = serializers.SerializerMethodField()
     is_enrolled = serializers.SerializerMethodField()
@@ -24,7 +31,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'pillar',
+            'id', 'title', 'description', 'pillar', 'subjects',
             'level', 'duration_hours', 'module_count',
             'progress_pct', 'is_enrolled',
         ]
@@ -55,6 +62,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
+    subjects = SubjectSerializer(many=True, read_only=True)
     modules = ModuleLocalizedSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     is_enrolled = serializers.SerializerMethodField()
@@ -68,7 +76,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'pillar', 'level', 'duration_hours',
+            'id', 'title', 'description', 'pillar', 'subjects', 'level', 'duration_hours',
             'learning_outcomes', 'module_count', 'modules',
             'is_enrolled', 'progress_pct', 'current_module_id', 'completed_module_ids',
         ]
@@ -177,6 +185,11 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
     pillar_id = serializers.PrimaryKeyRelatedField(
         queryset=LearningPillar.objects.all(), source='pillar', write_only=True,
     )
+    subjects = SubjectSerializer(many=True, read_only=True)
+    subject_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.filter(is_active=True), source='subjects',
+        many=True, write_only=True, required=False,
+    )
     modules = ModuleAuthoringSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     created_by_id = serializers.IntegerField(source='created_by.id', read_only=True, default=None)
@@ -187,7 +200,7 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'pillar', 'pillar_id', 'level',
             'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
-            'created_by_id', 'created_by_name',
+            'subjects', 'subject_ids', 'created_by_id', 'created_by_name',
             'source_language', 'translations', 'translation_status',
         ]
         read_only_fields = ['is_published', 'translations', 'translation_status']

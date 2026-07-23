@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hub.models import UserProfile
+from hub.models import Subject, UserProfile
 
 _VALID_PILLARS = ['teach-with-ai', 'teach-for-ai', 'teach-about-ai']
 _VALID_STYLES  = [c[0] for c in UserProfile.LearningStyle.choices]
@@ -34,9 +34,9 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
     first_name   = serializers.CharField(max_length=150, required=False, allow_blank=True)
     last_name    = serializers.CharField(max_length=150, required=False, allow_blank=True)
     email        = serializers.EmailField(required=False)
-    subject_area = serializers.ChoiceField(
-        choices=[('', '')] + list(UserProfile.SubjectArea.choices),
-        required=False, allow_blank=True,
+    subject      = serializers.PrimaryKeyRelatedField(
+        queryset=Subject.objects.filter(is_active=True),
+        required=False, allow_null=True,
     )
     gender  = serializers.ChoiceField(
         choices=[('', '')] + list(UserProfile.Gender.choices),
@@ -53,7 +53,8 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'first_name':   user.first_name,
             'last_name':    user.last_name,
             'email':        user.email,
-            'subject_area': instance.subject_area,
+            'subject':      instance.subject_id,
+            'subject_name': instance.subject.name if instance.subject else '',
             'gender':       instance.gender,
             'country':      instance.country,
             'school':       instance.school,
@@ -68,13 +69,13 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
         user.email      = validated_data.get('email',      user.email)
         user.save(update_fields=['first_name', 'last_name', 'email'])
 
-        instance.subject_area = validated_data.get('subject_area', instance.subject_area)
-        instance.gender       = validated_data.get('gender',       instance.gender)
-        instance.country      = validated_data.get('country',      instance.country)
-        instance.school       = validated_data.get('school',       instance.school)
-        instance.phone        = validated_data.get('phone',        instance.phone)
-        instance.location     = validated_data.get('location',     instance.location)
-        instance.save(update_fields=['subject_area', 'gender', 'country', 'school', 'phone', 'location'])
+        instance.subject  = validated_data.get('subject',  instance.subject)
+        instance.gender   = validated_data.get('gender',   instance.gender)
+        instance.country  = validated_data.get('country',  instance.country)
+        instance.school   = validated_data.get('school',   instance.school)
+        instance.phone    = validated_data.get('phone',    instance.phone)
+        instance.location = validated_data.get('location', instance.location)
+        instance.save(update_fields=['subject', 'gender', 'country', 'school', 'phone', 'location'])
         return instance
 
 

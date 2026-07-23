@@ -23,6 +23,7 @@ from .course import (
     MyLearningEnrollmentSerializer,
     PillarSerializer,
     PillarSummarySerializer,
+    SubjectSerializer,
 )
 from .onboarding import OnboardingSubmitSerializer
 from .pathway import RecommendationSerializer, UserLearningPathSerializer
@@ -52,6 +53,7 @@ __all__ = [
     'PreferenceOptionSerializer',
     'PreferenceQuestionSerializer',
     'RecommendationSerializer',
+    'SubjectSerializer',
     'UserLearningPathSerializer',
     'UserProfileSerializer',
     'UserSerializer',

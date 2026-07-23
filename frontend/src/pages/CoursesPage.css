@@ -202,3 +202,20 @@
 .course-btn--outline:hover {
   background: var(--color-bg);
 }
+
+/* Subject tags on course cards */
+.course-subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.course-subjects .subject-tag {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 0.7rem;
+  font-weight: 500;
+}

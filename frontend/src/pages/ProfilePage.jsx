@@ -71,19 +71,11 @@ function PersonalInfoSection() {
   const { t } = useTranslation()
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject_area: '', gender: '', country: '', school: '', phone: '', location: '',
+    subject: '', gender: '', country: '', school: '', phone: '', location: '',
   })
+  const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/info/')
-
-  const SUBJECT_AREAS = [
-    { value: '',           label: t('profile.personalInfo.subjectOptions.select') },
-    { value: 'stem',       label: t('profile.personalInfo.subjectOptions.stem') },
-    { value: 'humanities', label: t('profile.personalInfo.subjectOptions.humanities') },
-    { value: 'languages',  label: t('profile.personalInfo.subjectOptions.languages') },
-    { value: 'arts',       label: t('profile.personalInfo.subjectOptions.arts') },
-    { value: 'general',    label: t('profile.personalInfo.subjectOptions.general') },
-  ]
 
   const GENDER_OPTIONS = [
     { value: '',                label: t('profile.personalInfo.genderOptions.select') },
@@ -93,8 +85,9 @@ function PersonalInfoSection() {
   ]
 
   useEffect(() => {
+    client.get('/subjects/').then(res => setSubjects(res.data)).catch(() => {})
     client.get('/profile/info/')
-      .then(res => setForm(res.data))
+      .then(res => setForm(prev => ({ ...prev, ...res.data, subject: res.data.subject ?? '' })))
       .catch(() => setError(t('profile.personalInfo.loadFailed')))
       .finally(() => setLoading(false))
   }, [setError, t])
@@ -103,7 +96,8 @@ function PersonalInfoSection() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    save(form)
+    // The API expects a subject id or null — never an empty string.
+    save({ ...form, subject: form.subject === '' ? null : form.subject })
   }
 
   if (loading) return <section className="profile-card"><p className="profile-loading">{t('common.loading')}</p></section>
@@ -130,8 +124,9 @@ function PersonalInfoSection() {
           </div>
           <div className="profile-field">
             <label>{t('profile.personalInfo.subjectDepartment')}</label>
-            <select value={form.subject_area} onChange={set('subject_area')}>
-              {SUBJECT_AREAS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            <select value={form.subject ?? ''} onChange={set('subject')}>
+              <option value="">{t('profile.personalInfo.subjectOptions.select')}</option>
+              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
           </div>
           <div className="profile-field">

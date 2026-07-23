@@ -13,6 +13,7 @@ from .recommendations import (
     RecommendationConfig,
     RecommendationEvent,
 )
+from .subject import Subject
 from .user import UserProfile
 
 __all__ = [
@@ -36,6 +37,7 @@ __all__ = [
     'PreferenceQuestion',
     'RecommendationConfig',
     'RecommendationEvent',
+    'Subject',
     'UserLearningPath',
     'UserProfile',
 ]

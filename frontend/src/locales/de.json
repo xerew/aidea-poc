@@ -178,7 +178,8 @@
           "addressEthics": "Ethische Fragen rund um KI thematisieren"
         }
       }
-    }
+    },
+    "selectSubject": "Wähle dein Fach"
   },
   "profile": {
     "title": "Profil",
@@ -494,7 +495,9 @@
       "loadError": "Kurs konnte nicht geladen werden.",
       "deleteCourse": "Kurs löschen",
       "deleting": "Löschen…",
-      "confirmDelete": "Diesen Kurs endgültig löschen? Alle Module, Lektionen und Einschreibungen gehen verloren. Dies kann nicht rückgängig gemacht werden."
+      "confirmDelete": "Diesen Kurs endgültig löschen? Alle Module, Lektionen und Einschreibungen gehen verloren. Dies kann nicht rückgängig gemacht werden.",
+      "subjectsLabel": "Fächer",
+      "subjectsHint": "Für welche Lehrkräfte ist dieser Kurs? Wähle alle zutreffenden aus."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz-Editor",

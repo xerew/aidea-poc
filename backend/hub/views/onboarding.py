@@ -57,7 +57,7 @@ class OnboardingView(APIView):
         path  = assign_path(score)
 
         profile = request.user.profile
-        profile.subject_area         = data['subject_area']
+        profile.subject              = data['subject']
         profile.teaching_level       = data['teaching_level']
         profile.goals                = data['goals']
         profile.competency_score     = score

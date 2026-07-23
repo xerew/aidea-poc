@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hub.models import UserProfile
+from hub.models import Subject, UserProfile
 from hub.models.pathway import LearningPath, UserLearningPath
 
 
@@ -29,7 +29,6 @@ def make_path(slug, competency_min, competency_max):
 
 
 VALID_PAYLOAD = {
-    'subject_area':   'stem',
     'teaching_level': 'secondary',
     'answers':        {'q3': 'b', 'q4': 'b', 'q5': 'b'},
     'goals':          ['save_time'],
@@ -63,12 +62,14 @@ class OnboardingPostTestCase(APITestCase):
         make_path('beginner-foundations', 0, 2)
         make_path('intermediate-growth', 3, 4)
         make_path('advanced-integration', 5, 6)
+        self.subject = Subject.objects.get(slug='mathematics')
+        self.payload = {**VALID_PAYLOAD, 'subject': self.subject.id}
         login = self.client.post(reverse('auth-login'), {'username': 'teacher1', 'password': 'pass'})
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_correct_answers_score_6_and_assign_advanced_path(self, mock_task):
-        response = self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
+        response = self.client.post(reverse('onboarding'), self.payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['competency_score'], 6)
         self.assertEqual(response.data['competency_level'], 'advanced')
@@ -76,25 +77,25 @@ class OnboardingPostTestCase(APITestCase):
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_profile_saved_correctly(self, mock_task):
-        self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
+        self.client.post(reverse('onboarding'), self.payload, format='json')
         self.user.profile.refresh_from_db()
         self.assertTrue(self.user.profile.onboarding_completed)
-        self.assertEqual(self.user.profile.subject_area, 'stem')
+        self.assertEqual(self.user.profile.subject_id, self.subject.id)
         self.assertEqual(self.user.profile.competency_score, 6)
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_user_learning_path_created(self, mock_task):
-        self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
+        self.client.post(reverse('onboarding'), self.payload, format='json')
         self.assertTrue(UserLearningPath.objects.filter(user=self.user).exists())
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_celery_task_fired(self, mock_task):
-        self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
+        self.client.post(reverse('onboarding'), self.payload, format='json')
         mock_task.assert_called_once_with(self.user.id)
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_wrong_answers_score_0_and_assign_beginner_path(self, mock_task):
-        payload = {**VALID_PAYLOAD, 'answers': {'q3': 'a', 'q4': 'a', 'q5': 'a'}}
+        payload = {**self.payload, 'answers': {'q3': 'a', 'q4': 'a', 'q5': 'a'}}
         response = self.client.post(reverse('onboarding'), payload, format='json')
         self.assertEqual(response.data['competency_score'], 0)
         self.assertEqual(response.data['competency_level'], 'beginner')
@@ -104,18 +105,23 @@ class OnboardingPostTestCase(APITestCase):
     def test_fallback_path_assigned_when_no_match(self, mock_task):
         LearningPath.objects.all().delete()
         LearningPath.objects.create(name='Beginner Foundations', slug='beginner-foundations', competency_min=0, competency_max=2)
-        payload = {**VALID_PAYLOAD, 'answers': {'q3': 'b', 'q4': 'b', 'q5': 'b'}}
+        payload = {**self.payload, 'answers': {'q3': 'b', 'q4': 'b', 'q5': 'b'}}
         response = self.client.post(reverse('onboarding'), payload, format='json')
         self.assertEqual(response.data['pathway_name'], 'Beginner Foundations')
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_submit_twice_is_idempotent(self, mock_task):
-        self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
-        response = self.client.post(reverse('onboarding'), VALID_PAYLOAD, format='json')
+        self.client.post(reverse('onboarding'), self.payload, format='json')
+        response = self.client.post(reverse('onboarding'), self.payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(UserLearningPath.objects.filter(user=self.user).count(), 1)
 
-    def test_invalid_subject_area_rejected(self):
-        payload = {**VALID_PAYLOAD, 'subject_area': 'invalid'}
+    def test_invalid_subject_rejected(self):
+        payload = {**self.payload, 'subject': 999999}
+        response = self.client.post(reverse('onboarding'), payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_missing_subject_rejected(self):
+        payload = {**VALID_PAYLOAD}  # no 'subject'
         response = self.client.post(reverse('onboarding'), payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

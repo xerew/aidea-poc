@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from hub.models import UserProfile
+from hub.models import Subject, UserProfile
 from hub.models.recommendations import CourseRecommendation
 from hub.tasks import compute_user_recommendations
 
@@ -15,7 +15,7 @@ class ComputeUserRecommendationsSQLiteTest(TestCase):
             user=self.user,
             user_type=UserProfile.UserType.TEACHER,
             onboarding_completed=True,
-            subject_area='stem',
+            subject=Subject.objects.get(slug='mathematics'),
             teaching_level='secondary',
             competency_score=3,
         )
