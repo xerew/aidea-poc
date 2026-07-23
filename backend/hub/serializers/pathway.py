@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from hub.models.content import Course
 from hub.models.enrollment import Enrollment
-from hub.models.pathway import LearningPathCourse, UserLearningPath
+from hub.models.pathway import UserLearningPath
 from hub.models.recommendations import CourseRecommendation
 
 from .localize import localized, viewer_language
@@ -31,11 +31,7 @@ class PathwayCourseSerializer(serializers.ModelSerializer):
         return 'completed' if enrollment.progress_pct == 100 else 'in_progress'
 
     def get_order(self, obj):
-        path = self.context.get('path')
-        if not path:
-            return 0
-        lpc = LearningPathCourse.objects.filter(path=path, course=obj).first()
-        return lpc.order if lpc else 0
+        return self.context.get('order_map', {}).get(obj.id, 0)
 
 
 class UserLearningPathSerializer(serializers.ModelSerializer):
@@ -58,17 +54,18 @@ class UserLearningPathSerializer(serializers.ModelSerializer):
         return 'advanced'
 
     def get_courses(self, obj):
-        courses = obj.path.courses.order_by('learningpathcourse__order')
+        order_map = {cid: i + 1 for i, cid in enumerate(obj.course_ids or [])}
+        courses = list(Course.objects.filter(id__in=order_map).select_related('pillar'))
+        courses.sort(key=lambda c: order_map.get(c.id, 0))
         return PathwayCourseSerializer(
-            courses, many=True, context={**self.context, 'path': obj.path},
+            courses, many=True, context={**self.context, 'order_map': order_map},
         ).data
 
     def get_progress(self, obj):
-        user       = obj.user
-        course_ids = list(obj.path.courses.values_list('id', flat=True))
+        course_ids = obj.course_ids or []
         total      = len(course_ids)
         completed  = Enrollment.objects.filter(
-            user=user, course_id__in=course_ids, progress_pct=100,
+            user=obj.user, course_id__in=course_ids, progress_pct=100,
         ).count()
         return {'completed': completed, 'total': total}
 

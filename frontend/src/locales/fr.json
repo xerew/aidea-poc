@@ -624,6 +624,15 @@
       "pending": "En attente",
       "approved": "Approuvée",
       "denied": "Refusée"
+    },
+    "systemTab": "Système",
+    "recompute": {
+      "title": "Actualiser les recommandations",
+      "description": "Recalculer les recommandations personnalisées pour chaque enseignant maintenant, sans attendre l'exécution nocturne.",
+      "button": "Actualiser maintenant",
+      "queuing": "Mise en file…",
+      "queued": "Actualisation des recommandations mise en file d'attente.",
+      "failed": "Impossible de lancer l'actualisation. Veuillez réessayer."
     }
   },
   "analytics": {

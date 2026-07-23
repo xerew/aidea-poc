@@ -29,39 +29,6 @@ const STEP_DEFS = [
     ],
   },
   {
-    key: 'q3',
-    i18nKey: 'q3',
-    type: 'radio',
-    options: [
-      { value: 'a', i18nKey: 'a' },
-      { value: 'b', i18nKey: 'b' },
-      { value: 'c', i18nKey: 'c' },
-      { value: 'd', i18nKey: 'd' },
-    ],
-  },
-  {
-    key: 'q4',
-    i18nKey: 'q4',
-    type: 'radio',
-    options: [
-      { value: 'a', i18nKey: 'a' },
-      { value: 'b', i18nKey: 'b' },
-      { value: 'c', i18nKey: 'c' },
-      { value: 'd', i18nKey: 'd' },
-    ],
-  },
-  {
-    key: 'q5',
-    i18nKey: 'q5',
-    type: 'radio',
-    options: [
-      { value: 'a', i18nKey: 'a' },
-      { value: 'b', i18nKey: 'b' },
-      { value: 'c', i18nKey: 'c' },
-      { value: 'd', i18nKey: 'd' },
-    ],
-  },
-  {
     key: 'goals',
     i18nKey: 'goals',
     type: 'multiselect',
@@ -82,21 +49,40 @@ export default function OnboardingPage() {
   const [step, setStep]       = useState(0)
   const [answers, setAnswers] = useState({})
   const [subjects, setSubjects] = useState([])
+  const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
 
   useEffect(() => {
     client.get('/subjects/').then(res => setSubjects(res.data)).catch(() => {})
+    client.get('/onboarding/').then(res => setQuestions(res.data.questions ?? [])).catch(() => {})
   }, [])
 
-  const STEPS = STEP_DEFS.map(s => ({
+  const resolveStatic = (s) => ({
     ...s,
     question: t(`onboarding.questions.${s.i18nKey}.question`),
     options: (s.options || []).map(o => ({
       ...o,
       label: t(`onboarding.questions.${s.i18nKey}.options.${o.i18nKey}`),
     })),
+  })
+
+  // Admin-editable competency questions (from the API) sit between the fixed
+  // teaching-level step and the final goals step.
+  const questionSteps = questions.map(q => ({
+    key: `q_${q.id}`,
+    type: 'question',
+    questionId: q.id,
+    question: q.text,
+    options: q.options.map(o => ({ value: String(o.id), label: o.text })),
   }))
+
+  const STEPS = [
+    resolveStatic(STEP_DEFS[0]),  // subject
+    resolveStatic(STEP_DEFS[1]),  // teaching level
+    ...questionSteps,
+    resolveStatic(STEP_DEFS[2]),  // goals
+  ]
 
   const current = STEPS[step]
   const isLast  = step === STEPS.length - 1
@@ -122,10 +108,15 @@ export default function OnboardingPage() {
     setLoading(true)
     setError('')
     try {
+      const questionAnswers = {}
+      questions.forEach(q => {
+        const optionId = answers[`q_${q.id}`]
+        if (optionId != null) questionAnswers[q.id] = Number(optionId)
+      })
       await client.post('/onboarding/', {
         subject:        answers.subject,
         teaching_level: answers.teaching_level,
-        answers:        { q3: answers.q3, q4: answers.q4, q5: answers.q5 },
+        answers:        questionAnswers,
         goals:          answers.goals || [],
       })
       updateUser({
@@ -155,7 +146,7 @@ export default function OnboardingPage() {
         <div className="onboarding-question">
           <h2 className="onboarding-question-text">{current.question}</h2>
 
-          {current.type === 'radio' && (
+          {(current.type === 'radio' || current.type === 'question') && (
             <RadioGroup
               value={answers[current.key] || ''}
               onValueChange={handleRadio}

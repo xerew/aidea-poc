@@ -13,6 +13,19 @@ from hub.serializers.profile import (
 from hub.tasks import compute_user_recommendations
 
 
+def _regenerate_pathway(user):
+    """Re-personalise an onboarded teacher's pathway after a preference or
+    subject change. No-op for users who haven't onboarded (no pathway yet)."""
+    from hub.models.pathway import UserLearningPath
+    from hub.pathway_gen import generate_pathway
+    try:
+        user_path = UserLearningPath.objects.get(user=user)
+    except UserLearningPath.DoesNotExist:
+        return
+    user_path.course_ids = generate_pathway(user)
+    user_path.save(update_fields=['course_ids'])
+
+
 class ProfilePreferencesView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -27,6 +40,7 @@ class ProfilePreferencesView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         compute_user_recommendations.delay(request.user.id)
+        _regenerate_pathway(request.user)
         return Response(serializer.data)
 
 
@@ -43,6 +57,8 @@ class ProfilePersonalInfoView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         serializer.update(request.user.profile, serializer.validated_data)
+        # Subject feeds the pathway ranking, so a change re-personalises it.
+        _regenerate_pathway(request.user)
         return Response(ProfilePersonalInfoSerializer(request.user.profile).data)
 
 

@@ -624,6 +624,15 @@
       "pending": "In sospeso",
       "approved": "Approvato",
       "denied": "Rifiutato"
+    },
+    "systemTab": "Sistema",
+    "recompute": {
+      "title": "Aggiorna raccomandazioni",
+      "description": "Ricalcola ora le raccomandazioni personalizzate per ogni insegnante, senza attendere l'esecuzione notturna.",
+      "button": "Aggiorna ora",
+      "queuing": "In coda…",
+      "queued": "Aggiornamento delle raccomandazioni in coda.",
+      "failed": "Impossibile mettere in coda l'aggiornamento. Riprova."
     }
   },
   "analytics": {

@@ -127,8 +127,13 @@ class Command(BaseCommand):
                 'user_type': UserProfile.UserType.TEACHER,
                 'avatar_initials': 'NG',
                 'subject': self.subjects.get('mathematics'),
+                'onboarding_completed': True,
+                'competency_score': 3,
+                'preferred_pillars': ['teach-with-ai'],
+                'goals': ['save_time'],
             },
         )
+        self._assign_demo_pathway(user)
 
         course = Course.objects.filter(pillar__slug='teach-with-ai').first()
         if course:
@@ -145,6 +150,21 @@ class Command(BaseCommand):
 
         action = 'Created' if created else 'Already exists'
         self.stdout.write(f'  Demo user ({action}): demo_teacher / demo1234')
+
+    def _assign_demo_pathway(self, user):
+        from hub.models import LearningPath, UserLearningPath
+        from hub.pathway_gen import generate_pathway
+        user.refresh_from_db()
+        score = user.profile.competency_score
+        path = (
+            LearningPath.objects.filter(competency_min__lte=score, competency_max__gte=score).first()
+            or LearningPath.objects.filter(slug='beginner-foundations').first()
+        )
+        if path:
+            UserLearningPath.objects.update_or_create(
+                user=user,
+                defaults={'path': path, 'course_ids': generate_pathway(user)},
+            )
 
     def _seed_demo_content_creator(self):
         user, created = User.objects.get_or_create(

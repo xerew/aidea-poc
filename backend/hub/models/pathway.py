@@ -34,7 +34,10 @@ class LearningPathCourse(models.Model):
 
 class UserLearningPath(models.Model):
     user        = models.OneToOneField(User, on_delete=models.CASCADE, related_name='learning_path')
+    # `path` gives the pathway its competency-band name/description; the actual
+    # ordered course list is personalised per teacher in `course_ids`.
     path        = models.ForeignKey(LearningPath, on_delete=models.PROTECT)
+    course_ids  = models.JSONField(default=list, blank=True)
     assigned_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

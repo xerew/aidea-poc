@@ -4,6 +4,7 @@ from .assignment import AssignmentSubmission
 from .content import Course, LearningPillar, Lesson, Module
 from .enrollment import Enrollment, LessonProgress
 from .history import CourseEditHistory
+from .onboarding_quiz import OnboardingOption, OnboardingQuestion
 from .pathway import LearningPath, LearningPathCourse, UserLearningPath
 from .preference_quiz import PreferenceOption, PreferenceQuestion
 from .recommendations import (
@@ -33,6 +34,8 @@ __all__ = [
     'LessonProgress',
     'LessonSession',
     'Module',
+    'OnboardingOption',
+    'OnboardingQuestion',
     'PreferenceOption',
     'PreferenceQuestion',
     'RecommendationConfig',

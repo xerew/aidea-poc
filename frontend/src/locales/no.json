@@ -624,6 +624,15 @@
       "pending": "Venter",
       "approved": "Godkjent",
       "denied": "Avslått"
+    },
+    "systemTab": "System",
+    "recompute": {
+      "title": "Oppdater anbefalinger",
+      "description": "Beregn personlige anbefalinger for hver lærer på nytt nå, uten å vente på nattkjøringen.",
+      "button": "Oppdater nå",
+      "queuing": "Legger i kø…",
+      "queued": "Oppdatering av anbefalinger lagt i kø.",
+      "failed": "Kunne ikke legge oppdateringen i kø. Prøv igjen."
     }
   },
   "analytics": {

@@ -624,6 +624,15 @@
       "pending": "Väntande",
       "approved": "Godkänd",
       "denied": "Avslagen"
+    },
+    "systemTab": "System",
+    "recompute": {
+      "title": "Uppdatera rekommendationer",
+      "description": "Beräkna om personliga rekommendationer för varje lärare nu, utan att vänta på nattkörningen.",
+      "button": "Uppdatera nu",
+      "queuing": "Köar…",
+      "queued": "Uppdatering av rekommendationer köad.",
+      "failed": "Det gick inte att köa uppdateringen. Försök igen."
     }
   },
   "analytics": {

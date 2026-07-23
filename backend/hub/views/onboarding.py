@@ -1,19 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.models import OnboardingQuestion
 from hub.models.pathway import LearningPath, UserLearningPath
-from hub.serializers.onboarding import OnboardingSubmitSerializer
+from hub.serializers.onboarding import OnboardingQuestionSerializer, OnboardingSubmitSerializer
 from hub.views.permissions import IsTeacher
-
-ANSWER_SCORES = {
-    'q3': {'b': 2, 'c': 1},
-    'q4': {'b': 2, 'c': 1},
-    'q5': {'b': 2, 'c': 1, 'd': 1},
-}
-
-
-def score_answers(answers: dict) -> int:
-    return sum(ANSWER_SCORES.get(q, {}).get(a, 0) for q, a in answers.items())
 
 
 def get_competency_level(score: int) -> str:
@@ -39,12 +30,14 @@ class OnboardingView(APIView):
 
     def get(self, request):
         profile = request.user.profile
+        questions = OnboardingQuestion.objects.filter(is_active=True).prefetch_related('options')
         return Response({
             'completed': profile.onboarding_completed,
             'competency_level': (
                 get_competency_level(profile.competency_score)
                 if profile.onboarding_completed else None
             ),
+            'questions': OnboardingQuestionSerializer(questions, many=True).data,
         })
 
     def post(self, request):
@@ -52,7 +45,8 @@ class OnboardingView(APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
-        score = score_answers(data['answers'])
+        # answers is {question_id: OnboardingOption}; competency = sum of points.
+        score = sum(option.score for option in data['answers'].values())
         level = get_competency_level(score)
         path  = assign_path(score)
 
@@ -64,9 +58,10 @@ class OnboardingView(APIView):
         profile.onboarding_completed = True
         profile.save()
 
+        from hub.pathway_gen import generate_pathway
         UserLearningPath.objects.update_or_create(
             user=request.user,
-            defaults={'path': path},
+            defaults={'path': path, 'course_ids': generate_pathway(request.user)},
         )
 
         from hub.tasks import compute_user_recommendations

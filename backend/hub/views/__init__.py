@@ -7,6 +7,7 @@ from .access_requests import (
 from .admin import (
     AdminAccessRequestListView,
     AdminAccessRequestReviewView,
+    AdminRecomputeRecommendationsView,
     AdminUserListView,
     AdminUserRoleView,
 )
@@ -69,6 +70,7 @@ __all__ = [
     'AccessRequestSeenView',
     'AccessRequestView',
     'AdminAccessRequestListView',
+    'AdminRecomputeRecommendationsView',
     'AdminAccessRequestReviewView',
     'AdminUserListView',
     'AdminUserRoleView',

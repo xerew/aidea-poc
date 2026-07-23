@@ -258,6 +258,41 @@ function RequestsTab() {
   )
 }
 
+// ── System tab ────────────────────────────────────────────────────────────────
+
+function SystemTab() {
+  const { t } = useTranslation()
+  const [status, setStatus] = useState('idle')  // idle | queuing | queued | error
+
+  const handleRecompute = async () => {
+    setStatus('queuing')
+    try {
+      await client.post('/admin/recompute-recommendations/')
+      setStatus('queued')
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <div className="admin-system">
+      <div className="admin-system-card">
+        <h2>{t('admin.recompute.title')}</h2>
+        <p className="admin-system-desc">{t('admin.recompute.description')}</p>
+        <button
+          className="admin-approve-btn"
+          onClick={handleRecompute}
+          disabled={status === 'queuing'}
+        >
+          {status === 'queuing' ? t('admin.recompute.queuing') : t('admin.recompute.button')}
+        </button>
+        {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
+        {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
+      </div>
+    </div>
+  )
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AdminPage() {
@@ -281,8 +316,16 @@ export default function AdminPage() {
         >
           {t('admin.requestsTab')}
         </button>
+        <button
+          className={`admin-tab-btn ${tab === 'system' ? 'active' : ''}`}
+          onClick={() => setTab('system')}
+        >
+          {t('admin.systemTab')}
+        </button>
       </div>
-      {tab === 'users' ? <UsersTab /> : <RequestsTab />}
+      {tab === 'users' && <UsersTab />}
+      {tab === 'requests' && <RequestsTab />}
+      {tab === 'system' && <SystemTab />}
     </div>
   )
 }

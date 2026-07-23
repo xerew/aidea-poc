@@ -624,6 +624,15 @@
       "pending": "Odottaa",
       "approved": "Hyväksytty",
       "denied": "Hylätty"
+    },
+    "systemTab": "Järjestelmä",
+    "recompute": {
+      "title": "Päivitä suositukset",
+      "description": "Laske jokaisen opettajan henkilökohtaiset suositukset uudelleen nyt odottamatta yöllistä ajoa.",
+      "button": "Päivitä nyt",
+      "queuing": "Lisätään jonoon…",
+      "queued": "Suositusten päivitys lisätty jonoon.",
+      "failed": "Päivitystä ei voitu lisätä jonoon. Yritä uudelleen."
     }
   },
   "analytics": {

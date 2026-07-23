@@ -13,6 +13,10 @@ logger = logging.getLogger(__name__)
 # recommendations rework (#24) may move signal tuning into RecommendationConfig.
 SUBJECT_MATCH_BOOST = 1.2
 
+# Nudge for courses in a pillar the teacher marked as preferred, so changing
+# the preferred pillar visibly reshuffles recommendations.
+PILLAR_MATCH_BOOST = 1.25
+
 
 @shared_task
 def compute_course_embeddings(course_id: int) -> None:
@@ -210,6 +214,7 @@ def compute_user_recommendations(user_id: int) -> None:
     # is nudged up. Deeper signal-weight tuning lives in the recommendations
     # rework (#24); this is a light, fixed alignment boost.
     teacher_subject_slug = profile.subject.slug if profile.subject else None
+    preferred_pillars = set(profile.preferred_pillars or [])
 
     filtered = []
     for emb in candidates:
@@ -222,6 +227,8 @@ def compute_user_recommendations(user_id: int) -> None:
             course_subject_slugs = {s.slug for s in emb.course.subjects.all()}
             if teacher_subject_slug in course_subject_slugs or 'general' in course_subject_slugs:
                 similarity *= SUBJECT_MATCH_BOOST
+        if emb.course.pillar.slug in preferred_pillars:
+            similarity *= PILLAR_MATCH_BOOST
         filtered.append((emb.course, similarity))
         if len(filtered) >= 5:
             break

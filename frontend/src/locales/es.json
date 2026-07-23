@@ -624,6 +624,15 @@
       "pending": "Pendiente",
       "approved": "Aprobado",
       "denied": "Denegado"
+    },
+    "systemTab": "Sistema",
+    "recompute": {
+      "title": "Actualizar recomendaciones",
+      "description": "Recalcular ahora las recomendaciones personalizadas para cada docente, sin esperar a la ejecución nocturna.",
+      "button": "Actualizar ahora",
+      "queuing": "Encolando…",
+      "queued": "Actualización de recomendaciones en cola.",
+      "failed": "No se pudo poner en cola la actualización. Inténtalo de nuevo."
     }
   },
   "analytics": {

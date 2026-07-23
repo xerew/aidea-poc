@@ -624,6 +624,15 @@
       "pending": "Ausstehend",
       "approved": "Genehmigt",
       "denied": "Abgelehnt"
+    },
+    "systemTab": "System",
+    "recompute": {
+      "title": "Empfehlungen aktualisieren",
+      "description": "Personalisierte Empfehlungen für jede Lehrkraft jetzt neu berechnen, ohne auf den nächtlichen Lauf zu warten.",
+      "button": "Jetzt aktualisieren",
+      "queuing": "Wird eingereiht…",
+      "queued": "Aktualisierung der Empfehlungen eingereiht.",
+      "failed": "Aktualisierung konnte nicht eingereiht werden. Bitte erneut versuchen."
     }
   },
   "analytics": {

@@ -18,6 +18,8 @@ from .models import (
     LessonProgress,
     LessonSession,
     Module,
+    OnboardingOption,
+    OnboardingQuestion,
     PreferenceOption,
     PreferenceQuestion,
     Subject,
@@ -164,6 +166,21 @@ class AccessRequestAdmin(admin.ModelAdmin):
             reviewed_at=timezone.now(),
         )
         self.message_user(request, f'{count} request(s) denied.', messages.WARNING)
+
+
+# ── Onboarding competency questions ───────────────────────────────────────────
+
+class OnboardingOptionInline(admin.TabularInline):
+    model = OnboardingOption
+    extra = 2
+    fields = ['text', 'score', 'order']
+
+
+@admin.register(OnboardingQuestion)
+class OnboardingQuestionAdmin(admin.ModelAdmin):
+    list_display  = ['text', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    inlines = [OnboardingOptionInline]
 
 
 # ── Subjects ──────────────────────────────────────────────────────────────────

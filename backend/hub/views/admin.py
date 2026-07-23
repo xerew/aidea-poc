@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -52,6 +53,20 @@ class AdminUserRoleView(APIView):
         user.profile.user_type = serializer.validated_data['user_type']
         user.profile.save()
         return Response(AdminUserSerializer(user).data)
+
+
+class AdminRecomputeRecommendationsView(APIView):
+    """POST — queue a platform-wide recommendation refresh (the same task the
+    nightly crontab runs), on demand."""
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        from hub.tasks import recompute_all_recommendations
+        recompute_all_recommendations.delay()
+        return Response(
+            {'detail': 'Recommendation refresh queued.'},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 class AdminAccessRequestListView(APIView):

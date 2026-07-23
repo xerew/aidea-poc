@@ -624,6 +624,15 @@
       "pending": "Pending",
       "approved": "Approved",
       "denied": "Denied"
+    },
+    "systemTab": "System",
+    "recompute": {
+      "title": "Refresh recommendations",
+      "description": "Recompute personalised recommendations for every teacher now, instead of waiting for the nightly run.",
+      "button": "Refresh now",
+      "queuing": "Queuing…",
+      "queued": "Recommendation refresh queued.",
+      "failed": "Could not queue the refresh. Please try again."
     }
   },
   "analytics": {
