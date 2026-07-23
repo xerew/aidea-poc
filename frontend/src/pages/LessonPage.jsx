@@ -9,6 +9,7 @@ import {
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
+import HtmlContent from '../components/lesson/HtmlContent'
 import './LessonPage.css'
 
 // ─── Lesson-type icons ───────────────────────────────────────────────────────
@@ -66,7 +67,7 @@ function TextLesson({ lesson }) {
     <div className="lp-content-card">
       {lesson.content ? (
         <div className="lp-text-body">
-          <p className="lp-text-content">{lesson.content}</p>
+          <HtmlContent content={lesson.content} className="lp-text-content" />
         </div>
       ) : (
         <p className="lp-empty">{t('lesson.noContent')}</p>

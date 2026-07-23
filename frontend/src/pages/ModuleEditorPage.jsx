@@ -9,6 +9,8 @@ import {
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
+import RichTextEditor from '../components/lesson/RichTextEditor'
+import HtmlContent from '../components/lesson/HtmlContent'
 import TranslationBar from '../components/authoring/TranslationBar'
 import './ModuleEditorPage.css'
 
@@ -239,7 +241,7 @@ function LessonPreview({ lesson }) {
   switch (lesson.lesson_type) {
     case 'text':
       return lesson.content
-        ? <p className="lesson-preview-text">{lesson.content}</p>
+        ? <HtmlContent content={lesson.content} className="lesson-preview-text" />
         : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
     case 'video':
       return lesson.content
@@ -364,15 +366,12 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
         {lesson.lesson_type === 'text' && (
           <div className="lesson-field">
             <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
-            <textarea
-              className="lesson-field-textarea lesson-field-textarea--content"
+            <RichTextEditor
               value={lesson.content}
               disabled={fieldsDisabled}
-              rows={8}
-              onChange={(e) => onChange('content', e.target.value)}
+              onChange={(html) => onChange('content', html)}
               placeholder={t('authoring.moduleEditor.contentPlaceholder')}
             />
-            <p className="lesson-field-hint">{t('authoring.moduleEditor.markdownHint')}</p>
           </div>
         )}
 
