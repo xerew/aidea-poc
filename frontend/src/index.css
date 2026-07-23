@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* Scope Tailwind's automatic source detection to this folder (src/). Without
+   this, v4 scans the whole Vite root — which in the Docker dev image is /app,
+   where `COPY . .` places the Dockerfile — and Vite then tries to parse that
+   extension-less file as JS, crashing the dev server. */
+@import "tailwindcss" source(".");
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 /* Lexend + Oswald loaded via <link> in index.html */
