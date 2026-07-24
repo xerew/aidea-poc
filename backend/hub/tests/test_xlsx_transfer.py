@@ -62,7 +62,7 @@ class ExportXlsxTests(APITestCase):
         wb = load_workbook(BytesIO(res.getvalue()))
         self.assertEqual(
             set(wb.sheetnames),
-            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Choices'},
+            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices'},
         )
         self.assertEqual(wb['Choices'].sheet_state, 'hidden')
 
@@ -119,7 +119,7 @@ class TemplateXlsxTests(APITestCase):
         wb = load_workbook(BytesIO(res.getvalue()))
         self.assertEqual(
             set(wb.sheetnames),
-            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Choices'},
+            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices'},
         )
         # Headers present, but no data rows.
         self.assertEqual(wb['Course']['A1'].value, 'title')
@@ -183,6 +183,26 @@ class ImportXlsxTests(APITestCase):
         }])
         video = new.modules.get(order=1).lessons.get(order=2)
         self.assertFalse(video.is_required)
+
+    def test_round_trip_preserves_media_items(self):
+        text_lesson = Lesson.objects.filter(
+            module__course=self.course, lesson_type='text',
+        ).first()
+        text_lesson.media_items = [
+            {'type': 'image', 'url': 'https://ex.com/a.png', 'caption': 'Diagram'},
+            {'type': 'pdf', 'url': 'https://ex.com/b.pdf', 'caption': ''},
+        ]
+        text_lesson.save()
+        self.client.force_authenticate(self.creator)
+        res = self._post(self._export_bytes(self.course))
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        new = Course.objects.get(pk=res.data['id'])
+        new_lesson = Lesson.objects.get(module__course=new, title=text_lesson.title)
+        self.assertEqual(len(new_lesson.media_items), 2)
+        self.assertEqual(new_lesson.media_items[0], {
+            'type': 'image', 'url': 'https://ex.com/a.png', 'caption': 'Diagram',
+        })
+        self.assertEqual(new_lesson.media_items[1]['type'], 'pdf')
 
     def test_round_trip_preserves_subjects(self):
         from hub.models import Subject

@@ -90,6 +90,13 @@ class Command(BaseCommand):
                         },
                     )
                     for lesson_order, lesson in enumerate(lessons_data, start=1):
+                        # Media lessons carry their URL as a single media_item now,
+                        # matching the migrated shape.
+                        content = lesson.get('content', '')
+                        media_items = []
+                        if lesson['type'] in ('image', 'video', 'pdf') and content:
+                            media_items = [{'type': lesson['type'], 'url': content, 'caption': ''}]
+                            content = ''
                         Lesson.objects.update_or_create(
                             title=lesson['title'],
                             module=module,
@@ -98,7 +105,8 @@ class Command(BaseCommand):
                                 'order':            lesson_order,
                                 'duration_minutes': lesson['duration'],
                                 'is_required':      lesson['required'],
-                                'content':          lesson.get('content', ''),
+                                'content':          content,
+                                'media_items':      media_items,
                                 'quiz_data':        lesson.get('quiz_data', []),
                             },
                         )

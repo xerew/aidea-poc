@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Wählen Sie eine Lektion aus der Liste oder fügen Sie eine neue hinzu.",
       "loadError": "Modul konnte nicht geladen werden.",
       "saveFailedGeneric": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "deleteFailedGeneric": "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "deleteFailedGeneric": "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "mediaLabel": "Medienanhänge",
+      "mediaHint": "Bilder, PDFs oder Videos hinzufügen. Bilder werden hier hinzugefügt, nicht im Texteditor.",
+      "captionPlaceholder": "Bildunterschrift (optional)",
+      "addMedia": "Medium hinzufügen",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten"
     },
     "translate": {
       "switchLanguage": "Language",

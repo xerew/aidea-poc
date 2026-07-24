@@ -4,13 +4,14 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList,
-  Trash2, GripVertical, Save, Lock, Plus, Upload,
+  Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
-import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
 import RichTextEditor from '../components/lesson/RichTextEditor'
 import HtmlContent from '../components/lesson/HtmlContent'
+import MediaItem from '../components/lesson/MediaItem'
+import MediaItemsEditor from '../components/lesson/MediaItemsEditor'
 import TranslationBar from '../components/authoring/TranslationBar'
 import './ModuleEditorPage.css'
 
@@ -24,6 +25,13 @@ const LESSON_TYPES = [
   { type: 'pdf',        Icon: FileDown,     color: 'red'    },
   { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
 ]
+
+// New lessons are Content (text body + media attachments), Quiz or Assignment.
+// The legacy image/video/pdf types still render/edit for existing lessons.
+const NEW_LESSON_TYPES = LESSON_TYPES.filter((lt) => ['text', 'quiz', 'assignment'].includes(lt.type))
+
+// Lesson types that carry a rich-text body and media attachments.
+const CONTENT_TYPES = ['text', 'image', 'video', 'pdf']
 
 function lessonTypeConfig(type) {
   return LESSON_TYPES.find((lt) => lt.type === type) ?? LESSON_TYPES[0]
@@ -217,6 +225,7 @@ const lessonShape = PropTypes.shape({
   description: PropTypes.string,
   lesson_type: PropTypes.string.isRequired,
   content: PropTypes.string,
+  media_items: PropTypes.array,
   quiz_data: PropTypes.array,
   duration_minutes: PropTypes.number,
   is_required: PropTypes.bool,
@@ -240,21 +249,26 @@ function LessonPreview({ lesson }) {
   const { t } = useTranslation()
   switch (lesson.lesson_type) {
     case 'text':
-      return lesson.content
-        ? <HtmlContent content={lesson.content} className="lesson-preview-text" />
-        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
     case 'video':
-      return lesson.content
-        ? <VideoEmbed url={lesson.content} />
-        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewVideoEmpty')}</p>
     case 'pdf':
-      return lesson.content
-        ? <PdfEmbed url={lesson.content} />
-        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewPdfEmpty')}</p>
-    case 'image':
-      return lesson.content
-        ? <img src={lesson.content} alt={lesson.title} className="lesson-preview-image" />
-        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewImageEmpty')}</p>
+    case 'image': {
+      const media = lesson.media_items ?? []
+      // Back-compat: a legacy media lesson may still hold a single URL in content.
+      const legacy = !media.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
+        ? [{ type: lesson.lesson_type, url: lesson.content, caption: '' }]
+        : []
+      const allMedia = media.length ? media : legacy
+      const bodyHtml = lesson.lesson_type === 'text' ? lesson.content : ''
+      if (!bodyHtml && !allMedia.length) {
+        return <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
+      }
+      return (
+        <div className="lesson-preview-content">
+          {bodyHtml && <HtmlContent content={bodyHtml} className="lesson-preview-text" />}
+          {allMedia.map((item, i) => <MediaItem key={i} item={item} />)}
+        </div>
+      )
+    }
     case 'assignment':
       return lesson.content
         ? (
@@ -281,12 +295,11 @@ function LessonPreview({ lesson }) {
   }
 }
 
-function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave, onError, errors }) {
+function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave, errors }) {
   const { t } = useTranslation()
   const cfg = lessonTypeConfig(lesson.lesson_type)
   const typeLabel = t(`lesson.type.${lesson.lesson_type}`)
   const err = errors ?? {}
-  const [uploading, setUploading] = useState(false)
 
   // A brand-new, not-yet-saved lesson has no `translations` bucket to write
   // into — block translated-mode edits on it until it's saved in the
@@ -294,24 +307,6 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
   const blockedNew = lesson.isNew && translating
   const fieldsDisabled = locked || blockedNew
   const structureLocked = locked || translating
-
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setUploading(true)
-    try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await client.post('/authoring/upload/', fd)
-      onChange('content', res.data.url)
-      onError(null)
-    } catch (uploadErr) {
-      onError(uploadErr.response?.data?.error ?? t('authoring.moduleEditor.uploadFailed'))
-    } finally {
-      setUploading(false)
-      e.target.value = ''
-    }
-  }
 
   return (
     <div className="lesson-editor-panel">
@@ -363,49 +358,25 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           />
         </div>
 
-        {lesson.lesson_type === 'text' && (
-          <div className="lesson-field">
-            <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
-            <RichTextEditor
-              value={lesson.content}
-              disabled={fieldsDisabled}
-              onChange={(html) => onChange('content', html)}
-              placeholder={t('authoring.moduleEditor.contentPlaceholder')}
-            />
-          </div>
-        )}
-
-        {['video', 'image', 'pdf'].includes(lesson.lesson_type) && (
-          <div className="lesson-field">
-            <label className="lesson-field-label">
-              {t('authoring.moduleEditor.urlLabel', { type: typeLabel })}
-            </label>
-            <input
-              type="url"
-              className={`lesson-field-input${err.content ? ' lesson-field-input--error' : ''}`}
-              value={lesson.content}
-              disabled={fieldsDisabled}
-              onChange={(e) => onChange('content', e.target.value)}
-              placeholder={t('authoring.moduleEditor.urlPlaceholder')}
-            />
-            <FieldError msg={err.content} />
-            {['pdf', 'image'].includes(lesson.lesson_type) && !locked && !translating && (
-              <div className="lesson-upload-row">
-                <span className="lesson-upload-or">{t('authoring.moduleEditor.uploadOr')}</span>
-                <label className="lesson-upload-btn">
-                  <Upload size={14} />
-                  {uploading ? t('authoring.moduleEditor.uploading') : t('authoring.moduleEditor.uploadFile')}
-                  <input
-                    type="file"
-                    accept={lesson.lesson_type === 'pdf' ? '.pdf' : 'image/*'}
-                    hidden
-                    disabled={uploading}
-                    onChange={handleFileUpload}
-                  />
-                </label>
-              </div>
-            )}
-          </div>
+        {CONTENT_TYPES.includes(lesson.lesson_type) && (
+          <>
+            <div className="lesson-field">
+              <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
+              <RichTextEditor
+                value={lesson.content}
+                disabled={fieldsDisabled}
+                onChange={(html) => onChange('content', html)}
+                placeholder={t('authoring.moduleEditor.contentPlaceholder')}
+              />
+            </div>
+            <div className="lesson-field">
+              <MediaItemsEditor
+                items={lesson.media_items ?? []}
+                disabled={fieldsDisabled || translating}
+                onChange={(next) => onChange('media_items', next)}
+              />
+            </div>
+          </>
         )}
 
         {lesson.lesson_type === 'assignment' && (
@@ -911,7 +882,7 @@ export default function ModuleEditorPage() {
             <div className="me-card">
               <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
               <div className="me-lesson-type-grid">
-                {LESSON_TYPES.map(({ type, Icon, color }) => (
+                {NEW_LESSON_TYPES.map(({ type, Icon, color }) => (
                   <button
                     key={type}
                     className={`me-type-btn me-type-btn--${color}`}

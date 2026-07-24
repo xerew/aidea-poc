@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Välj en lektion från listan, eller lägg till en ny.",
       "loadError": "Det gick inte att läsa in modulen.",
       "saveFailedGeneric": "Det gick inte att spara. Försök igen.",
-      "deleteFailedGeneric": "Det gick inte att ta bort. Försök igen."
+      "deleteFailedGeneric": "Det gick inte att ta bort. Försök igen.",
+      "mediaLabel": "Mediebilagor",
+      "mediaHint": "Lägg till bilder, PDF:er eller videor. Bilder läggs till här, inte i textredigeraren.",
+      "captionPlaceholder": "Bildtext (valfritt)",
+      "addMedia": "Lägg till media",
+      "moveUp": "Flytta upp",
+      "moveDown": "Flytta ned"
     },
     "translate": {
       "switchLanguage": "Language",

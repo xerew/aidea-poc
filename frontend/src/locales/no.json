@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Velg en leksjon fra listen, eller legg til en ny.",
       "loadError": "Kunne ikke laste modulen.",
       "saveFailedGeneric": "Lagring mislyktes. Prøv igjen.",
-      "deleteFailedGeneric": "Sletting mislyktes. Prøv igjen."
+      "deleteFailedGeneric": "Sletting mislyktes. Prøv igjen.",
+      "mediaLabel": "Medievedlegg",
+      "mediaHint": "Legg til bilder, PDF-er eller videoer. Bilder legges til her, ikke inne i teksteditoren.",
+      "captionPlaceholder": "Bildetekst (valgfritt)",
+      "addMedia": "Legg til media",
+      "moveUp": "Flytt opp",
+      "moveDown": "Flytt ned"
     },
     "translate": {
       "switchLanguage": "Language",

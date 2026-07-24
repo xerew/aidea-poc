@@ -8,8 +8,8 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
-import { VideoEmbed, PdfEmbed } from '../components/lesson/MediaEmbeds'
 import HtmlContent from '../components/lesson/HtmlContent'
+import MediaItem from '../components/lesson/MediaItem'
 import './LessonPage.css'
 
 // ─── Lesson-type icons ───────────────────────────────────────────────────────
@@ -41,6 +41,7 @@ const lessonShape = PropTypes.shape({
   id:           PropTypes.number,
   title:        PropTypes.string,
   content:      PropTypes.string,
+  media_items:  PropTypes.array,
   quiz_data:    PropTypes.array,
   lesson_type:  PropTypes.string,
   is_completed: PropTypes.bool,
@@ -51,55 +52,28 @@ const lessonShape = PropTypes.shape({
   assignment_submission: PropTypes.object,
 })
 
-VideoLesson.propTypes   = { lesson: lessonShape.isRequired }
-function VideoLesson({ lesson }) {
-  return (
-    <div className="lp-content-card">
-      <VideoEmbed url={lesson.content} />
-    </div>
-  )
-}
-
-TextLesson.propTypes       = { lesson: lessonShape.isRequired }
-function TextLesson({ lesson }) {
+ContentLesson.propTypes = { lesson: lessonShape.isRequired }
+function ContentLesson({ lesson }) {
   const { t } = useTranslation()
+  const media = lesson.media_items ?? []
+  // Back-compat: a legacy media lesson may still hold a single URL in content.
+  const legacy = !media.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
+    ? [{ type: lesson.lesson_type, url: lesson.content, caption: '' }]
+    : []
+  const allMedia = media.length ? media : legacy
+  const bodyHtml = lesson.lesson_type === 'text' ? lesson.content : ''
+
+  if (!bodyHtml && !allMedia.length) {
+    return <div className="lp-content-card"><p className="lp-empty">{t('lesson.noContent')}</p></div>
+  }
   return (
     <div className="lp-content-card">
-      {lesson.content ? (
+      {bodyHtml && (
         <div className="lp-text-body">
-          <HtmlContent content={lesson.content} className="lp-text-content" />
+          <HtmlContent content={bodyHtml} className="lp-text-content" />
         </div>
-      ) : (
-        <p className="lp-empty">{t('lesson.noContent')}</p>
       )}
-    </div>
-  )
-}
-
-ImageLesson.propTypes      = { lesson: lessonShape.isRequired }
-function ImageLesson({ lesson }) {
-  const { t } = useTranslation()
-  return (
-    <div className="lp-content-card">
-      {lesson.content
-        ? <img src={lesson.content} alt={lesson.title} className="lp-image" />
-        : (
-          <div className="lp-video-player">
-            <Image size={48} className="lp-video-icon" />
-            <p className="lp-video-label">{t('lesson.type.image')}</p>
-            {lesson.content && <p className="lp-video-url">{lesson.content}</p>}
-          </div>
-        )
-      }
-    </div>
-  )
-}
-
-PdfLesson.propTypes        = { lesson: lessonShape.isRequired }
-function PdfLesson({ lesson }) {
-  return (
-    <div className="lp-content-card">
-      <PdfEmbed url={lesson.content} />
+      {allMedia.map((item, i) => <MediaItem key={i} item={item} />)}
     </div>
   )
 }
@@ -309,13 +283,9 @@ LessonContent.propTypes = {
 }
 function LessonContent({ lesson, onComplete, onSubmissionChange, courseId }) {
   switch (lesson.lesson_type) {
-    case 'video':      return <VideoLesson lesson={lesson} />
-    case 'text':       return <TextLesson lesson={lesson} />
-    case 'image':      return <ImageLesson lesson={lesson} />
-    case 'pdf':        return <PdfLesson lesson={lesson} />
     case 'assignment': return <AssignmentLesson lesson={lesson} courseId={courseId} onSubmissionChange={onSubmissionChange} />
     case 'quiz':       return <QuizLesson key={lesson.id} lesson={lesson} onComplete={onComplete} courseId={courseId} />
-    default:           return <TextLesson lesson={lesson} />
+    default:           return <ContentLesson lesson={lesson} />
   }
 }
 

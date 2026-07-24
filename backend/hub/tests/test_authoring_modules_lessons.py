@@ -230,6 +230,37 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         response = self.client.post(url, self.valid_payload)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_create_lesson_with_media_items(self):
+        payload = {
+            'title': 'With media', 'lesson_type': 'text',
+            'media_items': [
+                {'type': 'image', 'url': 'https://ex.com/a.png', 'caption': 'Fig 1'},
+                {'type': 'video', 'url': 'https://youtu.be/x'},
+            ],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lesson = Lesson.objects.get(pk=response.data['id'])
+        self.assertEqual(len(lesson.media_items), 2)
+        self.assertEqual(lesson.media_items[0]['caption'], 'Fig 1')
+        self.assertEqual(lesson.media_items[1]['caption'], '')  # defaulted
+
+    def test_media_item_invalid_type_rejected(self):
+        payload = {
+            'title': 'Bad media', 'lesson_type': 'text',
+            'media_items': [{'type': 'gif', 'url': 'https://ex.com/a.gif'}],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_media_item_missing_url_rejected(self):
+        payload = {
+            'title': 'No url', 'lesson_type': 'text',
+            'media_items': [{'type': 'image', 'url': ''}],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_lesson_missing_title_returns_400(self):
         response = self.client.post(self.url, {'lesson_type': 'text'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

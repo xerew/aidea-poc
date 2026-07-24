@@ -4,16 +4,37 @@ from hub.models import Lesson, Module
 
 from .localize import localized, viewer_language
 
+MEDIA_ITEM_TYPES = {'image', 'video', 'pdf'}
+
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = [
             'id', 'title', 'description', 'lesson_type',
-            'content', 'quiz_data', 'duration_minutes', 'order', 'is_required',
+            'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
             'translations',
         ]
         read_only_fields = ['translations']
+
+    def validate_media_items(self, value):
+        """A list of {type: image|video|pdf, url: str, caption: str}."""
+        if not isinstance(value, list):
+            raise serializers.ValidationError('media_items must be a list.')
+        cleaned = []
+        for i, item in enumerate(value):
+            if not isinstance(item, dict):
+                raise serializers.ValidationError(f'Media item {i + 1} must be an object.')
+            item_type = item.get('type')
+            if item_type not in MEDIA_ITEM_TYPES:
+                raise serializers.ValidationError(
+                    f'Media item {i + 1} type must be one of {sorted(MEDIA_ITEM_TYPES)}.',
+                )
+            url = str(item.get('url', '')).strip()
+            if not url:
+                raise serializers.ValidationError(f'Media item {i + 1} needs a url.')
+            cleaned.append({'type': item_type, 'url': url, 'caption': str(item.get('caption', ''))})
+        return cleaned
 
     def validate_quiz_data(self, value):
         """Ensure quiz_data is a valid list of questions with options."""
@@ -57,7 +78,7 @@ class LessonLearnDetailSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = [
             'id', 'title', 'description', 'lesson_type',
-            'content', 'quiz_data', 'duration_minutes', 'order', 'is_required',
+            'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
         ]
 
     def get_title(self, obj):

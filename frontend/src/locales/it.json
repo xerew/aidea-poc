@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Seleziona una lezione dall'elenco oppure aggiungine una nuova.",
       "loadError": "Impossibile caricare il modulo.",
       "saveFailedGeneric": "Salvataggio non riuscito. Riprova.",
-      "deleteFailedGeneric": "Eliminazione non riuscita. Riprova."
+      "deleteFailedGeneric": "Eliminazione non riuscita. Riprova.",
+      "mediaLabel": "Allegati multimediali",
+      "mediaHint": "Aggiungi immagini, PDF o video. Le immagini si aggiungono qui, non dentro l'editor di testo.",
+      "captionPlaceholder": "Didascalia (facoltativa)",
+      "addMedia": "Aggiungi media",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù"
     },
     "translate": {
       "switchLanguage": "Language",

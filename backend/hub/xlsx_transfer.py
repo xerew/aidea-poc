@@ -14,6 +14,8 @@ LESSON_HEADERS = ['module_order', 'order', 'title', 'description',
 QUIZ_HEADERS   = ['module_order', 'lesson_order', 'question_order', 'question',
                   'option_a', 'option_b', 'option_c', 'option_d', 'option_e',
                   'option_f', 'correct']
+MEDIA_HEADERS  = ['module_order', 'lesson_order', 'order', 'type', 'url', 'caption']
+MEDIA_TYPES    = {'image', 'video', 'pdf'}
 OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 DROPDOWN_ROWS  = 500
 
@@ -114,6 +116,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     lessons_ws = wb.create_sheet('Lessons')
     _write_headers(lessons_ws, LESSON_HEADERS)
     quiz_rows = []
+    media_rows = []
     for module in modules:
         for lesson in module.lessons.order_by('order'):
             lessons_ws.append([
@@ -126,6 +129,11 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
                 lesson.duration_minutes,
                 'yes' if lesson.is_required else 'no',
             ])
+            for m_idx, item in enumerate(lesson.media_items or [], start=1):
+                media_rows.append([
+                    module.order, lesson.order, m_idx,
+                    item.get('type', ''), item.get('url', ''), item.get('caption', ''),
+                ])
             if lesson.lesson_type == Lesson.LessonType.QUIZ:
                 for q_idx, question in enumerate(lesson.quiz_data or [], start=1):
                     options = question.get('options', [])[:len(OPTION_LETTERS)]
@@ -148,7 +156,13 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     for row in quiz_rows:
         quiz_ws.append(row)
 
-    for ws in (course_ws, modules_ws, lessons_ws, quiz_ws):
+    # ── Media ───────────────────────────────────────────────────────────
+    media_ws = wb.create_sheet('Media')
+    _write_headers(media_ws, MEDIA_HEADERS)
+    for row in media_rows:
+        media_ws.append(row)
+
+    for ws in (course_ws, modules_ws, lessons_ws, quiz_ws, media_ws):
         for col in range(1, ws.max_column + 1):
             ws.column_dimensions[get_column_letter(col)].width = 22
 
@@ -313,8 +327,37 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             'order': order, 'title': l_title.strip(), 'description': l_desc or '',
             'lesson_type': l_type, 'content': content or '',
             'duration_minutes': minutes, 'is_required': _YES_NO[req_key],
-            'quiz_data': [],
+            'quiz_data': [], 'media_items': [],
         }
+
+    # ── Media sheet (optional) ──────────────────────────────────────────
+    if 'Media' in wb.sheetnames:
+        media_by_lesson: dict = {}
+        for row_num, values in _rows(wb['Media']):
+            values = list(values) + [None] * (len(MEDIA_HEADERS) - len(values))
+            m_order, l_order, item_order, m_type, url, caption = values[:6]
+            m_order, ok_m = _as_int(m_order, default=-1)
+            l_order, ok_l = _as_int(l_order, default=-1)
+            lesson = modules.get(m_order, {}).get('lessons', {}).get(l_order) if ok_m and ok_l else None
+            if lesson is None:
+                errors.append(f'{_cell("Media", 1, row_num)}: module_order/lesson_order do not match any lesson.')
+                continue
+            if m_type not in MEDIA_TYPES:
+                errors.append(f'{_cell("Media", 4, row_num)}: type must be one of {sorted(MEDIA_TYPES)}.')
+                continue
+            if not (url or '').strip():
+                errors.append(f'{_cell("Media", 5, row_num)}: url is required.')
+                continue
+            item_order, _ = _as_int(item_order, default=len(lesson['media_items']) + 1)
+            media_by_lesson.setdefault(id(lesson), lesson)
+            lesson['media_items'].append((item_order, {
+                'type': m_type, 'url': str(url).strip(), 'caption': str(caption or ''),
+            }))
+        # Sort each lesson's media by item order and strip the sort key.
+        for lesson in media_by_lesson.values():
+            lesson['media_items'] = [
+                item for _, item in sorted(lesson['media_items'], key=lambda pair: pair[0])
+            ]
 
     # ── Quiz sheet (optional) ───────────────────────────────────────────
     if 'Quiz' in wb.sheetnames:

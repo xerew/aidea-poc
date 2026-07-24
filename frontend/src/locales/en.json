@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Select a lesson from the list, or add a new one.",
       "loadError": "Failed to load module.",
       "saveFailedGeneric": "Save failed. Please try again.",
-      "deleteFailedGeneric": "Delete failed. Please try again."
+      "deleteFailedGeneric": "Delete failed. Please try again.",
+      "mediaLabel": "Media attachments",
+      "mediaHint": "Add images, PDFs or videos. Images are added here, not inside the text editor.",
+      "captionPlaceholder": "Caption (optional)",
+      "addMedia": "Add media",
+      "moveUp": "Move up",
+      "moveDown": "Move down"
     },
     "translate": {
       "switchLanguage": "Language",

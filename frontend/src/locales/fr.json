@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Sélectionnez une leçon dans la liste, ou ajoutez-en une nouvelle.",
       "loadError": "Échec du chargement du module.",
       "saveFailedGeneric": "Échec de l'enregistrement. Veuillez réessayer.",
-      "deleteFailedGeneric": "Échec de la suppression. Veuillez réessayer."
+      "deleteFailedGeneric": "Échec de la suppression. Veuillez réessayer.",
+      "mediaLabel": "Pièces jointes multimédias",
+      "mediaHint": "Ajoutez des images, PDF ou vidéos. Les images s'ajoutent ici, pas dans l'éditeur de texte.",
+      "captionPlaceholder": "Légende (facultatif)",
+      "addMedia": "Ajouter un média",
+      "moveUp": "Monter",
+      "moveDown": "Descendre"
     },
     "translate": {
       "switchLanguage": "Language",

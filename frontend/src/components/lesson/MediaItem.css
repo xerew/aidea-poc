@@ -1,0 +1,16 @@
+.media-item-view {
+  margin: 0 0 1rem;
+}
+
+.media-item-image {
+  max-width: 100%;
+  border-radius: 8px;
+  display: block;
+}
+
+.media-item-caption-text {
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  color: #64748b;
+  text-align: center;
+}

@@ -558,7 +558,13 @@
       "selectLessonPrompt": "Selecciona una lección de la lista, o añade una nueva.",
       "loadError": "No se pudo cargar el módulo.",
       "saveFailedGeneric": "Error al guardar. Inténtalo de nuevo.",
-      "deleteFailedGeneric": "Error al eliminar. Inténtalo de nuevo."
+      "deleteFailedGeneric": "Error al eliminar. Inténtalo de nuevo.",
+      "mediaLabel": "Archivos multimedia",
+      "mediaHint": "Añade imágenes, PDF o vídeos. Las imágenes se añaden aquí, no dentro del editor de texto.",
+      "captionPlaceholder": "Leyenda (opcional)",
+      "addMedia": "Añadir multimedia",
+      "moveUp": "Subir",
+      "moveDown": "Bajar"
     },
     "translate": {
       "switchLanguage": "Language",

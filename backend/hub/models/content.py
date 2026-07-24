@@ -90,6 +90,9 @@ class Lesson(models.Model):
         max_length=20, choices=LessonType.choices, default=LessonType.TEXT,
     )
     content          = models.TextField(blank=True)
+    # media_items: ordered attachments shown after the text body.
+    # [{"type": "image"|"video"|"pdf", "url": str, "caption": str}]
+    media_items      = models.JSONField(default=list, blank=True)
     # quiz_data structure (only used when lesson_type='quiz'):
     # [{"question": str, "options": [{"text": str, "is_correct": bool}]}]
     quiz_data        = models.JSONField(default=list, blank=True)

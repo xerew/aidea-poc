@@ -98,6 +98,7 @@ class AuthoringCourseImportView(APIView):
                         k: lesson_data[k] for k in (
                             'title', 'description', 'lesson_type', 'content',
                             'duration_minutes', 'order', 'is_required', 'quiz_data',
+                            'media_items',
                         )
                     })
             CourseEditHistory.objects.create(
