@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "deleteFailedGeneric": "Löschen fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "mediaLabel": "Medienanhänge",
-      "mediaHint": "Bilder, PDFs oder Videos hinzufügen. Bilder werden hier hinzugefügt, nicht im Texteditor.",
+      "mediaHint": "Füge eines oder mehrere hinzu — sie erscheinen der Reihe nach.",
       "captionPlaceholder": "Bildunterschrift (optional)",
       "addMedia": "Medium hinzufügen",
       "moveUp": "Nach oben",

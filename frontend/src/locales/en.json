@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Save failed. Please try again.",
       "deleteFailedGeneric": "Delete failed. Please try again.",
       "mediaLabel": "Media attachments",
-      "mediaHint": "Add images, PDFs or videos. Images are added here, not inside the text editor.",
+      "mediaHint": "Add one or more — they appear in order.",
       "captionPlaceholder": "Caption (optional)",
       "addMedia": "Add media",
       "moveUp": "Move up",

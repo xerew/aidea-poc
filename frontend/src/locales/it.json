@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Salvataggio non riuscito. Riprova.",
       "deleteFailedGeneric": "Eliminazione non riuscita. Riprova.",
       "mediaLabel": "Allegati multimediali",
-      "mediaHint": "Aggiungi immagini, PDF o video. Le immagini si aggiungono qui, non dentro l'editor di testo.",
+      "mediaHint": "Aggiungine uno o più — appaiono nell'ordine.",
       "captionPlaceholder": "Didascalia (facoltativa)",
       "addMedia": "Aggiungi media",
       "moveUp": "Sposta su",

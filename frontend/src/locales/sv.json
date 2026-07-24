@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Det gick inte att spara. Försök igen.",
       "deleteFailedGeneric": "Det gick inte att ta bort. Försök igen.",
       "mediaLabel": "Mediebilagor",
-      "mediaHint": "Lägg till bilder, PDF:er eller videor. Bilder läggs till här, inte i textredigeraren.",
+      "mediaHint": "Lägg till ett eller flera — de visas i ordning.",
       "captionPlaceholder": "Bildtext (valfritt)",
       "addMedia": "Lägg till media",
       "moveUp": "Flytta upp",

@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Tallennus epäonnistui. Yritä uudelleen.",
       "deleteFailedGeneric": "Poistaminen epäonnistui. Yritä uudelleen.",
       "mediaLabel": "Medialiitteet",
-      "mediaHint": "Lisää kuvia, PDF-tiedostoja tai videoita. Kuvat lisätään tähän, ei tekstieditoriin.",
+      "mediaHint": "Lisää yksi tai useampi — ne näytetään järjestyksessä.",
       "captionPlaceholder": "Kuvateksti (valinnainen)",
       "addMedia": "Lisää media",
       "moveUp": "Siirrä ylös",

@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Lagring mislyktes. Prøv igjen.",
       "deleteFailedGeneric": "Sletting mislyktes. Prøv igjen.",
       "mediaLabel": "Medievedlegg",
-      "mediaHint": "Legg til bilder, PDF-er eller videoer. Bilder legges til her, ikke inne i teksteditoren.",
+      "mediaHint": "Legg til ett eller flere — de vises i rekkefølge.",
       "captionPlaceholder": "Bildetekst (valgfritt)",
       "addMedia": "Legg til media",
       "moveUp": "Flytt opp",

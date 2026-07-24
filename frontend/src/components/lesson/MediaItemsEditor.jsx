@@ -8,18 +8,19 @@ import './MediaItemsEditor.css'
 const TYPES = ['image', 'video', 'pdf']
 
 /**
- * Manages a lesson's ordered media attachments: each item is
- * {type: image|video|pdf, url, caption}. Images/PDFs can be uploaded or linked;
- * videos are a URL. Images are added here — never inside the text editor.
+ * Manages a lesson's ordered media items: each is {type, url, caption}.
+ * When `fixedType` is set the whole list is that one media type (an image
+ * lesson holds only images, etc.) and the per-item type dropdown is hidden.
+ * Images/PDFs can be uploaded or linked; videos are a URL.
  */
-export default function MediaItemsEditor({ items, onChange, disabled = false }) {
+export default function MediaItemsEditor({ items, onChange, disabled = false, fixedType = null }) {
   const { t } = useTranslation()
   const [uploadingIdx, setUploadingIdx] = useState(null)
 
   const update = (i, patch) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)))
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
-  const add = () => onChange([...items, { type: 'image', url: '', caption: '' }])
+  const add = () => onChange([...items, { type: fixedType ?? 'image', url: '', caption: '' }])
 
   const move = (i, dir) => {
     const j = i + dir
@@ -51,14 +52,16 @@ export default function MediaItemsEditor({ items, onChange, disabled = false }) 
       {items.map((item, i) => (
         <div key={i} className="media-item">
           <div className="media-item-row">
-            <select
-              className="media-item-type"
-              value={item.type}
-              disabled={disabled}
-              onChange={(e) => update(i, { type: e.target.value })}
-            >
-              {TYPES.map((ty) => <option key={ty} value={ty}>{t(`lesson.type.${ty}`)}</option>)}
-            </select>
+            {!fixedType && (
+              <select
+                className="media-item-type"
+                value={item.type}
+                disabled={disabled}
+                onChange={(e) => update(i, { type: e.target.value })}
+              >
+                {TYPES.map((ty) => <option key={ty} value={ty}>{t(`lesson.type.${ty}`)}</option>)}
+              </select>
+            )}
             <input
               className="media-item-url"
               type="url"
@@ -119,4 +122,5 @@ MediaItemsEditor.propTypes = {
   items: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
+  fixedType: PropTypes.string,
 }

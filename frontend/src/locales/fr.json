@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Échec de l'enregistrement. Veuillez réessayer.",
       "deleteFailedGeneric": "Échec de la suppression. Veuillez réessayer.",
       "mediaLabel": "Pièces jointes multimédias",
-      "mediaHint": "Ajoutez des images, PDF ou vidéos. Les images s'ajoutent ici, pas dans l'éditeur de texte.",
+      "mediaHint": "Ajoutez-en un ou plusieurs — ils apparaissent dans l'ordre.",
       "captionPlaceholder": "Légende (facultatif)",
       "addMedia": "Ajouter un média",
       "moveUp": "Monter",

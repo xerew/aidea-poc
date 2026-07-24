@@ -26,12 +26,8 @@ const LESSON_TYPES = [
   { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
 ]
 
-// New lessons are Content (text body + media attachments), Quiz or Assignment.
-// The legacy image/video/pdf types still render/edit for existing lessons.
-const NEW_LESSON_TYPES = LESSON_TYPES.filter((lt) => ['text', 'quiz', 'assignment'].includes(lt.type))
-
-// Lesson types that carry a rich-text body and media attachments.
-const CONTENT_TYPES = ['text', 'image', 'video', 'pdf']
+// image/video/pdf lessons hold multiple media items, all of that one type.
+const MEDIA_TYPES = ['image', 'video', 'pdf']
 
 function lessonTypeConfig(type) {
   return LESSON_TYPES.find((lt) => lt.type === type) ?? LESSON_TYPES[0]
@@ -358,25 +354,27 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           />
         </div>
 
-        {CONTENT_TYPES.includes(lesson.lesson_type) && (
-          <>
-            <div className="lesson-field">
-              <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
-              <RichTextEditor
-                value={lesson.content}
-                disabled={fieldsDisabled}
-                onChange={(html) => onChange('content', html)}
-                placeholder={t('authoring.moduleEditor.contentPlaceholder')}
-              />
-            </div>
-            <div className="lesson-field">
-              <MediaItemsEditor
-                items={lesson.media_items ?? []}
-                disabled={fieldsDisabled || translating}
-                onChange={(next) => onChange('media_items', next)}
-              />
-            </div>
-          </>
+        {lesson.lesson_type === 'text' && (
+          <div className="lesson-field">
+            <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
+            <RichTextEditor
+              value={lesson.content}
+              disabled={fieldsDisabled}
+              onChange={(html) => onChange('content', html)}
+              placeholder={t('authoring.moduleEditor.contentPlaceholder')}
+            />
+          </div>
+        )}
+
+        {MEDIA_TYPES.includes(lesson.lesson_type) && (
+          <div className="lesson-field">
+            <MediaItemsEditor
+              items={lesson.media_items ?? []}
+              fixedType={lesson.lesson_type}
+              disabled={fieldsDisabled || translating}
+              onChange={(next) => onChange('media_items', next)}
+            />
+          </div>
         )}
 
         {lesson.lesson_type === 'assignment' && (
@@ -882,7 +880,7 @@ export default function ModuleEditorPage() {
             <div className="me-card">
               <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
               <div className="me-lesson-type-grid">
-                {NEW_LESSON_TYPES.map(({ type, Icon, color }) => (
+                {LESSON_TYPES.map(({ type, Icon, color }) => (
                   <button
                     key={type}
                     className={`me-type-btn me-type-btn--${color}`}

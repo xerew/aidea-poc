@@ -560,7 +560,7 @@
       "saveFailedGeneric": "Error al guardar. Inténtalo de nuevo.",
       "deleteFailedGeneric": "Error al eliminar. Inténtalo de nuevo.",
       "mediaLabel": "Archivos multimedia",
-      "mediaHint": "Añade imágenes, PDF o vídeos. Las imágenes se añaden aquí, no dentro del editor de texto.",
+      "mediaHint": "Añade uno o varios — aparecen en orden.",
       "captionPlaceholder": "Leyenda (opcional)",
       "addMedia": "Añadir multimedia",
       "moveUp": "Subir",
