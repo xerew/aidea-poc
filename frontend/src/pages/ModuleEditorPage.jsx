@@ -248,20 +248,23 @@ function LessonPreview({ lesson }) {
     case 'video':
     case 'pdf':
     case 'image': {
-      const media = lesson.media_items ?? []
+      const blocks = lesson.media_items ?? []
       // Back-compat: a legacy media lesson may still hold a single URL in content.
-      const legacy = !media.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
+      const legacy = !blocks.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
         ? [{ type: lesson.lesson_type, url: lesson.content, caption: '' }]
         : []
-      const allMedia = media.length ? media : legacy
+      const allBlocks = blocks.length ? blocks : legacy
       const bodyHtml = lesson.lesson_type === 'text' ? lesson.content : ''
-      if (!bodyHtml && !allMedia.length) {
+      if (!bodyHtml && !allBlocks.length) {
         return <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
       }
       return (
         <div className="lesson-preview-content">
           {bodyHtml && <HtmlContent content={bodyHtml} className="lesson-preview-text" />}
-          {allMedia.map((item, i) => <MediaItem key={i} item={item} />)}
+          {allBlocks.map((block, i) => (block.type === 'text'
+            ? <HtmlContent key={i} content={block.html} className="lesson-preview-text" />
+            : <MediaItem key={i} item={block} />
+          ))}
         </div>
       )
     }
@@ -374,6 +377,7 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
               disabled={fieldsDisabled || translating}
               onChange={(next) => onChange('media_items', next)}
             />
+            <FieldError msg={err.media} />
           </div>
         )}
 
@@ -476,8 +480,14 @@ function validateLesson(lesson, t) {
   if (!lesson.title.trim()) {
     errors.title = t('authoring.moduleEditor.titleRequiredError')
   }
-  if (['video', 'image', 'pdf'].includes(lesson.lesson_type) && !lesson.content.trim()) {
-    errors.content = t('authoring.moduleEditor.urlRequiredError', { type: t(`lesson.type.${lesson.lesson_type}`) })
+  if (['video', 'image', 'pdf'].includes(lesson.lesson_type)) {
+    const blocks = lesson.media_items ?? []
+    const mediaBlocks = blocks.filter((b) => b.type !== 'text')
+    if (mediaBlocks.length === 0) {
+      errors.media = t('authoring.moduleEditor.mediaRequiredError', { type: t(`lesson.type.${lesson.lesson_type}`) })
+    } else if (mediaBlocks.some((b) => !(b.url || '').trim())) {
+      errors.media = t('authoring.moduleEditor.mediaUrlRequiredError')
+    }
   }
   if (lesson.lesson_type === 'assignment' && !lesson.content.trim()) {
     errors.content = t('authoring.moduleEditor.assignmentRequiredError')
@@ -617,6 +627,7 @@ export default function ModuleEditorPage() {
         description: lesson.description,
         lesson_type: lesson.lesson_type,
         content: lesson.content,
+        media_items: lesson.media_items ?? [],
         quiz_data: lesson.quiz_data ?? [],
         duration_minutes: lesson.duration_minutes,
         is_required: lesson.is_required,

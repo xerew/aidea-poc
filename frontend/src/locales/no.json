@@ -564,7 +564,11 @@
       "captionPlaceholder": "Bildetekst (valgfritt)",
       "addMedia": "Legg til media",
       "moveUp": "Flytt opp",
-      "moveDown": "Flytt ned"
+      "moveDown": "Flytt ned",
+      "addText": "Legg til tekst",
+      "addMediaOfType": "Legg til {{type}}",
+      "mediaRequiredError": "Legg til minst én: {{type}}.",
+      "mediaUrlRequiredError": "Hvert medieelement trenger en URL."
     },
     "translate": {
       "switchLanguage": "Language",

@@ -564,7 +564,11 @@
       "captionPlaceholder": "Caption (optional)",
       "addMedia": "Add media",
       "moveUp": "Move up",
-      "moveDown": "Move down"
+      "moveDown": "Move down",
+      "addText": "Add text",
+      "addMediaOfType": "Add {{type}}",
+      "mediaRequiredError": "Add at least one {{type}}.",
+      "mediaUrlRequiredError": "Each media item needs a URL."
     },
     "translate": {
       "switchLanguage": "Language",

@@ -564,7 +564,11 @@
       "captionPlaceholder": "Bildtext (valfritt)",
       "addMedia": "Lägg till media",
       "moveUp": "Flytta upp",
-      "moveDown": "Flytta ned"
+      "moveDown": "Flytta ned",
+      "addText": "Lägg till text",
+      "addMediaOfType": "Lägg till {{type}}",
+      "mediaRequiredError": "Lägg till minst en: {{type}}.",
+      "mediaUrlRequiredError": "Varje medieobjekt behöver en URL."
     },
     "translate": {
       "switchLanguage": "Language",

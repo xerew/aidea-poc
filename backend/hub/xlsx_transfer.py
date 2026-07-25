@@ -130,10 +130,14 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
                 'yes' if lesson.is_required else 'no',
             ])
             for m_idx, item in enumerate(lesson.media_items or [], start=1):
-                media_rows.append([
-                    module.order, lesson.order, m_idx,
-                    item.get('type', ''), item.get('url', ''), item.get('caption', ''),
-                ])
+                if item.get('type') == 'text':
+                    # Text blocks reuse the caption column for their HTML.
+                    media_rows.append([module.order, lesson.order, m_idx, 'text', '', item.get('html', '')])
+                else:
+                    media_rows.append([
+                        module.order, lesson.order, m_idx,
+                        item.get('type', ''), item.get('url', ''), item.get('caption', ''),
+                    ])
             if lesson.lesson_type == Lesson.LessonType.QUIZ:
                 for q_idx, question in enumerate(lesson.quiz_data or [], start=1):
                     options = question.get('options', [])[:len(OPTION_LETTERS)]
@@ -342,14 +346,18 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             if lesson is None:
                 errors.append(f'{_cell("Media", 1, row_num)}: module_order/lesson_order do not match any lesson.')
                 continue
+            item_order, _ = _as_int(item_order, default=len(lesson['media_items']) + 1)
+            media_by_lesson.setdefault(id(lesson), lesson)
+            if m_type == 'text':
+                # Text block: the caption column carries the HTML body.
+                lesson['media_items'].append((item_order, {'type': 'text', 'html': str(caption or '')}))
+                continue
             if m_type not in MEDIA_TYPES:
-                errors.append(f'{_cell("Media", 4, row_num)}: type must be one of {sorted(MEDIA_TYPES)}.')
+                errors.append(f'{_cell("Media", 4, row_num)}: type must be text or one of {sorted(MEDIA_TYPES)}.')
                 continue
             if not (url or '').strip():
                 errors.append(f'{_cell("Media", 5, row_num)}: url is required.')
                 continue
-            item_order, _ = _as_int(item_order, default=len(lesson['media_items']) + 1)
-            media_by_lesson.setdefault(id(lesson), lesson)
             lesson['media_items'].append((item_order, {
                 'type': m_type, 'url': str(url).strip(), 'caption': str(caption or ''),
             }))

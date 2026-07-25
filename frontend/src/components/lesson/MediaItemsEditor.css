@@ -14,6 +14,26 @@
   background: #f8fafc;
 }
 
+.media-item-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.media-item-kind {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.media-add-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .media-item-row {
   display: flex;
   align-items: center;

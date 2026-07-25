@@ -1,26 +1,25 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, Upload, ChevronUp, ChevronDown } from 'lucide-react'
+import { Plus, Trash2, Upload, ChevronUp, ChevronDown, Type } from 'lucide-react'
 import client from '../../api/client'
+import RichTextEditor from './RichTextEditor'
 import './MediaItemsEditor.css'
 
-const TYPES = ['image', 'video', 'pdf']
-
 /**
- * Manages a lesson's ordered media items: each is {type, url, caption}.
- * When `fixedType` is set the whole list is that one media type (an image
- * lesson holds only images, etc.) and the per-item type dropdown is hidden.
- * Images/PDFs can be uploaded or linked; videos are a URL.
+ * Ordered block editor for a media lesson: interleave rich-text blocks
+ * ({type: 'text', html}) with media items of the lesson's own type
+ * ({type: fixedType, url, caption}). An image lesson holds only images, etc.
  */
-export default function MediaItemsEditor({ items, onChange, disabled = false, fixedType = null }) {
+export default function MediaItemsEditor({ items, onChange, disabled = false, fixedType }) {
   const { t } = useTranslation()
   const [uploadingIdx, setUploadingIdx] = useState(null)
 
   const update = (i, patch) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)))
   const remove = (i) => onChange(items.filter((_, idx) => idx !== i))
-  const add = () => onChange([...items, { type: fixedType ?? 'image', url: '', caption: '' }])
+  const addText = () => onChange([...items, { type: 'text', html: '' }])
+  const addMedia = () => onChange([...items, { type: fixedType, url: '', caption: '' }])
 
   const move = (i, dir) => {
     const j = i + dir
@@ -44,6 +43,8 @@ export default function MediaItemsEditor({ items, onChange, disabled = false, fi
     finally { setUploadingIdx(null) }
   }
 
+  const mediaLabel = t(`lesson.type.${fixedType}`)
+
   return (
     <div className="media-items">
       <label className="lesson-field-label">{t('authoring.moduleEditor.mediaLabel')}</label>
@@ -51,47 +52,10 @@ export default function MediaItemsEditor({ items, onChange, disabled = false, fi
 
       {items.map((item, i) => (
         <div key={i} className="media-item">
-          <div className="media-item-row">
-            {!fixedType && (
-              <select
-                className="media-item-type"
-                value={item.type}
-                disabled={disabled}
-                onChange={(e) => update(i, { type: e.target.value })}
-              >
-                {TYPES.map((ty) => <option key={ty} value={ty}>{t(`lesson.type.${ty}`)}</option>)}
-              </select>
-            )}
-            <input
-              className="media-item-url"
-              type="url"
-              value={item.url}
-              disabled={disabled}
-              placeholder={t('authoring.moduleEditor.urlPlaceholder')}
-              onChange={(e) => update(i, { url: e.target.value })}
-            />
-            {['image', 'pdf'].includes(item.type) && !disabled && (
-              <label className="lesson-upload-btn">
-                <Upload size={14} />
-                {uploadingIdx === i ? t('authoring.moduleEditor.uploading') : t('authoring.moduleEditor.uploadFile')}
-                <input
-                  type="file"
-                  hidden
-                  accept={item.type === 'pdf' ? '.pdf' : 'image/*'}
-                  disabled={uploadingIdx !== null}
-                  onChange={(e) => upload(i, e.target.files?.[0])}
-                />
-              </label>
-            )}
-          </div>
-          <div className="media-item-row">
-            <input
-              className="media-item-caption"
-              value={item.caption ?? ''}
-              disabled={disabled}
-              placeholder={t('authoring.moduleEditor.captionPlaceholder')}
-              onChange={(e) => update(i, { caption: e.target.value })}
-            />
+          <div className="media-item-topbar">
+            <span className="media-item-kind">
+              {item.type === 'text' ? t('lesson.type.text') : t(`lesson.type.${item.type}`)}
+            </span>
             {!disabled && (
               <div className="media-item-actions">
                 <button className="me-media-btn" onClick={() => move(i, -1)} disabled={i === 0} title={t('authoring.moduleEditor.moveUp')}>
@@ -106,13 +70,59 @@ export default function MediaItemsEditor({ items, onChange, disabled = false, fi
               </div>
             )}
           </div>
+
+          {item.type === 'text' ? (
+            <RichTextEditor
+              value={item.html}
+              disabled={disabled}
+              onChange={(html) => update(i, { html })}
+            />
+          ) : (
+            <>
+              <div className="media-item-row">
+                <input
+                  className="media-item-url"
+                  type="url"
+                  value={item.url}
+                  disabled={disabled}
+                  placeholder={t('authoring.moduleEditor.urlPlaceholder')}
+                  onChange={(e) => update(i, { url: e.target.value })}
+                />
+                {['image', 'pdf'].includes(item.type) && !disabled && (
+                  <label className="lesson-upload-btn">
+                    <Upload size={14} />
+                    {uploadingIdx === i ? t('authoring.moduleEditor.uploading') : t('authoring.moduleEditor.uploadFile')}
+                    <input
+                      type="file"
+                      hidden
+                      accept={item.type === 'pdf' ? '.pdf' : 'image/*'}
+                      disabled={uploadingIdx !== null}
+                      onChange={(e) => upload(i, e.target.files?.[0])}
+                    />
+                  </label>
+                )}
+              </div>
+              <input
+                className="media-item-caption"
+                value={item.caption ?? ''}
+                disabled={disabled}
+                placeholder={t('authoring.moduleEditor.captionPlaceholder')}
+                onChange={(e) => update(i, { caption: e.target.value })}
+              />
+            </>
+          )}
         </div>
       ))}
 
       {!disabled && (
-        <button className="add-dashed-btn" onClick={add}>
-          <Plus size={14} /> {t('authoring.moduleEditor.addMedia')}
-        </button>
+        <div className="media-add-row">
+          <button className="add-dashed-btn" onClick={addText}>
+            <Type size={14} /> {t('authoring.moduleEditor.addText')}
+          </button>
+          <button className="add-dashed-btn" onClick={addMedia}>
+            <Plus size={14} /> {t('authoring.moduleEditor.addMediaOfType', { type: mediaLabel })}
+          </button>
+        </div>
       )}
     </div>
   )
@@ -122,5 +132,5 @@ MediaItemsEditor.propTypes = {
   items: PropTypes.array.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  fixedType: PropTypes.string,
+  fixedType: PropTypes.string.isRequired,
 }

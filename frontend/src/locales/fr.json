@@ -564,7 +564,11 @@
       "captionPlaceholder": "Légende (facultatif)",
       "addMedia": "Ajouter un média",
       "moveUp": "Monter",
-      "moveDown": "Descendre"
+      "moveDown": "Descendre",
+      "addText": "Ajouter du texte",
+      "addMediaOfType": "Ajouter {{type}}",
+      "mediaRequiredError": "Ajoutez au moins un élément : {{type}}.",
+      "mediaUrlRequiredError": "Chaque média nécessite une URL."
     },
     "translate": {
       "switchLanguage": "Language",

@@ -55,15 +55,15 @@ const lessonShape = PropTypes.shape({
 ContentLesson.propTypes = { lesson: lessonShape.isRequired }
 function ContentLesson({ lesson }) {
   const { t } = useTranslation()
-  const media = lesson.media_items ?? []
+  const blocks = lesson.media_items ?? []
   // Back-compat: a legacy media lesson may still hold a single URL in content.
-  const legacy = !media.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
+  const legacy = !blocks.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
     ? [{ type: lesson.lesson_type, url: lesson.content, caption: '' }]
     : []
-  const allMedia = media.length ? media : legacy
+  const allBlocks = blocks.length ? blocks : legacy
   const bodyHtml = lesson.lesson_type === 'text' ? lesson.content : ''
 
-  if (!bodyHtml && !allMedia.length) {
+  if (!bodyHtml && !allBlocks.length) {
     return <div className="lp-content-card"><p className="lp-empty">{t('lesson.noContent')}</p></div>
   }
   return (
@@ -73,7 +73,10 @@ function ContentLesson({ lesson }) {
           <HtmlContent content={bodyHtml} className="lp-text-content" />
         </div>
       )}
-      {allMedia.map((item, i) => <MediaItem key={i} item={item} />)}
+      {allBlocks.map((block, i) => (block.type === 'text'
+        ? <div key={i} className="lp-text-body"><HtmlContent content={block.html} className="lp-text-content" /></div>
+        : <MediaItem key={i} item={block} />
+      ))}
     </div>
   )
 }

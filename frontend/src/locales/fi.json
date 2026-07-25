@@ -564,7 +564,11 @@
       "captionPlaceholder": "Kuvateksti (valinnainen)",
       "addMedia": "Lisää media",
       "moveUp": "Siirrä ylös",
-      "moveDown": "Siirrä alas"
+      "moveDown": "Siirrä alas",
+      "addText": "Lisää tekstiä",
+      "addMediaOfType": "Lisää {{type}}",
+      "mediaRequiredError": "Lisää vähintään yksi: {{type}}.",
+      "mediaUrlRequiredError": "Jokainen mediakohde tarvitsee URL-osoitteen."
     },
     "translate": {
       "switchLanguage": "Language",

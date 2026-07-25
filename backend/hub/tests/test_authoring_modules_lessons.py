@@ -261,6 +261,21 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_text_block_interleaved_with_media(self):
+        payload = {
+            'title': 'Image lesson', 'lesson_type': 'image',
+            'media_items': [
+                {'type': 'text', 'html': '<p>Before</p>'},
+                {'type': 'image', 'url': 'https://ex.com/a.png', 'caption': 'A'},
+                {'type': 'text', 'html': '<p>After</p>'},
+            ],
+        }
+        response = self.client.post(self.url, payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lesson = Lesson.objects.get(pk=response.data['id'])
+        self.assertEqual([b['type'] for b in lesson.media_items], ['text', 'image', 'text'])
+        self.assertEqual(lesson.media_items[0]['html'], '<p>Before</p>')
+
     def test_create_lesson_missing_title_returns_400(self):
         response = self.client.post(self.url, {'lesson_type': 'text'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

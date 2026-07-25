@@ -564,7 +564,11 @@
       "captionPlaceholder": "Leyenda (opcional)",
       "addMedia": "Añadir multimedia",
       "moveUp": "Subir",
-      "moveDown": "Bajar"
+      "moveDown": "Bajar",
+      "addText": "Añadir texto",
+      "addMediaOfType": "Añadir {{type}}",
+      "mediaRequiredError": "Añade al menos un elemento: {{type}}.",
+      "mediaUrlRequiredError": "Cada elemento multimedia necesita una URL."
     },
     "translate": {
       "switchLanguage": "Language",

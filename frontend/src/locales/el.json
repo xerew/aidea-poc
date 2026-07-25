@@ -564,7 +564,11 @@
       "captionPlaceholder": "Λεζάντα (προαιρετικό)",
       "addMedia": "Προσθήκη πολυμέσου",
       "moveUp": "Μετακίνηση πάνω",
-      "moveDown": "Μετακίνηση κάτω"
+      "moveDown": "Μετακίνηση κάτω",
+      "addText": "Προσθήκη κειμένου",
+      "addMediaOfType": "Προσθήκη {{type}}",
+      "mediaRequiredError": "Προσθέστε τουλάχιστον ένα: {{type}}.",
+      "mediaUrlRequiredError": "Κάθε πολυμέσο χρειάζεται URL."
     },
     "translate": {
       "switchLanguage": "Language",

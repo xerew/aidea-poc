@@ -564,7 +564,11 @@
       "captionPlaceholder": "Didascalia (facoltativa)",
       "addMedia": "Aggiungi media",
       "moveUp": "Sposta su",
-      "moveDown": "Sposta giù"
+      "moveDown": "Sposta giù",
+      "addText": "Aggiungi testo",
+      "addMediaOfType": "Aggiungi {{type}}",
+      "mediaRequiredError": "Aggiungi almeno un elemento: {{type}}.",
+      "mediaUrlRequiredError": "Ogni elemento multimediale necessita di un URL."
     },
     "translate": {
       "switchLanguage": "Language",

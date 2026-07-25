@@ -18,22 +18,26 @@ class LessonSerializer(serializers.ModelSerializer):
         read_only_fields = ['translations']
 
     def validate_media_items(self, value):
-        """A list of {type: image|video|pdf, url: str, caption: str}."""
+        """An ordered list of blocks: a text block {type: 'text', html: str} or a
+        media block {type: image|video|pdf, url: str, caption: str}."""
         if not isinstance(value, list):
             raise serializers.ValidationError('media_items must be a list.')
         cleaned = []
         for i, item in enumerate(value):
             if not isinstance(item, dict):
-                raise serializers.ValidationError(f'Media item {i + 1} must be an object.')
+                raise serializers.ValidationError(f'Block {i + 1} must be an object.')
             item_type = item.get('type')
-            if item_type not in MEDIA_ITEM_TYPES:
+            if item_type == 'text':
+                cleaned.append({'type': 'text', 'html': str(item.get('html', ''))})
+            elif item_type in MEDIA_ITEM_TYPES:
+                url = str(item.get('url', '')).strip()
+                if not url:
+                    raise serializers.ValidationError(f'Block {i + 1} needs a url.')
+                cleaned.append({'type': item_type, 'url': url, 'caption': str(item.get('caption', ''))})
+            else:
                 raise serializers.ValidationError(
-                    f'Media item {i + 1} type must be one of {sorted(MEDIA_ITEM_TYPES)}.',
+                    f"Block {i + 1} type must be 'text' or one of {sorted(MEDIA_ITEM_TYPES)}.",
                 )
-            url = str(item.get('url', '')).strip()
-            if not url:
-                raise serializers.ValidationError(f'Media item {i + 1} needs a url.')
-            cleaned.append({'type': item_type, 'url': url, 'caption': str(item.get('caption', ''))})
         return cleaned
 
     def validate_quiz_data(self, value):

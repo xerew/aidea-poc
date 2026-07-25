@@ -564,7 +564,11 @@
       "captionPlaceholder": "Bildunterschrift (optional)",
       "addMedia": "Medium hinzufügen",
       "moveUp": "Nach oben",
-      "moveDown": "Nach unten"
+      "moveDown": "Nach unten",
+      "addText": "Text hinzufügen",
+      "addMediaOfType": "{{type}} hinzufügen",
+      "mediaRequiredError": "Füge mindestens ein Element hinzu: {{type}}.",
+      "mediaUrlRequiredError": "Jedes Medienelement benötigt eine URL."
     },
     "translate": {
       "switchLanguage": "Language",
