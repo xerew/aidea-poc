@@ -211,3 +211,30 @@
 .ml-empty a:hover {
   text-decoration: underline;
 }
+
+/* Unavailable (unpublished) course cards */
+.ml-card--unavailable {
+  opacity: 0.72;
+}
+
+.ml-unavailable-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ml-unavailable-note {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: #b45309;
+}
+
+.ml-action-btn:disabled,
+.ml-review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

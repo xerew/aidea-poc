@@ -358,7 +358,8 @@
     "yourProgress": "Votre progression",
     "whatYoullLearn": "Ce que vous allez apprendre",
     "courseModules": "Modules du cours",
-    "enrollError": "Échec de l'inscription."
+    "enrollError": "Échec de l'inscription.",
+    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié."
   },
   "myLearning": {
     "subtitle": "Suivez votre progression et poursuivez vos cours",
@@ -385,7 +386,9 @@
     "browseCourses": "Parcourir les cours",
     "inProgressTitle": "En cours",
     "completedTitle": "Terminés",
-    "completedBadge": "Terminé"
+    "completedBadge": "Terminé",
+    "unavailable": "Indisponible",
+    "unavailableNote": "L'auteur a dépublié ce cours. Il reviendra lorsqu'il le republiera."
   },
   "pathway": {
     "loadError": "Impossible de charger votre parcours.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Ajoutez des notes personnelles pour cette leçon…",
     "yourNotesTitle": "Vos notes",
     "markComplete": "Marquer comme terminé",
-    "pendingReview": "En attente d'évaluation"
+    "pendingReview": "En attente d'évaluation",
+    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié."
   },
   "authoring": {
     "title": "Création de cours",

@@ -358,7 +358,8 @@
     "yourProgress": "Your progress",
     "whatYoullLearn": "What You'll Learn",
     "courseModules": "Course Modules",
-    "enrollError": "Enrollment failed."
+    "enrollError": "Enrollment failed.",
+    "unavailable": "This course is currently unavailable — its author has unpublished it."
   },
   "myLearning": {
     "subtitle": "Track your progress and continue your courses",
@@ -385,7 +386,9 @@
     "browseCourses": "Browse courses",
     "inProgressTitle": "In Progress",
     "completedTitle": "Completed",
-    "completedBadge": "Completed"
+    "completedBadge": "Completed",
+    "unavailable": "Unavailable",
+    "unavailableNote": "The author has unpublished this course. It will return when they publish it again."
   },
   "pathway": {
     "loadError": "Could not load your pathway.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Add personal notes for this lesson…",
     "yourNotesTitle": "Your Notes",
     "markComplete": "Mark Complete",
-    "pendingReview": "Pending review"
+    "pendingReview": "Pending review",
+    "unavailable": "This course is currently unavailable — its author has unpublished it."
   },
   "authoring": {
     "title": "Course Authoring",

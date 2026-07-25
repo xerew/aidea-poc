@@ -34,19 +34,22 @@ InProgressCard.propTypes = {
     progress_pct: PropTypes.number,
     module_count: PropTypes.number,
     last_accessed_at: PropTypes.string,
+    is_available: PropTypes.bool,
   }),
 }
 
 function InProgressCard({ enrollment }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const unavailable = enrollment.is_available === false
   return (
-    <div className="ml-card ml-card--progress">
+    <div className={`ml-card ml-card--progress${unavailable ? ' ml-card--unavailable' : ''}`}>
       <div className="ml-card-top-row">
         <div className="ml-card-main">
           <div className="ml-card-header">
             <span className="ml-pillar-badge">{enrollment.pillar_name}</span>
             <span className="ml-card-title">{enrollment.course_title}</span>
+            {unavailable && <span className="ml-unavailable-badge">{t('myLearning.unavailable')}</span>}
           </div>
           <div className="ml-card-meta">
             <span className="ml-meta-item">
@@ -56,9 +59,11 @@ function InProgressCard({ enrollment }) {
             <span className="ml-meta-sep">·</span>
             <span className="ml-meta-item">{t('myLearning.moduleCount', { count: enrollment.module_count })}</span>
           </div>
+          {unavailable && <p className="ml-unavailable-note">{t('myLearning.unavailableNote')}</p>}
         </div>
         <button
           className="ml-action-btn"
+          disabled={unavailable}
           onClick={() => navigate(`/courses/${enrollment.course_id}/learn`)}
         >
           {t('myLearning.resume')}
@@ -80,22 +85,27 @@ CompletedCard.propTypes = {
     course_title: PropTypes.string,
     pillar_name: PropTypes.string,
     last_accessed_at: PropTypes.string,
+    is_available: PropTypes.bool,
   }),
 }
 
 function CompletedCard({ enrollment }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const unavailable = enrollment.is_available === false
   return (
-    <div className="ml-card ml-card--completed">
+    <div className={`ml-card ml-card--completed${unavailable ? ' ml-card--unavailable' : ''}`}>
       <div className="ml-card-top">
         <span className="ml-pillar-badge">{enrollment.pillar_name}</span>
-        <span className="ml-completed-badge">&#x2713; {t('myLearning.completedBadge')}</span>
+        {unavailable
+          ? <span className="ml-unavailable-badge">{t('myLearning.unavailable')}</span>
+          : <span className="ml-completed-badge">&#x2713; {t('myLearning.completedBadge')}</span>}
       </div>
       <h3 className="ml-card-title ml-card-title--completed">{enrollment.course_title}</h3>
       <p className="ml-completed-date">{t('myLearning.completedOn', { date: formatDate(enrollment.last_accessed_at) })}</p>
       <button
         className="ml-review-btn"
+        disabled={unavailable}
         onClick={() => navigate(`/courses/${enrollment.course_id}/learn`)}
       >
         {t('myLearning.reviewCourse')}

@@ -358,7 +358,8 @@
     "yourProgress": "Tu progreso",
     "whatYoullLearn": "Lo Que Aprenderás",
     "courseModules": "Módulos del Curso",
-    "enrollError": "No se pudo completar la inscripción."
+    "enrollError": "No se pudo completar la inscripción.",
+    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado."
   },
   "myLearning": {
     "subtitle": "Sigue tu progreso y continúa tus cursos",
@@ -385,7 +386,9 @@
     "browseCourses": "Explorar cursos",
     "inProgressTitle": "En Progreso",
     "completedTitle": "Completados",
-    "completedBadge": "Completado"
+    "completedBadge": "Completado",
+    "unavailable": "No disponible",
+    "unavailableNote": "El autor ha retirado este curso. Volverá cuando lo publique de nuevo."
   },
   "pathway": {
     "loadError": "No se pudo cargar tu itinerario.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Añade notas personales para esta lección…",
     "yourNotesTitle": "Tus Notas",
     "markComplete": "Marcar como Completado",
-    "pendingReview": "Pendiente de revisión"
+    "pendingReview": "Pendiente de revisión",
+    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado."
   },
   "authoring": {
     "title": "Creación de Cursos",

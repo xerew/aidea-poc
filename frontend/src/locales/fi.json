@@ -358,7 +358,8 @@
     "yourProgress": "Edistymisesi",
     "whatYoullLearn": "Mitä opit",
     "courseModules": "Kurssin moduulit",
-    "enrollError": "Ilmoittautuminen epäonnistui."
+    "enrollError": "Ilmoittautuminen epäonnistui.",
+    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta."
   },
   "myLearning": {
     "subtitle": "Seuraa edistymistäsi ja jatka kurssejasi",
@@ -385,7 +386,9 @@
     "browseCourses": "Selaa kursseja",
     "inProgressTitle": "Kesken",
     "completedTitle": "Suoritetut",
-    "completedBadge": "Suoritettu"
+    "completedBadge": "Suoritettu",
+    "unavailable": "Ei saatavilla",
+    "unavailableNote": "Tekijä on poistanut tämän kurssin julkaisusta. Se palaa, kun hän julkaisee sen uudelleen."
   },
   "pathway": {
     "loadError": "Oppimispolkuasi ei voitu ladata.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Lisää henkilökohtaisia muistiinpanoja tähän oppituntiin…",
     "yourNotesTitle": "Muistiinpanosi",
     "markComplete": "Merkitse suoritetuksi",
-    "pendingReview": "Odottaa arviointia"
+    "pendingReview": "Odottaa arviointia",
+    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta."
   },
   "authoring": {
     "title": "Kurssien sisällöntuotanto",

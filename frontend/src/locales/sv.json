@@ -358,7 +358,8 @@
     "yourProgress": "Dina framsteg",
     "whatYoullLearn": "Vad du kommer att lära dig",
     "courseModules": "Kursmoduler",
-    "enrollError": "Registreringen misslyckades."
+    "enrollError": "Registreringen misslyckades.",
+    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den."
   },
   "myLearning": {
     "subtitle": "Följ dina framsteg och fortsätt dina kurser",
@@ -385,7 +386,9 @@
     "browseCourses": "Bläddra bland kurser",
     "inProgressTitle": "Pågående",
     "completedTitle": "Slutförda",
-    "completedBadge": "Slutförd"
+    "completedBadge": "Slutförd",
+    "unavailable": "Otillgänglig",
+    "unavailableNote": "Författaren har avpublicerat kursen. Den återkommer när den publiceras igen."
   },
   "pathway": {
     "loadError": "Kunde inte läsa in din lärväg.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Lägg till personliga anteckningar för den här lektionen…",
     "yourNotesTitle": "Dina anteckningar",
     "markComplete": "Markera som slutförd",
-    "pendingReview": "Väntar på granskning"
+    "pendingReview": "Väntar på granskning",
+    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den."
   },
   "authoring": {
     "title": "Kursskapande",

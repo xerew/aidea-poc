@@ -283,7 +283,11 @@ class MyLearningView(APIView):
 
         in_progress = [e for e in enrollments if e.progress_pct < 100]
         completed = [e for e in enrollments if e.progress_pct == 100]
-        continue_learning = in_progress[0] if in_progress else None
+        # "Continue" must point at a still-available course; unpublished ones
+        # stay listed (flagged unavailable) but are never the primary CTA.
+        continue_learning = next(
+            (e for e in in_progress if e.course.is_published), None,
+        )
 
         return Response({
             'continue_learning': (
@@ -301,9 +305,11 @@ class MyLearningView(APIView):
 
 class HomeView(APIView):
     def get(self, request):
+        # Only surface a still-available (published) course as "continue" —
+        # an unpublished course would dead-end in a 404.
         latest_enrollment = (
             Enrollment.objects
-            .filter(user=request.user)
+            .filter(user=request.user, course__is_published=True)
             .select_related('course', 'current_module')
             .first()
         )

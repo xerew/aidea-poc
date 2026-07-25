@@ -312,7 +312,9 @@ export function LearnRedirect() {
           navigate(`/courses/${id}`, { replace: true })
         }
       })
-      .catch(() => setError(t('lesson.learnRedirectError')))
+      .catch((err) => setError(
+        err.response?.status === 404 ? t('lesson.unavailable') : t('lesson.learnRedirectError'),
+      ))
   }, [id, navigate, user, t])
 
   if (error) return <p className="page-error">{error}</p>
@@ -343,7 +345,9 @@ export default function LessonPage() {
   useEffect(() => {
     client.get(`/courses/${courseId}/learn/`)
       .then(res => setCourseLearn(res.data))
-      .catch(() => setError(t('lesson.loadCourseError')))
+      .catch((err) => setError(
+        err.response?.status === 404 ? t('lesson.unavailable') : t('lesson.loadCourseError'),
+      ))
   }, [courseId, t])
 
   // Fetch lesson whenever lessonId changes

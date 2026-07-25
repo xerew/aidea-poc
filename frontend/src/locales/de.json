@@ -358,7 +358,8 @@
     "yourProgress": "Ihr Fortschritt",
     "whatYoullLearn": "Was Sie lernen werden",
     "courseModules": "Kursmodule",
-    "enrollError": "Einschreibung fehlgeschlagen."
+    "enrollError": "Einschreibung fehlgeschlagen.",
+    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen."
   },
   "myLearning": {
     "subtitle": "Verfolgen Sie Ihren Fortschritt und setzen Sie Ihre Kurse fort",
@@ -385,7 +386,9 @@
     "browseCourses": "Kurse durchsuchen",
     "inProgressTitle": "In Bearbeitung",
     "completedTitle": "Abgeschlossen",
-    "completedBadge": "Abgeschlossen"
+    "completedBadge": "Abgeschlossen",
+    "unavailable": "Nicht verfügbar",
+    "unavailableNote": "Der Autor hat diesen Kurs zurückgezogen. Er kehrt zurück, sobald er ihn erneut veröffentlicht."
   },
   "pathway": {
     "loadError": "Ihr Lernpfad konnte nicht geladen werden.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Persönliche Notizen zu dieser Lektion hinzufügen…",
     "yourNotesTitle": "Ihre Notizen",
     "markComplete": "Als abgeschlossen markieren",
-    "pendingReview": "Überprüfung ausstehend"
+    "pendingReview": "Überprüfung ausstehend",
+    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen."
   },
   "authoring": {
     "title": "Kurserstellung",

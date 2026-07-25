@@ -30,7 +30,13 @@ export default function CourseDetailPage() {
   useEffect(() => {
     client.get(`/courses/${id}/`)
       .then((res) => setCourse(res.data))
-      .catch(() => setError(t('courseDetail.loadError')))
+      .catch((err) => setError(
+        // The catalog only serves published courses, so a 404 here means the
+        // course was unpublished rather than a real load failure.
+        err.response?.status === 404
+          ? t('courseDetail.unavailable')
+          : t('courseDetail.loadError'),
+      ))
   }, [id, t])
 
   const handleEnroll = async () => {

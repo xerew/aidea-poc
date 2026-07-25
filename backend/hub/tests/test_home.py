@@ -25,8 +25,8 @@ class HomeViewTestCase(APITestCase):
             description='Prepare students for AI.', order=2,
         )
 
-        self.course1 = Course.objects.create(title='Course 1', pillar=self.pillar1)
-        self.course2 = Course.objects.create(title='Course 2', pillar=self.pillar1)
+        self.course1 = Course.objects.create(title='Course 1', pillar=self.pillar1, is_published=True)
+        self.course2 = Course.objects.create(title='Course 2', pillar=self.pillar1, is_published=True)
         self.module1 = Module.objects.create(title='Module 1', course=self.course1, order=1)
         self.module2 = Module.objects.create(title='Module 2', course=self.course1, order=2)
 

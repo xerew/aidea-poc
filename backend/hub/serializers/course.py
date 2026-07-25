@@ -167,13 +167,16 @@ class MyLearningEnrollmentSerializer(serializers.ModelSerializer):
     pillar_slug = serializers.CharField(source='course.pillar.slug')
     module_count = serializers.IntegerField(source='course.modules.count')
     current_module_title = serializers.CharField(source='current_module.title', default=None)
+    # False when the author has unpublished the course — the frontend flags it
+    # "Unavailable" and blocks opening the lesson (which would 404).
+    is_available = serializers.BooleanField(source='course.is_published')
 
     class Meta:
         model = Enrollment
         fields = [
             'course_id', 'course_title', 'pillar_name', 'pillar_slug',
             'progress_pct', 'module_count', 'last_accessed_at',
-            'current_module_title', 'enrolled_at', 'completed_at',
+            'current_module_title', 'enrolled_at', 'completed_at', 'is_available',
         ]
 
     def get_course_title(self, obj):

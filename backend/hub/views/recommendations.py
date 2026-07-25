@@ -17,7 +17,7 @@ class RecommendationsView(APIView):
     def get(self, request):
         recs = (
             CourseRecommendation.objects
-            .filter(user=request.user)
+            .filter(user=request.user, course__is_published=True)
             .select_related('course__pillar')
             .order_by('-score')
         )

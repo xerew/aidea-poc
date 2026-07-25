@@ -26,13 +26,13 @@ class MyLearningViewTestCase(APITestCase):
         )
 
         self.course1 = Course.objects.create(
-            title='Introduction to AI Tools for Teachers', pillar=self.pillar,
+            title='Introduction to AI Tools for Teachers', pillar=self.pillar, is_published=True,
         )
         self.course2 = Course.objects.create(
-            title='AI-Generated Content in Teaching', pillar=self.pillar2,
+            title='AI-Generated Content in Teaching', pillar=self.pillar2, is_published=True,
         )
         self.course3 = Course.objects.create(
-            title='Creative Teaching with AI', pillar=self.pillar2,
+            title='Creative Teaching with AI', pillar=self.pillar2, is_published=True,
         )
 
         self.module1 = Module.objects.create(title='Module 1', course=self.course1, order=1)
@@ -79,6 +79,22 @@ class MyLearningViewTestCase(APITestCase):
         Enrollment.objects.create(user=self.user, course=self.course1, progress_pct=50)
         response = self.client.get(self.url)
         self.assertEqual(response.data['in_progress'][0]['module_count'], 2)
+
+    def test_unpublished_course_flagged_and_never_continue(self):
+        # course1 stays available, course2 gets unpublished after enrolment.
+        Enrollment.objects.create(user=self.user, course=self.course1, progress_pct=30)
+        e2 = Enrollment.objects.create(user=self.user, course=self.course2, progress_pct=80)
+        self.course2.is_published = False
+        self.course2.save()
+        # Make course2 the most recently accessed so it *would* be "continue".
+        e2.save()
+
+        response = self.client.get(self.url)
+        by_id = {e['course_id']: e for e in response.data['in_progress']}
+        self.assertFalse(by_id[self.course2.id]['is_available'])
+        self.assertTrue(by_id[self.course1.id]['is_available'])
+        # The unavailable course is listed but is never the primary CTA.
+        self.assertEqual(response.data['continue_learning']['course_id'], self.course1.id)
 
     def test_completed_enrollment(self):
         Enrollment.objects.create(

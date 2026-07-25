@@ -358,7 +358,8 @@
     "yourProgress": "Din fremgang",
     "whatYoullLearn": "Hva du vil lære",
     "courseModules": "Kursmoduler",
-    "enrollError": "Påmelding mislyktes."
+    "enrollError": "Påmelding mislyktes.",
+    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det."
   },
   "myLearning": {
     "subtitle": "Følg fremgangen din og fortsett kursene dine",
@@ -385,7 +386,9 @@
     "browseCourses": "Bla gjennom kurs",
     "inProgressTitle": "Pågående",
     "completedTitle": "Fullført",
-    "completedBadge": "Fullført"
+    "completedBadge": "Fullført",
+    "unavailable": "Utilgjengelig",
+    "unavailableNote": "Forfatteren har avpublisert dette kurset. Det kommer tilbake når det publiseres igjen."
   },
   "pathway": {
     "loadError": "Kunne ikke laste læringsveien din.",
@@ -435,7 +438,8 @@
     "notesPlaceholder": "Legg til personlige notater for denne leksjonen…",
     "yourNotesTitle": "Dine notater",
     "markComplete": "Merk som fullført",
-    "pendingReview": "Venter på vurdering"
+    "pendingReview": "Venter på vurdering",
+    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det."
   },
   "authoring": {
     "title": "Kursforfatting",
