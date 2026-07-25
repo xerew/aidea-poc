@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -25,7 +26,7 @@ class CoursesView(APIView):
         if level:
             qs = qs.filter(level=level)
         if search:
-            qs = qs.filter(title__icontains=search)
+            qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
         serializer = CourseListSerializer(qs, many=True, context={'request': request})
         return Response(serializer.data)
 

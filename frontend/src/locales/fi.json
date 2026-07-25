@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”"
+  },
+  "search": {
+    "noResults": "Kursseja ei löytynyt"
   }
 }

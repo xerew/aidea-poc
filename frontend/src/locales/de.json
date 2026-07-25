@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Ihre Anfrage für den Zugang als Content Creator wurde abgelehnt: „{{reason}}“"
+  },
+  "search": {
+    "noResults": "Keine Kurse gefunden"
   }
 }

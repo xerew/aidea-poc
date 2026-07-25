@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Forespørselen din om tilgang som innholdsskaper ble avslått: «{{reason}}»"
+  },
+  "search": {
+    "noResults": "Ingen kurs funnet"
   }
 }

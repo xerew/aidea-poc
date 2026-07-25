@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »"
+  },
+  "search": {
+    "noResults": "Aucun cours trouvé"
   }
 }

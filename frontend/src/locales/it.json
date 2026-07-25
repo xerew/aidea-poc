@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "La tua richiesta di accesso come Creatore di contenuti è stata rifiutata: «{{reason}}»"
+  },
+  "search": {
+    "noResults": "Nessun corso trovato"
   }
 }

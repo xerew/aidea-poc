@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import LanguageSwitcher from '../LanguageSwitcher'
+import CourseSearch from './CourseSearch'
 import './Header.css'
 
 export default function Header() {
@@ -17,10 +18,7 @@ export default function Header() {
     <header className="header">
       <div className="header-title">{t('header.platform')}</div>
 
-      <div className="header-search">
-        <Search size={15} className="search-icon" />
-        <input type="text" placeholder={t('common.search')} />
-      </div>
+      <CourseSearch />
 
       <LanguageSwitcher />
 

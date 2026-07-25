@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Din begäran om åtkomst som innehållsskapare avslogs: ”{{reason}}”"
+  },
+  "search": {
+    "noResults": "Inga kurser hittades"
   }
 }

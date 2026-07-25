@@ -146,7 +146,12 @@ export default function CoursesPage() {
     return courses.filter((c) => {
       if (pillarFilter && c.pillar.slug !== pillarFilter) return false
       if (levelFilter  && c.level       !== levelFilter)  return false
-      if (search && !c.title.toLowerCase().includes(search.toLowerCase())) return false
+      if (search) {
+        const q = search.toLowerCase()
+        const inTitle = c.title.toLowerCase().includes(q)
+        const inDesc  = (c.description ?? '').toLowerCase().includes(q)
+        if (!inTitle && !inDesc) return false
+      }
       return true
     })
   }, [courses, pillarFilter, levelFilter, search])

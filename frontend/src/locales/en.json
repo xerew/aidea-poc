@@ -687,5 +687,8 @@
   },
   "layout": {
     "denialBanner": "Your Content Creator access request was denied: “{{reason}}”"
+  },
+  "search": {
+    "noResults": "No courses found"
   }
 }
