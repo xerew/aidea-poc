@@ -115,3 +115,26 @@
   background: var(--color-primary-light);
   color: var(--color-primary);
 }
+
+/* ── Mobile header ──────────────────────────────────────────────────────────── */
+.header-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  padding: 0.25rem;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .header { gap: 0.75rem; padding: 0 1rem; }
+  .header-menu-btn { display: inline-flex; }
+  .header-title { display: none; }
+  .header-search { max-width: none; margin: 0; }
+}
+
+@media (max-width: 640px) {
+  .header .username { display: none; }
+  .header .chevron { display: none; }
+}

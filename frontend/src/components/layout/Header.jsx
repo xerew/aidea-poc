@@ -1,13 +1,14 @@
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Menu } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { getAvatarSrc } from '../../lib/avatar'
 import LanguageSwitcher from '../LanguageSwitcher'
 import CourseSearch from './CourseSearch'
 import './Header.css'
 
-export default function Header() {
+export default function Header({ onMenuClick }) {
   const { t } = useTranslation()
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -18,6 +19,14 @@ export default function Header() {
 
   return (
     <header className="header">
+      <button
+        className="header-menu-btn"
+        onClick={onMenuClick}
+        aria-label={t('nav.openMenu')}
+      >
+        <Menu size={20} />
+      </button>
+
       <div className="header-title">{t('header.platform')}</div>
 
       <CourseSearch />
@@ -41,4 +50,8 @@ export default function Header() {
       </div>
     </header>
   )
+}
+
+Header.propTypes = {
+  onMenuClick: PropTypes.func,
 }

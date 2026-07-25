@@ -238,3 +238,9 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 640px) {
+  .ml-cards-grid { grid-template-columns: 1fr; }
+  .ml-card-top-row { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+  .ml-action-btn { width: 100%; }
+}

@@ -14,6 +14,16 @@
 .layout-main {
   flex: 1;
   padding: 2rem;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .layout-main { padding: 1.25rem; }
+  .denial-banner { padding: 0.75rem 1rem; }
+}
+
+@media (max-width: 480px) {
+  .layout-main { padding: 1rem 0.85rem; }
 }
 
 .denial-banner {

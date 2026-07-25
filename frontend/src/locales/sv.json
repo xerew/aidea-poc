@@ -8,7 +8,8 @@
     "profile": "Profil",
     "authoring": "Kursskapande",
     "admin": "Admin",
-    "reviews": "Granskningar"
+    "reviews": "Granskningar",
+    "openMenu": "Öppna meny"
   },
   "common": {
     "search": "Sök kurser…",

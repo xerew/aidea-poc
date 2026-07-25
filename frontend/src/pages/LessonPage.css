@@ -453,3 +453,16 @@
 }
 .lp-notes-input:focus { outline: none; border-color: #7c3aed; }
 .lp-notes-input::placeholder { color: #9ca3af; }
+
+/* ── Mobile: stack the lesson list above the content ────────────────────────── */
+@media (max-width: 768px) {
+  .lp-body { flex-direction: column; }
+  .lp-sidebar {
+    width: 100%;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .lp-main { padding: 20px 16px 36px; max-width: none; }
+  .lp-topbar { padding: 0 16px; }
+}

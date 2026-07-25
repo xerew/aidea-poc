@@ -204,3 +204,9 @@
   color: #15803d;
   font-weight: 500;
 }
+
+@media (max-width: 640px) {
+  .pillars-grid,
+  .recommendations-grid,
+  .cf-grid { grid-template-columns: 1fr; }
+}

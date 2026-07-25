@@ -286,3 +286,8 @@
   display: flex;
   align-items: center;
 }
+
+@media (max-width: 640px) {
+  .editor-save-area { flex-wrap: wrap; }
+  .detail-hero-meta { flex-wrap: wrap; }
+}

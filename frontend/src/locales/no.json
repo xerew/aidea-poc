@@ -8,7 +8,8 @@
     "profile": "Profil",
     "authoring": "Kursforfatting",
     "admin": "Admin",
-    "reviews": "Vurderinger"
+    "reviews": "Vurderinger",
+    "openMenu": "Åpne meny"
   },
   "common": {
     "search": "Søk etter kurs...",

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck } from 'lucide-react'
@@ -17,7 +18,7 @@ const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: P
 const ADMIN_ITEM     = { to: '/admin/users',  labelKey: 'nav.admin',     Icon: Shield  }
 const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: ClipboardCheck }
 
-export default function Sidebar() {
+export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const userType = user?.profile?.user_type
@@ -38,7 +39,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
       <div className="sidebar-logo">
         <img
           src="/images/logos/aidea-logo.png"
@@ -52,6 +53,7 @@ export default function Sidebar() {
               <NavLink
                 to={to}
                 end={to === '/'}
+                onClick={onNavigate}
                 className={({ isActive }) => isActive ? 'active' : ''}
               >
                 <NavIcon size={18} className="nav-icon" />
@@ -63,4 +65,9 @@ export default function Sidebar() {
       </nav>
     </aside>
   )
+}
+
+Sidebar.propTypes = {
+  open: PropTypes.bool,
+  onNavigate: PropTypes.func,
 }

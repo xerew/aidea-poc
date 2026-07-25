@@ -8,7 +8,8 @@
     "profile": "Perfil",
     "authoring": "Creación de Contenido",
     "admin": "Administración",
-    "reviews": "Revisiones"
+    "reviews": "Revisiones",
+    "openMenu": "Abrir menú"
   },
   "common": {
     "search": "Buscar cursos...",

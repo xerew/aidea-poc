@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
@@ -27,12 +28,18 @@ function DenialBanner() {
 
 function LayoutInner() {
   const { user } = useAuth()
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const closeDrawer = () => setDrawerOpen(false)
+
   if (!user) return <Navigate to="/login" replace />
   return (
     <div className="layout">
-      <Sidebar />
+      <Sidebar open={drawerOpen} onNavigate={closeDrawer} />
+      {drawerOpen && (
+        <div className="sidebar-backdrop" onClick={() => setDrawerOpen(false)} />
+      )}
       <div className="layout-body">
-        <Header />
+        <Header onMenuClick={() => setDrawerOpen((o) => !o)} />
         <DenialBanner />
         <main className="layout-main">
           <Outlet />

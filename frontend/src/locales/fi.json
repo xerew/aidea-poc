@@ -8,7 +8,8 @@
     "profile": "Profiili",
     "authoring": "Sisällöntuotanto",
     "admin": "Ylläpito",
-    "reviews": "Arvioinnit"
+    "reviews": "Arvioinnit",
+    "openMenu": "Avaa valikko"
   },
   "common": {
     "search": "Hae kursseja...",

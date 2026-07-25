@@ -264,3 +264,9 @@
 
 .an-answer-q { font-weight: 500; }
 .an-answer-a { color: #475569; }
+
+@media (max-width: 640px) {
+  .an-stat-grid { grid-template-columns: 1fr 1fr; }
+  .an-course-stats { flex-wrap: wrap; gap: 1rem 1.5rem; }
+  .an-header-row { align-items: flex-start; }
+}
