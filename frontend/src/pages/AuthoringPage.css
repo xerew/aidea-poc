@@ -212,3 +212,10 @@
 }
 
 .edit-btn:hover { opacity: 0.8; }
+
+@media (max-width: 640px) {
+  .authoring-header { flex-direction: column; align-items: stretch; }
+  .authoring-header-actions { flex-wrap: wrap; }
+  .authoring-course-row { flex-direction: column; align-items: flex-start; }
+  .authoring-course-actions { width: 100%; flex-wrap: wrap; }
+}
