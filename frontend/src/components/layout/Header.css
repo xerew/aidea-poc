@@ -57,6 +57,11 @@
   margin-left: auto;
 }
 
+.avatar--img {
+  object-fit: cover;
+  background: none;
+}
+
 .avatar {
   width: 36px;
   height: 36px;

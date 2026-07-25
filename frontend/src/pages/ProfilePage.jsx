@@ -12,14 +12,8 @@ import { useAuth } from '../context/AuthContext'
 import { useAccessRequest } from '../context/AccessRequestContext'
 import { COUNTRIES, getFlagEmoji } from '../data/countries'
 import client from '../api/client'
+import { getAvatarSrc } from '../lib/avatar'
 import './ProfilePage.css'
-
-function getAvatarSrc(profile) {
-  if (profile?.avatar_url) return profile.avatar_url
-  if (profile?.gender === 'male') return '/images/avatars/male_avatar.jpg'
-  if (profile?.gender === 'female') return '/images/avatars/female_avatar.jpg'
-  return null
-}
 
 function useSectionSave(endpoint, method = 'patch') {
   const { t } = useTranslation()
@@ -35,8 +29,10 @@ function useSectionSave(endpoint, method = 'patch') {
       await client[method](endpoint, data)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
+      return true
     } catch (err) {
       setError(err?.response?.data?.error || t('common.saveFailed'))
+      return false
     } finally {
       setSaving(false)
     }
@@ -69,9 +65,10 @@ SaveFeedback.propTypes = {
 
 function PersonalInfoSection() {
   const { t } = useTranslation()
+  const { user, updateUser } = useAuth()
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject: '', gender: '', country: '', school: '', phone: '', location: '',
+    subject: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
   })
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -94,10 +91,12 @@ function PersonalInfoSection() {
 
   const set = (key) => (e) => setForm(prev => ({ ...prev, [key]: e.target.value }))
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     // The API expects a subject id or null — never an empty string.
-    save({ ...form, subject: form.subject === '' ? null : form.subject })
+    const ok = await save({ ...form, subject: form.subject === '' ? null : form.subject })
+    // Keep the header avatar in sync when the gender-based avatar changes.
+    if (ok && user) updateUser({ profile: { ...user.profile, gender: form.gender } })
   }
 
   if (loading) return <section className="profile-card"><p className="profile-loading">{t('common.loading')}</p></section>
@@ -154,6 +153,16 @@ function PersonalInfoSection() {
             <label>{t('profile.personalInfo.location')}</label>
             <input value={form.location} onChange={set('location')} placeholder={t('profile.personalInfo.locationPlaceholder')} />
           </div>
+        </div>
+        <div className="profile-field">
+          <label>{t('profile.personalInfo.bio')}</label>
+          <textarea
+            value={form.bio}
+            onChange={set('bio')}
+            rows={4}
+            maxLength={1000}
+            placeholder={t('profile.personalInfo.bioPlaceholder')}
+          />
         </div>
         <SaveFeedback saving={saving} saved={saved} error={error} label={t('profile.personalInfo.saveChanges')} />
       </form>

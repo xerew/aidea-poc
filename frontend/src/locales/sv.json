@@ -232,7 +232,9 @@
         "male": "Man",
         "female": "Kvinna",
         "preferNotSay": "Vill inte ange"
-      }
+      },
+      "bio": "Om dig",
+      "bioPlaceholder": "Några ord om dig — din undervisning, dina intressen eller vad du hoppas få ut av AIDEA."
     },
     "preferences": {
       "title": "Läropreferenser",

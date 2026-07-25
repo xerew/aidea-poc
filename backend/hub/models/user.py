@@ -61,6 +61,7 @@ class UserProfile(models.Model):
     school               = models.CharField(max_length=200, blank=True)
     phone                = models.CharField(max_length=30, blank=True)
     location             = models.CharField(max_length=200, blank=True)
+    bio                  = models.TextField(blank=True)
     weekly_learning_goal = models.CharField(max_length=10, choices=WeeklyGoal.choices, blank=True)
     email_notifications  = models.BooleanField(default=True)
     progress_reminders   = models.BooleanField(default=True)

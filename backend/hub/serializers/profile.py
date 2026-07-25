@@ -46,6 +46,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
     school   = serializers.CharField(max_length=200, required=False, allow_blank=True)
     phone    = serializers.CharField(max_length=30,  required=False, allow_blank=True)
     location = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    bio      = serializers.CharField(required=False, allow_blank=True)
 
     def to_representation(self, instance):
         user = instance.user
@@ -60,6 +61,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'school':       instance.school,
             'phone':        instance.phone,
             'location':     instance.location,
+            'bio':          instance.bio,
         }
 
     def update(self, instance, validated_data):
@@ -75,7 +77,8 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
         instance.school   = validated_data.get('school',   instance.school)
         instance.phone    = validated_data.get('phone',    instance.phone)
         instance.location = validated_data.get('location', instance.location)
-        instance.save(update_fields=['subject', 'gender', 'country', 'school', 'phone', 'location'])
+        instance.bio      = validated_data.get('bio',      instance.bio)
+        instance.save(update_fields=['subject', 'gender', 'country', 'school', 'phone', 'location', 'bio'])
         return instance
 
 

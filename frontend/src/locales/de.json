@@ -232,7 +232,9 @@
         "male": "Männlich",
         "female": "Weiblich",
         "preferNotSay": "Keine Angabe"
-      }
+      },
+      "bio": "Über dich",
+      "bioPlaceholder": "Ein paar Worte über dich — deinen Unterricht, deine Interessen oder was du dir von AIDEA erhoffst."
     },
     "preferences": {
       "title": "Lernpräferenzen",

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { getAvatarSrc } from '../../lib/avatar'
 import LanguageSwitcher from '../LanguageSwitcher'
 import CourseSearch from './CourseSearch'
 import './Header.css'
@@ -13,6 +14,7 @@ export default function Header() {
 
   const initials = user?.profile?.avatar_initials ||
     `${user?.first_name?.[0] ?? ''}${user?.last_name?.[0] ?? ''}`.toUpperCase()
+  const avatarSrc = getAvatarSrc(user?.profile)
 
   return (
     <header className="header">
@@ -23,7 +25,9 @@ export default function Header() {
       <LanguageSwitcher />
 
       <div className="header-user" onClick={() => setMenuOpen((o) => !o)}>
-        <div className="avatar">{initials}</div>
+        {avatarSrc
+          ? <img className="avatar avatar--img" src={avatarSrc} alt={initials} />
+          : <div className="avatar">{initials}</div>}
         <span className="username">
           {user?.first_name} {user?.last_name}
         </span>

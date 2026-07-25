@@ -106,3 +106,22 @@ class CreatorPreferencesTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.creator.profile.refresh_from_db()
         self.assertEqual(self.creator.profile.learning_style, 'video')
+
+
+class ProfileBioTests(APITestCase):
+    def setUp(self):
+        self.user = make_teacher('bio_teacher')
+        self.client.force_authenticate(self.user)
+        self.url = reverse('profile-info')
+
+    def test_bio_defaults_empty(self):
+        res = self.client.get(self.url)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data['bio'], '')
+
+    def test_bio_saved_and_returned(self):
+        res = self.client.patch(self.url, {'bio': 'Physics teacher who loves AI.'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data['bio'], 'Physics teacher who loves AI.')
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.bio, 'Physics teacher who loves AI.')

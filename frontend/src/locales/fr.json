@@ -232,7 +232,9 @@
         "male": "Homme",
         "female": "Femme",
         "preferNotSay": "Préfère ne pas préciser"
-      }
+      },
+      "bio": "À propos de vous",
+      "bioPlaceholder": "Quelques mots sur vous — votre enseignement, vos centres d'intérêt ou ce que vous attendez d'AIDEA."
     },
     "preferences": {
       "title": "Préférences d'apprentissage",

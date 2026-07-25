@@ -232,7 +232,9 @@
         "male": "Mies",
         "female": "Nainen",
         "preferNotSay": "En halua kertoa"
-      }
+      },
+      "bio": "Tietoa sinusta",
+      "bioPlaceholder": "Muutama sana itsestäsi — opetuksestasi, kiinnostuksen kohteistasi tai mitä toivot saavasi AIDEAsta."
     },
     "preferences": {
       "title": "Oppimismieltymykset",
