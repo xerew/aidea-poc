@@ -90,7 +90,10 @@
 
 .pathway-course-info {
   flex: 1;
+  min-width: 0;
 }
+
+.pathway-course-title { overflow-wrap: anywhere; }
 
 .pathway-course-title {
   font-size: 1rem;
@@ -101,7 +104,8 @@
 .pathway-course-meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.5rem;
   font-size: 0.8125rem;
   color: #64748b;
 }
@@ -126,4 +130,11 @@
   padding: 3rem;
   text-align: center;
   color: #64748b;
+}
+
+@media (max-width: 640px) {
+  .pathway-page { padding: 1.25rem 0; }
+  .pathway-course-content { flex-wrap: wrap; padding: 0.9rem 1rem !important; }
+  .pathway-cta { width: 100%; }
+  .pathway-cta a { display: block; text-align: center; }
 }
