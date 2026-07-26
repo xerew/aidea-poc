@@ -362,7 +362,8 @@
     "whatYoullLearn": "Vad du kommer att lära dig",
     "courseModules": "Kursmoduler",
     "enrollError": "Registreringen misslyckades.",
-    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den."
+    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den.",
+    "by": "Av"
   },
   "myLearning": {
     "subtitle": "Följ dina framsteg och fortsätt dina kurser",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "Inga kurser hittades"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Lärare",
+      "contentCreator": "Innehållsskapare",
+      "aideaPartner": "AIDEA-partner",
+      "admin": "Administratör"
+    },
+    "private": "Den här profilen är privat.",
+    "notFound": "Profilen hittades inte.",
+    "loadFailed": "Det gick inte att ladda den här profilen.",
+    "memberSince": "Medlem sedan {{date}}",
+    "competencyTitle": "AI-kompetens",
+    "competency": {
+      "beginner": "Nybörjare",
+      "intermediate": "Medel",
+      "advanced": "Avancerad"
+    },
+    "progressTitle": "Inlärningsframsteg",
+    "completed": "Slutförda",
+    "inProgress": "Pågående",
+    "authoredTitle": "Publicerade kurser",
+    "noCourses": "Inga publicerade kurser ännu."
   }
 }

@@ -362,7 +362,8 @@
     "whatYoullLearn": "Ce que vous allez apprendre",
     "courseModules": "Modules du cours",
     "enrollError": "Échec de l'inscription.",
-    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié."
+    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié.",
+    "by": "Par"
   },
   "myLearning": {
     "subtitle": "Suivez votre progression et poursuivez vos cours",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "Aucun cours trouvé"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Enseignant",
+      "contentCreator": "Créateur de contenu",
+      "aideaPartner": "Partenaire AIDEA",
+      "admin": "Administrateur"
+    },
+    "private": "Ce profil est privé.",
+    "notFound": "Profil introuvable.",
+    "loadFailed": "Impossible de charger ce profil.",
+    "memberSince": "Membre depuis {{date}}",
+    "competencyTitle": "Compétence en IA",
+    "competency": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "progressTitle": "Progression d'apprentissage",
+    "completed": "Terminés",
+    "inProgress": "En cours",
+    "authoredTitle": "Cours publiés",
+    "noCourses": "Aucun cours publié pour le moment."
   }
 }

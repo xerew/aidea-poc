@@ -1,0 +1,178 @@
+.pp-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.pp-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.pp-back:hover { color: var(--color-primary); }
+
+.pp-loading,
+.pp-message {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.pp-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+}
+
+/* Identity */
+.pp-identity {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  min-width: 0;
+}
+.pp-avatar,
+.pp-avatar-img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pp-avatar-img { object-fit: cover; }
+.pp-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.pp-identity-text { min-width: 0; }
+.pp-name {
+  font-size: 1.4rem;
+  margin: 0 0 0.4rem;
+  overflow-wrap: anywhere;
+}
+.pp-role {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.pp-role--content_creator,
+.pp-role--aidea_partner { color: var(--color-primary); border-color: var(--color-primary); }
+
+/* Private notice */
+.pp-private {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding: 1rem 1.1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+}
+.pp-private p { margin: 0; }
+
+/* Public content */
+.pp-bio {
+  margin: 1.5rem 0 0;
+  line-height: 1.6;
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+.pp-details {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.pp-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-text-muted);
+  min-width: 0;
+}
+.pp-detail-icon { flex-shrink: 0; color: var(--color-primary); }
+
+.pp-block {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+.pp-block-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.pp-competency {
+  display: inline-block;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+.pp-competency--beginner     { background: #fef3c7; color: #92400e; }
+.pp-competency--intermediate { background: #dbeafe; color: #1e40af; }
+.pp-competency--advanced     { background: #dcfce7; color: #166534; }
+
+.pp-stats { display: flex; gap: 1.5rem; }
+.pp-stat { display: flex; flex-direction: column; }
+.pp-stat-num { font-size: 1.6rem; font-weight: 700; color: var(--color-primary); }
+.pp-stat-label { font-size: 0.8rem; color: var(--color-text-muted); }
+
+.pp-courses {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pp-course-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--color-text);
+  min-width: 0;
+}
+.pp-course-link:hover { border-color: var(--color-primary); }
+.pp-course-link svg { flex-shrink: 0; color: var(--color-primary); }
+.pp-course-title { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.pp-course-pillar {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+.pp-empty { color: var(--color-text-muted); margin: 0; }
+
+@media (max-width: 640px) {
+  .pp-page { padding: 1rem; }
+  .pp-card { padding: 1.25rem; }
+  .pp-identity { gap: 0.9rem; }
+  .pp-avatar, .pp-avatar-img { width: 60px; height: 60px; }
+  .pp-name { font-size: 1.2rem; }
+  .pp-course-pillar { display: none; }
+}

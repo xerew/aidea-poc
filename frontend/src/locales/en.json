@@ -362,7 +362,8 @@
     "whatYoullLearn": "What You'll Learn",
     "courseModules": "Course Modules",
     "enrollError": "Enrollment failed.",
-    "unavailable": "This course is currently unavailable — its author has unpublished it."
+    "unavailable": "This course is currently unavailable — its author has unpublished it.",
+    "by": "By"
   },
   "myLearning": {
     "subtitle": "Track your progress and continue your courses",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "No courses found"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Teacher",
+      "contentCreator": "Content Creator",
+      "aideaPartner": "AIDEA Partner",
+      "admin": "Administrator"
+    },
+    "private": "This profile is private.",
+    "notFound": "Profile not found.",
+    "loadFailed": "Could not load this profile.",
+    "memberSince": "Member since {{date}}",
+    "competencyTitle": "AI Competency",
+    "competency": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "progressTitle": "Learning Progress",
+    "completed": "Completed",
+    "inProgress": "In progress",
+    "authoredTitle": "Published Courses",
+    "noCourses": "No published courses yet."
   }
 }

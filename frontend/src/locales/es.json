@@ -362,7 +362,8 @@
     "whatYoullLearn": "Lo Que Aprenderás",
     "courseModules": "Módulos del Curso",
     "enrollError": "No se pudo completar la inscripción.",
-    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado."
+    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado.",
+    "by": "Por"
   },
   "myLearning": {
     "subtitle": "Sigue tu progreso y continúa tus cursos",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "No se encontraron cursos"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Profesor",
+      "contentCreator": "Creador de contenido",
+      "aideaPartner": "Socio de AIDEA",
+      "admin": "Administrador"
+    },
+    "private": "Este perfil es privado.",
+    "notFound": "Perfil no encontrado.",
+    "loadFailed": "No se pudo cargar este perfil.",
+    "memberSince": "Miembro desde {{date}}",
+    "competencyTitle": "Competencia en IA",
+    "competency": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "progressTitle": "Progreso de aprendizaje",
+    "completed": "Completados",
+    "inProgress": "En curso",
+    "authoredTitle": "Cursos publicados",
+    "noCourses": "Aún no hay cursos publicados."
   }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ClipboardCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import PropTypes from 'prop-types'
@@ -35,14 +36,16 @@ function SubmissionRow({ sub, onDone }) {
 
   return (
     <div className="rv-row">
-      <button type="button" className="rv-row-head" onClick={() => setOpenRow(o => !o)}>
+      <div className="rv-row-head">
         <div className="rv-row-title">
-          <span className="rv-learner">{sub.learner_name}</span>
+          <Link className="rv-learner" to={`/users/${sub.learner_id}`}>{sub.learner_name}</Link>
           <span className="rv-meta">{sub.course_title} · {sub.module_title} · {sub.lesson_title}</span>
         </div>
-        <span className="rv-date">{new Date(sub.submitted_at).toLocaleDateString()}</span>
-        {openRow ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button>
+        <button type="button" className="rv-row-toggle" onClick={() => setOpenRow(o => !o)}>
+          <span className="rv-date">{new Date(sub.submitted_at).toLocaleDateString()}</span>
+          {openRow ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+      </div>
 
       {openRow && (
         <div className="rv-row-body">

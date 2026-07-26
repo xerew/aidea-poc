@@ -362,7 +362,8 @@
     "whatYoullLearn": "Mitä opit",
     "courseModules": "Kurssin moduulit",
     "enrollError": "Ilmoittautuminen epäonnistui.",
-    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta."
+    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta.",
+    "by": "Tekijä"
   },
   "myLearning": {
     "subtitle": "Seuraa edistymistäsi ja jatka kurssejasi",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "Kursseja ei löytynyt"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Opettaja",
+      "contentCreator": "Sisällöntuottaja",
+      "aideaPartner": "AIDEA-kumppani",
+      "admin": "Ylläpitäjä"
+    },
+    "private": "Tämä profiili on yksityinen.",
+    "notFound": "Profiilia ei löytynyt.",
+    "loadFailed": "Profiilin lataaminen epäonnistui.",
+    "memberSince": "Jäsen alkaen {{date}}",
+    "competencyTitle": "Tekoälyosaaminen",
+    "competency": {
+      "beginner": "Aloittelija",
+      "intermediate": "Keskitaso",
+      "advanced": "Edistynyt"
+    },
+    "progressTitle": "Oppimisen edistyminen",
+    "completed": "Suoritettu",
+    "inProgress": "Kesken",
+    "authoredTitle": "Julkaistut kurssit",
+    "noCourses": "Ei vielä julkaistuja kursseja."
   }
 }

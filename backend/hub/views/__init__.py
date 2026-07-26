@@ -61,6 +61,7 @@ from .profile import (
     ProfilePreferencesView,
     ProfileSettingsView,
 )
+from .public_profile import PublicProfileView
 from .recommendations import RecommendationEventView, RecommendationsView
 from .subjects import SubjectsView
 
@@ -113,6 +114,7 @@ __all__ = [
     'OnboardingView',
     'PathwayView',
     'PreferenceQuizView',
+    'PublicProfileView',
     'SubjectsView',
     'ChangePasswordView',
     'ProfileAvatarView',

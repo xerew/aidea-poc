@@ -362,7 +362,8 @@
     "whatYoullLearn": "Hva du vil lære",
     "courseModules": "Kursmoduler",
     "enrollError": "Påmelding mislyktes.",
-    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det."
+    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det.",
+    "by": "Av"
   },
   "myLearning": {
     "subtitle": "Følg fremgangen din og fortsett kursene dine",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "Ingen kurs funnet"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Lærer",
+      "contentCreator": "Innholdsskaper",
+      "aideaPartner": "AIDEA-partner",
+      "admin": "Administrator"
+    },
+    "private": "Denne profilen er privat.",
+    "notFound": "Fant ikke profilen.",
+    "loadFailed": "Kunne ikke laste denne profilen.",
+    "memberSince": "Medlem siden {{date}}",
+    "competencyTitle": "AI-kompetanse",
+    "competency": {
+      "beginner": "Nybegynner",
+      "intermediate": "Middels",
+      "advanced": "Avansert"
+    },
+    "progressTitle": "Læringsfremgang",
+    "completed": "Fullført",
+    "inProgress": "Pågår",
+    "authoredTitle": "Publiserte kurs",
+    "noCourses": "Ingen publiserte kurs ennå."
   }
 }

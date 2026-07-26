@@ -362,7 +362,8 @@
     "whatYoullLearn": "Was Sie lernen werden",
     "courseModules": "Kursmodule",
     "enrollError": "Einschreibung fehlgeschlagen.",
-    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen."
+    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen.",
+    "by": "Von"
   },
   "myLearning": {
     "subtitle": "Verfolgen Sie Ihren Fortschritt und setzen Sie Ihre Kurse fort",
@@ -699,5 +700,28 @@
   },
   "search": {
     "noResults": "Keine Kurse gefunden"
+  },
+  "publicProfile": {
+    "roles": {
+      "teacher": "Lehrkraft",
+      "contentCreator": "Inhaltsersteller",
+      "aideaPartner": "AIDEA-Partner",
+      "admin": "Administrator"
+    },
+    "private": "Dieses Profil ist privat.",
+    "notFound": "Profil nicht gefunden.",
+    "loadFailed": "Dieses Profil konnte nicht geladen werden.",
+    "memberSince": "Mitglied seit {{date}}",
+    "competencyTitle": "KI-Kompetenz",
+    "competency": {
+      "beginner": "Anfänger",
+      "intermediate": "Fortgeschritten",
+      "advanced": "Experte"
+    },
+    "progressTitle": "Lernfortschritt",
+    "completed": "Abgeschlossen",
+    "inProgress": "In Bearbeitung",
+    "authoredTitle": "Veröffentlichte Kurse",
+    "noCourses": "Noch keine veröffentlichten Kurse."
   }
 }

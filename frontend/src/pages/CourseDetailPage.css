@@ -86,6 +86,18 @@
   margin: 0;
 }
 
+.detail-author {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin: 0.25rem 0 0.75rem;
+}
+.detail-author a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.detail-author a:hover { text-decoration: underline; }
+
 .detail-desc {
   font-size: 0.95rem;
   color: var(--color-text-muted);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Users, CheckCircle, Target, Award, Download, ChevronDown, ChevronRight, Clock } from 'lucide-react'
 import client from '../api/client'
@@ -52,9 +53,15 @@ function TeacherDetail({ teacher }) {
 
   return (
     <div className="an-teacher">
-      <button className="an-teacher-head" onClick={() => hasQuizzes && setOpen(o => !o)}>
-        {hasQuizzes ? (open ? <ChevronDown size={14} /> : <ChevronRight size={14} />) : <span className="an-teacher-spacer" />}
-        <span className="an-teacher-name">{teacher.name}</span>
+      <div className="an-teacher-head">
+        <button
+          className="an-teacher-toggle"
+          onClick={() => hasQuizzes && setOpen(o => !o)}
+          disabled={!hasQuizzes}
+        >
+          {hasQuizzes ? (open ? <ChevronDown size={14} /> : <ChevronRight size={14} />) : <span className="an-teacher-spacer" />}
+        </button>
+        <Link className="an-teacher-name" to={`/users/${teacher.user_id}`}>{teacher.name}</Link>
         <span className="an-teacher-meta">
           {t('analytics.pctCompleted', { pct: teacher.progress_pct })}
           <span className="an-teacher-dot">·</span>
@@ -66,7 +73,7 @@ function TeacherDetail({ teacher }) {
             </>
           )}
         </span>
-      </button>
+      </div>
 
       {open && teacher.quizzes.map(quiz => (
         <div key={quiz.lesson_id} className="an-quiz">

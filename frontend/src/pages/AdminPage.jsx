@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
@@ -138,7 +139,7 @@ function UsersTab() {
             return (
               <tr key={u.id}>
                 <td><div className="admin-avatar">{u.avatar_initials || '?'}</div></td>
-                <td>{u.first_name} {u.last_name}</td>
+                <td><Link className="admin-user-link" to={`/users/${u.id}`}>{u.first_name} {u.last_name}</Link></td>
                 <td>@{u.username}</td>
                 <td>{u.email}</td>
                 <td>

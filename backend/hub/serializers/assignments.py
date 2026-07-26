@@ -11,6 +11,7 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
 
 class ReviewQueueSerializer(serializers.ModelSerializer):
     learner_name = serializers.SerializerMethodField()
+    learner_id   = serializers.IntegerField(source='user.id', read_only=True)
     course_title = serializers.CharField(source='lesson.module.course.title', read_only=True)
     course_id    = serializers.IntegerField(source='lesson.module.course.id', read_only=True)
     module_title = serializers.CharField(source='lesson.module.title', read_only=True)
@@ -18,7 +19,7 @@ class ReviewQueueSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = AssignmentSubmission
-        fields = ['id', 'learner_name', 'course_id', 'course_title', 'module_title',
+        fields = ['id', 'learner_name', 'learner_id', 'course_id', 'course_title', 'module_title',
                   'lesson_title', 'text', 'feedback', 'submitted_at']
 
     def get_learner_name(self, obj):

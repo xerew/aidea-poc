@@ -219,15 +219,29 @@
   align-items: center;
   gap: 0.5rem;
   width: 100%;
-  background: none;
-  border: none;
-  cursor: pointer;
   text-align: left;
   font-size: 0.85rem;
 }
 
+.an-teacher-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.an-teacher-toggle:disabled { cursor: default; }
+
 .an-teacher-spacer { width: 14px; display: inline-block; }
-.an-teacher-name { font-weight: 600; }
+.an-teacher-name {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.an-teacher-name:hover { text-decoration: underline; }
 
 .an-teacher-meta {
   display: inline-flex;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Circle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import client from '../api/client'
@@ -98,6 +98,12 @@ export default function CourseDetailPage() {
       </div>
 
       <h1 className="detail-title">{course.title}</h1>
+      {course.created_by_id && (
+        <p className="detail-author">
+          {t('courseDetail.by')}{' '}
+          <Link to={`/users/${course.created_by_id}`}>{course.created_by_name}</Link>
+        </p>
+      )}
       <p className="detail-desc">{course.description}</p>
 
       {course.subjects?.length > 0 && (
