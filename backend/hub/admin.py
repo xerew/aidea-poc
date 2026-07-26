@@ -452,5 +452,21 @@ class CourseRecommendationAdmin(admin.ModelAdmin):
 class CourseEmbeddingAdmin(admin.ModelAdmin):
     list_display  = ['course', 'computed_at']
     search_fields = ['course__title']
-    readonly_fields = ['course', 'embedding', 'computed_at']
+    # `embedding` is a 384-dim vector (numpy array); rendering it raw makes
+    # Django's admin do an ambiguous truth-check on the array. Show a short,
+    # safe preview instead and keep the raw field out of the form.
+    readonly_fields = ['course', 'embedding_preview', 'computed_at']
+    exclude = ['embedding']
     ordering = ['course']
+
+    def has_add_permission(self, request):
+        return False
+
+    @admin.display(description='Embedding')
+    def embedding_preview(self, obj):
+        vec = obj.embedding
+        if vec is None:
+            return '—'
+        values = list(vec)
+        head = ', '.join(f'{float(x):.3f}' for x in values[:8])
+        return f'{len(values)}-dim vector [{head}, …]'
