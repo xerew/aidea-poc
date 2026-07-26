@@ -3,6 +3,7 @@ import { Outlet, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import { AccessRequestProvider, useAccessRequest } from '../../context/AccessRequestContext'
+import { MessagesProvider } from '../../context/MessagesContext'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Footer from './Footer'
@@ -53,7 +54,9 @@ function LayoutInner() {
 export default function Layout() {
   return (
     <AccessRequestProvider>
-      <LayoutInner />
+      <MessagesProvider>
+        <LayoutInner />
+      </MessagesProvider>
     </AccessRequestProvider>
   )
 }

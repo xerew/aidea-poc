@@ -10,7 +10,8 @@
     "admin": "Amministrazione",
     "reviews": "Revisioni",
     "openMenu": "Apri menu",
-    "documentation": "Documentazione"
+    "documentation": "Documentazione",
+    "messages": "Messaggi"
   },
   "common": {
     "search": "Cerca corsi...",
@@ -730,7 +731,8 @@
     "completed": "Completati",
     "inProgress": "In corso",
     "authoredTitle": "Corsi pubblicati",
-    "noCourses": "Nessun corso pubblicato al momento."
+    "noCourses": "Nessun corso pubblicato al momento.",
+    "sendMessage": "Invia messaggio"
   },
   "documentation": {
     "title": "AIDEA — L'Accademia degli Educatori guidata dall'IA",
@@ -756,5 +758,14 @@
     "openGuide": "Apri la guida",
     "downloadGuide": "Scarica il PDF",
     "pdfFallback": "Il tuo browser non può visualizzare il PDF."
+  },
+  "messages": {
+    "title": "Messaggi",
+    "searchPlaceholder": "Cerca persone…",
+    "noConversations": "Ancora nessuna conversazione.",
+    "noMatches": "Nessuna persona corrisponde.",
+    "selectPrompt": "Seleziona una conversazione per iniziare.",
+    "startPrompt": "Ancora nessun messaggio: saluta!",
+    "composerPlaceholder": "Scrivi un messaggio…"
   }
 }

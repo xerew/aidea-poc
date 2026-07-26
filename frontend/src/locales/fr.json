@@ -10,7 +10,8 @@
     "admin": "Administration",
     "reviews": "Évaluations",
     "openMenu": "Ouvrir le menu",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "messages": "Messages"
   },
   "common": {
     "search": "Rechercher des cours...",
@@ -730,7 +731,8 @@
     "completed": "Terminés",
     "inProgress": "En cours",
     "authoredTitle": "Cours publiés",
-    "noCourses": "Aucun cours publié pour le moment."
+    "noCourses": "Aucun cours publié pour le moment.",
+    "sendMessage": "Envoyer un message"
   },
   "documentation": {
     "title": "AIDEA — L'Académie des Éducateurs pilotée par l'IA",
@@ -756,5 +758,14 @@
     "openGuide": "Ouvrir le guide",
     "downloadGuide": "Télécharger le PDF",
     "pdfFallback": "Votre navigateur ne peut pas afficher le PDF."
+  },
+  "messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Rechercher des personnes…",
+    "noConversations": "Aucune conversation pour l'instant.",
+    "noMatches": "Aucune personne trouvée.",
+    "selectPrompt": "Sélectionnez une conversation pour commencer.",
+    "startPrompt": "Aucun message — dites bonjour !",
+    "composerPlaceholder": "Écrivez un message…"
   }
 }

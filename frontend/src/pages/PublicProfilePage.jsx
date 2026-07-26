@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  ArrowLeft, Lock, GraduationCap, MapPin, School, BookOpen, CalendarDays,
+  ArrowLeft, Lock, GraduationCap, MapPin, School, BookOpen, CalendarDays, MessageCircle,
 } from 'lucide-react'
 import client from '../api/client'
+import { useAuth } from '../context/AuthContext'
 import { getAvatarSrc } from '../lib/avatar'
 import { getFlagEmoji, COUNTRIES } from '../data/countries'
 import './PublicProfilePage.css'
@@ -23,8 +24,10 @@ function countryName(code) {
 
 function Identity({ profile }) {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const avatarSrc = getAvatarSrc(profile)
   const roleKey = ROLE_KEYS[profile.user_type]
+  const isMe = user?.id === profile.id
   return (
     <div className="pp-identity">
       {avatarSrc ? (
@@ -40,6 +43,11 @@ function Identity({ profile }) {
           </span>
         )}
       </div>
+      {!isMe && (
+        <Link to={`/messages/${profile.id}`} className="pp-message-btn">
+          <MessageCircle size={16} /> {t('publicProfile.sendMessage')}
+        </Link>
+      )}
     </div>
   )
 }

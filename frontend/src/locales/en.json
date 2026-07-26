@@ -10,7 +10,8 @@
     "admin": "Admin",
     "reviews": "Reviews",
     "openMenu": "Open menu",
-    "documentation": "Documentation"
+    "documentation": "Documentation",
+    "messages": "Messages"
   },
   "common": {
     "search": "Search courses...",
@@ -730,7 +731,8 @@
     "completed": "Completed",
     "inProgress": "In progress",
     "authoredTitle": "Published Courses",
-    "noCourses": "No published courses yet."
+    "noCourses": "No published courses yet.",
+    "sendMessage": "Send message"
   },
   "documentation": {
     "title": "AIDEA — The AI-Driven Educators Academy",
@@ -756,5 +758,14 @@
     "openGuide": "Open guide",
     "downloadGuide": "Download PDF",
     "pdfFallback": "Your browser cannot display the PDF."
+  },
+  "messages": {
+    "title": "Messages",
+    "searchPlaceholder": "Search people…",
+    "noConversations": "No conversations yet.",
+    "noMatches": "No people match your search.",
+    "selectPrompt": "Select a conversation to start reading.",
+    "startPrompt": "No messages yet — say hello!",
+    "composerPlaceholder": "Type a message…"
   }
 }

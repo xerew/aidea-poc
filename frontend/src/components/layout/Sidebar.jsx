@@ -1,8 +1,9 @@
 import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck, FileText } from 'lucide-react'
+import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck, FileText, MessageCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { useMessages } from '../../context/MessagesContext'
 import './Sidebar.css'
 
 const BASE_NAV = [
@@ -11,6 +12,7 @@ const BASE_NAV = [
   { to: '/learning',  labelKey: 'nav.myLearning',  Icon: GraduationCap },
   { to: '/pathway',   labelKey: 'nav.myPathway',   Icon: Map },
   { to: '/analytics', labelKey: 'nav.analytics',   Icon: BarChart2 },
+  { to: '/messages',  labelKey: 'nav.messages',    Icon: MessageCircle, badgeKey: 'messages' },
   { to: '/profile',   labelKey: 'nav.profile',     Icon: User },
   { to: '/documentation', labelKey: 'nav.documentation', Icon: FileText },
 ]
@@ -26,6 +28,7 @@ const CREATOR_NAV = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS
 export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { unreadCount = 0 } = useMessages() ?? {}
   const userType = user?.profile?.user_type
 
   let navItems
@@ -47,7 +50,7 @@ export default function Sidebar({ open = false, onNavigate }) {
       </div>
       <nav>
         <ul>
-          {navItems.map(({ to, labelKey, Icon: NavIcon }) => (
+          {navItems.map(({ to, labelKey, Icon: NavIcon, badgeKey }) => (
             <li key={to}>
               <NavLink
                 to={to}
@@ -57,6 +60,9 @@ export default function Sidebar({ open = false, onNavigate }) {
               >
                 <NavIcon size={18} className="nav-icon" />
                 <span>{t(labelKey)}</span>
+                {badgeKey === 'messages' && unreadCount > 0 && (
+                  <span className="nav-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+                )}
               </NavLink>
             </li>
           ))}

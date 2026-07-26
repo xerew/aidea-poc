@@ -10,7 +10,8 @@
     "admin": "Ylläpito",
     "reviews": "Arvioinnit",
     "openMenu": "Avaa valikko",
-    "documentation": "Dokumentaatio"
+    "documentation": "Dokumentaatio",
+    "messages": "Viestit"
   },
   "common": {
     "search": "Hae kursseja...",
@@ -730,7 +731,8 @@
     "completed": "Suoritettu",
     "inProgress": "Kesken",
     "authoredTitle": "Julkaistut kurssit",
-    "noCourses": "Ei vielä julkaistuja kursseja."
+    "noCourses": "Ei vielä julkaistuja kursseja.",
+    "sendMessage": "Lähetä viesti"
   },
   "documentation": {
     "title": "AIDEA — Tekoälyvetoinen opettajien akatemia",
@@ -756,5 +758,14 @@
     "openGuide": "Avaa opas",
     "downloadGuide": "Lataa PDF",
     "pdfFallback": "Selaimesi ei voi näyttää PDF-tiedostoa."
+  },
+  "messages": {
+    "title": "Viestit",
+    "searchPlaceholder": "Hae henkilöitä…",
+    "noConversations": "Ei vielä keskusteluja.",
+    "noMatches": "Yksikään henkilö ei täsmää.",
+    "selectPrompt": "Valitse keskustelu aloittaaksesi.",
+    "startPrompt": "Ei vielä viestejä — tervehdi!",
+    "composerPlaceholder": "Kirjoita viesti…"
   }
 }

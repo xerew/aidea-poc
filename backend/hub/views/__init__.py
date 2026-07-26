@@ -54,6 +54,11 @@ from .learner import (
     MyLearningView,
     QuizCheckView,
 )
+from .messaging import (
+    ConversationDetailView,
+    ConversationListView,
+    UnreadMessageCountView,
+)
 from .onboarding import OnboardingView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsReviewer, IsTeacher
@@ -117,6 +122,9 @@ __all__ = [
     'LogoutView',
     'MeView',
     'RegisterView',
+    'ConversationDetailView',
+    'ConversationListView',
+    'UnreadMessageCountView',
     'OnboardingView',
     'PathwayView',
     'PreferenceQuizView',

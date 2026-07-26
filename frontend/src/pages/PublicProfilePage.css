@@ -53,7 +53,22 @@
   font-size: 1.5rem;
   font-weight: 600;
 }
-.pp-identity-text { min-width: 0; }
+.pp-identity-text { min-width: 0; flex: 1; }
+
+.pp-message-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius);
+  background: var(--color-primary);
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.pp-message-btn:hover { opacity: 0.92; }
 .pp-name {
   font-size: 1.4rem;
   margin: 0 0 0.4rem;
@@ -171,7 +186,8 @@
 @media (max-width: 640px) {
   .pp-page { padding: 1rem; }
   .pp-card { padding: 1.25rem; }
-  .pp-identity { gap: 0.9rem; }
+  .pp-identity { gap: 0.9rem; flex-wrap: wrap; }
+  .pp-message-btn { width: 100%; justify-content: center; }
   .pp-avatar, .pp-avatar-img { width: 60px; height: 60px; }
   .pp-name { font-size: 1.2rem; }
   .pp-course-pillar { display: none; }

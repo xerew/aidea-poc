@@ -30,6 +30,8 @@ from .views import (
     AuthoringPillarsView,
     AuthoringUploadView,
     ChangePasswordView,
+    ConversationDetailView,
+    ConversationListView,
     CourseDetailView,
     CourseEnrollView,
     CourseLearnView,
@@ -58,6 +60,7 @@ from .views import (
     ReviewQueueView,
     SubjectsView,
     SubmissionUploadView,
+    UnreadMessageCountView,
 )
 
 urlpatterns = [
@@ -84,6 +87,10 @@ urlpatterns = [
     path('preference-quiz/',      PreferenceQuizView.as_view(),      name='preference-quiz'),
     path('subjects/',             SubjectsView.as_view(),             name='subjects'),
     path('users/<int:pk>/profile/', PublicProfileView.as_view(),       name='public-profile'),
+    # Messaging
+    path('messages/conversations/', ConversationListView.as_view(),    name='conversation-list'),
+    path('messages/unread-count/',  UnreadMessageCountView.as_view(),  name='message-unread-count'),
+    path('messages/with/<int:user_id>/', ConversationDetailView.as_view(), name='conversation-detail'),
     path('profile/preferences/',  ProfilePreferencesView.as_view(),  name='profile-preferences'),
     path('profile/info/',         ProfilePersonalInfoView.as_view(), name='profile-info'),
     path('profile/settings/',     ProfileSettingsView.as_view(),     name='profile-settings'),

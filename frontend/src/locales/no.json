@@ -10,7 +10,8 @@
     "admin": "Admin",
     "reviews": "Vurderinger",
     "openMenu": "Åpne meny",
-    "documentation": "Dokumentasjon"
+    "documentation": "Dokumentasjon",
+    "messages": "Meldinger"
   },
   "common": {
     "search": "Søk etter kurs...",
@@ -730,7 +731,8 @@
     "completed": "Fullført",
     "inProgress": "Pågår",
     "authoredTitle": "Publiserte kurs",
-    "noCourses": "Ingen publiserte kurs ennå."
+    "noCourses": "Ingen publiserte kurs ennå.",
+    "sendMessage": "Send melding"
   },
   "documentation": {
     "title": "AIDEA — Den AI-drevne lærerakademiet",
@@ -756,5 +758,14 @@
     "openGuide": "Åpne veiledningen",
     "downloadGuide": "Last ned PDF",
     "pdfFallback": "Nettleseren din kan ikke vise PDF-en."
+  },
+  "messages": {
+    "title": "Meldinger",
+    "searchPlaceholder": "Søk etter personer…",
+    "noConversations": "Ingen samtaler ennå.",
+    "noMatches": "Ingen person samsvarer.",
+    "selectPrompt": "Velg en samtale for å begynne.",
+    "startPrompt": "Ingen meldinger ennå — si hei!",
+    "composerPlaceholder": "Skriv en melding…"
   }
 }

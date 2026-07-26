@@ -10,7 +10,8 @@
     "admin": "Verwaltung",
     "reviews": "Bewertungen",
     "openMenu": "Menü öffnen",
-    "documentation": "Dokumentation"
+    "documentation": "Dokumentation",
+    "messages": "Nachrichten"
   },
   "common": {
     "search": "Kurse suchen...",
@@ -730,7 +731,8 @@
     "completed": "Abgeschlossen",
     "inProgress": "In Bearbeitung",
     "authoredTitle": "Veröffentlichte Kurse",
-    "noCourses": "Noch keine veröffentlichten Kurse."
+    "noCourses": "Noch keine veröffentlichten Kurse.",
+    "sendMessage": "Nachricht senden"
   },
   "documentation": {
     "title": "AIDEA — Die KI-gestützte Akademie für Lehrkräfte",
@@ -756,5 +758,14 @@
     "openGuide": "Handbuch öffnen",
     "downloadGuide": "PDF herunterladen",
     "pdfFallback": "Ihr Browser kann das PDF nicht anzeigen."
+  },
+  "messages": {
+    "title": "Nachrichten",
+    "searchPlaceholder": "Personen suchen…",
+    "noConversations": "Noch keine Unterhaltungen.",
+    "noMatches": "Keine Person gefunden.",
+    "selectPrompt": "Wählen Sie eine Unterhaltung aus, um zu beginnen.",
+    "startPrompt": "Noch keine Nachrichten — sag Hallo!",
+    "composerPlaceholder": "Nachricht schreiben…"
   }
 }

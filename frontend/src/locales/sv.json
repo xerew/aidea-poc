@@ -10,7 +10,8 @@
     "admin": "Admin",
     "reviews": "Granskningar",
     "openMenu": "Öppna meny",
-    "documentation": "Dokumentation"
+    "documentation": "Dokumentation",
+    "messages": "Meddelanden"
   },
   "common": {
     "search": "Sök kurser…",
@@ -730,7 +731,8 @@
     "completed": "Slutförda",
     "inProgress": "Pågående",
     "authoredTitle": "Publicerade kurser",
-    "noCourses": "Inga publicerade kurser ännu."
+    "noCourses": "Inga publicerade kurser ännu.",
+    "sendMessage": "Skicka meddelande"
   },
   "documentation": {
     "title": "AIDEA — Den AI-drivna lärarakademin",
@@ -756,5 +758,14 @@
     "openGuide": "Öppna guiden",
     "downloadGuide": "Ladda ner PDF",
     "pdfFallback": "Din webbläsare kan inte visa PDF-filen."
+  },
+  "messages": {
+    "title": "Meddelanden",
+    "searchPlaceholder": "Sök personer…",
+    "noConversations": "Inga konversationer ännu.",
+    "noMatches": "Ingen person matchar.",
+    "selectPrompt": "Välj en konversation för att börja.",
+    "startPrompt": "Inga meddelanden ännu — säg hej!",
+    "composerPlaceholder": "Skriv ett meddelande…"
   }
 }
