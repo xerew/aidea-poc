@@ -40,7 +40,7 @@ pedagogical transformation.
   critical thinking.
 
 _Funded by the European Union through the Erasmus+ and Horizon Europe
-programmes. AIDEA by Ellinogermaniki Agogi._
+programmes._
 """
 
 CSS = """
