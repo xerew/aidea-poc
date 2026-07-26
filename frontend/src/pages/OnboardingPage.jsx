@@ -113,14 +113,20 @@ export default function OnboardingPage() {
         const optionId = answers[`q_${q.id}`]
         if (optionId != null) questionAnswers[q.id] = Number(optionId)
       })
-      await client.post('/onboarding/', {
+      const { data } = await client.post('/onboarding/', {
         subject:        answers.subject,
         teaching_level: answers.teaching_level,
         answers:        questionAnswers,
         goals:          answers.goals || [],
       })
+      // Sync the freshly-computed competency into the cached user so the
+      // profile/header reflect it immediately (not the pre-onboarding 0).
       updateUser({
-        profile: { ...user.profile, onboarding_completed: true },
+        profile: {
+          ...user.profile,
+          onboarding_completed: true,
+          competency_score: data.competency_score,
+        },
       })
       navigate('/')
     } catch (err) {
