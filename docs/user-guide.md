@@ -8,6 +8,7 @@ user can do.
 
 - [The three learning pillars](#the-three-learning-pillars)
 - [Accounts and roles](#accounts-and-roles)
+- [Creating an account](#creating-an-account)
 - [Signing in and choosing your language](#signing-in-and-choosing-your-language)
 - [For teachers](#for-teachers)
 - [For content creators](#for-content-creators)
@@ -43,17 +44,19 @@ There are four roles:
 New accounts start as **teachers**. A teacher can request content-creator access
 from their profile; an administrator approves or declines it.
 
-Demo accounts (in a seeded environment):
+## Creating an account
 
-| Username | Password | Role |
-|----------|----------|------|
-| `demo_teacher` | `demo1234` | Teacher |
-| `demo_creator` | `demo1234` | Content creator |
-| `demo_partner` | `demo1234` | AIDEA partner |
+If you don't have an account yet:
+
+1. On the sign-in screen, select **Register** to open the sign-up form.
+2. Enter your first and last name, a username, your email address and a
+   password (you can also add your gender and country).
+3. After registering, you'll answer a few short onboarding questions so the
+   platform can gauge your starting AI competency and personalise your pathway.
 
 ## Signing in and choosing your language
 
-1. Open the platform and sign in with your username and password (or register a new account).
+1. Open the platform and sign in with your username and password.
 2. The interface is available in **nine languages**: English, Greek, French,
    Spanish, Italian, Finnish, Swedish, Norwegian and German. Use the language
    switcher in the header to change it at any time — your choice is remembered.
