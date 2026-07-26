@@ -46,13 +46,13 @@ class AccessRequestSubmitTest(APITestCase):
         res = self.client.post('/api/access-requests/', {'message': 'Second request'}, format='json')
         self.assertEqual(res.status_code, 400)
 
-    def test_non_teacher_can_submit_request(self):
-        # #7: the role gate was dropped — any user without creator/admin access may request.
+    def test_partner_cannot_submit_request(self):
+        # AIDEA partners are content creators now, so they already have access.
         partner = make_user('partner1', UserProfile.UserType.AIDEA_PARTNER)
         self.client.force_authenticate(partner)
-        res = self.client.post('/api/access-requests/', {'message': 'I want to author'}, format='json')
-        self.assertEqual(res.status_code, 201)
-        self.assertTrue(AccessRequest.objects.filter(user=partner).exists())
+        res = self.client.post('/api/access-requests/', {'message': 'redundant'}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.assertFalse(AccessRequest.objects.filter(user=partner).exists())
 
     def test_content_creator_cannot_submit_request(self):
         creator = make_user('cc1', UserProfile.UserType.CONTENT_CREATOR)

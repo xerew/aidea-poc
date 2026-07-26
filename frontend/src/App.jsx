@@ -22,6 +22,8 @@ import RegisterPage from './pages/RegisterPage'
 import AdminPage from './pages/AdminPage'
 import ReviewsPage from './pages/ReviewsPage'
 
+// Content creators, AIDEA partners and admins all have content-creation access.
+const CREATOR_TYPES = ['content_creator', 'aidea_partner', 'admin']
 const REVIEWER_TYPES = ['content_creator', 'aidea_partner', 'admin']
 
 ContentCreatorRoute.propTypes = { element: PropTypes.node.isRequired }
@@ -29,7 +31,7 @@ ContentCreatorRoute.propTypes = { element: PropTypes.node.isRequired }
 function ContentCreatorRoute({ element }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
-  if (user.profile?.user_type !== 'content_creator') return <Navigate to="/" replace />
+  if (!CREATOR_TYPES.includes(user.profile?.user_type)) return <Navigate to="/" replace />
   return element
 }
 

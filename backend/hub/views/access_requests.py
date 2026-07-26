@@ -22,7 +22,7 @@ class AccessRequestView(APIView):
     def post(self, request):
         if request.user.access_requests.filter(status=AccessRequest.Status.PENDING).exists():
             return Response({'error': 'You already have a pending request.'}, status=400)
-        if request.user.profile.user_type in ('content_creator', 'admin'):
+        if request.user.profile.user_type in ('content_creator', 'aidea_partner', 'admin'):
             return Response({'error': 'You already have content creator access.'}, status=400)
         message = request.data.get('message', '').strip()
         if not message:

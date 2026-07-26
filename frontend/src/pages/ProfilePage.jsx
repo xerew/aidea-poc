@@ -482,8 +482,9 @@ function ContentCreatorAccessSection() {
   const [submitting, setSubmitting] = useState(false)
   const [error,      setError]      = useState('')
 
-  // #7: any user without creator/admin access may request it (not just teachers).
-  if (['content_creator', 'admin'].includes(user?.profile?.user_type)) return null
+  // Anyone who isn't already a content creator (creators, partners, admins all
+  // have authoring) may request access.
+  if (['content_creator', 'aidea_partner', 'admin'].includes(user?.profile?.user_type)) return null
 
   if (loading) {
     return (

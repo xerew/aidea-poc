@@ -175,7 +175,8 @@ export default function AnalyticsPage() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
 
-  const isCreator = user?.profile?.user_type === 'content_creator'
+  // Content creators, AIDEA partners and admins all have content-creation access.
+  const isCreator = ['content_creator', 'aidea_partner', 'admin'].includes(user?.profile?.user_type)
 
   useEffect(() => {
     if (!isCreator) return

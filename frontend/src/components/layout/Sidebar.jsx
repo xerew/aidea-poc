@@ -18,6 +18,10 @@ const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: P
 const ADMIN_ITEM     = { to: '/admin/users',  labelKey: 'nav.admin',     Icon: Shield  }
 const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: ClipboardCheck }
 
+// Content creators, AIDEA partners and admins share the content-creation nav
+// (authoring + reviews). Admins additionally get the Admin dashboard.
+const CREATOR_NAV = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, AUTHORING_ITEM]
+
 export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -25,15 +29,9 @@ export default function Sidebar({ open = false, onNavigate }) {
 
   let navItems
   if (userType === 'admin') {
-    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, ADMIN_ITEM]
-  } else if (userType === 'content_creator') {
-    navItems = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, AUTHORING_ITEM]
-  } else if (userType === 'aidea_partner') {
-    navItems = [
-      ...BASE_NAV.filter(item => ['/', '/courses'].includes(item.to)),
-      REVIEWS_ITEM,
-      ...BASE_NAV.filter(item => item.to === '/profile'),
-    ]
+    navItems = [...CREATOR_NAV, ADMIN_ITEM]
+  } else if (userType === 'content_creator' || userType === 'aidea_partner') {
+    navItems = CREATOR_NAV
   } else {
     navItems = BASE_NAV
   }

@@ -542,13 +542,12 @@ class CourseDeleteTestCase(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Course.objects.filter(pk=self.course.pk).exists())
 
-    def test_admin_blocked_by_authoring_permission(self):
-        # Admins don't use the authoring API (IsContentCreator blocks them);
-        # they delete courses through the Django admin instead.
+    def test_admin_can_delete_any_course(self):
+        # Admins manage everything — they can delete a course they didn't author.
         self.client.force_authenticate(self.admin)
         res = self.client.delete(self.url)
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertTrue(Course.objects.filter(pk=self.course.pk).exists())
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Course.objects.filter(pk=self.course.pk).exists())
 
     def test_other_creator_cannot_delete_course(self):
         self.client.force_authenticate(self.other)
@@ -567,3 +566,32 @@ class CourseDeleteTestCase(APITestCase):
         self.client.force_authenticate(self.author)
         res = self.client.delete(reverse('authoring-course-detail', kwargs={'pk': 99999}))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class AuthoringRoleHierarchyTests(APITestCase):
+    """Content creators, AIDEA partners and admins all have authoring access;
+    teachers do not."""
+
+    def setUp(self):
+        self.url = reverse('authoring-courses')
+
+    def _user(self, username, role):
+        u = User.objects.create_user(username=username, password='pass12345')
+        UserProfile.objects.create(user=u, user_type=role)
+        return u
+
+    def test_content_creator_can_author(self):
+        self.client.force_authenticate(self._user('rh_cc', 'content_creator'))
+        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_200_OK)
+
+    def test_partner_can_author(self):
+        self.client.force_authenticate(self._user('rh_partner', 'aidea_partner'))
+        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_200_OK)
+
+    def test_admin_can_author(self):
+        self.client.force_authenticate(self._user('rh_admin', 'admin'))
+        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_200_OK)
+
+    def test_teacher_cannot_author(self):
+        self.client.force_authenticate(self._user('rh_teacher', 'teacher'))
+        self.assertEqual(self.client.get(self.url).status_code, status.HTTP_403_FORBIDDEN)
