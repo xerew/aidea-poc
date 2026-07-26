@@ -423,7 +423,14 @@
       "responsePlaceholder": "Rédigez votre réponse ici…",
       "submitting": "Envoi en cours…",
       "resubmit": "Soumettre à nouveau pour évaluation",
-      "submit": "Soumettre pour évaluation"
+      "submit": "Soumettre pour évaluation",
+      "emptySubmission": "Ajoutez une réponse ou au moins une pièce jointe avant d'envoyer.",
+      "uploadFailed": "Échec du téléversement. Réessayez.",
+      "uploading": "Téléversement…",
+      "addFile": "Joindre une image ou un fichier",
+      "addLink": "Ajouter un lien",
+      "videoLinkPlaceholder": "Collez un lien vidéo (YouTube, Vimeo, …)",
+      "removeAttachment": "Supprimer la pièce jointe"
     },
     "quiz": {
       "noQuestions": "Pas encore de questions.",

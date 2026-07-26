@@ -423,7 +423,14 @@
       "responsePlaceholder": "Skriv ditt svar här…",
       "submitting": "Skickar in…",
       "resubmit": "Skicka in igen för granskning",
-      "submit": "Skicka in för granskning"
+      "submit": "Skicka in för granskning",
+      "emptySubmission": "Lägg till ett svar eller minst en bilaga innan du skickar.",
+      "uploadFailed": "Uppladdningen misslyckades. Försök igen.",
+      "uploading": "Laddar upp…",
+      "addFile": "Bifoga bild eller fil",
+      "addLink": "Lägg till länk",
+      "videoLinkPlaceholder": "Klistra in en videolänk (YouTube, Vimeo, …)",
+      "removeAttachment": "Ta bort bilaga"
     },
     "quiz": {
       "noQuestions": "Inga frågor än.",

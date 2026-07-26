@@ -423,7 +423,14 @@
       "responsePlaceholder": "Kirjoita vastauksesi tähän…",
       "submitting": "Lähetetään…",
       "resubmit": "Lähetä uudelleen arvioitavaksi",
-      "submit": "Lähetä arvioitavaksi"
+      "submit": "Lähetä arvioitavaksi",
+      "emptySubmission": "Lisää vastaus tai vähintään yksi liite ennen lähettämistä.",
+      "uploadFailed": "Lataus epäonnistui. Yritä uudelleen.",
+      "uploading": "Ladataan…",
+      "addFile": "Liitä kuva tai tiedosto",
+      "addLink": "Lisää linkki",
+      "videoLinkPlaceholder": "Liitä videolinkki (YouTube, Vimeo, …)",
+      "removeAttachment": "Poista liite"
     },
     "quiz": {
       "noQuestions": "Ei kysymyksiä vielä.",

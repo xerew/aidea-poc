@@ -423,7 +423,14 @@
       "responsePlaceholder": "Schreiben Sie hier Ihre Antwort…",
       "submitting": "Wird eingereicht…",
       "resubmit": "Erneut zur Überprüfung einreichen",
-      "submit": "Zur Überprüfung einreichen"
+      "submit": "Zur Überprüfung einreichen",
+      "emptySubmission": "Fügen Sie vor dem Absenden eine Antwort oder mindestens einen Anhang hinzu.",
+      "uploadFailed": "Upload fehlgeschlagen. Bitte erneut versuchen.",
+      "uploading": "Wird hochgeladen…",
+      "addFile": "Bild oder Datei anhängen",
+      "addLink": "Link hinzufügen",
+      "videoLinkPlaceholder": "Videolink einfügen (YouTube, Vimeo, …)",
+      "removeAttachment": "Anhang entfernen"
     },
     "quiz": {
       "noQuestions": "Noch keine Fragen vorhanden.",

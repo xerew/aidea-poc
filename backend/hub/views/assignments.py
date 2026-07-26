@@ -1,3 +1,7 @@
+import os
+import uuid
+
+from django.core.files.storage import default_storage
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,12 +12,40 @@ from hub.serializers.assignments import AssignmentSubmissionSerializer, ReviewQu
 
 from .permissions import IsReviewer
 
+# Attachments a learner may upload with a submission.
+IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+DOC_EXTENSIONS = {'.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.txt'}
+SUBMISSION_EXTENSIONS = IMAGE_EXTENSIONS | DOC_EXTENSIONS
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
+
 
 def _reviewer_scope(queryset, user):
     """Creators see their own courses' submissions; partners/admins see all."""
     if user.profile.user_type == UserProfile.UserType.CONTENT_CREATOR:
         return queryset.filter(lesson__module__course__created_by=user)
     return queryset
+
+
+def _clean_attachments(raw):
+    """Validate and normalise the attachments payload.
+
+    Returns (attachments, error). Each attachment is
+    {'type': 'image'|'file'|'video', 'url': str, 'name': str}.
+    """
+    if raw in (None, ''):
+        return [], None
+    if not isinstance(raw, list):
+        return None, 'attachments must be a list.'
+    cleaned = []
+    for item in raw:
+        if not isinstance(item, dict):
+            return None, 'Each attachment must be an object.'
+        atype = item.get('type')
+        url = str(item.get('url', '')).strip()
+        if atype not in ('image', 'file', 'video') or not url:
+            return None, 'Each attachment needs a valid type and url.'
+        cleaned.append({'type': atype, 'url': url, 'name': str(item.get('name', '')).strip()})
+    return cleaned, None
 
 
 class AssignmentSubmitView(APIView):
@@ -35,8 +67,14 @@ class AssignmentSubmitView(APIView):
             )
 
         text = str(request.data.get('text', '')).strip()
-        if not text:
-            return Response({'detail': 'text is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        attachments, err = _clean_attachments(request.data.get('attachments'))
+        if err:
+            return Response({'detail': err}, status=status.HTTP_400_BAD_REQUEST)
+        if not text and not attachments:
+            return Response(
+                {'detail': 'Provide text or at least one attachment.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         submission = AssignmentSubmission.objects.filter(user=request.user, lesson=lesson).first()
         if submission and submission.status == AssignmentSubmission.Status.APPROVED:
@@ -47,12 +85,13 @@ class AssignmentSubmitView(APIView):
 
         if submission:
             submission.text = text
+            submission.attachments = attachments
             submission.status = AssignmentSubmission.Status.PENDING
-            submission.save(update_fields=['text', 'status', 'updated_at'])
+            submission.save(update_fields=['text', 'attachments', 'status', 'updated_at'])
             created = False
         else:
             submission = AssignmentSubmission.objects.create(
-                user=request.user, lesson=lesson, text=text,
+                user=request.user, lesson=lesson, text=text, attachments=attachments,
             )
             created = True
 
@@ -63,6 +102,39 @@ class AssignmentSubmitView(APIView):
         return Response(
             AssignmentSubmissionSerializer(submission).data,
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+class SubmissionUploadView(APIView):
+    """POST /courses/<pk>/lessons/<lesson_pk>/submission-upload/ — store one
+    attachment for an enrolled learner and return its URL, name and type."""
+
+    def post(self, request, pk, lesson_pk):
+        if not Enrollment.objects.filter(user=request.user, course_id=pk).exists():
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'detail': 'No file provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        ext = os.path.splitext(file.name)[1].lower()
+        if ext not in SUBMISSION_EXTENSIONS:
+            allowed = ', '.join(sorted(SUBMISSION_EXTENSIONS))
+            return Response(
+                {'detail': f'File type not allowed. Allowed: {allowed}.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if file.size > MAX_UPLOAD_BYTES:
+            return Response({'detail': 'File too large (max 20 MB).'}, status=status.HTTP_400_BAD_REQUEST)
+
+        path = default_storage.save(f'submission_uploads/{uuid.uuid4().hex}{ext}', file)
+        return Response(
+            {
+                'url': request.build_absolute_uri(default_storage.url(path)),
+                'name': file.name,
+                'type': 'image' if ext in IMAGE_EXTENSIONS else 'file',
+            },
+            status=status.HTTP_201_CREATED,
         )
 
 

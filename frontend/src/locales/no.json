@@ -423,7 +423,14 @@
       "responsePlaceholder": "Skriv svaret ditt her…",
       "submitting": "Sender inn…",
       "resubmit": "Send inn på nytt for vurdering",
-      "submit": "Send inn for vurdering"
+      "submit": "Send inn for vurdering",
+      "emptySubmission": "Legg til et svar eller minst ett vedlegg før du sender inn.",
+      "uploadFailed": "Opplasting mislyktes. Prøv igjen.",
+      "uploading": "Laster opp…",
+      "addFile": "Legg ved bilde eller fil",
+      "addLink": "Legg til lenke",
+      "videoLinkPlaceholder": "Lim inn en videolenke (YouTube, Vimeo, …)",
+      "removeAttachment": "Fjern vedlegg"
     },
     "quiz": {
       "noQuestions": "Ingen spørsmål ennå.",

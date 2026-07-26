@@ -57,6 +57,7 @@ from .views import (
     ReviewActionView,
     ReviewQueueView,
     SubjectsView,
+    SubmissionUploadView,
 )
 
 urlpatterns = [
@@ -73,6 +74,7 @@ urlpatterns = [
     path('courses/<int:pk>/lessons/<int:lesson_pk>/complete/', LessonCompleteView.as_view(), name='lesson-complete'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/quiz-check/', QuizCheckView.as_view(), name='quiz-check'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/submit-assignment/', AssignmentSubmitView.as_view(), name='assignment-submit'),
+    path('courses/<int:pk>/lessons/<int:lesson_pk>/submission-upload/', SubmissionUploadView.as_view(), name='submission-upload'),
     path('reviews/', ReviewQueueView.as_view(), name='review-queue'),
     path('reviews/<int:pk>/', ReviewActionView.as_view(), name='review-action'),
     path('home/', HomeView.as_view(), name='home'),

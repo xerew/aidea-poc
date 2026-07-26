@@ -253,6 +253,90 @@
 .lp-assignment-error { color: #b91c1c; font-size: 0.85rem; margin: 0.5rem 0 0; }
 .lp-assignment-submit { margin-top: 0.75rem; }
 
+/* Assignment attachments */
+.lp-attach-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.lp-attach-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  min-width: 0;
+}
+.lp-attach-icon { color: #7c3aed; flex-shrink: 0; }
+.lp-attach-name {
+  flex: 1;
+  min-width: 0;
+  color: #4c1d95;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lp-attach-name:hover { text-decoration: underline; }
+.lp-attach-remove {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  color: #9ca3af;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+}
+.lp-attach-remove:hover { color: #b91c1c; }
+
+.lp-attach-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+.lp-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+.lp-attach-btn:hover:not(:disabled) { border-color: #7c3aed; color: #7c3aed; }
+.lp-attach-btn:disabled { opacity: 0.6; cursor: default; }
+.lp-attach-file-input { display: none; }
+
+.lp-attach-video {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 220px;
+}
+.lp-attach-video-icon { color: #9ca3af; flex-shrink: 0; }
+.lp-attach-video-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+.lp-attach-video-input:focus { outline: none; border-color: #7c3aed; }
+
 /* Empty */
 .lp-empty { padding: 32px; color: #9ca3af; font-size: 0.9rem; text-align: center; }
 

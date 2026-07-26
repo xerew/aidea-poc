@@ -204,3 +204,69 @@ class AssignmentFlowTests(APITestCase):
         self.client.post(f'/api/reviews/{sub.id}/', {'action': 'approve'}, format='json')
         res = self._submit(text='another try')
         self.assertEqual(res.status_code, 400)
+
+
+class AssignmentAttachmentTests(APITestCase):
+    def setUp(self):
+        self.creator = User.objects.create_user(username='att_cc', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.learner = User.objects.create_user(username='att_t', password='pass12345')
+        UserProfile.objects.create(user=self.learner, user_type=UserProfile.UserType.TEACHER)
+        self.outsider = User.objects.create_user(username='att_out', password='pass12345')
+        UserProfile.objects.create(user=self.outsider, user_type=UserProfile.UserType.TEACHER)
+
+        self.course, _, self.assignment = make_assignment_course(self.creator, slug='att1')
+        Enrollment.objects.create(user=self.learner, course=self.course)
+        self.submit_url = f'/api/courses/{self.course.id}/lessons/{self.assignment.id}/submit-assignment/'
+        self.upload_url = f'/api/courses/{self.course.id}/lessons/{self.assignment.id}/submission-upload/'
+
+    def test_submit_with_attachments_only(self):
+        self.client.force_authenticate(self.learner)
+        attachments = [{'type': 'video', 'url': 'https://youtu.be/abc', 'name': 'My video'}]
+        res = self.client.post(self.submit_url, {'text': '', 'attachments': attachments}, format='json')
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.data['attachments'], attachments)
+
+    def test_submit_rejects_empty_text_and_no_attachments(self):
+        self.client.force_authenticate(self.learner)
+        res = self.client.post(self.submit_url, {'text': '  ', 'attachments': []}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_submit_rejects_invalid_attachment(self):
+        self.client.force_authenticate(self.learner)
+        res = self.client.post(
+            self.submit_url,
+            {'text': 'hi', 'attachments': [{'type': 'bogus', 'url': 'x'}]}, format='json',
+        )
+        self.assertEqual(res.status_code, 400)
+
+    def test_attachments_visible_in_review_queue(self):
+        self.client.force_authenticate(self.learner)
+        att = [{'type': 'file', 'url': 'https://x/y.pdf', 'name': 'y.pdf'}]
+        self.client.post(self.submit_url, {'text': 'see file', 'attachments': att}, format='json')
+        self.client.force_authenticate(self.creator)
+        data = self.client.get('/api/reviews/').data
+        self.assertEqual(data[0]['attachments'], att)
+
+    def test_upload_stores_image_for_enrolled_learner(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        img = SimpleUploadedFile('pic.png', b'\x89PNG\r\n\x1a\n', content_type='image/png')
+        self.client.force_authenticate(self.learner)
+        res = self.client.post(self.upload_url, {'file': img}, format='multipart')
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.data['type'], 'image')
+        self.assertTrue(res.data['url'])
+
+    def test_upload_rejects_disallowed_extension(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        bad = SimpleUploadedFile('evil.exe', b'MZ', content_type='application/octet-stream')
+        self.client.force_authenticate(self.learner)
+        res = self.client.post(self.upload_url, {'file': bad}, format='multipart')
+        self.assertEqual(res.status_code, 400)
+
+    def test_upload_rejects_non_enrolled(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        img = SimpleUploadedFile('pic.png', b'\x89PNG', content_type='image/png')
+        self.client.force_authenticate(self.outsider)
+        res = self.client.post(self.upload_url, {'file': img}, format='multipart')
+        self.assertEqual(res.status_code, 403)

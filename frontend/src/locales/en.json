@@ -423,7 +423,14 @@
       "responsePlaceholder": "Write your response here…",
       "submitting": "Submitting…",
       "resubmit": "Resubmit for review",
-      "submit": "Submit for review"
+      "submit": "Submit for review",
+      "emptySubmission": "Add a response or at least one attachment before submitting.",
+      "uploadFailed": "Upload failed. Please try again.",
+      "uploading": "Uploading…",
+      "addFile": "Attach image or file",
+      "addLink": "Add link",
+      "videoLinkPlaceholder": "Paste a video link (YouTube, Vimeo, …)",
+      "removeAttachment": "Remove attachment"
     },
     "quiz": {
       "noQuestions": "No questions yet.",

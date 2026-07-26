@@ -423,7 +423,14 @@
       "responsePlaceholder": "Escribe tu respuesta aquí…",
       "submitting": "Enviando…",
       "resubmit": "Reenviar para revisión",
-      "submit": "Enviar para revisión"
+      "submit": "Enviar para revisión",
+      "emptySubmission": "Añade una respuesta o al menos un adjunto antes de enviar.",
+      "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+      "uploading": "Subiendo…",
+      "addFile": "Adjuntar imagen o archivo",
+      "addLink": "Añadir enlace",
+      "videoLinkPlaceholder": "Pega un enlace de vídeo (YouTube, Vimeo, …)",
+      "removeAttachment": "Quitar adjunto"
     },
     "quiz": {
       "noQuestions": "Aún no hay preguntas.",

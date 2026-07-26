@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ClipboardCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { ClipboardCheck, ChevronDown, ChevronUp, Image, FileIcon, Video } from 'lucide-react'
+
+const ATTACHMENT_ICONS = { image: Image, file: FileIcon, video: Video }
 import PropTypes from 'prop-types'
 import client from '../api/client'
 import './ReviewsPage.css'
@@ -49,7 +51,27 @@ function SubmissionRow({ sub, onDone }) {
 
       {openRow && (
         <div className="rv-row-body">
-          <p className="rv-text">{sub.text}</p>
+          {sub.text && <p className="rv-text">{sub.text}</p>}
+          {sub.attachments?.length > 0 && (
+            <div className="rv-attachments">
+              {sub.attachments.map((att, idx) => {
+                const Icon = ATTACHMENT_ICONS[att.type] ?? FileIcon
+                if (att.type === 'image') {
+                  return (
+                    <a key={idx} href={att.url} target="_blank" rel="noreferrer" className="rv-attach-thumb">
+                      <img src={att.url} alt={att.name || ''} />
+                    </a>
+                  )
+                }
+                return (
+                  <a key={idx} href={att.url} target="_blank" rel="noreferrer" className="rv-attach-chip">
+                    <Icon size={15} />
+                    <span>{att.name || att.url}</span>
+                  </a>
+                )
+              })}
+            </div>
+          )}
           {sub.feedback && (
             <p className="rv-prev-feedback"><strong>{t('reviews.previousFeedback')}</strong> {sub.feedback}</p>
           )}

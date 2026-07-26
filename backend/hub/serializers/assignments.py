@@ -6,7 +6,7 @@ from hub.models import AssignmentSubmission
 class AssignmentSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model  = AssignmentSubmission
-        fields = ['id', 'status', 'text', 'feedback', 'submitted_at', 'reviewed_at']
+        fields = ['id', 'status', 'text', 'attachments', 'feedback', 'submitted_at', 'reviewed_at']
 
 
 class ReviewQueueSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class ReviewQueueSerializer(serializers.ModelSerializer):
     class Meta:
         model  = AssignmentSubmission
         fields = ['id', 'learner_name', 'learner_id', 'course_id', 'course_title', 'module_title',
-                  'lesson_title', 'text', 'feedback', 'submitted_at']
+                  'lesson_title', 'text', 'attachments', 'feedback', 'submitted_at']
 
     def get_learner_name(self, obj):
         return obj.user.get_full_name() or obj.user.username

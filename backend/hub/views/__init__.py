@@ -11,7 +11,12 @@ from .admin import (
     AdminUserListView,
     AdminUserRoleView,
 )
-from .assignments import AssignmentSubmitView, ReviewActionView, ReviewQueueView
+from .assignments import (
+    AssignmentSubmitView,
+    ReviewActionView,
+    ReviewQueueView,
+    SubmissionUploadView,
+)
 from .auth import LoginView, LogoutView, MeView, RegisterView
 from .authoring_course import (
     AuthoringCourseDetailView,
@@ -78,6 +83,7 @@ __all__ = [
     'AssignmentSubmitView',
     'ReviewActionView',
     'ReviewQueueView',
+    'SubmissionUploadView',
     'AuthoringCourseDetailView',
     'AuthoringCourseExportView',
     'AuthoringCourseImportView',

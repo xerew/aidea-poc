@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, CheckCircle2, Circle,
   Video, FileText, HelpCircle, Image, FileIcon, ClipboardList,
+  Paperclip, Link2, X,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
@@ -86,23 +87,66 @@ AssignmentLesson.propTypes = {
   courseId: PropTypes.string.isRequired,
   onSubmissionChange: PropTypes.func.isRequired,
 }
+const ATTACHMENT_ICONS = { image: Image, file: FileIcon, video: Video }
+
 function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
   const { t } = useTranslation()
   const submission = lesson.assignment_submission
   const [text, setText] = useState(submission?.text ?? '')
+  const [attachments, setAttachments] = useState(submission?.attachments ?? [])
+  const [videoUrl, setVideoUrl] = useState('')
+  const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const fileRef = useRef(null)
 
   const status = submission?.status
   const locked = status === 'pending' || status === 'approved'
+  const busy = submitting || uploading
+
+  const handleFiles = async (e) => {
+    const files = Array.from(e.target.files || [])
+    e.target.value = ''
+    if (!files.length) return
+    setUploading(true)
+    setError('')
+    try {
+      for (const file of files) {
+        const form = new FormData()
+        form.append('file', file)
+        const { data } = await client.post(
+          `/courses/${courseId}/lessons/${lesson.id}/submission-upload/`, form,
+          { headers: { 'Content-Type': 'multipart/form-data' } },
+        )
+        setAttachments(prev => [...prev, data])
+      }
+    } catch (err) {
+      setError(err.response?.data?.detail ?? t('lesson.assignment.uploadFailed'))
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const addVideo = () => {
+    const url = videoUrl.trim()
+    if (!url) return
+    setAttachments(prev => [...prev, { type: 'video', url, name: url }])
+    setVideoUrl('')
+  }
+
+  const removeAttachment = (idx) => setAttachments(prev => prev.filter((_, i) => i !== idx))
 
   const handleSubmit = async () => {
-    if (!text.trim()) { setError(t('lesson.assignment.writeBeforeSubmit')); return }
+    if (!text.trim() && attachments.length === 0) {
+      setError(t('lesson.assignment.emptySubmission'))
+      return
+    }
     setSubmitting(true)
     setError('')
     try {
       const res = await client.post(
-        `/courses/${courseId}/lessons/${lesson.id}/submit-assignment/`, { text },
+        `/courses/${courseId}/lessons/${lesson.id}/submit-assignment/`,
+        { text, attachments },
       )
       onSubmissionChange(res.data)
     } catch (err) {
@@ -142,12 +186,75 @@ function AssignmentLesson({ lesson, courseId, onSubmissionChange }) {
           disabled={locked || submitting}
           onChange={(e) => setText(e.target.value)}
         />
+
+        {/* Attachments */}
+        {attachments.length > 0 && (
+          <ul className="lp-attach-list">
+            {attachments.map((att, idx) => {
+              const Icon = ATTACHMENT_ICONS[att.type] ?? FileIcon
+              return (
+                <li key={`${att.url}-${idx}`} className="lp-attach-item">
+                  <Icon size={15} className="lp-attach-icon" />
+                  <a href={att.url} target="_blank" rel="noreferrer" className="lp-attach-name">
+                    {att.name || att.url}
+                  </a>
+                  {!locked && (
+                    <button
+                      type="button"
+                      className="lp-attach-remove"
+                      onClick={() => removeAttachment(idx)}
+                      aria-label={t('lesson.assignment.removeAttachment')}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+
+        {!locked && (
+          <div className="lp-attach-controls">
+            <button
+              type="button"
+              className="lp-attach-btn"
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+            >
+              <Paperclip size={15} /> {uploading ? t('lesson.assignment.uploading') : t('lesson.assignment.addFile')}
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              multiple
+              accept=".png,.jpg,.jpeg,.gif,.webp,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt"
+              className="lp-attach-file-input"
+              onChange={handleFiles}
+            />
+            <div className="lp-attach-video">
+              <Link2 size={15} className="lp-attach-video-icon" />
+              <input
+                type="url"
+                className="lp-attach-video-input"
+                placeholder={t('lesson.assignment.videoLinkPlaceholder')}
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addVideo() } }}
+              />
+              <button type="button" className="lp-attach-btn" onClick={addVideo} disabled={!videoUrl.trim()}>
+                {t('lesson.assignment.addLink')}
+              </button>
+            </div>
+          </div>
+        )}
+
         {error && <p className="lp-assignment-error">{error}</p>}
         {!locked && (
           <button
             type="button"
             className="lp-complete-btn lp-assignment-submit"
-            disabled={submitting}
+            disabled={busy}
             onClick={handleSubmit}
           >
             {submitting

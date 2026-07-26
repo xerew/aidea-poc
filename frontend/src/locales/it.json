@@ -423,7 +423,14 @@
       "responsePlaceholder": "Scrivi qui la tua risposta…",
       "submitting": "Invio in corso…",
       "resubmit": "Reinvia per la revisione",
-      "submit": "Invia per la revisione"
+      "submit": "Invia per la revisione",
+      "emptySubmission": "Aggiungi una risposta o almeno un allegato prima di inviare.",
+      "uploadFailed": "Caricamento non riuscito. Riprova.",
+      "uploading": "Caricamento…",
+      "addFile": "Allega immagine o file",
+      "addLink": "Aggiungi link",
+      "videoLinkPlaceholder": "Incolla un link video (YouTube, Vimeo, …)",
+      "removeAttachment": "Rimuovi allegato"
     },
     "quiz": {
       "noQuestions": "Nessuna domanda ancora disponibile.",
