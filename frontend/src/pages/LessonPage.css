@@ -549,4 +549,7 @@
   }
   .lp-main { padding: 20px 16px 36px; max-width: none; }
   .lp-topbar { padding: 0 16px; }
+  .lp-assignment-body { padding: 20px 16px; }
+  /* Let the video-link row take the full width instead of forcing 220px. */
+  .lp-attach-video { min-width: 100%; }
 }
