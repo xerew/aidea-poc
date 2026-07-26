@@ -73,6 +73,13 @@
   vertical-align: middle;
 }
 
+.admin-user-link {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.admin-user-link:hover { text-decoration: underline; }
+
 .admin-avatar {
   width: 32px;
   height: 32px;
