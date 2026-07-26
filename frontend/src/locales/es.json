@@ -650,7 +650,13 @@
       "queuing": "Encolando…",
       "queued": "Actualización de recomendaciones en cola.",
       "failed": "No se pudo poner en cola la actualización. Inténtalo de nuevo."
-    }
+    },
+    "searchUsers": "Buscar por nombre, usuario o correo",
+    "searchRequests": "Buscar por solicitante",
+    "noMatch": "Sin coincidencias.",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "pageOf": "Página {{page}} de {{total}}"
   },
   "analytics": {
     "subtitle": "Sigue la participación y el rendimiento de los cursos que has creado",

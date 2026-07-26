@@ -650,7 +650,13 @@
       "queuing": "Wird eingereiht…",
       "queued": "Aktualisierung der Empfehlungen eingereiht.",
       "failed": "Aktualisierung konnte nicht eingereiht werden. Bitte erneut versuchen."
-    }
+    },
+    "searchUsers": "Nach Name, Benutzername oder E-Mail suchen",
+    "searchRequests": "Nach Antragsteller suchen",
+    "noMatch": "Keine Treffer.",
+    "prev": "Zurück",
+    "next": "Weiter",
+    "pageOf": "Seite {{page}} von {{total}}"
   },
   "analytics": {
     "subtitle": "Verfolgen Sie Interaktion und Leistung über Ihre erstellten Kurse hinweg",

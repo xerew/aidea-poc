@@ -650,7 +650,13 @@
       "queuing": "Lisätään jonoon…",
       "queued": "Suositusten päivitys lisätty jonoon.",
       "failed": "Päivitystä ei voitu lisätä jonoon. Yritä uudelleen."
-    }
+    },
+    "searchUsers": "Hae nimellä, käyttäjätunnuksella tai sähköpostilla",
+    "searchRequests": "Hae pyytäjän mukaan",
+    "noMatch": "Ei osumia.",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "pageOf": "Sivu {{page}} / {{total}}"
   },
   "analytics": {
     "subtitle": "Seuraa luomiesi kurssien sitoutumista ja suorituskykyä",

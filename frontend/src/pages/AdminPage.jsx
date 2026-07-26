@@ -1,8 +1,60 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
+import { Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import './AdminPage.css'
+
+const PER_PAGE = 10
+
+// A person matches the query if it appears in their name, username or email.
+function personMatches(p, query) {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  return (
+    `${p.first_name ?? ''} ${p.last_name ?? ''}`.toLowerCase().includes(q) ||
+    (p.username ?? '').toLowerCase().includes(q) ||
+    (p.email ?? '').toLowerCase().includes(q)
+  )
+}
+
+AdminSearch.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+}
+
+function AdminSearch({ value, onChange, placeholder }) {
+  return (
+    <div className="admin-search">
+      <Search size={15} className="admin-search-icon" />
+      <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} />
+    </div>
+  )
+}
+
+Pagination.propTypes = {
+  page: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  onPage: PropTypes.func.isRequired,
+}
+
+function Pagination({ page, totalPages, onPage }) {
+  const { t } = useTranslation()
+  if (totalPages <= 1) return null
+  return (
+    <div className="admin-pagination">
+      <button className="admin-page-btn" disabled={page <= 1} onClick={() => onPage(page - 1)}>
+        {t('admin.prev')}
+      </button>
+      <span className="admin-page-info">{t('admin.pageOf', { page, total: totalPages })}</span>
+      <button className="admin-page-btn" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>
+        {t('admin.next')}
+      </button>
+    </div>
+  )
+}
 
 
 // ── Users tab ────────────────────────────────────────────────────────────────
@@ -13,6 +65,15 @@ function UsersTab() {
   const [users,    setUsers]    = useState([])
   const [loading,  setLoading]  = useState(true)
   const [feedback, setFeedback] = useState({})
+  const [query,    setQuery]    = useState('')
+  const [page,     setPage]     = useState(1)
+
+  const filtered = useMemo(() => users.filter((u) => personMatches(u, query)), [users, query])
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const pageUsers = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  const onSearch = (value) => { setQuery(value); setPage(1) }
 
   const ROLE_LABELS = {
     teacher: t('admin.roles.teacher'),
@@ -54,7 +115,12 @@ function UsersTab() {
   if (loading) return <p className="admin-loading">{t('admin.loadingUsers')}</p>
 
   return (
-    <div className="admin-users-table-wrap">
+    <div className="admin-tab-body">
+      <AdminSearch value={query} onChange={onSearch} placeholder={t('admin.searchUsers')} />
+      {filtered.length === 0 ? (
+        <p className="admin-empty">{t('admin.noMatch')}</p>
+      ) : (
+      <div className="admin-users-table-wrap">
       <table className="admin-users-table">
         <thead>
           <tr>
@@ -66,7 +132,7 @@ function UsersTab() {
           </tr>
         </thead>
         <tbody>
-          {users.map(u => {
+          {pageUsers.map(u => {
             const isMe = u.id === me?.id
             const fb   = feedback[u.id] || {}
             return (
@@ -110,6 +176,9 @@ function UsersTab() {
           })}
         </tbody>
       </table>
+      </div>
+      )}
+      <Pagination page={safePage} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }
@@ -123,6 +192,9 @@ function RequestsTab() {
   const [denyForms,     setDenyForms]     = useState({})
   const [approveErrors, setApproveErrors] = useState({})
   const [showPast,      setShowPast]      = useState(false)
+  const [query,         setQuery]         = useState('')
+  const [page,          setPage]          = useState(1)
+  const onSearch = (value) => { setQuery(value); setPage(1) }
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -170,14 +242,20 @@ function RequestsTab() {
 
   if (loading) return <p className="admin-loading">{t('admin.loadingRequests')}</p>
 
-  const pending = requests.filter(r => r.status === 'pending')
-  const past    = requests.filter(r => r.status !== 'pending')
+  const matched = requests.filter(r => personMatches(r, query))
+  const pending = matched.filter(r => r.status === 'pending')
+  const past    = matched.filter(r => r.status !== 'pending')
+  const totalPages = Math.max(1, Math.ceil(pending.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const pagePending = pending.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
 
   return (
     <div className="admin-requests">
-      {pending.length === 0 && <p className="admin-empty">{t('admin.noPendingRequests')}</p>}
+      <AdminSearch value={query} onChange={onSearch} placeholder={t('admin.searchRequests')} />
 
-      {pending.map(req => (
+      {pending.length === 0 && <p className="admin-empty">{query.trim() ? t('admin.noMatch') : t('admin.noPendingRequests')}</p>}
+
+      {pagePending.map(req => (
         <div key={req.id} className="admin-request-card">
           <div className="admin-request-header">
             <div className="admin-avatar">{req.avatar_initials || '?'}</div>
@@ -228,6 +306,8 @@ function RequestsTab() {
           </div>
         </div>
       ))}
+
+      <Pagination page={safePage} totalPages={totalPages} onPage={setPage} />
 
       {past.length > 0 && (
         <div className="admin-past-section">

@@ -650,7 +650,13 @@
       "queuing": "Queuing…",
       "queued": "Recommendation refresh queued.",
       "failed": "Could not queue the refresh. Please try again."
-    }
+    },
+    "searchUsers": "Search by name, username or email",
+    "searchRequests": "Search by requestor",
+    "noMatch": "No matches.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}"
   },
   "analytics": {
     "subtitle": "Track engagement and performance across your created courses",

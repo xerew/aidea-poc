@@ -650,7 +650,13 @@
       "queuing": "Mise en file…",
       "queued": "Actualisation des recommandations mise en file d'attente.",
       "failed": "Impossible de lancer l'actualisation. Veuillez réessayer."
-    }
+    },
+    "searchUsers": "Rechercher par nom, nom d'utilisateur ou e-mail",
+    "searchRequests": "Rechercher par demandeur",
+    "noMatch": "Aucun résultat.",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "pageOf": "Page {{page}} sur {{total}}"
   },
   "analytics": {
     "subtitle": "Suivez l'engagement et les performances de vos cours créés",

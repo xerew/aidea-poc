@@ -29,9 +29,10 @@ class AccessRequestAdminSerializer(serializers.ModelSerializer):
     username        = serializers.CharField(source='user.username',                read_only=True)
     first_name      = serializers.CharField(source='user.first_name',              read_only=True)
     last_name       = serializers.CharField(source='user.last_name',               read_only=True)
+    email           = serializers.CharField(source='user.email',                   read_only=True)
     avatar_initials = serializers.CharField(source='user.profile.avatar_initials', read_only=True)
 
     class Meta:
         model  = AccessRequest
-        fields = ['id', 'username', 'first_name', 'last_name', 'avatar_initials',
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'avatar_initials',
                   'message', 'status', 'denial_reason', 'created_at', 'reviewed_at']

@@ -650,7 +650,13 @@
       "queuing": "In coda…",
       "queued": "Aggiornamento delle raccomandazioni in coda.",
       "failed": "Impossibile mettere in coda l'aggiornamento. Riprova."
-    }
+    },
+    "searchUsers": "Cerca per nome, nome utente o email",
+    "searchRequests": "Cerca per richiedente",
+    "noMatch": "Nessun risultato.",
+    "prev": "Precedente",
+    "next": "Successiva",
+    "pageOf": "Pagina {{page}} di {{total}}"
   },
   "analytics": {
     "subtitle": "Monitora il coinvolgimento e le prestazioni dei corsi da te creati",
