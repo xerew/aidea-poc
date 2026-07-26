@@ -76,3 +76,11 @@
 .cl-resume-btn:hover {
   opacity: 0.9;
 }
+
+.cl-title { overflow-wrap: anywhere; }
+
+@media (max-width: 640px) {
+  .cl-banner { padding: 1.35rem 1.25rem; }
+  .cl-title { font-size: 1.3rem; }
+  .cl-resume-btn { width: 100%; }
+}

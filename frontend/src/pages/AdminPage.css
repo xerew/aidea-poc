@@ -361,3 +361,14 @@
 .admin-page-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .admin-page-info { font-size: 0.82rem; color: var(--color-text-muted, #64748b); }
+
+/* Mobile */
+@media (max-width: 640px) {
+  .admin-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-tab-btn { padding: 0.6rem 0.9rem; white-space: nowrap; }
+  .admin-search { max-width: none; }
+  .admin-request-actions { flex-wrap: wrap; }
+  .admin-request-name { overflow-wrap: anywhere; }
+  .admin-request-message { overflow-wrap: anywhere; }
+  .admin-pagination { flex-wrap: wrap; }
+}
