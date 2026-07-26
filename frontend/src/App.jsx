@@ -22,6 +22,7 @@ import RegisterPage from './pages/RegisterPage'
 import AdminPage from './pages/AdminPage'
 import ReviewsPage from './pages/ReviewsPage'
 import PublicProfilePage from './pages/PublicProfilePage'
+import DocumentationPage from './pages/DocumentationPage'
 
 // Content creators, AIDEA partners and admins all have content-creation access.
 const CREATOR_TYPES = ['content_creator', 'aidea_partner', 'admin']
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="/analytics"            element={<AnalyticsPage />} />
             <Route path="/profile"              element={<ProfilePage />} />
             <Route path="/users/:id"            element={<PublicProfilePage />} />
+            <Route path="/documentation"       element={<DocumentationPage />} />
             <Route path="/authoring"                  element={<ContentCreatorRoute element={<AuthoringPage />} />} />
             <Route path="/authoring/courses/new"      element={<ContentCreatorRoute element={<CourseCreatePage />} />} />
             <Route path="/authoring/courses/:id"      element={<ContentCreatorRoute element={<CourseEditorPage />} />} />

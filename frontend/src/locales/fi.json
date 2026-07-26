@@ -9,7 +9,8 @@
     "authoring": "Sisällöntuotanto",
     "admin": "Ylläpito",
     "reviews": "Arvioinnit",
-    "openMenu": "Avaa valikko"
+    "openMenu": "Avaa valikko",
+    "documentation": "Dokumentaatio"
   },
   "common": {
     "search": "Hae kursseja...",
@@ -723,5 +724,30 @@
     "inProgress": "Kesken",
     "authoredTitle": "Julkaistut kurssit",
     "noCourses": "Ei vielä julkaistuja kursseja."
+  },
+  "documentation": {
+    "title": "AIDEA — Tekoälyvetoinen opettajien akatemia",
+    "tagline": "Tekoäly pedagogisen muutoksen katalyyttinä.",
+    "mission": "AIDEA määrittelee uudelleen, miten tekoäly integroituu eurooppalaiseen opettajankoulutukseen. Yhdistämällä johtavien Erasmus+- ja Horizon Europe -hankkeiden tutkimuksen se tarjoaa modulaarisen, tutkimukseen perustuvan koulutuskehyksen, joka ylittää perinteisen opettajankoulutuksen.",
+    "pillars": {
+      "about": {
+        "title": "Tekoälystä opettaminen",
+        "desc": "Opettajien tekoälylukutaidon ja eettisen tietoisuuden kehittäminen."
+      },
+      "with": {
+        "title": "Tekoälyn kanssa opettaminen",
+        "desc": "Tekoälytyökaluja formatiiviseen arviointiin ja mukautuvaan oppimiseen."
+      },
+      "for": {
+        "title": "Tekoälyä varten opettaminen",
+        "desc": "Oppilaiden valmentaminen tekoälyn muokkaamaan tulevaisuuteen kriittisen ajattelun avulla."
+      }
+    },
+    "funding": "Rahoittaa Euroopan unioni Erasmus+- ja Horizon Europe -ohjelmien kautta. AIDEA – Ellinogermaniki Agogi.",
+    "guideTitle": "Käyttöopas",
+    "guideDesc": "Miten kukin käyttäjätyyppi käyttää alustaa.",
+    "openGuide": "Avaa opas",
+    "downloadGuide": "Lataa PDF",
+    "pdfFallback": "Selaimesi ei voi näyttää PDF-tiedostoa."
   }
 }

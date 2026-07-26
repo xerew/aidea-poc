@@ -9,7 +9,8 @@
     "authoring": "Authoring",
     "admin": "Admin",
     "reviews": "Reviews",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "documentation": "Documentation"
   },
   "common": {
     "search": "Search courses...",
@@ -723,5 +724,30 @@
     "inProgress": "In progress",
     "authoredTitle": "Published Courses",
     "noCourses": "No published courses yet."
+  },
+  "documentation": {
+    "title": "AIDEA — The AI-Driven Educators Academy",
+    "tagline": "AI as a catalyst for pedagogical transformation.",
+    "mission": "AIDEA redefines how artificial intelligence integrates into European teacher education. Unifying research from leading Erasmus+ and Horizon Europe initiatives, it offers a modular, research-backed training framework that moves beyond conventional teacher preparation.",
+    "pillars": {
+      "about": {
+        "title": "Teaching About AI",
+        "desc": "Building educator AI literacy and ethical awareness."
+      },
+      "with": {
+        "title": "Teaching With AI",
+        "desc": "AI tools for formative assessment and adaptive learning."
+      },
+      "for": {
+        "title": "Teaching For AI",
+        "desc": "Preparing students for an AI-driven future through critical thinking."
+      }
+    },
+    "funding": "Funded by the European Union through Erasmus+ and Horizon Europe. AIDEA by Ellinogermaniki Agogi.",
+    "guideTitle": "User Guide",
+    "guideDesc": "How each type of user works with the platform.",
+    "openGuide": "Open guide",
+    "downloadGuide": "Download PDF",
+    "pdfFallback": "Your browser cannot display the PDF."
   }
 }

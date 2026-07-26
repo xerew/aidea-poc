@@ -9,7 +9,8 @@
     "authoring": "Kursforfatting",
     "admin": "Admin",
     "reviews": "Vurderinger",
-    "openMenu": "Åpne meny"
+    "openMenu": "Åpne meny",
+    "documentation": "Dokumentasjon"
   },
   "common": {
     "search": "Søk etter kurs...",
@@ -723,5 +724,30 @@
     "inProgress": "Pågår",
     "authoredTitle": "Publiserte kurs",
     "noCourses": "Ingen publiserte kurs ennå."
+  },
+  "documentation": {
+    "title": "AIDEA — Den AI-drevne lærerakademiet",
+    "tagline": "KI som katalysator for pedagogisk endring.",
+    "mission": "AIDEA omdefinerer hvordan kunstig intelligens integreres i europeisk lærerutdanning. Ved å samle forskning fra ledende Erasmus+- og Horizon Europe-initiativer tilbyr prosjektet et modulært, forskningsbasert opplæringsrammeverk som går utover konvensjonell lærerutdanning.",
+    "pillars": {
+      "about": {
+        "title": "Undervise om KI",
+        "desc": "Bygge læreres KI-kompetanse og etiske bevissthet."
+      },
+      "with": {
+        "title": "Undervise med KI",
+        "desc": "KI-verktøy for formativ vurdering og adaptiv læring."
+      },
+      "for": {
+        "title": "Undervise for KI",
+        "desc": "Forberede elever på en KI-drevet fremtid gjennom kritisk tenkning."
+      }
+    },
+    "funding": "Finansiert av Den europeiske union gjennom Erasmus+ og Horizon Europe. AIDEA av Ellinogermaniki Agogi.",
+    "guideTitle": "Brukerveiledning",
+    "guideDesc": "Hvordan hver brukertype arbeider med plattformen.",
+    "openGuide": "Åpne veiledningen",
+    "downloadGuide": "Last ned PDF",
+    "pdfFallback": "Nettleseren din kan ikke vise PDF-en."
   }
 }

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck } from 'lucide-react'
+import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck, FileText } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
@@ -12,6 +12,7 @@ const BASE_NAV = [
   { to: '/pathway',   labelKey: 'nav.myPathway',   Icon: Map },
   { to: '/analytics', labelKey: 'nav.analytics',   Icon: BarChart2 },
   { to: '/profile',   labelKey: 'nav.profile',     Icon: User },
+  { to: '/documentation', labelKey: 'nav.documentation', Icon: FileText },
 ]
 
 const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: PenLine }

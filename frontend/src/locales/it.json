@@ -9,7 +9,8 @@
     "authoring": "Creazione contenuti",
     "admin": "Amministrazione",
     "reviews": "Revisioni",
-    "openMenu": "Apri menu"
+    "openMenu": "Apri menu",
+    "documentation": "Documentazione"
   },
   "common": {
     "search": "Cerca corsi...",
@@ -723,5 +724,30 @@
     "inProgress": "In corso",
     "authoredTitle": "Corsi pubblicati",
     "noCourses": "Nessun corso pubblicato al momento."
+  },
+  "documentation": {
+    "title": "AIDEA — L'Accademia degli Educatori guidata dall'IA",
+    "tagline": "L'IA come catalizzatore di trasformazione pedagogica.",
+    "mission": "AIDEA ridefinisce il modo in cui l'intelligenza artificiale si integra nella formazione degli insegnanti in Europa. Unendo la ricerca di importanti iniziative Erasmus+ e Horizon Europe, offre un quadro formativo modulare e basato sulla ricerca che va oltre la preparazione tradizionale degli insegnanti.",
+    "pillars": {
+      "about": {
+        "title": "Insegnare l'IA",
+        "desc": "Sviluppare l'alfabetizzazione all'IA e la consapevolezza etica dei docenti."
+      },
+      "with": {
+        "title": "Insegnare con l'IA",
+        "desc": "Strumenti di IA per la valutazione formativa e l'apprendimento adattivo."
+      },
+      "for": {
+        "title": "Insegnare per l'IA",
+        "desc": "Preparare gli studenti a un futuro guidato dall'IA con il pensiero critico."
+      }
+    },
+    "funding": "Finanziato dall'Unione Europea tramite Erasmus+ e Horizon Europe. AIDEA di Ellinogermaniki Agogi.",
+    "guideTitle": "Guida per l'utente",
+    "guideDesc": "Come ogni tipo di utente utilizza la piattaforma.",
+    "openGuide": "Apri la guida",
+    "downloadGuide": "Scarica il PDF",
+    "pdfFallback": "Il tuo browser non può visualizzare il PDF."
   }
 }

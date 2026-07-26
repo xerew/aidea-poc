@@ -9,7 +9,8 @@
     "authoring": "Kurserstellung",
     "admin": "Verwaltung",
     "reviews": "Bewertungen",
-    "openMenu": "Menü öffnen"
+    "openMenu": "Menü öffnen",
+    "documentation": "Dokumentation"
   },
   "common": {
     "search": "Kurse suchen...",
@@ -723,5 +724,30 @@
     "inProgress": "In Bearbeitung",
     "authoredTitle": "Veröffentlichte Kurse",
     "noCourses": "Noch keine veröffentlichten Kurse."
+  },
+  "documentation": {
+    "title": "AIDEA — Die KI-gestützte Akademie für Lehrkräfte",
+    "tagline": "KI als Katalysator für pädagogischen Wandel.",
+    "mission": "AIDEA definiert neu, wie künstliche Intelligenz in die europäische Lehrerbildung integriert wird. Durch die Bündelung der Forschung führender Erasmus+- und Horizon-Europe-Initiativen bietet das Projekt einen modularen, forschungsbasierten Ausbildungsrahmen, der über die herkömmliche Lehrerausbildung hinausgeht.",
+    "pillars": {
+      "about": {
+        "title": "Über KI unterrichten",
+        "desc": "KI-Kompetenz und ethisches Bewusstsein von Lehrkräften aufbauen."
+      },
+      "with": {
+        "title": "Mit KI unterrichten",
+        "desc": "KI-Werkzeuge für formative Bewertung und adaptives Lernen."
+      },
+      "for": {
+        "title": "Für KI unterrichten",
+        "desc": "Schüler durch kritisches Denken auf eine von KI geprägte Zukunft vorbereiten."
+      }
+    },
+    "funding": "Gefördert von der Europäischen Union über Erasmus+ und Horizon Europe. AIDEA von Ellinogermaniki Agogi.",
+    "guideTitle": "Benutzerhandbuch",
+    "guideDesc": "Wie jeder Benutzertyp mit der Plattform arbeitet.",
+    "openGuide": "Handbuch öffnen",
+    "downloadGuide": "PDF herunterladen",
+    "pdfFallback": "Ihr Browser kann das PDF nicht anzeigen."
   }
 }

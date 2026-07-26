@@ -9,7 +9,8 @@
     "authoring": "Kursskapande",
     "admin": "Admin",
     "reviews": "Granskningar",
-    "openMenu": "Öppna meny"
+    "openMenu": "Öppna meny",
+    "documentation": "Dokumentation"
   },
   "common": {
     "search": "Sök kurser…",
@@ -723,5 +724,30 @@
     "inProgress": "Pågående",
     "authoredTitle": "Publicerade kurser",
     "noCourses": "Inga publicerade kurser ännu."
+  },
+  "documentation": {
+    "title": "AIDEA — Den AI-drivna lärarakademin",
+    "tagline": "AI som katalysator för pedagogisk förändring.",
+    "mission": "AIDEA omdefinierar hur artificiell intelligens integreras i europeisk lärarutbildning. Genom att förena forskning från ledande Erasmus+- och Horizon Europe-initiativ erbjuder projektet ett modulärt, forskningsbaserat utbildningsramverk som går längre än konventionell lärarutbildning.",
+    "pillars": {
+      "about": {
+        "title": "Undervisa om AI",
+        "desc": "Bygga lärares AI-kompetens och etiska medvetenhet."
+      },
+      "with": {
+        "title": "Undervisa med AI",
+        "desc": "AI-verktyg för formativ bedömning och adaptivt lärande."
+      },
+      "for": {
+        "title": "Undervisa för AI",
+        "desc": "Förbereda elever för en AI-driven framtid genom kritiskt tänkande."
+      }
+    },
+    "funding": "Finansieras av Europeiska unionen via Erasmus+ och Horizon Europe. AIDEA av Ellinogermaniki Agogi.",
+    "guideTitle": "Användarguide",
+    "guideDesc": "Hur varje användartyp arbetar med plattformen.",
+    "openGuide": "Öppna guiden",
+    "downloadGuide": "Ladda ner PDF",
+    "pdfFallback": "Din webbläsare kan inte visa PDF-filen."
   }
 }
