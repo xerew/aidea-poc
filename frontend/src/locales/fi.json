@@ -677,7 +677,8 @@
       "empty": "Ei palautetta täällä.",
       "reasonRequired": "Hylkäämiseen tarvitaan syy.",
       "reasonPlaceholder": "Hylkäämisen syy…",
-      "confirmReject": "Vahvista hylkäys"
+      "confirmReject": "Vahvista hylkäys",
+      "rejectionSaved": "Hylkäys tallennettu"
     }
   },
   "analytics": {

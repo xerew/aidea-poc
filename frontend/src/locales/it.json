@@ -677,7 +677,8 @@
       "empty": "Nessun feedback qui.",
       "reasonRequired": "È richiesto un motivo per rifiutare.",
       "reasonPlaceholder": "Motivo del rifiuto…",
-      "confirmReject": "Conferma rifiuto"
+      "confirmReject": "Conferma rifiuto",
+      "rejectionSaved": "Rifiuto salvato"
     }
   },
   "analytics": {

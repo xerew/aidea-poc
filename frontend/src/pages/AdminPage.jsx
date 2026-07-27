@@ -419,6 +419,9 @@ function FeedbackCard({ item, onStatus }) {
     commit('rejected', reason.trim())
   }
 
+  // The rejection is already saved with this exact reason — nothing to confirm.
+  const rejectionSaved = item.status === 'rejected' && reason.trim() === (item.rejection_reason || '')
+
   return (
     <div className="admin-fb-card">
       <div className="admin-fb-head">
@@ -454,14 +457,18 @@ function FeedbackCard({ item, onStatus }) {
               onChange={(e) => setReason(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); confirmReject() } }}
             />
-            <button
-              type="button"
-              className="admin-fb-reject-btn"
-              onClick={confirmReject}
-              disabled={saving || !reason.trim()}
-            >
-              {t('admin.feedback.confirmReject')}
-            </button>
+            {rejectionSaved ? (
+              <span className="admin-feedback success">{t('admin.feedback.rejectionSaved')}</span>
+            ) : (
+              <button
+                type="button"
+                className="admin-fb-reject-btn"
+                onClick={confirmReject}
+                disabled={saving || !reason.trim()}
+              >
+                {t('admin.feedback.confirmReject')}
+              </button>
+            )}
           </>
         )}
         {saving && <span className="admin-feedback info">{t('common.saving')}</span>}

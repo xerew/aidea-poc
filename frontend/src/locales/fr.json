@@ -677,7 +677,8 @@
       "empty": "Aucun retour ici.",
       "reasonRequired": "Un motif est requis pour rejeter.",
       "reasonPlaceholder": "Motif du rejet…",
-      "confirmReject": "Confirmer le rejet"
+      "confirmReject": "Confirmer le rejet",
+      "rejectionSaved": "Rejet enregistré"
     }
   },
   "analytics": {

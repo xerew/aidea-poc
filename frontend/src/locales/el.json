@@ -677,7 +677,8 @@
       "empty": "Δεν υπάρχουν σχόλια εδώ.",
       "reasonRequired": "Απαιτείται λόγος για απόρριψη.",
       "reasonPlaceholder": "Λόγος απόρριψης…",
-      "confirmReject": "Επιβεβαίωση απόρριψης"
+      "confirmReject": "Επιβεβαίωση απόρριψης",
+      "rejectionSaved": "Η απόρριψη αποθηκεύτηκε"
     }
   },
   "analytics": {
