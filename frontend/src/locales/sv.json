@@ -676,7 +676,8 @@
       "allCategories": "Alla kategorier",
       "empty": "Ingen feedback här.",
       "reasonRequired": "En orsak krävs för att avvisa.",
-      "reasonPlaceholder": "Orsak till avvisning…"
+      "reasonPlaceholder": "Orsak till avvisning…",
+      "confirmReject": "Bekräfta avvisning"
     }
   },
   "analytics": {

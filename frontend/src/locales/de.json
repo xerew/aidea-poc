@@ -676,7 +676,8 @@
       "allCategories": "Alle Kategorien",
       "empty": "Kein Feedback hier.",
       "reasonRequired": "Für die Ablehnung ist ein Grund erforderlich.",
-      "reasonPlaceholder": "Grund für die Ablehnung…"
+      "reasonPlaceholder": "Grund für die Ablehnung…",
+      "confirmReject": "Ablehnung bestätigen"
     }
   },
   "analytics": {

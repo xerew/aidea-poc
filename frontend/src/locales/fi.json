@@ -676,7 +676,8 @@
       "allCategories": "Kaikki luokat",
       "empty": "Ei palautetta täällä.",
       "reasonRequired": "Hylkäämiseen tarvitaan syy.",
-      "reasonPlaceholder": "Hylkäämisen syy…"
+      "reasonPlaceholder": "Hylkäämisen syy…",
+      "confirmReject": "Vahvista hylkäys"
     }
   },
   "analytics": {

@@ -676,7 +676,8 @@
       "allCategories": "Toutes les catégories",
       "empty": "Aucun retour ici.",
       "reasonRequired": "Un motif est requis pour rejeter.",
-      "reasonPlaceholder": "Motif du rejet…"
+      "reasonPlaceholder": "Motif du rejet…",
+      "confirmReject": "Confirmer le rejet"
     }
   },
   "analytics": {

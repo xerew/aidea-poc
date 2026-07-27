@@ -676,7 +676,8 @@
       "allCategories": "Όλες οι κατηγορίες",
       "empty": "Δεν υπάρχουν σχόλια εδώ.",
       "reasonRequired": "Απαιτείται λόγος για απόρριψη.",
-      "reasonPlaceholder": "Λόγος απόρριψης…"
+      "reasonPlaceholder": "Λόγος απόρριψης…",
+      "confirmReject": "Επιβεβαίωση απόρριψης"
     }
   },
   "analytics": {

@@ -676,7 +676,8 @@
       "allCategories": "Todas las categorías",
       "empty": "No hay comentarios aquí.",
       "reasonRequired": "Se requiere un motivo para rechazar.",
-      "reasonPlaceholder": "Motivo del rechazo…"
+      "reasonPlaceholder": "Motivo del rechazo…",
+      "confirmReject": "Confirmar rechazo"
     }
   },
   "analytics": {

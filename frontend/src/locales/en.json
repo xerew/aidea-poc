@@ -676,7 +676,8 @@
       "allCategories": "All categories",
       "empty": "No feedback here.",
       "reasonRequired": "A reason is required to reject.",
-      "reasonPlaceholder": "Reason for rejection…"
+      "reasonPlaceholder": "Reason for rejection…",
+      "confirmReject": "Confirm rejection"
     }
   },
   "analytics": {

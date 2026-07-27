@@ -676,7 +676,8 @@
       "allCategories": "Alle kategorier",
       "empty": "Ingen tilbakemelding her.",
       "reasonRequired": "En årsak kreves for å avvise.",
-      "reasonPlaceholder": "Årsak til avvisning…"
+      "reasonPlaceholder": "Årsak til avvisning…",
+      "confirmReject": "Bekreft avvisning"
     }
   },
   "analytics": {

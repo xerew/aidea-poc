@@ -384,24 +384,39 @@ FeedbackCard.propTypes = { item: PropTypes.object.isRequired, onStatus: PropType
 
 function FeedbackCard({ item, onStatus }) {
   const { t } = useTranslation()
+  // `selected` is the pending dropdown choice; it may differ from the saved
+  // item.status while a rejection reason is being entered.
+  const [selected, setSelected] = useState(item.status)
   const [reason, setReason] = useState(item.rejection_reason || '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const apply = async (nextStatus) => {
-    if (nextStatus === 'rejected' && !reason.trim()) {
-      setError(t('admin.feedback.reasonRequired'))
-      return
-    }
+  const commit = async (nextStatus, nextReason) => {
     setSaving(true)
     setError('')
     try {
-      await onStatus(item.id, nextStatus, reason.trim())
+      await onStatus(item.id, nextStatus, nextReason)
     } catch (err) {
       setError(err?.response?.data?.detail || t('admin.updateFailed'))
+      setSelected(item.status)  // revert the dropdown on failure
     } finally {
       setSaving(false)
     }
+  }
+
+  const onSelect = (value) => {
+    setSelected(value)
+    setError('')
+    // Non-reject statuses save straight away; rejection waits for a reason.
+    if (value !== 'rejected') commit(value, '')
+  }
+
+  const confirmReject = () => {
+    if (!reason.trim()) {
+      setError(t('admin.feedback.reasonRequired'))
+      return
+    }
+    commit('rejected', reason.trim())
   }
 
   return (
@@ -424,20 +439,30 @@ function FeedbackCard({ item, onStatus }) {
       <div className="admin-fb-controls">
         <select
           className="admin-role-select"
-          value={item.status}
+          value={selected}
           disabled={saving}
-          onChange={(e) => apply(e.target.value)}
+          onChange={(e) => onSelect(e.target.value)}
         >
           {FB_STATUSES.map(s => <option key={s} value={s}>{t(`feedback.statuses.${s}`)}</option>)}
         </select>
-        {item.status === 'rejected' && (
-          <input
-            className="admin-fb-reason"
-            placeholder={t('admin.feedback.reasonPlaceholder')}
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            onBlur={() => reason.trim() && apply('rejected')}
-          />
+        {selected === 'rejected' && (
+          <>
+            <input
+              className="admin-fb-reason"
+              placeholder={t('admin.feedback.reasonPlaceholder')}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); confirmReject() } }}
+            />
+            <button
+              type="button"
+              className="admin-fb-reject-btn"
+              onClick={confirmReject}
+              disabled={saving || !reason.trim()}
+            >
+              {t('admin.feedback.confirmReject')}
+            </button>
+          </>
         )}
         {saving && <span className="admin-feedback info">{t('common.saving')}</span>}
         {error && <span className="admin-feedback error">{error}</span>}
