@@ -195,7 +195,8 @@ function RequestsTab() {
   const [showPast,      setShowPast]      = useState(false)
   const [query,         setQuery]         = useState('')
   const [page,          setPage]          = useState(1)
-  const onSearch = (value) => { setQuery(value); setPage(1) }
+  const [pastPage,      setPastPage]      = useState(1)
+  const onSearch = (value) => { setQuery(value); setPage(1); setPastPage(1) }
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -249,6 +250,9 @@ function RequestsTab() {
   const totalPages = Math.max(1, Math.ceil(pending.length / PER_PAGE))
   const safePage = Math.min(page, totalPages)
   const pagePending = pending.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+  const pastTotalPages = Math.max(1, Math.ceil(past.length / PER_PAGE))
+  const safePastPage = Math.min(pastPage, pastTotalPages)
+  const pagePast = past.slice((safePastPage - 1) * PER_PAGE, safePastPage * PER_PAGE)
 
   return (
     <div className="admin-requests">
@@ -315,7 +319,7 @@ function RequestsTab() {
           <button className="admin-past-toggle" onClick={() => setShowPast(v => !v)}>
             {showPast ? '▲' : '▼'} {t('admin.pastRequests', { count: past.length })}
           </button>
-          {showPast && past.map(req => (
+          {showPast && pagePast.map(req => (
             <div key={req.id} className="admin-request-card">
               <div className="admin-request-header">
                 <div className="admin-avatar">{req.avatar_initials || '?'}</div>
@@ -333,6 +337,7 @@ function RequestsTab() {
               )}
             </div>
           ))}
+          {showPast && <Pagination page={safePastPage} totalPages={pastTotalPages} onPage={setPastPage} />}
         </div>
       )}
     </div>
