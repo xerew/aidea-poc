@@ -680,6 +680,22 @@
       "confirmReject": "Confirmer le rejet",
       "rejectionSaved": "Rejet enregistré",
       "editReason": "Modifier le motif"
+    },
+    "researchTab": "Recherche",
+    "research": {
+      "enabled": "Étude activée",
+      "controlPath": "Programme témoin (groupe fixe)",
+      "noPath": "— aucun sélectionné —",
+      "postOpen": "Post-test ouvert",
+      "noAssessment": "Aucune question d'évaluation — ajoutez-les dans l'admin Django avant de lancer l'étude.",
+      "noControlWarn": "Sélectionnez un programme témoin, sinon le groupe fixe n'a aucun cours.",
+      "adaptive": "Adaptatif",
+      "fixed": "Fixe",
+      "preDone": "Pré-test fait",
+      "postDone": "Post-test fait",
+      "declined": "Refusé",
+      "questions": "Questions",
+      "export": "Exporter les données (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "En cours",
       "resolved": "Résolu",
       "rejected": "Rejeté"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Étude de recherche",
+      "body": "Nous comparons deux façons de guider votre apprentissage. Si vous participez, vous serez placé au hasard dans l'un des deux groupes et répondrez à quelques questions maintenant puis plus tard.",
+      "voluntary": "La participation est volontaire et vos données sont stockées de façon pseudonyme. Vous pouvez ignorer ceci à tout moment.",
+      "join": "Participer à l'étude",
+      "decline": "Non merci"
+    },
+    "assessment": {
+      "preTitle": "Questionnaire initial",
+      "postTitle": "Questionnaire final",
+      "intro": "Veuillez répondre à chaque question. Cela mesure votre point de départ — il n'y a ni réussite ni échec.",
+      "submit": "Envoyer",
+      "submitting": "Envoi…",
+      "loadError": "Impossible de charger le questionnaire.",
+      "submitError": "Échec de l'envoi. Réessayez."
+    },
+    "postPrompt": {
+      "text": "Le questionnaire final de l'étude est maintenant disponible.",
+      "take": "Le remplir"
     }
   }
 }

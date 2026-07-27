@@ -680,6 +680,22 @@
       "confirmReject": "Bekreft avvisning",
       "rejectionSaved": "Avvisning lagret",
       "editReason": "Rediger årsak"
+    },
+    "researchTab": "Forskning",
+    "research": {
+      "enabled": "Studie aktivert",
+      "controlPath": "Kontrollplan (fast gruppe)",
+      "noPath": "— ingen valgt —",
+      "postOpen": "Ettertest åpen",
+      "noAssessment": "Ingen vurderingsspørsmål ennå — legg dem til i Django-admin før studien kan kjøre.",
+      "noControlWarn": "Velg en kontrollplan, ellers har den faste gruppen ingen kurs.",
+      "adaptive": "Adaptiv",
+      "fixed": "Fast",
+      "preDone": "Førtest gjort",
+      "postDone": "Ettertest gjort",
+      "declined": "Avslo",
+      "questions": "Spørsmål",
+      "export": "Eksporter data (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "Pågår",
       "resolved": "Løst",
       "rejected": "Avvist"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Forskningsstudie",
+      "body": "Vi sammenligner to måter å veilede læringen din på. Hvis du deltar, blir du tilfeldig plassert i en av to grupper og får noen spørsmål nå og senere.",
+      "voluntary": "Deltakelse er frivillig og dataene dine lagres pseudonymt. Du kan ignorere dette når som helst.",
+      "join": "Delta i studien",
+      "decline": "Nei takk"
+    },
+    "assessment": {
+      "preTitle": "Innledende spørreskjema",
+      "postTitle": "Avsluttende spørreskjema",
+      "intro": "Svar på hvert spørsmål. Dette måler utgangspunktet ditt — det finnes ingen bestått eller stryk.",
+      "submit": "Send inn",
+      "submitting": "Sender…",
+      "loadError": "Kunne ikke laste spørreskjemaet.",
+      "submitError": "Kunne ikke sende. Prøv igjen."
+    },
+    "postPrompt": {
+      "text": "Det avsluttende spørreskjemaet for studien er nå tilgjengelig.",
+      "take": "Fyll ut"
     }
   }
 }

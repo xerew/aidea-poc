@@ -680,6 +680,22 @@
       "confirmReject": "Vahvista hylkäys",
       "rejectionSaved": "Hylkäys tallennettu",
       "editReason": "Muokkaa syytä"
+    },
+    "researchTab": "Tutkimus",
+    "research": {
+      "enabled": "Tutkimus käytössä",
+      "controlPath": "Verrokkiopinto-ohjelma (kiinteä ryhmä)",
+      "noPath": "— ei valittu —",
+      "postOpen": "Loppukoe avoinna",
+      "noAssessment": "Ei vielä arviointikysymyksiä — lisää ne Django-adminissa ennen tutkimuksen aloitusta.",
+      "noControlWarn": "Valitse verrokkiohjelma, muuten kiinteällä ryhmällä ei ole kursseja.",
+      "adaptive": "Mukautuva",
+      "fixed": "Kiinteä",
+      "preDone": "Alkukoe tehty",
+      "postDone": "Loppukoe tehty",
+      "declined": "Kieltäytyi",
+      "questions": "Kysymykset",
+      "export": "Vie tiedot (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "Käynnissä",
       "resolved": "Ratkaistu",
       "rejected": "Hylätty"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Tutkimus",
+      "body": "Vertailemme kahta tapaa ohjata oppimistasi. Jos osallistut, sinut sijoitetaan satunnaisesti toiseen kahdesta ryhmästä ja sinulle esitetään lyhyt kysymyssarja nyt ja myöhemmin.",
+      "voluntary": "Osallistuminen on vapaaehtoista ja tietosi tallennetaan nimimerkillä. Voit ohittaa tämän milloin tahansa.",
+      "join": "Osallistu tutkimukseen",
+      "decline": "Ei kiitos"
+    },
+    "assessment": {
+      "preTitle": "Alkukysely",
+      "postTitle": "Loppukysely",
+      "intro": "Vastaa jokaiseen kysymykseen. Tämä mittaa lähtötasoasi — ei ole läpäisyä tai hylkäystä.",
+      "submit": "Lähetä",
+      "submitting": "Lähetetään…",
+      "loadError": "Kyselyä ei voitu ladata.",
+      "submitError": "Lähetys epäonnistui. Yritä uudelleen."
+    },
+    "postPrompt": {
+      "text": "Tutkimuksen loppukysely on nyt saatavilla.",
+      "take": "Täytä se"
     }
   }
 }

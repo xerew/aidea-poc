@@ -578,6 +578,92 @@ function FeedbackTab() {
   )
 }
 
+// ── Research tab (adaptive-vs-fixed study) ────────────────────────────────────
+
+function StatTile({ label, value }) {
+  return (
+    <div className="admin-stat">
+      <span className="admin-stat-value">{value}</span>
+      <span className="admin-stat-label">{label}</span>
+    </div>
+  )
+}
+StatTile.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.node.isRequired }
+
+function ResearchTab() {
+  const { t } = useTranslation()
+  const [data, setData] = useState(null)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    client.get('/admin/study/').then(res => setData(res.data)).catch(() => setData(null))
+  }, [])
+
+  const patch = async (body) => {
+    setSaving(true)
+    try {
+      const res = await client.patch('/admin/study/', body)
+      setData(res.data)
+    } catch { /* ignore */ } finally {
+      setSaving(false)
+    }
+  }
+
+  const exportData = async () => {
+    const res = await client.get('/admin/study/export/', { responseType: 'blob' })
+    const url = URL.createObjectURL(res.data)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'aidea-study-export.xlsx'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  if (!data) return <p className="admin-loading">{t('common.loading')}</p>
+  const c = data.counts
+
+  return (
+    <div className="admin-tab-body">
+      <div className="admin-research-controls">
+        <label className="admin-toggle-row">
+          <input type="checkbox" checked={data.enabled} disabled={saving}
+                 onChange={(e) => patch({ enabled: e.target.checked })} />
+          <span>{t('admin.research.enabled')}</span>
+        </label>
+
+        <div className="admin-research-field">
+          <label>{t('admin.research.controlPath')}</label>
+          <select className="admin-role-select" value={data.control_path || ''} disabled={saving}
+                  onChange={(e) => patch({ control_path: e.target.value || null })}>
+            <option value="">{t('admin.research.noPath')}</option>
+            {data.available_paths.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+        </div>
+
+        <label className="admin-toggle-row">
+          <input type="checkbox" checked={data.post_test_open} disabled={saving}
+                 onChange={(e) => patch({ post_test_open: e.target.checked })} />
+          <span>{t('admin.research.postOpen')}</span>
+        </label>
+      </div>
+
+      {!data.has_assessment && <p className="admin-research-warn">{t('admin.research.noAssessment')}</p>}
+      {data.enabled && !data.control_path && <p className="admin-research-warn">{t('admin.research.noControlWarn')}</p>}
+
+      <div className="admin-stats">
+        <StatTile label={t('admin.research.adaptive')} value={c.adaptive} />
+        <StatTile label={t('admin.research.fixed')} value={c.fixed} />
+        <StatTile label={t('admin.research.preDone')} value={c.pre_done} />
+        <StatTile label={t('admin.research.postDone')} value={c.post_done} />
+        <StatTile label={t('admin.research.declined')} value={c.declined} />
+        <StatTile label={t('admin.research.questions')} value={data.assessment_questions} />
+      </div>
+
+      <button className="admin-approve-btn" onClick={exportData}>{t('admin.research.export')}</button>
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const { t } = useTranslation()
   const [tab, setTab] = useState('users')
@@ -606,6 +692,12 @@ export default function AdminPage() {
           {t('admin.feedbackTab')}
         </button>
         <button
+          className={`admin-tab-btn ${tab === 'research' ? 'active' : ''}`}
+          onClick={() => setTab('research')}
+        >
+          {t('admin.researchTab')}
+        </button>
+        <button
           className={`admin-tab-btn ${tab === 'system' ? 'active' : ''}`}
           onClick={() => setTab('system')}
         >
@@ -615,6 +707,7 @@ export default function AdminPage() {
       {tab === 'users' && <UsersTab />}
       {tab === 'requests' && <RequestsTab />}
       {tab === 'feedback' && <FeedbackTab />}
+      {tab === 'research' && <ResearchTab />}
       {tab === 'system' && <SystemTab />}
     </div>
   )

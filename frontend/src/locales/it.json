@@ -680,6 +680,22 @@
       "confirmReject": "Conferma rifiuto",
       "rejectionSaved": "Rifiuto salvato",
       "editReason": "Modifica motivo"
+    },
+    "researchTab": "Ricerca",
+    "research": {
+      "enabled": "Studio attivo",
+      "controlPath": "Curriculum di controllo (gruppo fisso)",
+      "noPath": "— nessuno selezionato —",
+      "postOpen": "Post-test aperto",
+      "noAssessment": "Nessuna domanda di valutazione — aggiungile nell'admin Django prima di avviare lo studio.",
+      "noControlWarn": "Seleziona un curriculum di controllo, altrimenti il gruppo fisso non ha corsi.",
+      "adaptive": "Adattivo",
+      "fixed": "Fisso",
+      "preDone": "Pre-test fatto",
+      "postDone": "Post-test fatto",
+      "declined": "Rifiutato",
+      "questions": "Domande",
+      "export": "Esporta dati (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "In corso",
       "resolved": "Risolto",
       "rejected": "Rifiutato"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Studio di ricerca",
+      "body": "Stiamo confrontando due modi di guidare il tuo apprendimento. Se partecipi, sarai assegnato casualmente a uno di due gruppi e risponderai ad alcune domande ora e più avanti.",
+      "voluntary": "La partecipazione è volontaria e i tuoi dati sono archiviati in forma pseudonima. Puoi ignorare questo in qualsiasi momento.",
+      "join": "Partecipa allo studio",
+      "decline": "No, grazie"
+    },
+    "assessment": {
+      "preTitle": "Questionario iniziale",
+      "postTitle": "Questionario finale",
+      "intro": "Rispondi a ogni domanda. Misura il tuo punto di partenza: non c'è promozione o bocciatura.",
+      "submit": "Invia",
+      "submitting": "Invio…",
+      "loadError": "Impossibile caricare il questionario.",
+      "submitError": "Impossibile inviare. Riprova."
+    },
+    "postPrompt": {
+      "text": "Il questionario finale dello studio è ora disponibile.",
+      "take": "Compilalo"
     }
   }
 }

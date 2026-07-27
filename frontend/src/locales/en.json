@@ -680,6 +680,22 @@
       "confirmReject": "Confirm rejection",
       "rejectionSaved": "Rejection saved",
       "editReason": "Edit reason"
+    },
+    "researchTab": "Research",
+    "research": {
+      "enabled": "Study enabled",
+      "controlPath": "Control curriculum (fixed group)",
+      "noPath": "— none selected —",
+      "postOpen": "Post-test open",
+      "noAssessment": "No assessment questions yet — add them in Django admin before the study can run.",
+      "noControlWarn": "Select a control curriculum, or the fixed group has no courses.",
+      "adaptive": "Adaptive",
+      "fixed": "Fixed",
+      "preDone": "Pre-test done",
+      "postDone": "Post-test done",
+      "declined": "Declined",
+      "questions": "Questions",
+      "export": "Export data (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "In progress",
       "resolved": "Resolved",
       "rejected": "Rejected"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Research study",
+      "body": "We're comparing two ways of guiding your learning. If you take part, you'll be randomly placed in one of two groups and asked a short set of questions now and again later.",
+      "voluntary": "Taking part is voluntary and your data is stored pseudonymously. You can ignore this at any time.",
+      "join": "Join the study",
+      "decline": "No thanks"
+    },
+    "assessment": {
+      "preTitle": "Starting questionnaire",
+      "postTitle": "Final questionnaire",
+      "intro": "Please answer each question. This measures your starting point — there's no pass or fail.",
+      "submit": "Submit",
+      "submitting": "Submitting…",
+      "loadError": "Could not load the questionnaire.",
+      "submitError": "Could not submit. Please try again."
+    },
+    "postPrompt": {
+      "text": "The final questionnaire for the research study is now available.",
+      "take": "Take it"
     }
   }
 }

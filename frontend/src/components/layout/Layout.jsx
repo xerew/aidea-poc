@@ -7,6 +7,7 @@ import { MessagesProvider } from '../../context/MessagesContext'
 import Sidebar from './Sidebar'
 import Header from './Header'
 import Footer from './Footer'
+import StudyGate from '../StudyGate'
 import './Layout.css'
 
 function DenialBanner() {
@@ -41,6 +42,7 @@ function LayoutInner() {
       )}
       <div className="layout-body">
         <Header onMenuClick={() => setDrawerOpen((o) => !o)} />
+        <StudyGate />
         <DenialBanner />
         <main className="layout-main">
           <Outlet />

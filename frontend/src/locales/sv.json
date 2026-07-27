@@ -680,6 +680,22 @@
       "confirmReject": "Bekräfta avvisning",
       "rejectionSaved": "Avvisning sparad",
       "editReason": "Redigera orsak"
+    },
+    "researchTab": "Forskning",
+    "research": {
+      "enabled": "Studie aktiverad",
+      "controlPath": "Kontrolläroplan (fast grupp)",
+      "noPath": "— ingen vald —",
+      "postOpen": "Eftertest öppet",
+      "noAssessment": "Inga bedömningsfrågor ännu — lägg till dem i Django-admin innan studien kan köras.",
+      "noControlWarn": "Välj en kontrolläroplan, annars har den fasta gruppen inga kurser.",
+      "adaptive": "Adaptiv",
+      "fixed": "Fast",
+      "preDone": "Förtest klart",
+      "postDone": "Eftertest klart",
+      "declined": "Avböjde",
+      "questions": "Frågor",
+      "export": "Exportera data (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "Pågår",
       "resolved": "Löst",
       "rejected": "Avvisad"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Forskningsstudie",
+      "body": "Vi jämför två sätt att vägleda ditt lärande. Om du deltar placeras du slumpmässigt i en av två grupper och får svara på några frågor nu och senare.",
+      "voluntary": "Deltagandet är frivilligt och dina data lagras pseudonymt. Du kan ignorera detta när som helst.",
+      "join": "Delta i studien",
+      "decline": "Nej tack"
+    },
+    "assessment": {
+      "preTitle": "Inledande frågeformulär",
+      "postTitle": "Avslutande frågeformulär",
+      "intro": "Svara på varje fråga. Detta mäter din utgångspunkt — det finns inget godkänt eller underkänt.",
+      "submit": "Skicka",
+      "submitting": "Skickar…",
+      "loadError": "Det gick inte att ladda frågeformuläret.",
+      "submitError": "Det gick inte att skicka. Försök igen."
+    },
+    "postPrompt": {
+      "text": "Studiens avslutande frågeformulär är nu tillgängligt.",
+      "take": "Fyll i det"
     }
   }
 }

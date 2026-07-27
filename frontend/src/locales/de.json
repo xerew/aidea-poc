@@ -680,6 +680,22 @@
       "confirmReject": "Ablehnung bestätigen",
       "rejectionSaved": "Ablehnung gespeichert",
       "editReason": "Grund bearbeiten"
+    },
+    "researchTab": "Forschung",
+    "research": {
+      "enabled": "Studie aktiviert",
+      "controlPath": "Kontroll-Lehrplan (feste Gruppe)",
+      "noPath": "— keiner ausgewählt —",
+      "postOpen": "Nachtest offen",
+      "noAssessment": "Noch keine Bewertungsfragen — fügen Sie sie im Django-Admin hinzu, bevor die Studie laufen kann.",
+      "noControlWarn": "Wählen Sie einen Kontroll-Lehrplan, sonst hat die feste Gruppe keine Kurse.",
+      "adaptive": "Adaptiv",
+      "fixed": "Fest",
+      "preDone": "Vortest erledigt",
+      "postDone": "Nachtest erledigt",
+      "declined": "Abgelehnt",
+      "questions": "Fragen",
+      "export": "Daten exportieren (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "In Bearbeitung",
       "resolved": "Gelöst",
       "rejected": "Abgelehnt"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Forschungsstudie",
+      "body": "Wir vergleichen zwei Arten, Ihr Lernen zu begleiten. Wenn Sie teilnehmen, werden Sie zufällig einer von zwei Gruppen zugeteilt und beantworten jetzt und später einige Fragen.",
+      "voluntary": "Die Teilnahme ist freiwillig und Ihre Daten werden pseudonym gespeichert. Sie können dies jederzeit ignorieren.",
+      "join": "An der Studie teilnehmen",
+      "decline": "Nein danke"
+    },
+    "assessment": {
+      "preTitle": "Eingangsfragebogen",
+      "postTitle": "Abschlussfragebogen",
+      "intro": "Bitte beantworten Sie jede Frage. Dies misst Ihren Ausgangspunkt — es gibt kein Bestehen oder Durchfallen.",
+      "submit": "Absenden",
+      "submitting": "Wird gesendet…",
+      "loadError": "Fragebogen konnte nicht geladen werden.",
+      "submitError": "Senden fehlgeschlagen. Bitte erneut versuchen."
+    },
+    "postPrompt": {
+      "text": "Der Abschlussfragebogen der Studie ist jetzt verfügbar.",
+      "take": "Ausfüllen"
     }
   }
 }

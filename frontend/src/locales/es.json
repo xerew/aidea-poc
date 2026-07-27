@@ -680,6 +680,22 @@
       "confirmReject": "Confirmar rechazo",
       "rejectionSaved": "Rechazo guardado",
       "editReason": "Editar motivo"
+    },
+    "researchTab": "Investigación",
+    "research": {
+      "enabled": "Estudio activado",
+      "controlPath": "Currículo de control (grupo fijo)",
+      "noPath": "— ninguno seleccionado —",
+      "postOpen": "Post-test abierto",
+      "noAssessment": "Aún no hay preguntas de evaluación: añádelas en el admin de Django antes de iniciar el estudio.",
+      "noControlWarn": "Selecciona un currículo de control, o el grupo fijo no tendrá cursos.",
+      "adaptive": "Adaptativo",
+      "fixed": "Fijo",
+      "preDone": "Pre-test hecho",
+      "postDone": "Post-test hecho",
+      "declined": "Rechazado",
+      "questions": "Preguntas",
+      "export": "Exportar datos (XLSX)"
     }
   },
   "analytics": {
@@ -813,6 +829,28 @@
       "in_progress": "En curso",
       "resolved": "Resuelto",
       "rejected": "Rechazado"
+    }
+  },
+  "study": {
+    "consent": {
+      "title": "Estudio de investigación",
+      "body": "Estamos comparando dos formas de guiar tu aprendizaje. Si participas, se te asignará al azar a uno de dos grupos y responderás unas preguntas ahora y más adelante.",
+      "voluntary": "La participación es voluntaria y tus datos se almacenan de forma seudónima. Puedes ignorar esto en cualquier momento.",
+      "join": "Unirme al estudio",
+      "decline": "No, gracias"
+    },
+    "assessment": {
+      "preTitle": "Cuestionario inicial",
+      "postTitle": "Cuestionario final",
+      "intro": "Responde cada pregunta. Mide tu punto de partida: no hay aprobado ni suspenso.",
+      "submit": "Enviar",
+      "submitting": "Enviando…",
+      "loadError": "No se pudo cargar el cuestionario.",
+      "submitError": "No se pudo enviar. Inténtalo de nuevo."
+    },
+    "postPrompt": {
+      "text": "El cuestionario final del estudio ya está disponible.",
+      "take": "Completarlo"
     }
   }
 }
