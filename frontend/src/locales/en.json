@@ -666,7 +666,18 @@
     "noMatch": "No matches.",
     "prev": "Previous",
     "next": "Next",
-    "pageOf": "Page {{page}} of {{total}}"
+    "pageOf": "Page {{page}} of {{total}}",
+    "feedbackTab": "Feedback",
+    "feedback": {
+      "userStream": "User feedback",
+      "partnerStream": "Partner feedback",
+      "searchName": "Search by name…",
+      "allStatuses": "All statuses",
+      "allCategories": "All categories",
+      "empty": "No feedback here.",
+      "reasonRequired": "A reason is required to reject.",
+      "reasonPlaceholder": "Reason for rejection…"
+    }
   },
   "analytics": {
     "subtitle": "Track engagement and performance across your created courses",
@@ -767,5 +778,38 @@
     "selectPrompt": "Select a conversation to start reading.",
     "startPrompt": "No messages yet — say hello!",
     "composerPlaceholder": "Type a message…"
+  },
+  "feedback": {
+    "title": "Send feedback",
+    "subtitle": "Report a bug, suggest an improvement, or share your thoughts.",
+    "categoryLabel": "Category",
+    "messageLabel": "Your message",
+    "messagePlaceholder": "Describe it in as much detail as you like…",
+    "messageRequired": "Please write a message.",
+    "addFile": "Attach image or file",
+    "uploading": "Uploading…",
+    "uploadFailed": "Upload failed. Please try again.",
+    "linkPlaceholder": "Paste a link (video, doc, …)",
+    "addLink": "Add link",
+    "removeAttachment": "Remove attachment",
+    "submit": "Submit feedback",
+    "submitting": "Submitting…",
+    "submitFailed": "Could not submit. Please try again.",
+    "thanks": "Thanks! Your feedback was submitted.",
+    "yourSubmissions": "Your submissions",
+    "categories": {
+      "bug": "Bug",
+      "suggestion": "Suggestion",
+      "feedback": "Feedback",
+      "feature_request": "Feature request",
+      "content_issue": "Content issue"
+    },
+    "statuses": {
+      "new": "New",
+      "reviewing": "Under review",
+      "in_progress": "In progress",
+      "resolved": "Resolved",
+      "rejected": "Rejected"
+    }
   }
 }

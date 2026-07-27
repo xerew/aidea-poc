@@ -666,7 +666,18 @@
     "noMatch": "Aucun résultat.",
     "prev": "Précédent",
     "next": "Suivant",
-    "pageOf": "Page {{page}} sur {{total}}"
+    "pageOf": "Page {{page}} sur {{total}}",
+    "feedbackTab": "Retours",
+    "feedback": {
+      "userStream": "Retours des utilisateurs",
+      "partnerStream": "Retours des partenaires",
+      "searchName": "Rechercher par nom…",
+      "allStatuses": "Tous les statuts",
+      "allCategories": "Toutes les catégories",
+      "empty": "Aucun retour ici.",
+      "reasonRequired": "Un motif est requis pour rejeter.",
+      "reasonPlaceholder": "Motif du rejet…"
+    }
   },
   "analytics": {
     "subtitle": "Suivez l'engagement et les performances de vos cours créés",
@@ -767,5 +778,38 @@
     "selectPrompt": "Sélectionnez une conversation pour commencer.",
     "startPrompt": "Aucun message — dites bonjour !",
     "composerPlaceholder": "Écrivez un message…"
+  },
+  "feedback": {
+    "title": "Envoyer un retour",
+    "subtitle": "Signalez un bug, suggérez une amélioration ou partagez votre avis.",
+    "categoryLabel": "Catégorie",
+    "messageLabel": "Votre message",
+    "messagePlaceholder": "Décrivez-le aussi précisément que vous le souhaitez…",
+    "messageRequired": "Veuillez écrire un message.",
+    "addFile": "Joindre une image ou un fichier",
+    "uploading": "Téléversement…",
+    "uploadFailed": "Échec du téléversement. Réessayez.",
+    "linkPlaceholder": "Collez un lien (vidéo, document, …)",
+    "addLink": "Ajouter un lien",
+    "removeAttachment": "Supprimer la pièce jointe",
+    "submit": "Envoyer",
+    "submitting": "Envoi…",
+    "submitFailed": "Échec de l'envoi. Réessayez.",
+    "thanks": "Merci ! Votre retour a été envoyé.",
+    "yourSubmissions": "Vos envois",
+    "categories": {
+      "bug": "Bug",
+      "suggestion": "Suggestion",
+      "feedback": "Retour",
+      "feature_request": "Demande de fonctionnalité",
+      "content_issue": "Problème de contenu"
+    },
+    "statuses": {
+      "new": "Nouveau",
+      "reviewing": "En cours d'examen",
+      "in_progress": "En cours",
+      "resolved": "Résolu",
+      "rejected": "Rejeté"
+    }
   }
 }

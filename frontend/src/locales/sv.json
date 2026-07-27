@@ -666,7 +666,18 @@
     "noMatch": "Inga träffar.",
     "prev": "Föregående",
     "next": "Nästa",
-    "pageOf": "Sida {{page}} av {{total}}"
+    "pageOf": "Sida {{page}} av {{total}}",
+    "feedbackTab": "Feedback",
+    "feedback": {
+      "userStream": "Användarfeedback",
+      "partnerStream": "Partnerfeedback",
+      "searchName": "Sök efter namn…",
+      "allStatuses": "Alla statusar",
+      "allCategories": "Alla kategorier",
+      "empty": "Ingen feedback här.",
+      "reasonRequired": "En orsak krävs för att avvisa.",
+      "reasonPlaceholder": "Orsak till avvisning…"
+    }
   },
   "analytics": {
     "subtitle": "Följ engagemang och prestation för dina skapade kurser",
@@ -767,5 +778,38 @@
     "selectPrompt": "Välj en konversation för att börja.",
     "startPrompt": "Inga meddelanden ännu — säg hej!",
     "composerPlaceholder": "Skriv ett meddelande…"
+  },
+  "feedback": {
+    "title": "Skicka feedback",
+    "subtitle": "Rapportera ett fel, föreslå en förbättring eller dela dina tankar.",
+    "categoryLabel": "Kategori",
+    "messageLabel": "Ditt meddelande",
+    "messagePlaceholder": "Beskriv det så detaljerat du vill…",
+    "messageRequired": "Skriv ett meddelande.",
+    "addFile": "Bifoga bild eller fil",
+    "uploading": "Laddar upp…",
+    "uploadFailed": "Uppladdningen misslyckades. Försök igen.",
+    "linkPlaceholder": "Klistra in en länk (video, dokument, …)",
+    "addLink": "Lägg till länk",
+    "removeAttachment": "Ta bort bilaga",
+    "submit": "Skicka feedback",
+    "submitting": "Skickar…",
+    "submitFailed": "Det gick inte att skicka. Försök igen.",
+    "thanks": "Tack! Din feedback skickades.",
+    "yourSubmissions": "Dina inskick",
+    "categories": {
+      "bug": "Fel",
+      "suggestion": "Förslag",
+      "feedback": "Feedback",
+      "feature_request": "Funktionsbegäran",
+      "content_issue": "Innehållsproblem"
+    },
+    "statuses": {
+      "new": "Ny",
+      "reviewing": "Under granskning",
+      "in_progress": "Pågår",
+      "resolved": "Löst",
+      "rejected": "Avvisad"
+    }
   }
 }

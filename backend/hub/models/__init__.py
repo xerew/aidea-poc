@@ -3,6 +3,7 @@ from .activity import LearnerActivityConfig, LessonSession
 from .assignment import AssignmentSubmission
 from .content import Course, LearningPillar, Lesson, Module
 from .enrollment import Enrollment, LessonProgress
+from .feedback import Feedback
 from .history import CourseEditHistory
 from .messaging import Conversation, Message
 from .onboarding_quiz import OnboardingOption, OnboardingQuestion
@@ -28,6 +29,7 @@ __all__ = [
     'CourseView',
     'Conversation',
     'Enrollment',
+    'Feedback',
     'Message',
     'LearnerActivityConfig',
     'LearningPath',

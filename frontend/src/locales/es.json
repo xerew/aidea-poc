@@ -666,7 +666,18 @@
     "noMatch": "Sin coincidencias.",
     "prev": "Anterior",
     "next": "Siguiente",
-    "pageOf": "Página {{page}} de {{total}}"
+    "pageOf": "Página {{page}} de {{total}}",
+    "feedbackTab": "Comentarios",
+    "feedback": {
+      "userStream": "Comentarios de usuarios",
+      "partnerStream": "Comentarios de socios",
+      "searchName": "Buscar por nombre…",
+      "allStatuses": "Todos los estados",
+      "allCategories": "Todas las categorías",
+      "empty": "No hay comentarios aquí.",
+      "reasonRequired": "Se requiere un motivo para rechazar.",
+      "reasonPlaceholder": "Motivo del rechazo…"
+    }
   },
   "analytics": {
     "subtitle": "Sigue la participación y el rendimiento de los cursos que has creado",
@@ -767,5 +778,38 @@
     "selectPrompt": "Selecciona una conversación para empezar.",
     "startPrompt": "Aún no hay mensajes: ¡saluda!",
     "composerPlaceholder": "Escribe un mensaje…"
+  },
+  "feedback": {
+    "title": "Enviar comentarios",
+    "subtitle": "Informa de un error, sugiere una mejora o comparte tu opinión.",
+    "categoryLabel": "Categoría",
+    "messageLabel": "Tu mensaje",
+    "messagePlaceholder": "Descríbelo con todo el detalle que quieras…",
+    "messageRequired": "Escribe un mensaje.",
+    "addFile": "Adjuntar imagen o archivo",
+    "uploading": "Subiendo…",
+    "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+    "linkPlaceholder": "Pega un enlace (vídeo, documento, …)",
+    "addLink": "Añadir enlace",
+    "removeAttachment": "Quitar adjunto",
+    "submit": "Enviar comentarios",
+    "submitting": "Enviando…",
+    "submitFailed": "No se pudo enviar. Inténtalo de nuevo.",
+    "thanks": "¡Gracias! Tus comentarios se enviaron.",
+    "yourSubmissions": "Tus envíos",
+    "categories": {
+      "bug": "Error",
+      "suggestion": "Sugerencia",
+      "feedback": "Comentario",
+      "feature_request": "Solicitud de función",
+      "content_issue": "Problema de contenido"
+    },
+    "statuses": {
+      "new": "Nuevo",
+      "reviewing": "En revisión",
+      "in_progress": "En curso",
+      "resolved": "Resuelto",
+      "rejected": "Rechazado"
+    }
   }
 }

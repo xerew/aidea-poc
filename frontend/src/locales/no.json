@@ -666,7 +666,18 @@
     "noMatch": "Ingen treff.",
     "prev": "Forrige",
     "next": "Neste",
-    "pageOf": "Side {{page}} av {{total}}"
+    "pageOf": "Side {{page}} av {{total}}",
+    "feedbackTab": "Tilbakemelding",
+    "feedback": {
+      "userStream": "Brukertilbakemelding",
+      "partnerStream": "Partnertilbakemelding",
+      "searchName": "Søk etter navn…",
+      "allStatuses": "Alle statuser",
+      "allCategories": "Alle kategorier",
+      "empty": "Ingen tilbakemelding her.",
+      "reasonRequired": "En årsak kreves for å avvise.",
+      "reasonPlaceholder": "Årsak til avvisning…"
+    }
   },
   "analytics": {
     "subtitle": "Følg engasjement og resultater på tvers av kursene du har opprettet",
@@ -767,5 +778,38 @@
     "selectPrompt": "Velg en samtale for å begynne.",
     "startPrompt": "Ingen meldinger ennå — si hei!",
     "composerPlaceholder": "Skriv en melding…"
+  },
+  "feedback": {
+    "title": "Send tilbakemelding",
+    "subtitle": "Rapporter en feil, foreslå en forbedring eller del tankene dine.",
+    "categoryLabel": "Kategori",
+    "messageLabel": "Meldingen din",
+    "messagePlaceholder": "Beskriv det så detaljert du vil…",
+    "messageRequired": "Skriv en melding.",
+    "addFile": "Legg ved bilde eller fil",
+    "uploading": "Laster opp…",
+    "uploadFailed": "Opplasting mislyktes. Prøv igjen.",
+    "linkPlaceholder": "Lim inn en lenke (video, dokument, …)",
+    "addLink": "Legg til lenke",
+    "removeAttachment": "Fjern vedlegg",
+    "submit": "Send tilbakemelding",
+    "submitting": "Sender…",
+    "submitFailed": "Kunne ikke sende. Prøv igjen.",
+    "thanks": "Takk! Tilbakemeldingen din ble sendt.",
+    "yourSubmissions": "Dine innsendinger",
+    "categories": {
+      "bug": "Feil",
+      "suggestion": "Forslag",
+      "feedback": "Tilbakemelding",
+      "feature_request": "Funksjonsforespørsel",
+      "content_issue": "Innholdsproblem"
+    },
+    "statuses": {
+      "new": "Ny",
+      "reviewing": "Under vurdering",
+      "in_progress": "Pågår",
+      "resolved": "Løst",
+      "rejected": "Avvist"
+    }
   }
 }

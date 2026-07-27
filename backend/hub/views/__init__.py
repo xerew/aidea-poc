@@ -43,6 +43,13 @@ from .authoring_xlsx import (
     AuthoringCourseImportView,
     AuthoringCourseTemplateView,
 )
+from .feedback import (
+    AdminFeedbackDetailView,
+    AdminFeedbackListView,
+    FeedbackMineView,
+    FeedbackUploadView,
+    FeedbackView,
+)
 from .learner import (
     CourseDetailView,
     CourseEnrollView,
@@ -125,6 +132,11 @@ __all__ = [
     'ConversationDetailView',
     'ConversationListView',
     'UnreadMessageCountView',
+    'AdminFeedbackDetailView',
+    'AdminFeedbackListView',
+    'FeedbackMineView',
+    'FeedbackUploadView',
+    'FeedbackView',
     'OnboardingView',
     'PathwayView',
     'PreferenceQuizView',

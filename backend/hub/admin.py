@@ -10,6 +10,7 @@ from .models import (
     Course,
     CourseEditHistory,
     Enrollment,
+    Feedback,
     LearnerActivityConfig,
     LearningPath,
     LearningPathCourse,
@@ -332,6 +333,15 @@ class AssignmentSubmissionAdmin(admin.ModelAdmin):
     @admin.display(description='Course', ordering='lesson__module__course__title')
     def get_course(self, obj):
         return obj.lesson.module.course.title
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display  = ['category', 'stream', 'user', 'status', 'reviewed_by', 'created_at']
+    list_filter   = ['stream', 'status', 'category']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'message']
+    readonly_fields = ['user', 'stream', 'category', 'message', 'attachments', 'created_at', 'updated_at']
+    ordering = ['-created_at']
 
 
 # ── Learning Paths ────────────────────────────────────────────────────────────

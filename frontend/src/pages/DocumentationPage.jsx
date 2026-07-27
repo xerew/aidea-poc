@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Brain, Wrench, Compass, ExternalLink, Download, FileText } from 'lucide-react'
+import FeedbackWidget from '../components/FeedbackWidget'
 import './DocumentationPage.css'
 
 const GUIDE_PDF = '/aidea-user-guide.pdf'
@@ -64,6 +65,9 @@ export default function DocumentationPage() {
           </p>
         </object>
       </section>
+
+      {/* Feedback */}
+      <FeedbackWidget />
     </div>
   )
 }

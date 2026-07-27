@@ -376,6 +376,153 @@ function SystemTab() {
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
+// ── Feedback tab ──────────────────────────────────────────────────────────────
+
+const FB_STATUSES = ['new', 'reviewing', 'in_progress', 'resolved', 'rejected']
+
+FeedbackCard.propTypes = { item: PropTypes.object.isRequired, onStatus: PropTypes.func.isRequired }
+
+function FeedbackCard({ item, onStatus }) {
+  const { t } = useTranslation()
+  const [reason, setReason] = useState(item.rejection_reason || '')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const apply = async (nextStatus) => {
+    if (nextStatus === 'rejected' && !reason.trim()) {
+      setError(t('admin.feedback.reasonRequired'))
+      return
+    }
+    setSaving(true)
+    setError('')
+    try {
+      await onStatus(item.id, nextStatus, reason.trim())
+    } catch (err) {
+      setError(err?.response?.data?.detail || t('admin.updateFailed'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="admin-fb-card">
+      <div className="admin-fb-head">
+        <Link className="admin-user-link" to={`/users/${item.submitter_id}`}>{item.submitter_name}</Link>
+        <span className="admin-fb-cat">{item.category_label}</span>
+        <span className="admin-fb-date">{new Date(item.created_at).toLocaleString()}</span>
+      </div>
+      <p className="admin-fb-msg">{item.message}</p>
+      {item.attachments?.length > 0 && (
+        <div className="admin-fb-attachments">
+          {item.attachments.map((att, idx) => (
+            att.type === 'image'
+              ? <a key={idx} href={att.url} target="_blank" rel="noreferrer" className="admin-fb-thumb"><img src={att.url} alt={att.name || ''} /></a>
+              : <a key={idx} href={att.url} target="_blank" rel="noreferrer" className="admin-fb-chip">{att.name || att.url}</a>
+          ))}
+        </div>
+      )}
+      <div className="admin-fb-controls">
+        <select
+          className="admin-role-select"
+          value={item.status}
+          disabled={saving}
+          onChange={(e) => apply(e.target.value)}
+        >
+          {FB_STATUSES.map(s => <option key={s} value={s}>{t(`feedback.statuses.${s}`)}</option>)}
+        </select>
+        {item.status === 'rejected' && (
+          <input
+            className="admin-fb-reason"
+            placeholder={t('admin.feedback.reasonPlaceholder')}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            onBlur={() => reason.trim() && apply('rejected')}
+          />
+        )}
+        {saving && <span className="admin-feedback info">{t('common.saving')}</span>}
+        {error && <span className="admin-feedback error">{error}</span>}
+      </div>
+    </div>
+  )
+}
+
+function FeedbackTab() {
+  const { t } = useTranslation()
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [stream, setStream] = useState('user')
+  const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [categoryFilter, setCategoryFilter] = useState('all')
+  const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    client.get('/admin/feedback/')
+      .then(res => setItems(res.data))
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const setStatus = useCallback(async (id, status, rejection_reason) => {
+    const { data } = await client.patch(`/admin/feedback/${id}/`, { status, rejection_reason })
+    setItems(prev => prev.map(it => it.id === id ? data : it))
+  }, [])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return items.filter(it =>
+      it.stream === stream &&
+      (statusFilter === 'all' || it.status === statusFilter) &&
+      (categoryFilter === 'all' || it.category === categoryFilter) &&
+      (!q || it.submitter_name.toLowerCase().includes(q)),
+    )
+  }, [items, stream, statusFilter, categoryFilter, query])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE))
+  const safePage = Math.min(page, totalPages)
+  const pageItems = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE)
+
+  const onFilterChange = (setter) => (val) => { setter(val); setPage(1) }
+
+  if (loading) return <p className="admin-loading">{t('common.loading')}</p>
+
+  return (
+    <div className="admin-tab-body">
+      <div className="admin-fb-streams">
+        <button className={`admin-subtab ${stream === 'user' ? 'active' : ''}`} onClick={() => { setStream('user'); setPage(1) }}>
+          {t('admin.feedback.userStream')}
+        </button>
+        <button className={`admin-subtab ${stream === 'partner' ? 'active' : ''}`} onClick={() => { setStream('partner'); setPage(1) }}>
+          {t('admin.feedback.partnerStream')}
+        </button>
+      </div>
+
+      <div className="admin-fb-filters">
+        <AdminSearch value={query} onChange={onFilterChange(setQuery)} placeholder={t('admin.feedback.searchName')} />
+        <select className="admin-role-select" value={statusFilter} onChange={(e) => onFilterChange(setStatusFilter)(e.target.value)}>
+          <option value="all">{t('admin.feedback.allStatuses')}</option>
+          {FB_STATUSES.map(s => <option key={s} value={s}>{t(`feedback.statuses.${s}`)}</option>)}
+        </select>
+        <select className="admin-role-select" value={categoryFilter} onChange={(e) => onFilterChange(setCategoryFilter)(e.target.value)}>
+          <option value="all">{t('admin.feedback.allCategories')}</option>
+          {['bug', 'suggestion', 'feedback', 'feature_request', 'content_issue'].map(c => (
+            <option key={c} value={c}>{t(`feedback.categories.${c}`)}</option>
+          ))}
+        </select>
+      </div>
+
+      {pageItems.length === 0 ? (
+        <p className="admin-empty">{t('admin.feedback.empty')}</p>
+      ) : (
+        <div className="admin-fb-list">
+          {pageItems.map(it => <FeedbackCard key={it.id} item={it} onStatus={setStatus} />)}
+        </div>
+      )}
+      <Pagination page={safePage} totalPages={totalPages} onPage={setPage} />
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const { t } = useTranslation()
   const [tab, setTab] = useState('users')
@@ -398,6 +545,12 @@ export default function AdminPage() {
           {t('admin.requestsTab')}
         </button>
         <button
+          className={`admin-tab-btn ${tab === 'feedback' ? 'active' : ''}`}
+          onClick={() => setTab('feedback')}
+        >
+          {t('admin.feedbackTab')}
+        </button>
+        <button
           className={`admin-tab-btn ${tab === 'system' ? 'active' : ''}`}
           onClick={() => setTab('system')}
         >
@@ -406,6 +559,7 @@ export default function AdminPage() {
       </div>
       {tab === 'users' && <UsersTab />}
       {tab === 'requests' && <RequestsTab />}
+      {tab === 'feedback' && <FeedbackTab />}
       {tab === 'system' && <SystemTab />}
     </div>
   )

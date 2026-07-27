@@ -666,7 +666,18 @@
     "noMatch": "Keine Treffer.",
     "prev": "Zurück",
     "next": "Weiter",
-    "pageOf": "Seite {{page}} von {{total}}"
+    "pageOf": "Seite {{page}} von {{total}}",
+    "feedbackTab": "Feedback",
+    "feedback": {
+      "userStream": "Nutzer-Feedback",
+      "partnerStream": "Partner-Feedback",
+      "searchName": "Nach Namen suchen…",
+      "allStatuses": "Alle Status",
+      "allCategories": "Alle Kategorien",
+      "empty": "Kein Feedback hier.",
+      "reasonRequired": "Für die Ablehnung ist ein Grund erforderlich.",
+      "reasonPlaceholder": "Grund für die Ablehnung…"
+    }
   },
   "analytics": {
     "subtitle": "Verfolgen Sie Interaktion und Leistung über Ihre erstellten Kurse hinweg",
@@ -767,5 +778,38 @@
     "selectPrompt": "Wählen Sie eine Unterhaltung aus, um zu beginnen.",
     "startPrompt": "Noch keine Nachrichten — sag Hallo!",
     "composerPlaceholder": "Nachricht schreiben…"
+  },
+  "feedback": {
+    "title": "Feedback senden",
+    "subtitle": "Melden Sie einen Fehler, schlagen Sie eine Verbesserung vor oder teilen Sie Ihre Meinung.",
+    "categoryLabel": "Kategorie",
+    "messageLabel": "Ihre Nachricht",
+    "messagePlaceholder": "Beschreiben Sie es so ausführlich, wie Sie möchten…",
+    "messageRequired": "Bitte schreiben Sie eine Nachricht.",
+    "addFile": "Bild oder Datei anhängen",
+    "uploading": "Wird hochgeladen…",
+    "uploadFailed": "Upload fehlgeschlagen. Bitte erneut versuchen.",
+    "linkPlaceholder": "Link einfügen (Video, Dokument, …)",
+    "addLink": "Link hinzufügen",
+    "removeAttachment": "Anhang entfernen",
+    "submit": "Feedback senden",
+    "submitting": "Wird gesendet…",
+    "submitFailed": "Senden fehlgeschlagen. Bitte erneut versuchen.",
+    "thanks": "Danke! Ihr Feedback wurde gesendet.",
+    "yourSubmissions": "Ihre Einreichungen",
+    "categories": {
+      "bug": "Fehler",
+      "suggestion": "Vorschlag",
+      "feedback": "Feedback",
+      "feature_request": "Funktionswunsch",
+      "content_issue": "Inhaltsproblem"
+    },
+    "statuses": {
+      "new": "Neu",
+      "reviewing": "In Prüfung",
+      "in_progress": "In Bearbeitung",
+      "resolved": "Gelöst",
+      "rejected": "Abgelehnt"
+    }
   }
 }

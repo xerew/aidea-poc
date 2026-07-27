@@ -666,7 +666,18 @@
     "noMatch": "Nessun risultato.",
     "prev": "Precedente",
     "next": "Successiva",
-    "pageOf": "Pagina {{page}} di {{total}}"
+    "pageOf": "Pagina {{page}} di {{total}}",
+    "feedbackTab": "Feedback",
+    "feedback": {
+      "userStream": "Feedback utenti",
+      "partnerStream": "Feedback partner",
+      "searchName": "Cerca per nome…",
+      "allStatuses": "Tutti gli stati",
+      "allCategories": "Tutte le categorie",
+      "empty": "Nessun feedback qui.",
+      "reasonRequired": "È richiesto un motivo per rifiutare.",
+      "reasonPlaceholder": "Motivo del rifiuto…"
+    }
   },
   "analytics": {
     "subtitle": "Monitora il coinvolgimento e le prestazioni dei corsi da te creati",
@@ -767,5 +778,38 @@
     "selectPrompt": "Seleziona una conversazione per iniziare.",
     "startPrompt": "Ancora nessun messaggio: saluta!",
     "composerPlaceholder": "Scrivi un messaggio…"
+  },
+  "feedback": {
+    "title": "Invia un feedback",
+    "subtitle": "Segnala un bug, suggerisci un miglioramento o condividi la tua opinione.",
+    "categoryLabel": "Categoria",
+    "messageLabel": "Il tuo messaggio",
+    "messagePlaceholder": "Descrivilo con tutti i dettagli che vuoi…",
+    "messageRequired": "Scrivi un messaggio.",
+    "addFile": "Allega immagine o file",
+    "uploading": "Caricamento…",
+    "uploadFailed": "Caricamento non riuscito. Riprova.",
+    "linkPlaceholder": "Incolla un link (video, documento, …)",
+    "addLink": "Aggiungi link",
+    "removeAttachment": "Rimuovi allegato",
+    "submit": "Invia feedback",
+    "submitting": "Invio…",
+    "submitFailed": "Impossibile inviare. Riprova.",
+    "thanks": "Grazie! Il tuo feedback è stato inviato.",
+    "yourSubmissions": "I tuoi invii",
+    "categories": {
+      "bug": "Bug",
+      "suggestion": "Suggerimento",
+      "feedback": "Feedback",
+      "feature_request": "Richiesta di funzione",
+      "content_issue": "Problema di contenuto"
+    },
+    "statuses": {
+      "new": "Nuovo",
+      "reviewing": "In revisione",
+      "in_progress": "In corso",
+      "resolved": "Risolto",
+      "rejected": "Rifiutato"
+    }
   }
 }

@@ -666,7 +666,18 @@
     "noMatch": "Ei osumia.",
     "prev": "Edellinen",
     "next": "Seuraava",
-    "pageOf": "Sivu {{page}} / {{total}}"
+    "pageOf": "Sivu {{page}} / {{total}}",
+    "feedbackTab": "Palaute",
+    "feedback": {
+      "userStream": "Käyttäjäpalaute",
+      "partnerStream": "Kumppanipalaute",
+      "searchName": "Hae nimellä…",
+      "allStatuses": "Kaikki tilat",
+      "allCategories": "Kaikki luokat",
+      "empty": "Ei palautetta täällä.",
+      "reasonRequired": "Hylkäämiseen tarvitaan syy.",
+      "reasonPlaceholder": "Hylkäämisen syy…"
+    }
   },
   "analytics": {
     "subtitle": "Seuraa luomiesi kurssien sitoutumista ja suorituskykyä",
@@ -767,5 +778,38 @@
     "selectPrompt": "Valitse keskustelu aloittaaksesi.",
     "startPrompt": "Ei vielä viestejä — tervehdi!",
     "composerPlaceholder": "Kirjoita viesti…"
+  },
+  "feedback": {
+    "title": "Lähetä palautetta",
+    "subtitle": "Ilmoita virheestä, ehdota parannusta tai jaa ajatuksiasi.",
+    "categoryLabel": "Luokka",
+    "messageLabel": "Viestisi",
+    "messagePlaceholder": "Kuvaile niin tarkasti kuin haluat…",
+    "messageRequired": "Kirjoita viesti.",
+    "addFile": "Liitä kuva tai tiedosto",
+    "uploading": "Ladataan…",
+    "uploadFailed": "Lataus epäonnistui. Yritä uudelleen.",
+    "linkPlaceholder": "Liitä linkki (video, asiakirja, …)",
+    "addLink": "Lisää linkki",
+    "removeAttachment": "Poista liite",
+    "submit": "Lähetä palaute",
+    "submitting": "Lähetetään…",
+    "submitFailed": "Lähetys epäonnistui. Yritä uudelleen.",
+    "thanks": "Kiitos! Palautteesi lähetettiin.",
+    "yourSubmissions": "Lähetyksesi",
+    "categories": {
+      "bug": "Virhe",
+      "suggestion": "Ehdotus",
+      "feedback": "Palaute",
+      "feature_request": "Ominaisuuspyyntö",
+      "content_issue": "Sisältöongelma"
+    },
+    "statuses": {
+      "new": "Uusi",
+      "reviewing": "Arvioitavana",
+      "in_progress": "Käynnissä",
+      "resolved": "Ratkaistu",
+      "rejected": "Hylätty"
+    }
   }
 }
