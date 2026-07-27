@@ -80,6 +80,13 @@ from .profile import (
 )
 from .public_profile import PublicProfileView
 from .recommendations import RecommendationEventView, RecommendationsView
+from .study import (
+    AdminStudyExportView,
+    AdminStudyView,
+    StudyAssessmentView,
+    StudyConsentView,
+    StudyStatusView,
+)
 from .subjects import SubjectsView
 
 __all__ = [
@@ -141,6 +148,11 @@ __all__ = [
     'PathwayView',
     'PreferenceQuizView',
     'PublicProfileView',
+    'AdminStudyExportView',
+    'AdminStudyView',
+    'StudyAssessmentView',
+    'StudyConsentView',
+    'StudyStatusView',
     'SubjectsView',
     'ChangePasswordView',
     'ProfileAvatarView',

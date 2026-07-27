@@ -23,6 +23,10 @@ from .models import (
     OnboardingQuestion,
     PreferenceOption,
     PreferenceQuestion,
+    StudyAssessmentOption,
+    StudyAssessmentQuestion,
+    StudyConfig,
+    StudyParticipant,
     Subject,
     UserLearningPath,
     UserProfile,
@@ -342,6 +346,45 @@ class FeedbackAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'message']
     readonly_fields = ['user', 'stream', 'category', 'message', 'attachments', 'created_at', 'updated_at']
     ordering = ['-created_at']
+
+
+# ── Study (adaptive-vs-fixed comparison) ──────────────────────────────────────
+
+class StudyAssessmentOptionInline(admin.TabularInline):
+    model = StudyAssessmentOption
+    extra = 4
+    fields = ['text', 'is_correct', 'order']
+    ordering = ['order']
+
+
+@admin.register(StudyAssessmentQuestion)
+class StudyAssessmentQuestionAdmin(admin.ModelAdmin):
+    list_display = ['text', 'order']
+    inlines = [StudyAssessmentOptionInline]
+    ordering = ['order']
+
+
+@admin.register(StudyConfig)
+class StudyConfigAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'enabled', 'control_path', 'post_test_open']
+
+    def has_add_permission(self, request):
+        return not StudyConfig.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(StudyParticipant)
+class StudyParticipantAdmin(admin.ModelAdmin):
+    list_display = ['user', 'group', 'in_study', 'pre_score', 'post_score', 'created_at']
+    list_filter  = ['group', 'in_study']
+    search_fields = ['user__username', 'user__first_name', 'user__last_name']
+    readonly_fields = [
+        'user', 'group', 'in_study', 'consented_at', 'pre_score', 'pre_completed_at',
+        'post_score', 'post_completed_at', 'created_at',
+    ]
+    ordering = ['created_at']
 
 
 # ── Learning Paths ────────────────────────────────────────────────────────────

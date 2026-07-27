@@ -11,6 +11,8 @@ from .views import (
     AdminFeedbackDetailView,
     AdminFeedbackListView,
     AdminRecomputeRecommendationsView,
+    AdminStudyExportView,
+    AdminStudyView,
     AdminUserListView,
     AdminUserRoleView,
     AssignmentSubmitView,
@@ -63,6 +65,9 @@ from .views import (
     RegisterView,
     ReviewActionView,
     ReviewQueueView,
+    StudyAssessmentView,
+    StudyConsentView,
+    StudyStatusView,
     SubjectsView,
     SubmissionUploadView,
     UnreadMessageCountView,
@@ -96,6 +101,10 @@ urlpatterns = [
     path('messages/conversations/', ConversationListView.as_view(),    name='conversation-list'),
     path('messages/unread-count/',  UnreadMessageCountView.as_view(),  name='message-unread-count'),
     path('messages/with/<int:user_id>/', ConversationDetailView.as_view(), name='conversation-detail'),
+    # Study (adaptive-vs-fixed comparison)
+    path('study/status/',     StudyStatusView.as_view(),     name='study-status'),
+    path('study/consent/',    StudyConsentView.as_view(),    name='study-consent'),
+    path('study/assessment/', StudyAssessmentView.as_view(), name='study-assessment'),
     # Feedback
     path('feedback/',        FeedbackView.as_view(),       name='feedback'),
     path('feedback/mine/',   FeedbackMineView.as_view(),   name='feedback-mine'),
@@ -121,6 +130,8 @@ urlpatterns = [
     path('admin/access-requests/<int:pk>/',     AdminAccessRequestReviewView.as_view(), name='admin-access-request-review'),
     path('admin/feedback/',                     AdminFeedbackListView.as_view(),   name='admin-feedback'),
     path('admin/feedback/<int:pk>/',            AdminFeedbackDetailView.as_view(), name='admin-feedback-detail'),
+    path('admin/study/',                        AdminStudyView.as_view(),          name='admin-study'),
+    path('admin/study/export/',                 AdminStudyExportView.as_view(),    name='admin-study-export'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/upload/', AuthoringUploadView.as_view(), name='authoring-upload'),

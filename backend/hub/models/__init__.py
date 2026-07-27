@@ -16,6 +16,12 @@ from .recommendations import (
     RecommendationConfig,
     RecommendationEvent,
 )
+from .study import (
+    StudyAssessmentOption,
+    StudyAssessmentQuestion,
+    StudyConfig,
+    StudyParticipant,
+)
 from .subject import Subject
 from .user import UserProfile
 
@@ -45,6 +51,10 @@ __all__ = [
     'PreferenceQuestion',
     'RecommendationConfig',
     'RecommendationEvent',
+    'StudyAssessmentOption',
+    'StudyAssessmentQuestion',
+    'StudyConfig',
+    'StudyParticipant',
     'Subject',
     'UserLearningPath',
     'UserProfile',

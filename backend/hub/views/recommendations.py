@@ -15,6 +15,10 @@ class RecommendationsView(APIView):
     permission_classes = [IsTeacher]
 
     def get(self, request):
+        from hub.study_logic import active_group
+        # The fixed (control) group gets no personalised recommendations.
+        if active_group(request.user) == 'fixed':
+            return Response([])
         recs = (
             CourseRecommendation.objects
             .filter(user=request.user, course__is_published=True)
