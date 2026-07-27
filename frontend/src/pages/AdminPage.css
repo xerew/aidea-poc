@@ -505,3 +505,6 @@
 }
 .admin-stat-value { font-size: 1.6rem; font-weight: 700; color: var(--color-primary); }
 .admin-stat-label { font-size: 0.75rem; color: var(--color-text-muted); text-align: center; margin-top: 0.2rem; }
+
+/* Export button sits left and sizes to its label (like the System tab). */
+.admin-export-btn { align-self: flex-start; }

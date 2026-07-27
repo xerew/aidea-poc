@@ -659,7 +659,7 @@ function ResearchTab() {
         <StatTile label={t('admin.research.questions')} value={data.assessment_questions} />
       </div>
 
-      <button className="admin-approve-btn" onClick={exportData}>{t('admin.research.export')}</button>
+      <button className="admin-approve-btn admin-export-btn" onClick={exportData}>{t('admin.research.export')}</button>
     </div>
   )
 }
