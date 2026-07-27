@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck, FileText, MessageCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useMessages } from '../../context/MessagesContext'
+import { MESSAGING_ENABLED } from '../../config'
 import './Sidebar.css'
 
 const BASE_NAV = [
@@ -39,6 +40,8 @@ export default function Sidebar({ open = false, onNavigate }) {
   } else {
     navItems = BASE_NAV
   }
+  // Messaging is hidden behind a feature flag.
+  if (!MESSAGING_ENABLED) navItems = navItems.filter(item => item.to !== '/messages')
 
   return (
     <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>

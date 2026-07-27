@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { MESSAGING_ENABLED } from '../config'
 import { getAvatarSrc } from '../lib/avatar'
 import { getFlagEmoji, COUNTRIES } from '../data/countries'
 import './PublicProfilePage.css'
@@ -43,7 +44,7 @@ function Identity({ profile }) {
           </span>
         )}
       </div>
-      {!isMe && (
+      {!isMe && MESSAGING_ENABLED && (
         <Link to={`/messages/${profile.id}`} className="pp-message-btn">
           <MessageCircle size={16} /> {t('publicProfile.sendMessage')}
         </Link>

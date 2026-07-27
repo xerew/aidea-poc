@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import PropTypes from 'prop-types'
 import { useAuth } from './AuthContext'
 import client from '../api/client'
+import { MESSAGING_ENABLED } from '../config'
 
 const MessagesContext = createContext(null)
 
@@ -22,7 +23,7 @@ export function MessagesProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    if (!user) return undefined
+    if (!user || !MESSAGING_ENABLED) return undefined
     let cancelled = false
     const tick = async () => {
       try {
