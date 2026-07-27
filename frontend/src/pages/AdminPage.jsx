@@ -389,6 +389,7 @@ function FeedbackCard({ item, onStatus }) {
   const [selected, setSelected] = useState(item.status)
   const [reason, setReason] = useState(item.rejection_reason || '')
   const [saving, setSaving] = useState(false)
+  const [editing, setEditing] = useState(false)  // reason editor open?
   const [error, setError] = useState('')
 
   const commit = async (nextStatus, nextReason) => {
@@ -396,6 +397,7 @@ function FeedbackCard({ item, onStatus }) {
     setError('')
     try {
       await onStatus(item.id, nextStatus, nextReason)
+      setEditing(false)
     } catch (err) {
       setError(err?.response?.data?.detail || t('admin.updateFailed'))
       setSelected(item.status)  // revert the dropdown on failure
@@ -419,8 +421,10 @@ function FeedbackCard({ item, onStatus }) {
     commit('rejected', reason.trim())
   }
 
-  // The rejection is already saved with this exact reason — nothing to confirm.
-  const rejectionSaved = item.status === 'rejected' && reason.trim() === (item.rejection_reason || '')
+  // A rejection is already on record for this item.
+  const isRejected = item.status === 'rejected'
+  // Show the editable reason field for a fresh rejection or when editing an existing one.
+  const showReasonEditor = selected === 'rejected' && (!isRejected || editing)
 
   return (
     <div className="admin-fb-card">
@@ -448,7 +452,7 @@ function FeedbackCard({ item, onStatus }) {
         >
           {FB_STATUSES.map(s => <option key={s} value={s}>{t(`feedback.statuses.${s}`)}</option>)}
         </select>
-        {selected === 'rejected' && (
+        {showReasonEditor && (
           <>
             <input
               className="admin-fb-reason"
@@ -457,19 +461,33 @@ function FeedbackCard({ item, onStatus }) {
               onChange={(e) => setReason(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); confirmReject() } }}
             />
-            {rejectionSaved ? (
-              <span className="admin-feedback success">{t('admin.feedback.rejectionSaved')}</span>
-            ) : (
+            <button
+              type="button"
+              className="admin-fb-reject-btn"
+              onClick={confirmReject}
+              disabled={saving || !reason.trim()}
+            >
+              {t('admin.feedback.confirmReject')}
+            </button>
+            {editing && (
               <button
                 type="button"
-                className="admin-fb-reject-btn"
-                onClick={confirmReject}
-                disabled={saving || !reason.trim()}
+                className="admin-fb-cancel-btn"
+                onClick={() => { setEditing(false); setReason(item.rejection_reason || ''); setError('') }}
+                disabled={saving}
               >
-                {t('admin.feedback.confirmReject')}
+                {t('common.cancel')}
               </button>
             )}
           </>
+        )}
+        {selected === 'rejected' && isRejected && !editing && (
+          <div className="admin-fb-reason-saved">
+            <span className="admin-fb-reason-text">{item.rejection_reason}</span>
+            <button type="button" className="admin-fb-edit-btn" onClick={() => setEditing(true)}>
+              {t('admin.feedback.editReason')}
+            </button>
+          </div>
         )}
         {saving && <span className="admin-feedback info">{t('common.saving')}</span>}
         {error && <span className="admin-feedback error">{error}</span>}

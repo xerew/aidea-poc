@@ -442,6 +442,45 @@
 }
 .admin-fb-reject-btn:disabled { opacity: 0.55; cursor: default; }
 
+.admin-fb-cancel-btn {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.admin-fb-cancel-btn:disabled { opacity: 0.55; cursor: default; }
+
+.admin-fb-reason-saved {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+.admin-fb-reason-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+.admin-fb-edit-btn {
+  flex-shrink: 0;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.admin-fb-edit-btn:hover { border-color: var(--color-primary); }
+
 @media (max-width: 640px) {
   .admin-fb-date { margin-left: 0; width: 100%; }
   .admin-fb-reason { min-width: 100%; }

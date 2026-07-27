@@ -678,7 +678,8 @@
       "reasonRequired": "Für die Ablehnung ist ein Grund erforderlich.",
       "reasonPlaceholder": "Grund für die Ablehnung…",
       "confirmReject": "Ablehnung bestätigen",
-      "rejectionSaved": "Ablehnung gespeichert"
+      "rejectionSaved": "Ablehnung gespeichert",
+      "editReason": "Grund bearbeiten"
     }
   },
   "analytics": {

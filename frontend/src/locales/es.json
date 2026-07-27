@@ -678,7 +678,8 @@
       "reasonRequired": "Se requiere un motivo para rechazar.",
       "reasonPlaceholder": "Motivo del rechazo…",
       "confirmReject": "Confirmar rechazo",
-      "rejectionSaved": "Rechazo guardado"
+      "rejectionSaved": "Rechazo guardado",
+      "editReason": "Editar motivo"
     }
   },
   "analytics": {

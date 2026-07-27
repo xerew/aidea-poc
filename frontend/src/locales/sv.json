@@ -678,7 +678,8 @@
       "reasonRequired": "En orsak krävs för att avvisa.",
       "reasonPlaceholder": "Orsak till avvisning…",
       "confirmReject": "Bekräfta avvisning",
-      "rejectionSaved": "Avvisning sparad"
+      "rejectionSaved": "Avvisning sparad",
+      "editReason": "Redigera orsak"
     }
   },
   "analytics": {

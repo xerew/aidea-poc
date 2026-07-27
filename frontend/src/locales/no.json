@@ -678,7 +678,8 @@
       "reasonRequired": "En årsak kreves for å avvise.",
       "reasonPlaceholder": "Årsak til avvisning…",
       "confirmReject": "Bekreft avvisning",
-      "rejectionSaved": "Avvisning lagret"
+      "rejectionSaved": "Avvisning lagret",
+      "editReason": "Rediger årsak"
     }
   },
   "analytics": {

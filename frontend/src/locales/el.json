@@ -678,7 +678,8 @@
       "reasonRequired": "Απαιτείται λόγος για απόρριψη.",
       "reasonPlaceholder": "Λόγος απόρριψης…",
       "confirmReject": "Επιβεβαίωση απόρριψης",
-      "rejectionSaved": "Η απόρριψη αποθηκεύτηκε"
+      "rejectionSaved": "Η απόρριψη αποθηκεύτηκε",
+      "editReason": "Επεξεργασία λόγου"
     }
   },
   "analytics": {

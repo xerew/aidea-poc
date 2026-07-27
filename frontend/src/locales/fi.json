@@ -678,7 +678,8 @@
       "reasonRequired": "Hylkäämiseen tarvitaan syy.",
       "reasonPlaceholder": "Hylkäämisen syy…",
       "confirmReject": "Vahvista hylkäys",
-      "rejectionSaved": "Hylkäys tallennettu"
+      "rejectionSaved": "Hylkäys tallennettu",
+      "editReason": "Muokkaa syytä"
     }
   },
   "analytics": {

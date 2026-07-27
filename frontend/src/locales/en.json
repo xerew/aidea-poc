@@ -678,7 +678,8 @@
       "reasonRequired": "A reason is required to reject.",
       "reasonPlaceholder": "Reason for rejection…",
       "confirmReject": "Confirm rejection",
-      "rejectionSaved": "Rejection saved"
+      "rejectionSaved": "Rejection saved",
+      "editReason": "Edit reason"
     }
   },
   "analytics": {
