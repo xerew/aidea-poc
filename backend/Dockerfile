@@ -3,8 +3,8 @@ FROM python:3.14-slim AS base
 
 WORKDIR /app
 
-# Install uv from the official image
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+# Install uv from PyPI (avoids depending on ghcr.io being reachable at build time)
+RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
 
