@@ -17,7 +17,7 @@ export default function Footer() {
         </p>
       </div>
       <div className="footer-bottom">
-        <span>© {new Date().getFullYear()} AIDEA by ICCS</span>
+        <span>© {new Date().getFullYear()} AIDEA by ICCS — Information Management Unit</span>
         <a href="https://aideaacademy.eu/" target="_blank" rel="noopener noreferrer">
           aideaacademy.eu
         </a>
