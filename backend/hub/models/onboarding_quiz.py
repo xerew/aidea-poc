@@ -11,6 +11,8 @@ class OnboardingQuestion(models.Model):
     text = models.CharField(max_length=300)
     order = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    # Per-language overrides for `text`, e.g. {"el": "…", "fr": "…"}.
+    translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']
@@ -26,6 +28,8 @@ class OnboardingOption(models.Model):
     text = models.CharField(max_length=300)
     score = models.PositiveSmallIntegerField(default=0)
     order = models.PositiveSmallIntegerField(default=0)
+    # Per-language overrides for `text`, e.g. {"el": "…", "fr": "…"}.
+    translations = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']

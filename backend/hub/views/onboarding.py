@@ -37,7 +37,9 @@ class OnboardingView(APIView):
                 get_competency_level(profile.competency_score)
                 if profile.onboarding_completed else None
             ),
-            'questions': OnboardingQuestionSerializer(questions, many=True).data,
+            'questions': OnboardingQuestionSerializer(
+                questions, many=True, context={'lang': profile.language},
+            ).data,
         })
 
     def post(self, request):

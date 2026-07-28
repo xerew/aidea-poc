@@ -178,7 +178,7 @@ class AccessRequestAdmin(admin.ModelAdmin):
 class OnboardingOptionInline(admin.TabularInline):
     model = OnboardingOption
     extra = 2
-    fields = ['text', 'score', 'order']
+    fields = ['text', 'translations', 'score', 'order']
 
 
 @admin.register(OnboardingQuestion)

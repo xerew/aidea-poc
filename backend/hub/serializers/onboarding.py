@@ -6,19 +6,37 @@ _TEACHING_LEVELS = ['primary', 'secondary', 'higher_ed', 'vocational', 'adult_ed
 _GOALS           = ['save_time', 'teach_about_ai', 'prepare_students', 'stay_current', 'address_ethics']
 
 
+def _localized_text(obj, lang):
+    """The translation for the viewer's language, falling back to the base text."""
+    if lang:
+        value = (obj.translations or {}).get(lang)
+        if value:
+            return value
+    return obj.text
+
+
 class OnboardingOptionSerializer(serializers.ModelSerializer):
     """Learner-facing option — never exposes the score."""
+    text = serializers.SerializerMethodField()
+
     class Meta:
         model = OnboardingOption
         fields = ['id', 'text']
 
+    def get_text(self, obj):
+        return _localized_text(obj, self.context.get('lang'))
+
 
 class OnboardingQuestionSerializer(serializers.ModelSerializer):
+    text = serializers.SerializerMethodField()
     options = OnboardingOptionSerializer(many=True, read_only=True)
 
     class Meta:
         model = OnboardingQuestion
         fields = ['id', 'text', 'options']
+
+    def get_text(self, obj):
+        return _localized_text(obj, self.context.get('lang'))
 
 
 class OnboardingSubmitSerializer(serializers.Serializer):

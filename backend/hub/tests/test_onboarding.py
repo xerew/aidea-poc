@@ -5,7 +5,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hub.models import OnboardingQuestion, Subject, UserProfile
+from hub.models import OnboardingOption, OnboardingQuestion, Subject, UserProfile
 from hub.models.pathway import LearningPath, UserLearningPath
 
 
@@ -64,6 +64,24 @@ class OnboardingGetTestCase(APITestCase):
         first = response.data['questions'][0]
         self.assertEqual(set(first.keys()), {'id', 'text', 'options'})
         self.assertEqual(set(first['options'][0].keys()), {'id', 'text'})
+
+    def test_questions_localized_to_user_language(self):
+        q = OnboardingQuestion.objects.create(text='Base Q', order=99, translations={'el': 'Ερώτηση'})
+        OnboardingOption.objects.create(question=q, text='Base O', order=1, translations={'el': 'Επιλογή'})
+        self.user.profile.language = 'el'
+        self.user.profile.save()
+        res = self.client.get(reverse('onboarding'))
+        found = next(x for x in res.data['questions'] if x['id'] == q.id)
+        self.assertEqual(found['text'], 'Ερώτηση')
+        self.assertEqual(found['options'][0]['text'], 'Επιλογή')
+
+    def test_questions_fall_back_to_base_when_no_translation(self):
+        q = OnboardingQuestion.objects.create(text='Only base', order=98, translations={'el': 'ΕΛ'})
+        self.user.profile.language = 'fr'  # no French translation
+        self.user.profile.save()
+        res = self.client.get(reverse('onboarding'))
+        found = next(x for x in res.data['questions'] if x['id'] == q.id)
+        self.assertEqual(found['text'], 'Only base')
 
     def test_content_creator_cannot_access(self):
         creator = User.objects.create_user(username='creator1', password='pass')
