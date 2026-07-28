@@ -37,6 +37,7 @@ services:
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-AIDEA <info@aidea-hub.eu>}
     volumes:
       - static_files:/app/staticfiles
+      - media_files:/app/media
     depends_on:
       - db
       - redis
@@ -91,6 +92,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - static_files:/srv/static
+      - media_files:/srv/media
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
@@ -102,5 +104,6 @@ volumes:
   postgres_data:
   redis_data:
   static_files:
+  media_files:
   caddy_data:
   caddy_config:
