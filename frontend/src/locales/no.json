@@ -608,7 +608,8 @@
       "addText": "Legg til tekst",
       "addMediaOfType": "Legg til {{type}}",
       "mediaRequiredError": "Legg til minst én: {{type}}.",
-      "mediaUrlRequiredError": "Hvert medieelement trenger en URL."
+      "mediaUrlRequiredError": "Hvert medieelement trenger en URL.",
+      "uploadTypeError": "Denne filtypen godtas ikke. Bruk en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (maks 20 MB)."
     },
     "translate": {
       "switchLanguage": "Language",

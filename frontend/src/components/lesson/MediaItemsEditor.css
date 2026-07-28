@@ -51,6 +51,12 @@
 .media-item-url { flex: 1 1 240px; }
 .media-item-caption { flex: 1 1 240px; }
 
+.media-item-error {
+  color: #b91c1c;
+  font-size: 0.82rem;
+  margin: 0.4rem 0 0;
+}
+
 .media-item-actions {
   display: flex;
   gap: 0.3rem;

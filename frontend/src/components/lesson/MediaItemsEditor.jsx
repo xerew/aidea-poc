@@ -14,6 +14,7 @@ import './MediaItemsEditor.css'
 export default function MediaItemsEditor({ items, onChange, disabled = false, fixedType }) {
   const { t } = useTranslation()
   const [uploadingIdx, setUploadingIdx] = useState(null)
+  const [errors, setErrors] = useState({})  // per-item upload error message
 
   const update = (i, patch) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)))
@@ -33,14 +34,18 @@ export default function MediaItemsEditor({ items, onChange, disabled = false, fi
 
   const upload = async (i, file) => {
     if (!file) return
+    setErrors(prev => { const n = { ...prev }; delete n[i]; return n })
     setUploadingIdx(i)
     try {
       const fd = new FormData()
       fd.append('file', file)
       const res = await client.post('/authoring/upload/', fd)
       update(i, { url: res.data.url })
-    } catch { /* ignore */ }
-    finally { setUploadingIdx(null) }
+    } catch {
+      setErrors(prev => ({ ...prev, [i]: t('authoring.moduleEditor.uploadTypeError') }))
+    } finally {
+      setUploadingIdx(null)
+    }
   }
 
   const mediaLabel = t(`lesson.type.${fixedType}`)
@@ -95,13 +100,14 @@ export default function MediaItemsEditor({ items, onChange, disabled = false, fi
                     <input
                       type="file"
                       hidden
-                      accept={item.type === 'pdf' ? '.pdf' : 'image/*'}
+                      accept={item.type === 'pdf' ? '.pdf' : '.png,.jpg,.jpeg,.gif,.webp'}
                       disabled={uploadingIdx !== null}
                       onChange={(e) => upload(i, e.target.files?.[0])}
                     />
                   </label>
                 )}
               </div>
+              {errors[i] && <p className="media-item-error">{errors[i]}</p>}
               <input
                 className="media-item-caption"
                 value={item.caption ?? ''}

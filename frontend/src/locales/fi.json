@@ -608,7 +608,8 @@
       "addText": "Lisää tekstiä",
       "addMediaOfType": "Lisää {{type}}",
       "mediaRequiredError": "Lisää vähintään yksi: {{type}}.",
-      "mediaUrlRequiredError": "Jokainen mediakohde tarvitsee URL-osoitteen."
+      "mediaUrlRequiredError": "Jokainen mediakohde tarvitsee URL-osoitteen.",
+      "uploadTypeError": "Tätä tiedostotyyppiä ei hyväksytä. Käytä PNG-, JPG-, GIF-, WEBP- tai PDF-tiedostoa (enintään 20 Mt)."
     },
     "translate": {
       "switchLanguage": "Language",

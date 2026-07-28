@@ -608,7 +608,8 @@
       "addText": "Προσθήκη κειμένου",
       "addMediaOfType": "Προσθήκη {{type}}",
       "mediaRequiredError": "Προσθέστε τουλάχιστον ένα: {{type}}.",
-      "mediaUrlRequiredError": "Κάθε πολυμέσο χρειάζεται URL."
+      "mediaUrlRequiredError": "Κάθε πολυμέσο χρειάζεται URL.",
+      "uploadTypeError": "Αυτός ο τύπος αρχείου δεν γίνεται δεκτός. Χρησιμοποιήστε αρχείο PNG, JPG, GIF, WEBP ή PDF (έως 20 MB)."
     },
     "translate": {
       "switchLanguage": "Language",

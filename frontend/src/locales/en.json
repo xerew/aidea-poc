@@ -608,7 +608,8 @@
       "addText": "Add text",
       "addMediaOfType": "Add {{type}}",
       "mediaRequiredError": "Add at least one {{type}}.",
-      "mediaUrlRequiredError": "Each media item needs a URL."
+      "mediaUrlRequiredError": "Each media item needs a URL.",
+      "uploadTypeError": "That file type isn’t accepted. Use a PNG, JPG, GIF, WEBP or PDF file (max 20 MB)."
     },
     "translate": {
       "switchLanguage": "Language",

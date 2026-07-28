@@ -608,7 +608,8 @@
       "addText": "Lägg till text",
       "addMediaOfType": "Lägg till {{type}}",
       "mediaRequiredError": "Lägg till minst en: {{type}}.",
-      "mediaUrlRequiredError": "Varje medieobjekt behöver en URL."
+      "mediaUrlRequiredError": "Varje medieobjekt behöver en URL.",
+      "uploadTypeError": "Den filtypen accepteras inte. Använd en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (max 20 MB)."
     },
     "translate": {
       "switchLanguage": "Language",
