@@ -15,8 +15,7 @@ export default function PrivacyPage() {
       <h2>1. Who we are</h2>
       <p>
         The data controller is the Information Management Unit (ICCS). You can contact us at{' '}
-        <a href="mailto:info@aidea-hub.eu">info@aidea-hub.eu</a> or via{' '}
-        <a href="https://imu.ntua.gr/wp/" target="_blank" rel="noreferrer">imu.ntua.gr</a>.
+        <a href="mailto:info@aidea-hub.eu">info@aidea-hub.eu</a>.
       </p>
 
       <h2>2. What data we collect</h2>

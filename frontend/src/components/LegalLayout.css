@@ -37,11 +37,13 @@
 .legal-body strong { font-weight: 600; }
 .legal-highlight {
   background: #eff6ff;
-  border-left: 3px solid var(--color-primary, #1d4ed8);
+  color: #1e293b;
+  border-left: 3px solid #1d4ed8;
   padding: 0.85rem 1rem;
   border-radius: 6px;
   margin: 0 0 1.1rem;
 }
+.legal-highlight strong { color: #1e293b; }
 
 .legal-footer {
   margin-top: 2rem;
@@ -57,9 +59,6 @@
 .legal-footer a { color: var(--color-primary); text-decoration: none; }
 .legal-footer a:hover { text-decoration: underline; }
 
-@media (prefers-color-scheme: dark) {
-  .legal-highlight { background: #1e293b; }
-}
 @media (max-width: 600px) {
   .legal-card { padding: 1.5rem 1.25rem; }
   .legal-title { font-size: 1.5rem; }
