@@ -762,7 +762,8 @@
     "export": {
       "title": "Velg kurs å eksportere",
       "selectAll": "Velg alle",
-      "exportSelected": "Eksporter {{count}}"
+      "exportSelected": "Eksporter {{count}}",
+      "search": "Søk kurs…"
     }
   },
   "media": {

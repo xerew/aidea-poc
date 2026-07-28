@@ -762,7 +762,8 @@
     "export": {
       "title": "Valitse vietävät kurssit",
       "selectAll": "Valitse kaikki",
-      "exportSelected": "Vie {{count}}"
+      "exportSelected": "Vie {{count}}",
+      "search": "Hae kursseja…"
     }
   },
   "media": {

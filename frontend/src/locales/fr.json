@@ -762,7 +762,8 @@
     "export": {
       "title": "Choisir les cours à exporter",
       "selectAll": "Tout sélectionner",
-      "exportSelected": "Exporter {{count}}"
+      "exportSelected": "Exporter {{count}}",
+      "search": "Rechercher des cours…"
     }
   },
   "media": {

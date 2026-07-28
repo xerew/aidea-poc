@@ -762,7 +762,8 @@
     "export": {
       "title": "Επιλέξτε μαθήματα για εξαγωγή",
       "selectAll": "Επιλογή όλων",
-      "exportSelected": "Εξαγωγή {{count}}"
+      "exportSelected": "Εξαγωγή {{count}}",
+      "search": "Αναζήτηση μαθημάτων…"
     }
   },
   "media": {

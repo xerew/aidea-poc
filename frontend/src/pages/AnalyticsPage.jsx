@@ -198,6 +198,7 @@ ExportModal.propTypes = { courses: PropTypes.array.isRequired, onClose: PropType
 function ExportModal({ courses, onClose }) {
   const { t } = useTranslation()
   const [selected, setSelected] = useState(() => new Set(courses.map(c => c.id)))
+  const [query, setQuery] = useState('')
   const [busy, setBusy] = useState(false)
 
   const allChecked = selected.size === courses.length
@@ -207,6 +208,13 @@ function ExportModal({ courses, onClose }) {
     return next
   })
   const toggleAll = () => setSelected(allChecked ? new Set() : new Set(courses.map(c => c.id)))
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return courses
+    return courses.filter(c =>
+      (c.title || '').toLowerCase().includes(q) || (c.author_name || '').toLowerCase().includes(q))
+  }, [courses, query])
 
   const doExport = async () => {
     setBusy(true)
@@ -223,12 +231,18 @@ function ExportModal({ courses, onClose }) {
           <h2>{t('analytics.export.title')}</h2>
           <button className="an-modal-close" onClick={onClose} aria-label={t('common.cancel')}><X size={18} /></button>
         </div>
+        <div className="an-search an-modal-search">
+          <Search size={15} />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('analytics.export.search')} />
+        </div>
         <label className="an-modal-all">
           <input type="checkbox" checked={allChecked} onChange={toggleAll} />
           <span>{t('analytics.export.selectAll')}</span>
         </label>
         <div className="an-modal-list">
-          {courses.map(c => (
+          {visible.length === 0 ? (
+            <p className="an-empty">{t('analytics.noMatch')}</p>
+          ) : visible.map(c => (
             <label key={c.id} className="an-modal-item">
               <input type="checkbox" checked={selected.has(c.id)} onChange={() => toggle(c.id)} />
               <span className="an-modal-item-title">{c.title}</span>

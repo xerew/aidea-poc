@@ -762,7 +762,8 @@
     "export": {
       "title": "Välj kurser att exportera",
       "selectAll": "Markera alla",
-      "exportSelected": "Exportera {{count}}"
+      "exportSelected": "Exportera {{count}}",
+      "search": "Sök kurser…"
     }
   },
   "media": {

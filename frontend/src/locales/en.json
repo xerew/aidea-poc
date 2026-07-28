@@ -762,7 +762,8 @@
     "export": {
       "title": "Choose courses to export",
       "selectAll": "Select all",
-      "exportSelected": "Export {{count}}"
+      "exportSelected": "Export {{count}}",
+      "search": "Search courses…"
     }
   },
   "media": {
