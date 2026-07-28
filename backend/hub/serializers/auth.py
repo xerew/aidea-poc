@@ -29,6 +29,14 @@ class RegisterSerializer(serializers.Serializer):
     country          = serializers.CharField(max_length=2, required=False, allow_blank=True)
     password         = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
+    accept_terms     = serializers.BooleanField(write_only=True)
+
+    def validate_accept_terms(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                'You must accept the Terms of Service and Privacy Policy to register.',
+            )
+        return value
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
@@ -53,8 +61,10 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         from django.db import transaction
+        from django.utils import timezone
 
         validated_data.pop('confirm_password')
+        validated_data.pop('accept_terms', None)
         password = validated_data.pop('password')
         gender   = validated_data.pop('gender', '')
         country  = validated_data.pop('country', '')
@@ -74,6 +84,7 @@ class RegisterSerializer(serializers.Serializer):
                 gender=gender,
                 country=country,
                 language=language_for_country(country),
+                accepted_terms_at=timezone.now(),
             )
         return user
 

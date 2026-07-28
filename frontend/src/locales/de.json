@@ -94,7 +94,10 @@
       "submitting": "Konto wird erstellt…",
       "haveAccount": "Sie haben bereits ein Konto?",
       "signIn": "Anmelden",
-      "genericError": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut."
+      "genericError": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "acceptPrefix": "Ich habe gelesen und akzeptiere die",
+      "acceptAnd": "und die",
+      "emailConsent": "Mit der Erstellung eines Kontos stimmen Sie zu, dass wir Ihre E-Mail für Mitteilungen über Kurse, KI und Plattform-Updates verwenden dürfen. Sie können sich jederzeit abmelden."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "Der Abschlussfragebogen der Studie ist jetzt verfügbar.",
       "take": "Ausfüllen"
     }
+  },
+  "legal": {
+    "termsTitle": "Nutzungsbedingungen",
+    "privacyTitle": "Datenschutzerklärung",
+    "lastUpdated": "Zuletzt aktualisiert: {{date}}",
+    "docLabel": "Rechtliches:"
   }
 }

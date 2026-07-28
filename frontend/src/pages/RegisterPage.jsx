@@ -30,6 +30,7 @@ export default function RegisterPage() {
   })
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
+  const [accepted, setAccepted] = useState(false)
 
   if (user) return <Navigate to="/" replace />
 
@@ -39,7 +40,7 @@ export default function RegisterPage() {
   const passwordsMatch = form.password.length > 0 && form.password === form.confirm
   const canSubmit      =
     form.first_name && form.last_name && form.username &&
-    form.email && allRulesMet && passwordsMatch && !loading
+    form.email && allRulesMet && passwordsMatch && accepted && !loading
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -56,6 +57,7 @@ export default function RegisterPage() {
         country:          form.country,
         password:         form.password,
         confirm_password: form.confirm,
+        accept_terms:     accepted,
       })
       loginSession(data)
       navigate('/onboarding')
@@ -162,6 +164,17 @@ export default function RegisterPage() {
               </span>
             )}
           </div>
+
+          <label className="register-terms">
+            <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+            <span>
+              {t('auth.register.acceptPrefix')}{' '}
+              <Link to="/terms" target="_blank" rel="noreferrer">{t('legal.termsTitle')}</Link>
+              {' '}{t('auth.register.acceptAnd')}{' '}
+              <Link to="/privacy" target="_blank" rel="noreferrer">{t('legal.privacyTitle')}</Link>.
+            </span>
+          </label>
+          <p className="register-terms-note">{t('auth.register.emailConsent')}</p>
 
           <button type="submit" className="register-submit" disabled={!canSubmit}>
             {loading ? t('auth.register.submitting') : t('auth.register.submit')}

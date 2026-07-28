@@ -6,6 +6,8 @@ import Layout from './components/layout/Layout'
 import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
 import OnboardingPage from './pages/OnboardingPage'
 import HomePage from './pages/HomePage'
 import CoursesPage from './pages/CoursesPage'
@@ -68,6 +70,8 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<RequireOnboarding><Layout /></RequireOnboarding>}>
             <Route index element={<HomePage />} />

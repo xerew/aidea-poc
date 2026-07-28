@@ -47,6 +47,7 @@ class ProfileLanguageApiTests(APITestCase):
             'username': 'greek_teacher', 'password': 'Str0ng!pass9',
             'confirm_password': 'Str0ng!pass9', 'email': 'g@example.com',
             'first_name': 'Nikos', 'last_name': 'P', 'country': 'GR',
+            'accept_terms': True,
         }, format='json')
         self.assertEqual(res.status_code, 201, res.data)
         self.assertEqual(User.objects.get(username='greek_teacher').profile.language, 'el')

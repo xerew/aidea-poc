@@ -10,7 +10,23 @@ class RegisterViewTest(APITestCase):
         'first_name': 'Test', 'last_name': 'User',
         'username': 'testuser', 'email': 'test@example.com',
         'password': 'Secure#123', 'confirm_password': 'Secure#123',
+        'accept_terms': True,
     }
+
+    def test_register_records_terms_acceptance(self):
+        self.client.post(self.URL, self.VALID, format='json')
+        profile = UserProfile.objects.get(user__username='testuser')
+        self.assertIsNotNone(profile.accepted_terms_at)
+
+    def test_register_without_accepting_terms_returns_400(self):
+        res = self.client.post(self.URL, {**self.VALID, 'accept_terms': False}, format='json')
+        self.assertEqual(res.status_code, 400)
+        self.assertFalse(User.objects.filter(username='testuser').exists())
+
+    def test_register_missing_accept_terms_returns_400(self):
+        data = {k: v for k, v in self.VALID.items() if k != 'accept_terms'}
+        res = self.client.post(self.URL, data, format='json')
+        self.assertEqual(res.status_code, 400)
 
     def test_register_creates_user_and_returns_201(self):
         res = self.client.post(self.URL, self.VALID, format='json')

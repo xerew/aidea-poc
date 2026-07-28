@@ -94,7 +94,10 @@
       "submitting": "Oppretter konto…",
       "haveAccount": "Har du allerede en konto?",
       "signIn": "Logg inn",
-      "genericError": "Registrering mislyktes. Prøv igjen."
+      "genericError": "Registrering mislyktes. Prøv igjen.",
+      "acceptPrefix": "Jeg har lest og godtar",
+      "acceptAnd": "og",
+      "emailConsent": "Ved å opprette en konto godtar du at vi kan bruke e-posten din til å sende deg meldinger om kurs, KI og plattformoppdateringer. Du kan melde deg av når som helst."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "Det avsluttende spørreskjemaet for studien er nå tilgjengelig.",
       "take": "Fyll ut"
     }
+  },
+  "legal": {
+    "termsTitle": "Vilkår for bruk",
+    "privacyTitle": "Personvernerklæring",
+    "lastUpdated": "Sist oppdatert: {{date}}",
+    "docLabel": "Juridisk:"
   }
 }

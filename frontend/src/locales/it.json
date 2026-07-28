@@ -94,7 +94,10 @@
       "submitting": "Creazione dell'account…",
       "haveAccount": "Hai già un account?",
       "signIn": "Accedi",
-      "genericError": "Registrazione non riuscita. Riprova."
+      "genericError": "Registrazione non riuscita. Riprova.",
+      "acceptPrefix": "Ho letto e accetto i",
+      "acceptAnd": "e l'",
+      "emailConsent": "Creando un account, accetti che possiamo usare la tua email per inviarti comunicazioni su corsi, IA e aggiornamenti della piattaforma. Puoi annullare l'iscrizione in qualsiasi momento."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "Il questionario finale dello studio è ora disponibile.",
       "take": "Compilalo"
     }
+  },
+  "legal": {
+    "termsTitle": "Termini di servizio",
+    "privacyTitle": "Informativa sulla privacy",
+    "lastUpdated": "Ultimo aggiornamento: {{date}}",
+    "docLabel": "Note legali:"
   }
 }

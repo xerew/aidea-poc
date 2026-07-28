@@ -94,7 +94,10 @@
       "submitting": "Création du compte…",
       "haveAccount": "Vous avez déjà un compte ?",
       "signIn": "Se connecter",
-      "genericError": "Échec de l'inscription. Veuillez réessayer."
+      "genericError": "Échec de l'inscription. Veuillez réessayer.",
+      "acceptPrefix": "J'ai lu et j'accepte les",
+      "acceptAnd": "et la",
+      "emailConsent": "En créant un compte, vous acceptez que nous utilisions votre e-mail pour vous envoyer des communications sur les cours, l'IA et les mises à jour de la plateforme. Vous pouvez vous désabonner à tout moment."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "Le questionnaire final de l'étude est maintenant disponible.",
       "take": "Le remplir"
     }
+  },
+  "legal": {
+    "termsTitle": "Conditions d'utilisation",
+    "privacyTitle": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour : {{date}}",
+    "docLabel": "Mentions légales :"
   }
 }

@@ -122,3 +122,16 @@
   .doc-guide-actions .doc-btn { flex: 1; justify-content: center; }
   .doc-pdf { height: 60vh; }
 }
+
+.doc-legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+.doc-legal a { color: var(--color-primary); text-decoration: none; font-weight: 500; }
+.doc-legal a:hover { text-decoration: underline; }
+.doc-legal-dot { color: var(--color-text-muted); }

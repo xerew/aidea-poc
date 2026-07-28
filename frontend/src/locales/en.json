@@ -94,7 +94,10 @@
       "submitting": "Creating account…",
       "haveAccount": "Already have an account?",
       "signIn": "Sign in",
-      "genericError": "Registration failed. Please try again."
+      "genericError": "Registration failed. Please try again.",
+      "acceptPrefix": "I have read and accept the",
+      "acceptAnd": "and the",
+      "emailConsent": "By creating an account, you agree that we may use your email to send you communications about courses, AI and platform updates. You can unsubscribe at any time."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "The final questionnaire for the research study is now available.",
       "take": "Take it"
     }
+  },
+  "legal": {
+    "termsTitle": "Terms of Service",
+    "privacyTitle": "Privacy Policy",
+    "lastUpdated": "Last updated: {{date}}",
+    "docLabel": "Legal:"
   }
 }

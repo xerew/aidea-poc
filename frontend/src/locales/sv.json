@@ -94,7 +94,10 @@
       "submitting": "Skapar konto…",
       "haveAccount": "Har du redan ett konto?",
       "signIn": "Logga in",
-      "genericError": "Registreringen misslyckades. Försök igen."
+      "genericError": "Registreringen misslyckades. Försök igen.",
+      "acceptPrefix": "Jag har läst och godkänner",
+      "acceptAnd": "och",
+      "emailConsent": "Genom att skapa ett konto godkänner du att vi använder din e-post för att skicka meddelanden om kurser, AI och plattformsuppdateringar. Du kan avsluta prenumerationen när som helst."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "Studiens avslutande frågeformulär är nu tillgängligt.",
       "take": "Fyll i det"
     }
+  },
+  "legal": {
+    "termsTitle": "Användarvillkor",
+    "privacyTitle": "Integritetspolicy",
+    "lastUpdated": "Senast uppdaterad: {{date}}",
+    "docLabel": "Juridiskt:"
   }
 }

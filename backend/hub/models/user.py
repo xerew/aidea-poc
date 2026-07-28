@@ -73,6 +73,8 @@ class UserProfile(models.Model):
     country              = models.CharField(max_length=2, blank=True)
     avatar               = models.ImageField(upload_to='avatars/', null=True, blank=True)
     language             = models.CharField(max_length=5, choices=Language.choices, default=Language.EN)
+    # When the user accepted the Terms of Service and Privacy Policy (at registration).
+    accepted_terms_at    = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.get_full_name()} ({self.get_user_type_display()})'

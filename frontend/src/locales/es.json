@@ -94,7 +94,10 @@
       "submitting": "Creando cuenta…",
       "haveAccount": "¿Ya tienes una cuenta?",
       "signIn": "Iniciar sesión",
-      "genericError": "No se pudo completar el registro. Inténtalo de nuevo."
+      "genericError": "No se pudo completar el registro. Inténtalo de nuevo.",
+      "acceptPrefix": "He leído y acepto los",
+      "acceptAnd": "y la",
+      "emailConsent": "Al crear una cuenta, aceptas que usemos tu correo para enviarte comunicaciones sobre cursos, IA y novedades de la plataforma. Puedes darte de baja en cualquier momento."
     },
     "password": {
       "rules": {
@@ -892,5 +895,11 @@
       "text": "El cuestionario final del estudio ya está disponible.",
       "take": "Completarlo"
     }
+  },
+  "legal": {
+    "termsTitle": "Términos del servicio",
+    "privacyTitle": "Política de privacidad",
+    "lastUpdated": "Última actualización: {{date}}",
+    "docLabel": "Legal:"
   }
 }
