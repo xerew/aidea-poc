@@ -752,7 +752,18 @@
     "avgScore": "ka {{pct}}%",
     "chose": "valitsi “{{answer}}”",
     "correctAnswer": "oikein: {{answer}}",
-    "notAnswered": "ei vastausta"
+    "notAnswered": "ei vastausta",
+    "searchPlaceholder": "Hae nimi, kuvaus tai tekijä…",
+    "allPillars": "Kaikki pilarit",
+    "noMatch": "Yksikään kurssi ei täsmää.",
+    "prev": "Edellinen",
+    "next": "Seuraava",
+    "pageOf": "Sivu {{page}} / {{total}}",
+    "export": {
+      "title": "Valitse vietävät kurssit",
+      "selectAll": "Valitse kaikki",
+      "exportSelected": "Vie {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Videotunti",

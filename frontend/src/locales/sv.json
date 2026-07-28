@@ -752,7 +752,18 @@
     "avgScore": "snitt {{pct}}%",
     "chose": "valde “{{answer}}”",
     "correctAnswer": "rätt: {{answer}}",
-    "notAnswered": "ej besvarad"
+    "notAnswered": "ej besvarad",
+    "searchPlaceholder": "Sök namn, beskrivning eller författare…",
+    "allPillars": "Alla pelare",
+    "noMatch": "Inga kurser matchar.",
+    "prev": "Föregående",
+    "next": "Nästa",
+    "pageOf": "Sida {{page}} av {{total}}",
+    "export": {
+      "title": "Välj kurser att exportera",
+      "selectAll": "Markera alla",
+      "exportSelected": "Exportera {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Videolektion",

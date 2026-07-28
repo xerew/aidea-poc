@@ -752,7 +752,18 @@
     "avgScore": "avg {{pct}}%",
     "chose": "chose “{{answer}}”",
     "correctAnswer": "correct: {{answer}}",
-    "notAnswered": "not answered"
+    "notAnswered": "not answered",
+    "searchPlaceholder": "Search name, description or author…",
+    "allPillars": "All pillars",
+    "noMatch": "No courses match your filters.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{page}} of {{total}}",
+    "export": {
+      "title": "Choose courses to export",
+      "selectAll": "Select all",
+      "exportSelected": "Export {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Video lesson",

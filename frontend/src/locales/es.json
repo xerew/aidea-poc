@@ -752,7 +752,18 @@
     "avgScore": "prom. {{pct}}%",
     "chose": "eligió “{{answer}}”",
     "correctAnswer": "correcto: {{answer}}",
-    "notAnswered": "sin responder"
+    "notAnswered": "sin responder",
+    "searchPlaceholder": "Buscar nombre, descripción o autor…",
+    "allPillars": "Todos los pilares",
+    "noMatch": "Ningún curso coincide.",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "pageOf": "Página {{page}} de {{total}}",
+    "export": {
+      "title": "Elige los cursos a exportar",
+      "selectAll": "Seleccionar todo",
+      "exportSelected": "Exportar {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Lección en vídeo",

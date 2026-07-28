@@ -752,7 +752,18 @@
     "avgScore": "snitt {{pct}}%",
     "chose": "valgte “{{answer}}”",
     "correctAnswer": "riktig: {{answer}}",
-    "notAnswered": "ikke besvart"
+    "notAnswered": "ikke besvart",
+    "searchPlaceholder": "Søk navn, beskrivelse eller forfatter…",
+    "allPillars": "Alle pilarer",
+    "noMatch": "Ingen kurs samsvarer.",
+    "prev": "Forrige",
+    "next": "Neste",
+    "pageOf": "Side {{page}} av {{total}}",
+    "export": {
+      "title": "Velg kurs å eksportere",
+      "selectAll": "Velg alle",
+      "exportSelected": "Eksporter {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Videoleksjon",

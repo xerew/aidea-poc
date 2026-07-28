@@ -752,7 +752,18 @@
     "avgScore": "μ.ό. {{pct}}%",
     "chose": "επέλεξε “{{answer}}”",
     "correctAnswer": "σωστό: {{answer}}",
-    "notAnswered": "δεν απάντησε"
+    "notAnswered": "δεν απάντησε",
+    "searchPlaceholder": "Αναζήτηση ονόματος, περιγραφής ή συγγραφέα…",
+    "allPillars": "Όλοι οι πυλώνες",
+    "noMatch": "Κανένα μάθημα δεν ταιριάζει.",
+    "prev": "Προηγούμενο",
+    "next": "Επόμενο",
+    "pageOf": "Σελίδα {{page}} από {{total}}",
+    "export": {
+      "title": "Επιλέξτε μαθήματα για εξαγωγή",
+      "selectAll": "Επιλογή όλων",
+      "exportSelected": "Εξαγωγή {{count}}"
+    }
   },
   "media": {
     "videoLessonTitle": "Μάθημα βίντεο",

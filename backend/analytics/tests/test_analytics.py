@@ -164,9 +164,9 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         titles = [c['title'] for c in res.data['courses']]
         self.assertIn('Draft course', titles)
 
-    def test_other_creators_published_courses_included(self):
-        # #11: published courses by anyone show up (platform-wide engagement),
-        # but they do NOT inflate the viewer's "courses created" count.
+    def test_other_creators_courses_excluded_for_content_creator(self):
+        # A content creator sees only their own courses — not others', even
+        # published ones.
         other = User.objects.create_user(username='other_creator2', password='pass12345')
         UserProfile.objects.create(user=other, user_type=UserProfile.UserType.CONTENT_CREATOR)
         Course.objects.create(
@@ -175,8 +175,23 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         )
         res = self.client.get(self.url)
         titles = [c['title'] for c in res.data['courses']]
-        self.assertIn('Someone elses published', titles)
-        self.assertEqual(res.data['summary']['courses_created'], 2)  # still only own
+        self.assertNotIn('Someone elses published', titles)
+        self.assertEqual(res.data['summary']['courses_created'], 2)
+
+    def test_admin_sees_all_courses(self):
+        admin = User.objects.create_user(username='an_admin', password='pass12345')
+        UserProfile.objects.create(user=admin, user_type=UserProfile.UserType.ADMIN)
+        self.client.force_authenticate(user=admin)
+        res = self.client.get(self.url)
+        titles = [c['title'] for c in res.data['courses']]
+        # Every creator's courses are visible to the admin.
+        self.assertIn('Course 1', titles)
+        self.assertIn('Other Course', titles)
+
+    def test_export_subset_by_ids(self):
+        res = self.client.get(reverse('analytics-export'), {'ids': str(self.course1.id)})
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn('spreadsheet', res['Content-Type'])
 
     def test_other_creators_unpublished_courses_excluded(self):
         other = User.objects.create_user(username='other_creator3', password='pass12345')

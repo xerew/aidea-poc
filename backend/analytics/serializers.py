@@ -11,19 +11,40 @@ class CourseAnalyticsSerializer(serializers.ModelSerializer):
     completion_rate = serializers.SerializerMethodField()
     avg_time_minutes = serializers.SerializerMethodField()
     owned = serializers.SerializerMethodField()
+    author_name = serializers.SerializerMethodField()
+    author_id = serializers.IntegerField(source='created_by_id', read_only=True)
+    pillar_name = serializers.CharField(source='pillar.name', read_only=True)
+    pillar_slug = serializers.CharField(source='pillar.slug', read_only=True)
+    can_view_teachers = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'enrolled', 'completed', 'in_progress',
-            'completion_rate', 'avg_time_minutes', 'owned',
+            'id', 'title', 'description', 'author_name', 'author_id',
+            'pillar_name', 'pillar_slug', 'enrolled', 'completed', 'in_progress',
+            'completion_rate', 'avg_time_minutes', 'owned', 'can_view_teachers',
         ]
 
     def get_owned(self, obj):
-        # Whether the requesting creator authored this course — the per-teacher
-        # drill-down is only available for their own courses.
         request = self.context.get('request')
         return bool(request and obj.created_by_id == request.user.id)
+
+    def get_author_name(self, obj):
+        if not obj.created_by:
+            return ''
+        return obj.created_by.get_full_name() or obj.created_by.username
+
+    def get_can_view_teachers(self, obj):
+        # The per-teacher drill-down is available for a creator's own courses,
+        # and for admins / AIDEA partners on any course.
+        request = self.context.get('request')
+        if not request:
+            return False
+        from hub.models import UserProfile
+        profile = request.user.profile
+        if profile.user_type in (UserProfile.UserType.ADMIN, UserProfile.UserType.AIDEA_PARTNER):
+            return True
+        return obj.created_by_id == request.user.id
 
     def _enrollments(self, obj):
         cache = self.context.setdefault('_enrollment_cache', {})

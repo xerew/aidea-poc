@@ -1,13 +1,12 @@
 from io import BytesIO
 
-from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, Enrollment, LessonProgress
+from hub.models import Course, Enrollment, LessonProgress, UserProfile
 from hub.views.permissions import IsContentCreator
 
 from .reports import build_analytics_workbook, build_course_teacher_report
@@ -16,21 +15,26 @@ from .serializers import CourseAnalyticsSerializer
 XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
+def scoped_courses(user):
+    """Which courses' analytics a user may see: admins and AIDEA partners see
+    every course; content creators see only the ones they authored."""
+    qs = Course.objects.select_related('created_by', 'pillar')
+    if user.profile.user_type in (UserProfile.UserType.ADMIN, UserProfile.UserType.AIDEA_PARTNER):
+        return qs
+    return qs.filter(created_by=user)
+
+
 class AnalyticsOverviewView(APIView):
     """GET /api/analytics/overview/ — Content creator analytics dashboard."""
 
     permission_classes = [IsContentCreator]
 
     def get(self, request):
-        # #11: creators see engagement across every published course (real
-        # platform usage), plus their own unpublished drafts — otherwise a
-        # creator who has authored nothing sees an empty dashboard while the
-        # catalog's enrolled teachers stay invisible.
+        # Admins/partners see every course; content creators see only their own.
         courses = list(
-            Course.objects
-            .filter(Q(is_published=True) | Q(created_by=request.user))
+            scoped_courses(request.user)
             .prefetch_related('modules__lessons')
-            .distinct()
+            .order_by('title')
         )
 
         total_enrollments = Enrollment.objects.filter(course__in=courses).count()
@@ -69,7 +73,7 @@ class AnalyticsCourseTeachersView(APIView):
 
     def get(self, request, pk):
         try:
-            course = Course.objects.get(pk=pk, created_by=request.user)
+            course = scoped_courses(request.user).get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         return Response(build_course_teacher_report(course))
@@ -82,12 +86,12 @@ class AnalyticsExportView(APIView):
     permission_classes = [IsContentCreator]
 
     def get(self, request):
-        courses = (
-            Course.objects
-            .filter(created_by=request.user)
-            .prefetch_related('modules__lessons')
-            .order_by('title')
-        )
+        courses = scoped_courses(request.user).prefetch_related('modules__lessons').order_by('title')
+        # Optional subset selected in the export dialog: ?ids=1,2,3
+        ids_param = request.query_params.get('ids')
+        if ids_param:
+            wanted = {int(x) for x in ids_param.split(',') if x.strip().isdigit()}
+            courses = courses.filter(id__in=wanted)
         buffer = BytesIO()
         build_analytics_workbook(courses).save(buffer)
         response = HttpResponse(buffer.getvalue(), content_type=XLSX_MIME)
