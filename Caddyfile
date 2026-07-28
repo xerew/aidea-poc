@@ -1,4 +1,10 @@
 # Caddyfile — production reverse proxy
+
+# Redirect www → apex so both addresses work (Caddy still gets a cert for www).
+www.{$DOMAIN:localhost} {
+    redir https://{$DOMAIN:localhost}{uri} permanent
+}
+
 {$DOMAIN:localhost} {
     handle /api/* {
         reverse_proxy backend:8000
