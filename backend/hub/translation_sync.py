@@ -16,9 +16,19 @@ def _target_langs(course):
 
 
 def _mark_pending(course, langs):
-    for lang in langs:
-        course.translation_status[lang] = 'pending'
-    course.save(update_fields=['translation_status'])
+    # Re-read under a row lock and merge, so this doesn't clobber a still-running
+    # translation task writing the same status dict (see hub.tasks._merge_json).
+    from django.db import transaction
+
+    from hub.models import Course
+    with transaction.atomic():
+        fresh = Course.objects.select_for_update().get(pk=course.pk)
+        status = dict(fresh.translation_status or {})
+        for lang in langs:
+            status[lang] = 'pending'
+        fresh.translation_status = status
+        fresh.save(update_fields=['translation_status'])
+    course.translation_status = status
 
 
 def resync_course_meta(course):

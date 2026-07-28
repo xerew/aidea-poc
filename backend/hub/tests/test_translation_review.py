@@ -123,3 +123,14 @@ class TranslationResyncTests(APITestCase):
         self.client.patch(url, {'content': 'Another edit'}, format='json')
         self.course.refresh_from_db()
         self.assertEqual(self.course.translation_status, {})
+
+    def test_retranslating_one_language_keeps_the_other(self, _mock):
+        # Re-translating one language must not drop another language's data
+        # (the atomic-merge fix for the concurrent lost-update bug).
+        from hub.tasks import _translate_course_meta
+        self.course.translations = {'el': {'title': 'EL'}, 'fr': {'title': 'FR'}}
+        self.course.save()
+        _translate_course_meta(self.course, 'el')
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.translations['fr']['title'], 'FR')  # untouched
+        self.assertEqual(self.course.translations['el']['title'], 'TR')  # re-translated

@@ -3,10 +3,26 @@ import math
 import random
 
 from celery import shared_task
+from django.db import transaction
 
 from hub.translation import translate_text
 
 logger = logging.getLogger(__name__)
+
+
+def _merge_json(model_cls, pk, field, key, value):
+    """Atomically set field[key]=value on a JSONField dict under a row lock.
+
+    Translations run one Celery task per language, all writing the same row's
+    JSON dict. Without the lock+re-read, a slower language would overwrite the
+    whole dict with its stale snapshot and clobber a faster language's update.
+    """
+    with transaction.atomic():
+        obj = model_cls.objects.select_for_update().get(pk=pk)
+        data = dict(getattr(obj, field) or {})
+        data[key] = value
+        setattr(obj, field, data)
+        obj.save(update_fields=[field])
 
 # Multiplicative nudge for courses whose subjects match the teacher's subject
 # (or the catch-all General/All). Kept as a fixed constant here; the
@@ -464,25 +480,28 @@ def _tr_quiz(quiz_data, src, target):
 
 
 def _translate_course_meta(course, target):
+    from hub.models import Course
     src = course.source_language
-    course.translations[target] = {
+    blob = {
         'title': translate_text(course.title, src, target),
         'description': translate_text(course.description, src, target),
         'learning_outcomes': [translate_text(o, src, target) for o in (course.learning_outcomes or [])],
     }
-    course.save(update_fields=['translations'])
+    _merge_json(Course, course.pk, 'translations', target, blob)
 
 
 def _translate_module(module, target):
+    from hub.models import Module
     src = module.course.source_language
-    module.translations[target] = {
+    blob = {
         'title': translate_text(module.title, src, target),
         'description': translate_text(module.description, src, target),
     }
-    module.save(update_fields=['translations'])
+    _merge_json(Module, module.pk, 'translations', target, blob)
 
 
 def _translate_lesson(lesson, target):
+    from hub.models import Lesson
     src = lesson.module.course.source_language
     blob = {
         'title': translate_text(lesson.title, src, target),
@@ -494,21 +513,20 @@ def _translate_lesson(lesson, target):
         blob['content'] = translate_text(lesson.content, src, target)
     elif lesson.lesson_type == 'quiz':
         blob['quiz_data'] = _tr_quiz(lesson.quiz_data, src, target)
-    lesson.translations[target] = blob
-    lesson.save(update_fields=['translations'])
+    _merge_json(Lesson, lesson.pk, 'translations', target, blob)
 
 
 def _finish(course, target, work):
     """Run a translation unit of work, then flip the course-level status to
     'done' (needs human re-review) or 'failed'."""
+    from hub.models import Course
     from hub.translation import TranslationError
     try:
         work()
-        course.translation_status[target] = 'done'
+        _merge_json(Course, course.pk, 'translation_status', target, 'done')
     except TranslationError as exc:
         logger.error('Translation of course %s into %s failed: %s', course.id, target, exc)
-        course.translation_status[target] = 'failed'
-    course.save(update_fields=['translation_status'])
+        _merge_json(Course, course.pk, 'translation_status', target, 'failed')
 
 
 @shared_task
