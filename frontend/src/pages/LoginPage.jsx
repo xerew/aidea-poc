@@ -71,6 +71,10 @@ export default function LoginPage() {
           </button>
         </form>
 
+        <p className="login-forgot-link">
+          <Link to="/forgot-password">{t('auth.login.forgotPassword')}</Link>
+        </p>
+
         <p className="login-signup-link">
           {t('auth.login.noAccount')} <Link to="/register">{t('auth.login.createAccount')}</Link>
         </p>

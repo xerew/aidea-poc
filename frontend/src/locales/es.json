@@ -64,7 +64,8 @@
       "signingIn": "Iniciando sesión…",
       "invalidCredentials": "Nombre de usuario o contraseña incorrectos.",
       "noAccount": "¿No tienes una cuenta?",
-      "createAccount": "Crea una"
+      "createAccount": "Crea una",
+      "forgotPassword": "¿Olvidaste tu contraseña?"
     },
     "register": {
       "title": "Crea tu cuenta",
@@ -114,6 +115,28 @@
       "hidePassword": "Ocultar contraseña",
       "match": "Las contraseñas coinciden",
       "noMatch": "Las contraseñas no coinciden"
+    },
+    "forgot": {
+      "subtitle": "Restablecer contraseña",
+      "emailLabel": "Tu dirección de correo",
+      "sendLink": "Enviar enlace",
+      "sending": "Enviando…",
+      "sent": "Si ese correo está registrado, enviamos un enlace de restablecimiento. Revisa tu bandeja (y el spam).",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "reset": {
+      "subtitle": "Elige una nueva contraseña",
+      "newPassword": "Nueva contraseña",
+      "newPasswordPlaceholder": "Introduce una nueva contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmPlaceholder": "Vuelve a introducir la contraseña",
+      "resetButton": "Restablecer",
+      "resetting": "Restableciendo…",
+      "success": "Tu contraseña se ha restablecido. Redirigiendo al inicio de sesión…",
+      "goToLogin": "Ir al inicio de sesión",
+      "rulesNotMet": "La contraseña no cumple los requisitos.",
+      "noMatch": "Las contraseñas no coinciden.",
+      "failed": "No se pudo restablecer. El enlace puede haber caducado."
     }
   },
   "onboarding": {

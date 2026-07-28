@@ -64,7 +64,8 @@
       "signingIn": "Loggar in…",
       "invalidCredentials": "Felaktigt användarnamn eller lösenord.",
       "noAccount": "Har du inget konto?",
-      "createAccount": "Skapa ett"
+      "createAccount": "Skapa ett",
+      "forgotPassword": "Glömt lösenordet?"
     },
     "register": {
       "title": "Skapa ditt konto",
@@ -114,6 +115,28 @@
       "hidePassword": "Dölj lösenord",
       "match": "Lösenorden matchar",
       "noMatch": "Lösenorden matchar inte"
+    },
+    "forgot": {
+      "subtitle": "Återställ lösenord",
+      "emailLabel": "Din e-postadress",
+      "sendLink": "Skicka länk",
+      "sending": "Skickar…",
+      "sent": "Om e-postadressen är registrerad har vi skickat en återställningslänk. Kolla din inkorg (och skräppost).",
+      "backToLogin": "Tillbaka till inloggning"
+    },
+    "reset": {
+      "subtitle": "Välj ett nytt lösenord",
+      "newPassword": "Nytt lösenord",
+      "newPasswordPlaceholder": "Ange ett nytt lösenord",
+      "confirmPassword": "Bekräfta lösenord",
+      "confirmPlaceholder": "Ange lösenordet igen",
+      "resetButton": "Återställ lösenord",
+      "resetting": "Återställer…",
+      "success": "Ditt lösenord har återställts. Omdirigerar till inloggning…",
+      "goToLogin": "Gå till inloggning",
+      "rulesNotMet": "Lösenordet uppfyller inte kraven.",
+      "noMatch": "Lösenorden matchar inte.",
+      "failed": "Kunde inte återställa. Länken kan ha gått ut."
     }
   },
   "onboarding": {

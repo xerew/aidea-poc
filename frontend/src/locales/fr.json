@@ -64,7 +64,8 @@
       "signingIn": "Connexion en cours…",
       "invalidCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
       "noAccount": "Vous n'avez pas de compte ?",
-      "createAccount": "Créer un compte"
+      "createAccount": "Créer un compte",
+      "forgotPassword": "Mot de passe oublié ?"
     },
     "register": {
       "title": "Créez votre compte",
@@ -114,6 +115,28 @@
       "hidePassword": "Masquer le mot de passe",
       "match": "Les mots de passe correspondent",
       "noMatch": "Les mots de passe ne correspondent pas"
+    },
+    "forgot": {
+      "subtitle": "Réinitialiser le mot de passe",
+      "emailLabel": "Votre adresse e-mail",
+      "sendLink": "Envoyer le lien",
+      "sending": "Envoi…",
+      "sent": "Si cet e-mail est enregistré, nous avons envoyé un lien de réinitialisation. Vérifiez votre boîte (et les spams).",
+      "backToLogin": "Retour à la connexion"
+    },
+    "reset": {
+      "subtitle": "Choisissez un nouveau mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Saisissez un nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPlaceholder": "Saisissez à nouveau le mot de passe",
+      "resetButton": "Réinitialiser",
+      "resetting": "Réinitialisation…",
+      "success": "Votre mot de passe a été réinitialisé. Redirection vers la connexion…",
+      "goToLogin": "Aller à la connexion",
+      "rulesNotMet": "Le mot de passe ne respecte pas les exigences.",
+      "noMatch": "Les mots de passe ne correspondent pas.",
+      "failed": "Impossible de réinitialiser. Le lien a peut-être expiré."
     }
   },
   "onboarding": {

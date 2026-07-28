@@ -64,7 +64,8 @@
       "signingIn": "Anmeldung läuft…",
       "invalidCredentials": "Ungültiger Benutzername oder ungültiges Passwort.",
       "noAccount": "Noch kein Konto?",
-      "createAccount": "Jetzt erstellen"
+      "createAccount": "Jetzt erstellen",
+      "forgotPassword": "Passwort vergessen?"
     },
     "register": {
       "title": "Konto erstellen",
@@ -114,6 +115,28 @@
       "hidePassword": "Passwort verbergen",
       "match": "Passwörter stimmen überein",
       "noMatch": "Passwörter stimmen nicht überein"
+    },
+    "forgot": {
+      "subtitle": "Passwort zurücksetzen",
+      "emailLabel": "Ihre E-Mail-Adresse",
+      "sendLink": "Link senden",
+      "sending": "Wird gesendet…",
+      "sent": "Wenn diese E-Mail registriert ist, haben wir einen Link gesendet. Prüfen Sie Ihren Posteingang (und Spam).",
+      "backToLogin": "Zurück zur Anmeldung"
+    },
+    "reset": {
+      "subtitle": "Neues Passwort wählen",
+      "newPassword": "Neues Passwort",
+      "newPasswordPlaceholder": "Neues Passwort eingeben",
+      "confirmPassword": "Passwort bestätigen",
+      "confirmPlaceholder": "Passwort erneut eingeben",
+      "resetButton": "Passwort zurücksetzen",
+      "resetting": "Wird zurückgesetzt…",
+      "success": "Ihr Passwort wurde zurückgesetzt. Weiterleitung zur Anmeldung…",
+      "goToLogin": "Zur Anmeldung",
+      "rulesNotMet": "Das Passwort erfüllt die Anforderungen nicht.",
+      "noMatch": "Die Passwörter stimmen nicht überein.",
+      "failed": "Zurücksetzen fehlgeschlagen. Der Link ist möglicherweise abgelaufen."
     }
   },
   "onboarding": {

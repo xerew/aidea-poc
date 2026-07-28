@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import RequireOnboarding from './components/RequireOnboarding'
 import Layout from './components/layout/Layout'
 import LoginPage from './pages/LoginPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import OnboardingPage from './pages/OnboardingPage'
 import HomePage from './pages/HomePage'
 import CoursesPage from './pages/CoursesPage'
@@ -63,6 +65,8 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password/:uid/:token" element={<ResetPasswordPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route element={<RequireOnboarding><Layout /></RequireOnboarding>}>

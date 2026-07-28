@@ -45,6 +45,27 @@ CSRF_TRUSTED_ORIGINS = [
     if host not in ('localhost', '127.0.0.1', '')
 ]
 
+# ── Email ─────────────────────────────────────────────────────────────────────
+# Configure SMTP via env (EMAIL_HOST etc.). With no EMAIL_HOST set, emails are
+# printed to the console — handy for local dev, harmless if left unconfigured.
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'AIDEA <info@aidea-hub.eu>')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+if EMAIL_HOST:
+    EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_PORT          = int(os.getenv('EMAIL_PORT', '587'))
+    EMAIL_HOST_USER     = os.getenv('EMAIL_HOST_USER', '')
+    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+    EMAIL_USE_SSL       = os.getenv('EMAIL_USE_SSL', 'False') == 'True'   # port 465
+    EMAIL_USE_TLS       = (os.getenv('EMAIL_USE_TLS', 'True') == 'True') and not EMAIL_USE_SSL  # port 587
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Where password-reset links point (the SPA). Defaults to the first real host.
+_real_hosts = [h for h in ALLOWED_HOSTS if h not in ('localhost', '127.0.0.1', '')]
+FRONTEND_BASE_URL = os.getenv('FRONTEND_BASE_URL') or (
+    f'https://{_real_hosts[0]}' if _real_hosts else 'http://localhost:5173'
+)
+
 
 # Application definition
 

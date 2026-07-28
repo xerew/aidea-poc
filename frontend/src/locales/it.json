@@ -64,7 +64,8 @@
       "signingIn": "Accesso in corso…",
       "invalidCredentials": "Nome utente o password non validi.",
       "noAccount": "Non hai un account?",
-      "createAccount": "Creane uno"
+      "createAccount": "Creane uno",
+      "forgotPassword": "Password dimenticata?"
     },
     "register": {
       "title": "Crea il tuo account",
@@ -114,6 +115,28 @@
       "hidePassword": "Nascondi password",
       "match": "Le password corrispondono",
       "noMatch": "Le password non corrispondono"
+    },
+    "forgot": {
+      "subtitle": "Reimposta la password",
+      "emailLabel": "Il tuo indirizzo email",
+      "sendLink": "Invia il link",
+      "sending": "Invio…",
+      "sent": "Se l'email è registrata, abbiamo inviato un link di reimpostazione. Controlla la posta (e lo spam).",
+      "backToLogin": "Torna all'accesso"
+    },
+    "reset": {
+      "subtitle": "Scegli una nuova password",
+      "newPassword": "Nuova password",
+      "newPasswordPlaceholder": "Inserisci una nuova password",
+      "confirmPassword": "Conferma password",
+      "confirmPlaceholder": "Reinserisci la password",
+      "resetButton": "Reimposta password",
+      "resetting": "Reimpostazione…",
+      "success": "La password è stata reimpostata. Reindirizzamento all'accesso…",
+      "goToLogin": "Vai all'accesso",
+      "rulesNotMet": "La password non soddisfa i requisiti.",
+      "noMatch": "Le password non corrispondono.",
+      "failed": "Impossibile reimpostare. Il link potrebbe essere scaduto."
     }
   },
   "onboarding": {

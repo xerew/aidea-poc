@@ -67,6 +67,7 @@ from .messaging import (
     UnreadMessageCountView,
 )
 from .onboarding import OnboardingView
+from .password_reset import PasswordResetConfirmView, PasswordResetRequestView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsReviewer, IsTeacher
 from .preference_quiz import PreferenceQuizView
@@ -145,6 +146,8 @@ __all__ = [
     'FeedbackUploadView',
     'FeedbackView',
     'OnboardingView',
+    'PasswordResetConfirmView',
+    'PasswordResetRequestView',
     'PathwayView',
     'PreferenceQuizView',
     'PublicProfileView',

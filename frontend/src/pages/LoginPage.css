@@ -140,3 +140,24 @@
 .login-signup-link a:hover {
   text-decoration: underline;
 }
+
+.login-forgot-link {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.login-forgot-link a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+.login-forgot-link a:hover { text-decoration: underline; }
+
+.login-info {
+  margin-top: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: var(--radius, 8px);
+  font-size: 0.9rem;
+  text-align: center;
+}

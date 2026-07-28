@@ -64,7 +64,8 @@
       "signingIn": "Kirjaudutaan sisään…",
       "invalidCredentials": "Virheellinen käyttäjätunnus tai salasana.",
       "noAccount": "Eikö sinulla ole tiliä?",
-      "createAccount": "Luo tili"
+      "createAccount": "Luo tili",
+      "forgotPassword": "Unohditko salasanasi?"
     },
     "register": {
       "title": "Luo tili",
@@ -114,6 +115,28 @@
       "hidePassword": "Piilota salasana",
       "match": "Salasanat täsmäävät",
       "noMatch": "Salasanat eivät täsmää"
+    },
+    "forgot": {
+      "subtitle": "Palauta salasana",
+      "emailLabel": "Sähköpostiosoitteesi",
+      "sendLink": "Lähetä linkki",
+      "sending": "Lähetetään…",
+      "sent": "Jos sähköposti on rekisteröity, lähetimme palautuslinkin. Tarkista postilaatikkosi (ja roskaposti).",
+      "backToLogin": "Takaisin kirjautumiseen"
+    },
+    "reset": {
+      "subtitle": "Valitse uusi salasana",
+      "newPassword": "Uusi salasana",
+      "newPasswordPlaceholder": "Anna uusi salasana",
+      "confirmPassword": "Vahvista salasana",
+      "confirmPlaceholder": "Anna salasana uudelleen",
+      "resetButton": "Palauta salasana",
+      "resetting": "Palautetaan…",
+      "success": "Salasanasi on palautettu. Ohjataan kirjautumiseen…",
+      "goToLogin": "Siirry kirjautumiseen",
+      "rulesNotMet": "Salasana ei täytä vaatimuksia.",
+      "noMatch": "Salasanat eivät täsmää.",
+      "failed": "Palautus epäonnistui. Linkki on ehkä vanhentunut."
     }
   },
   "onboarding": {

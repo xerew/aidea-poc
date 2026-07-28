@@ -64,7 +64,8 @@
       "signingIn": "Logger inn…",
       "invalidCredentials": "Ugyldig brukernavn eller passord.",
       "noAccount": "Har du ikke en konto?",
-      "createAccount": "Opprett en"
+      "createAccount": "Opprett en",
+      "forgotPassword": "Glemt passordet?"
     },
     "register": {
       "title": "Opprett kontoen din",
@@ -114,6 +115,28 @@
       "hidePassword": "Skjul passord",
       "match": "Passordene stemmer overens",
       "noMatch": "Passordene stemmer ikke overens"
+    },
+    "forgot": {
+      "subtitle": "Tilbakestill passord",
+      "emailLabel": "E-postadressen din",
+      "sendLink": "Send lenke",
+      "sending": "Sender…",
+      "sent": "Hvis e-posten er registrert, har vi sendt en tilbakestillingslenke. Sjekk innboksen (og søppelpost).",
+      "backToLogin": "Tilbake til innlogging"
+    },
+    "reset": {
+      "subtitle": "Velg et nytt passord",
+      "newPassword": "Nytt passord",
+      "newPasswordPlaceholder": "Skriv inn et nytt passord",
+      "confirmPassword": "Bekreft passord",
+      "confirmPlaceholder": "Skriv inn passordet på nytt",
+      "resetButton": "Tilbakestill passord",
+      "resetting": "Tilbakestiller…",
+      "success": "Passordet ditt er tilbakestilt. Omdirigerer til innlogging…",
+      "goToLogin": "Gå til innlogging",
+      "rulesNotMet": "Passordet oppfyller ikke kravene.",
+      "noMatch": "Passordene stemmer ikke.",
+      "failed": "Kunne ikke tilbakestille. Lenken kan ha utløpt."
     }
   },
   "onboarding": {

@@ -64,7 +64,8 @@
       "signingIn": "Signing in…",
       "invalidCredentials": "Invalid username or password.",
       "noAccount": "Don't have an account?",
-      "createAccount": "Create one"
+      "createAccount": "Create one",
+      "forgotPassword": "Forgot your password?"
     },
     "register": {
       "title": "Create your account",
@@ -114,6 +115,28 @@
       "hidePassword": "Hide password",
       "match": "Passwords match",
       "noMatch": "Passwords do not match"
+    },
+    "forgot": {
+      "subtitle": "Reset your password",
+      "emailLabel": "Your email address",
+      "sendLink": "Send reset link",
+      "sending": "Sending…",
+      "sent": "If that email is registered, we've sent a reset link. Check your inbox (and spam).",
+      "backToLogin": "Back to sign in"
+    },
+    "reset": {
+      "subtitle": "Choose a new password",
+      "newPassword": "New password",
+      "newPasswordPlaceholder": "Enter a new password",
+      "confirmPassword": "Confirm password",
+      "confirmPlaceholder": "Re-enter the password",
+      "resetButton": "Reset password",
+      "resetting": "Resetting…",
+      "success": "Your password has been reset. Redirecting to sign in…",
+      "goToLogin": "Go to sign in",
+      "rulesNotMet": "Your password doesn't meet the requirements.",
+      "noMatch": "The passwords don't match.",
+      "failed": "Could not reset your password. The link may have expired."
     }
   },
   "onboarding": {
