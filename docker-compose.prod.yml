@@ -74,6 +74,9 @@ services:
 
   caddy:
     image: caddy:2-alpine
+    environment:
+      # The Caddyfile reads {$DOMAIN}; it must be present inside the container.
+      DOMAIN: ${DOMAIN:-localhost}
     ports:
       - "80:80"
       - "443:443"
