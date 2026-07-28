@@ -1,10 +1,13 @@
 """Course <-> xlsx workbook conversion. One workbook = one course."""
+import json
+
 from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 from hub.models import Course, LearningPillar, Lesson, Subject
+from hub.translation import LANGUAGE_NAMES
 
 COURSE_HEADERS = ['title', 'description', 'pillar_slug', 'level',
                   'duration_hours', 'content_format', 'learning_outcomes', 'subjects']
@@ -15,9 +18,34 @@ QUIZ_HEADERS   = ['module_order', 'lesson_order', 'question_order', 'question',
                   'option_a', 'option_b', 'option_c', 'option_d', 'option_e',
                   'option_f', 'correct']
 MEDIA_HEADERS  = ['module_order', 'lesson_order', 'order', 'type', 'url', 'caption']
+TRANSLATION_HEADERS = ['type', 'module_order', 'lesson_order', 'language', 'field', 'value']
 MEDIA_TYPES    = {'image', 'video', 'pdf'}
+TRANSLATION_FIELDS = {'title', 'description', 'content', 'learning_outcomes', 'quiz_data', 'status'}
 OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 DROPDOWN_ROWS  = 500
+
+
+def _ser_translation(field, value):
+    """Flatten a translated field's value into one cell."""
+    if field == 'learning_outcomes':
+        return '\n'.join(value or [])
+    if field == 'quiz_data':
+        return json.dumps(value or [], ensure_ascii=False)
+    return value if value is not None else ''
+
+
+def _deser_translation(field, raw):
+    """Parse a Translations cell back into its value. Returns (value, ok)."""
+    if field == 'learning_outcomes':
+        return [line.strip() for line in str(raw or '').splitlines() if line.strip()], True
+    if field == 'quiz_data':
+        if raw in (None, ''):
+            return [], True
+        try:
+            return json.loads(raw), True
+        except (ValueError, TypeError):
+            return [], False
+    return str(raw or ''), True
 
 README_LINES = [
     'AIDEA course workbook',
@@ -38,6 +66,10 @@ README_LINES = [
     '            module_order and lesson_order refer to the Lessons sheet.',
     '            Fill option_a..option_f (at least two) and put the correct',
     '            letter(s) in "correct", comma separated, e.g. B or A,C.',
+    '  Translations - the course\'s existing translations, one row per field.',
+    '            type is course/module/lesson; module_order/lesson_order point to',
+    '            the Modules/Lessons sheets; language is a code (el, fr, ...).',
+    '            Auto-filled on export; leave it as-is to keep translations.',
     '',
     'Do not rename sheets or reorder columns. The hidden Choices sheet feeds',
     'the dropdowns - leave it alone.',
@@ -105,12 +137,26 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     _list_validation(wb, course_ws, 'A', len(levels), 'D', 2)
     _list_validation(wb, course_ws, 'B', len(content_formats), 'F', 2)
 
+    # ── Translations (collected as we go, written to its own sheet) ──────
+    translation_rows = []
+    if course is not None:
+        for lang, st in (course.translation_status or {}).items():
+            translation_rows.append(['course', '', '', lang, 'status', st])
+        for lang, blob in (course.translations or {}).items():
+            for field in ('title', 'description', 'learning_outcomes'):
+                if field in blob:
+                    translation_rows.append(['course', '', '', lang, field, _ser_translation(field, blob[field])])
+
     # ── Modules ─────────────────────────────────────────────────────────
     modules_ws = wb.create_sheet('Modules')
     _write_headers(modules_ws, MODULE_HEADERS)
     modules = list(course.modules.order_by('order').prefetch_related('lessons')) if course else []
     for module in modules:
         modules_ws.append([module.order, module.title, module.description, module.duration_minutes])
+        for lang, blob in (module.translations or {}).items():
+            for field in ('title', 'description'):
+                if field in blob:
+                    translation_rows.append(['module', module.order, '', lang, field, _ser_translation(field, blob[field])])
 
     # ── Lessons ─────────────────────────────────────────────────────────
     lessons_ws = wb.create_sheet('Lessons')
@@ -129,6 +175,13 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
                 lesson.duration_minutes,
                 'yes' if lesson.is_required else 'no',
             ])
+            for lang, blob in (lesson.translations or {}).items():
+                for field in ('title', 'description', 'content', 'quiz_data'):
+                    if field in blob:
+                        translation_rows.append([
+                            'lesson', module.order, lesson.order, lang, field,
+                            _ser_translation(field, blob[field]),
+                        ])
             for m_idx, item in enumerate(lesson.media_items or [], start=1):
                 if item.get('type') == 'text':
                     # Text blocks reuse the caption column for their HTML.
@@ -166,7 +219,13 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     for row in media_rows:
         media_ws.append(row)
 
-    for ws in (course_ws, modules_ws, lessons_ws, quiz_ws, media_ws):
+    # ── Translations ────────────────────────────────────────────────────
+    translations_ws = wb.create_sheet('Translations')
+    _write_headers(translations_ws, TRANSLATION_HEADERS)
+    for row in translation_rows:
+        translations_ws.append(row)
+
+    for ws in (course_ws, modules_ws, lessons_ws, quiz_ws, media_ws, translations_ws):
         for col in range(1, ws.max_column + 1):
             ws.column_dimensions[get_column_letter(col)].width = 22
 
@@ -272,6 +331,8 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             line.strip() for line in str(outcomes or '').splitlines() if line.strip()
         ],
         'subjects': subject_objs,
+        'translations': {},
+        'translation_status': {},
     }
 
     # ── Modules sheet ───────────────────────────────────────────────────
@@ -294,7 +355,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             errors.append(f'{_cell("Modules", 4, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
         modules[order] = {
             'order': order, 'title': m_title.strip(), 'description': m_desc or '',
-            'duration_minutes': m_minutes, 'lessons': {},
+            'duration_minutes': m_minutes, 'lessons': {}, 'translations': {},
         }
     if not modules:
         errors.append('Modules!A2: at least one module is required.')
@@ -331,7 +392,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             'order': order, 'title': l_title.strip(), 'description': l_desc or '',
             'lesson_type': l_type, 'content': content or '',
             'duration_minutes': minutes, 'is_required': _YES_NO[req_key],
-            'quiz_data': [], 'media_items': [],
+            'quiz_data': [], 'media_items': [], 'translations': {},
         }
 
     # ── Media sheet (optional) ──────────────────────────────────────────
@@ -408,6 +469,51 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
                     for letter, text in present.items()
                 ],
             }))
+
+    # ── Translations sheet (optional) ───────────────────────────────────
+    if 'Translations' in wb.sheetnames:
+        for row_num, values in _rows(wb['Translations']):
+            values = list(values) + [None] * (len(TRANSLATION_HEADERS) - len(values))
+            t_type, m_order, l_order, language, field, value = values[:6]
+            t_type = str(t_type or '').strip().lower()
+            language = str(language or '').strip()
+            field = str(field or '').strip()
+            if language not in LANGUAGE_NAMES:
+                errors.append(f'{_cell("Translations", 4, row_num)}: unknown language {language!r}.')
+                continue
+            if field not in TRANSLATION_FIELDS:
+                errors.append(f'{_cell("Translations", 5, row_num)}: unknown field {field!r}.')
+                continue
+
+            if t_type == 'course':
+                if field == 'status':
+                    course_payload['translation_status'][language] = str(value or '').strip()
+                    continue
+                target = course_payload['translations'].setdefault(language, {})
+            elif t_type == 'module':
+                m_order, ok = _as_int(m_order, default=-1)
+                module = modules.get(m_order)
+                if not ok or module is None:
+                    errors.append(f'{_cell("Translations", 2, row_num)}: module_order does not match any module.')
+                    continue
+                target = module['translations'].setdefault(language, {})
+            elif t_type == 'lesson':
+                m_order, ok_m = _as_int(m_order, default=-1)
+                l_order, ok_l = _as_int(l_order, default=-1)
+                lesson = modules.get(m_order, {}).get('lessons', {}).get(l_order) if ok_m and ok_l else None
+                if lesson is None:
+                    errors.append(f'{_cell("Translations", 3, row_num)}: module_order/lesson_order do not match any lesson.')
+                    continue
+                target = lesson['translations'].setdefault(language, {})
+            else:
+                errors.append(f'{_cell("Translations", 1, row_num)}: type must be course, module or lesson.')
+                continue
+
+            parsed, ok = _deser_translation(field, value)
+            if not ok:
+                errors.append(f'{_cell("Translations", 6, row_num)}: {field} value is not valid.')
+                continue
+            target[field] = parsed
 
     if errors:
         return None, errors

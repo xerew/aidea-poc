@@ -80,6 +80,8 @@ class AuthoringCourseImportView(APIView):
                 duration_hours=payload['duration_hours'],
                 content_format=payload['content_format'],
                 learning_outcomes=payload['learning_outcomes'],
+                translations=payload.get('translations', {}),
+                translation_status=payload.get('translation_status', {}),
                 is_published=False,
                 created_by=request.user,
             )
@@ -92,9 +94,10 @@ class AuthoringCourseImportView(APIView):
                     description=module_data['description'],
                     order=module_data['order'],
                     duration_minutes=module_data['duration_minutes'],
+                    translations=module_data.get('translations', {}),
                 )
                 for lesson_data in sorted(module_data['lessons'].values(), key=lambda lesson: lesson['order']):
-                    Lesson.objects.create(module=module, **{
+                    Lesson.objects.create(module=module, translations=lesson_data.get('translations', {}), **{
                         k: lesson_data[k] for k in (
                             'title', 'description', 'lesson_type', 'content',
                             'duration_minutes', 'order', 'is_required', 'quiz_data',

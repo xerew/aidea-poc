@@ -62,7 +62,7 @@ class ExportXlsxTests(APITestCase):
         wb = load_workbook(BytesIO(res.getvalue()))
         self.assertEqual(
             set(wb.sheetnames),
-            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices'},
+            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices', 'Translations'},
         )
         self.assertEqual(wb['Choices'].sheet_state, 'hidden')
 
@@ -119,7 +119,7 @@ class TemplateXlsxTests(APITestCase):
         wb = load_workbook(BytesIO(res.getvalue()))
         self.assertEqual(
             set(wb.sheetnames),
-            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices'},
+            {'README', 'Course', 'Modules', 'Lessons', 'Quiz', 'Media', 'Choices', 'Translations'},
         )
         # Headers present, but no data rows.
         self.assertEqual(wb['Course']['A1'].value, 'title')
@@ -183,6 +183,44 @@ class ImportXlsxTests(APITestCase):
         }])
         video = new.modules.get(order=1).lessons.get(order=2)
         self.assertFalse(video.is_required)
+
+    def test_round_trip_preserves_translations(self):
+        self.course.translations = {'el': {
+            'title': 'Τίτλος', 'description': 'Περιγραφή',
+            'learning_outcomes': ['Στόχος 1', 'Στόχος 2'],
+        }}
+        self.course.translation_status = {'el': 'reviewed'}
+        self.course.save()
+        m1 = self.course.modules.get(order=1)
+        m1.translations = {'el': {'title': 'Ενότητα', 'description': 'π'}}
+        m1.save()
+        text_lesson = m1.lessons.get(order=1)
+        text_lesson.translations = {'el': {'title': 'Εισαγωγή', 'content': 'Γεια'}}
+        text_lesson.save()
+        quiz_lesson = self.course.modules.get(order=2).lessons.get(order=1)
+        quiz_tr = [{'question': 'Διάλεξε', 'options': [
+            {'text': 'Α', 'is_correct': True},
+            {'text': 'Β', 'is_correct': False},
+            {'text': 'Γ', 'is_correct': True},
+        ]}]
+        quiz_lesson.translations = {'el': {'title': 'Κουίζ', 'quiz_data': quiz_tr}}
+        quiz_lesson.save()
+
+        self.client.force_authenticate(self.creator)
+        res = self._post(self._export_bytes(self.course))
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        new = Course.objects.get(pk=res.data['id'])
+
+        self.assertEqual(new.translations['el']['title'], 'Τίτλος')
+        self.assertEqual(new.translations['el']['learning_outcomes'], ['Στόχος 1', 'Στόχος 2'])
+        self.assertEqual(new.translation_status['el'], 'reviewed')
+        self.assertEqual(new.modules.get(order=1).translations['el']['title'], 'Ενότητα')
+        self.assertEqual(
+            new.modules.get(order=1).lessons.get(order=1).translations['el']['content'], 'Γεια',
+        )
+        self.assertEqual(
+            new.modules.get(order=2).lessons.get(order=1).translations['el']['quiz_data'], quiz_tr,
+        )
 
     def test_round_trip_preserves_media_items(self):
         text_lesson = Lesson.objects.filter(
