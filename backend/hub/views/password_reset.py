@@ -62,7 +62,8 @@ def _reset_email_html(name, link):
       <tr>
         <td style="background:#f8fafc;padding:24px;text-align:center;border-top:1px solid #eef0f4;">
           <p style="font-size:14px;font-weight:bold;color:#374151;margin:0 0 6px;">
-            ICCS Team — Information Management Unit
+            ICCS Team —
+            <a href="https://imu.ntua.gr/wp/" style="color:#374151;">Information Management Unit</a>
           </p>
           <p style="margin:0 0 8px;">
             <a href="{base}" style="color:#3b5bdb;font-size:13px;text-decoration:none;">{base_display}</a>
