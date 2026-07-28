@@ -16,6 +16,68 @@ from rest_framework.views import APIView
 logger = logging.getLogger(__name__)
 
 
+def _reset_email_html(name, link):
+    base = settings.FRONTEND_BASE_URL
+    logo = f'{base}/images/logos/aidea-logo.png'
+    base_display = base.replace('https://', '').replace('http://', '')
+    return f"""\
+<div style="margin:0;padding:24px 12px;background:#f3f4f6;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+   <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0"
+           style="max-width:600px;width:100%;background:#ffffff;border-radius:14px;overflow:hidden;
+                  box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+      <tr>
+        <td style="background:#3b5bdb;padding:32px 24px;text-align:center;">
+          <span style="display:inline-block;background:#ffffff;border-radius:10px;padding:12px 18px;">
+            <img src="{logo}" alt="AIDEA" width="140" style="display:block;height:auto;max-width:140px;">
+          </span>
+          <div style="color:#dbe4ff;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-top:14px;">
+            Password reset
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:32px 32px 12px;">
+          <p style="font-size:20px;font-weight:bold;color:#111827;margin:0 0 6px;">Hello {name},</p>
+          <h1 style="font-size:22px;color:#1e3a8a;margin:0 0 16px;">Reset your password</h1>
+          <p style="font-size:15px;color:#374151;line-height:1.6;margin:0 0 24px;">
+            We received a request to reset your AIDEA password. Click the button below to choose a new one.
+          </p>
+          <p style="text-align:center;margin:0 0 24px;">
+            <a href="{link}" style="display:inline-block;padding:13px 30px;background:#3b5bdb;color:#ffffff;
+               text-decoration:none;border-radius:8px;font-weight:bold;font-size:15px;">Reset password</a>
+          </p>
+          <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0 0 4px;">
+            Or paste this link into your browser:
+          </p>
+          <p style="font-size:13px;margin:0 0 24px;word-break:break-all;">
+            <a href="{link}" style="color:#3b5bdb;">{link}</a>
+          </p>
+          <p style="font-size:13px;color:#6b7280;line-height:1.6;margin:0;">
+            If you didn't request this, you can safely ignore this email — your password will stay the same.
+          </p>
+        </td>
+      </tr>
+      <tr>
+        <td style="background:#f8fafc;padding:24px;text-align:center;border-top:1px solid #eef0f4;">
+          <p style="font-size:14px;font-weight:bold;color:#374151;margin:0 0 6px;">
+            ICCS Team — Information Management Unit
+          </p>
+          <p style="margin:0 0 8px;">
+            <a href="{base}" style="color:#3b5bdb;font-size:13px;text-decoration:none;">{base_display}</a>
+          </p>
+          <p style="font-size:12px;color:#9ca3af;margin:0;">
+            This message was sent automatically by the AIDEA platform.
+          </p>
+        </td>
+      </tr>
+    </table>
+   </td></tr>
+  </table>
+</div>"""
+
+
 class PasswordResetRequestView(APIView):
     """POST /api/auth/password-reset/ {email} — email a reset link.
 
@@ -44,19 +106,10 @@ class PasswordResetRequestView(APIView):
             f'{link}\n\n'
             "If you didn't request this, you can safely ignore this email — "
             'your password will stay the same.\n\n'
-            'The AIDEA team'
+            'ICCS Team — Information Management Unit\n'
+            f'{settings.FRONTEND_BASE_URL}'
         )
-        html = (
-            f'<p>Hello {name},</p>'
-            '<p>We received a request to reset your AIDEA password. '
-            'Click the button below to choose a new one:</p>'
-            f'<p><a href="{link}" style="display:inline-block;padding:10px 18px;'
-            'background:#1d4ed8;color:#fff;text-decoration:none;border-radius:6px">'
-            'Reset password</a></p>'
-            f'<p>Or paste this link into your browser:<br><a href="{link}">{link}</a></p>'
-            "<p>If you didn't request this, you can safely ignore this email.</p>"
-            '<p>— The AIDEA team</p>'
-        )
+        html = _reset_email_html(name, link)
         try:
             send_mail(
                 subject='Reset your AIDEA password',
