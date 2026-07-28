@@ -12,6 +12,12 @@
   text-decoration: none;
   font-size: 0.9rem;
   margin-bottom: 1rem;
+  /* Works as a <button> too. */
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
 }
 .pp-back:hover { color: var(--color-primary); }
 

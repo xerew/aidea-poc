@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, Lock, GraduationCap, MapPin, School, BookOpen, CalendarDays, MessageCircle,
@@ -69,6 +69,10 @@ DetailRow.propTypes = { icon: PropTypes.elementType.isRequired, children: PropTy
 export default function PublicProfilePage() {
   const { t } = useTranslation()
   const { id } = useParams()
+  const navigate = useNavigate()
+  // Go back to wherever the user came from; fall back to Courses if there's
+  // no history (e.g. the profile link was opened directly).
+  const goBack = () => (window.history.length > 1 ? navigate(-1) : navigate('/courses'))
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -96,7 +100,7 @@ export default function PublicProfilePage() {
   if (loading) return <div className="pp-page"><p className="pp-loading">{t('common.loading')}</p></div>
   if (error) return (
     <div className="pp-page">
-      <Link to="/courses" className="pp-back"><ArrowLeft size={16} /> {t('common.back')}</Link>
+      <button type="button" onClick={goBack} className="pp-back"><ArrowLeft size={16} /> {t('common.back')}</button>
       <p className="pp-message">{error}</p>
     </div>
   )
@@ -129,7 +133,7 @@ export default function PublicProfilePage() {
 
   return (
     <div className="pp-page">
-      <Link to="/courses" className="pp-back"><ArrowLeft size={16} /> {t('common.back')}</Link>
+      <button type="button" onClick={goBack} className="pp-back"><ArrowLeft size={16} /> {t('common.back')}</button>
 
       <section className="pp-card">
         <Identity profile={profile} />
