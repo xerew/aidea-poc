@@ -692,6 +692,14 @@
       "queued": "Suositusten päivitys lisätty jonoon.",
       "failed": "Päivitystä ei voitu lisätä jonoon. Yritä uudelleen."
     },
+    "onboardingTr": {
+      "title": "Perehdytyskysymysten käännökset",
+      "description": "Käännä perehdytyksen osaamiskysymykset automaattisesti jokaiselle kielelle tekoälyllä. Tarkista jokainen kieli ja merkitse se ihmisen tarkistamaksi, kun käännös on oikein.",
+      "noQuestions": "Ei aktiivisia perehdytyskysymyksiä käännettäväksi.",
+      "loadFailed": "Käännöksen tilaa ei voitu ladata.",
+      "translate": "Käännä",
+      "reconfirm": "Käännetäänkö tämä kieli uudelleen? Mahdollinen ihmisen tarkistusmerkintä poistetaan ja tekoälykäännös luodaan uudelleen."
+    },
     "searchUsers": "Hae nimellä, käyttäjätunnuksella tai sähköpostilla",
     "searchRequests": "Hae pyytäjän mukaan",
     "noMatch": "Ei osumia.",

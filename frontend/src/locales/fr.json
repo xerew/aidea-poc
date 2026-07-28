@@ -692,6 +692,14 @@
       "queued": "Actualisation des recommandations mise en file d'attente.",
       "failed": "Impossible de lancer l'actualisation. Veuillez réessayer."
     },
+    "onboardingTr": {
+      "title": "Traductions des questions d'intégration",
+      "description": "Traduisez automatiquement les questions d'évaluation d'intégration dans chaque langue avec l'IA. Vérifiez chaque langue et marquez-la comme relue par un humain une fois la traduction correcte.",
+      "noQuestions": "Aucune question d'intégration active à traduire.",
+      "loadFailed": "Impossible de charger l'état de la traduction.",
+      "translate": "Traduire",
+      "reconfirm": "Retraduire cette langue ? Toute marque de relecture humaine sera supprimée et la traduction IA régénérée."
+    },
     "searchUsers": "Rechercher par nom, nom d'utilisateur ou e-mail",
     "searchRequests": "Rechercher par demandeur",
     "noMatch": "Aucun résultat.",

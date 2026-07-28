@@ -692,6 +692,14 @@
       "queued": "Aktualisierung der Empfehlungen eingereiht.",
       "failed": "Aktualisierung konnte nicht eingereiht werden. Bitte erneut versuchen."
     },
+    "onboardingTr": {
+      "title": "Übersetzungen der Onboarding-Fragen",
+      "description": "Übersetzen Sie die Onboarding-Kompetenzfragen automatisch mit KI in jede Sprache. Prüfen Sie jede Sprache und markieren Sie sie als von einem Menschen geprüft, sobald die Übersetzung korrekt ist.",
+      "noQuestions": "Es gibt keine aktiven Onboarding-Fragen zum Übersetzen.",
+      "loadFailed": "Übersetzungsstatus konnte nicht geladen werden.",
+      "translate": "Übersetzen",
+      "reconfirm": "Diese Sprache neu übersetzen? Eine eventuelle Markierung als von einem Menschen geprüft wird entfernt und die KI-Übersetzung neu erstellt."
+    },
     "searchUsers": "Nach Name, Benutzername oder E-Mail suchen",
     "searchRequests": "Nach Antragsteller suchen",
     "noMatch": "Keine Treffer.",

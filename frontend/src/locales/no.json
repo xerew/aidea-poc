@@ -692,6 +692,14 @@
       "queued": "Oppdatering av anbefalinger lagt i kø.",
       "failed": "Kunne ikke legge oppdateringen i kø. Prøv igjen."
     },
+    "onboardingTr": {
+      "title": "Oversettelser av introduksjonsspørsmål",
+      "description": "Oversett introduksjonens kompetansespørsmål automatisk til hvert språk med KI. Gjennomgå hvert språk og merk det som gjennomgått av et menneske når oversettelsen er riktig.",
+      "noQuestions": "Det finnes ingen aktive introduksjonsspørsmål å oversette.",
+      "loadFailed": "Kunne ikke laste oversettelsesstatusen.",
+      "translate": "Oversett",
+      "reconfirm": "Oversette dette språket på nytt? Eventuell markering for menneskelig gjennomgang fjernes, og KI-oversettelsen genereres på nytt."
+    },
     "searchUsers": "Søk etter navn, brukernavn eller e-post",
     "searchRequests": "Søk etter forespør",
     "noMatch": "Ingen treff.",

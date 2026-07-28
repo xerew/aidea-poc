@@ -692,6 +692,14 @@
       "queued": "Recommendation refresh queued.",
       "failed": "Could not queue the refresh. Please try again."
     },
+    "onboardingTr": {
+      "title": "Onboarding question translations",
+      "description": "Auto-translate the onboarding competency questions into each language with AI. Review each language and mark it as human-reviewed once the translation is correct.",
+      "noQuestions": "There are no active onboarding questions to translate.",
+      "loadFailed": "Could not load translation status.",
+      "translate": "Translate",
+      "reconfirm": "Re-translate this language? Any human-reviewed mark will be cleared and the AI translation regenerated."
+    },
     "searchUsers": "Search by name, username or email",
     "searchRequests": "Search by requestor",
     "noMatch": "No matches.",

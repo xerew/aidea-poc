@@ -344,6 +344,122 @@ function RequestsTab() {
   )
 }
 
+// ── Onboarding translations (System tab) ───────────────────────────────────────
+
+const ONB_POLL_MS = 3000
+
+function OnboardingTranslationsCard() {
+  const { t } = useTranslation()
+  const [data, setData] = useState(null)      // {source_language, translation_status, has_questions, languages}
+  const [busyLang, setBusyLang] = useState(null)
+  const [error, setError] = useState(false)
+
+  // Initial load.
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await client.get('/admin/onboarding-translations/')
+        if (!cancelled) setData(res.data)
+      } catch {
+        if (!cancelled) setError(true)
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  // Poll while any language is still translating.
+  const anyPending = !!data && Object.values(data.translation_status || {}).includes('pending')
+  useEffect(() => {
+    if (!anyPending) return undefined
+    const id = setInterval(async () => {
+      try {
+        const res = await client.get('/admin/onboarding-translations/')
+        setData(res.data)
+      } catch { /* keep polling */ }
+    }, ONB_POLL_MS)
+    return () => clearInterval(id)
+  }, [anyPending])
+
+  const translate = async (code, isRetranslate) => {
+    if (isRetranslate && !window.confirm(t('admin.onboardingTr.reconfirm'))) return
+    setBusyLang(code)
+    try {
+      const res = await client.post('/admin/onboarding-translations/', { language: code })
+      setData(res.data)
+    } catch { setError(true) } finally { setBusyLang(null) }
+  }
+
+  const review = async (code, reviewed) => {
+    setBusyLang(code)
+    try {
+      const res = await client.patch('/admin/onboarding-translations/', { language: code, reviewed })
+      setData(res.data)
+    } catch { setError(true) } finally { setBusyLang(null) }
+  }
+
+  const statusLabel = (st) => ({
+    pending:  t('authoring.translate.statusPending'),
+    done:     t('authoring.translate.statusDone'),
+    reviewed: t('authoring.translate.statusReviewed'),
+    failed:   t('authoring.translate.statusFailed'),
+  }[st] ?? t('authoring.translate.statusNone'))
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.onboardingTr.title')}</h2>
+      <p className="admin-system-desc">{t('admin.onboardingTr.description')}</p>
+      {error && !data && <span className="admin-feedback error">{t('admin.onboardingTr.loadFailed')}</span>}
+      {data && !data.has_questions && (
+        <span className="admin-feedback">{t('admin.onboardingTr.noQuestions')}</span>
+      )}
+      {data && (
+        <ul className="onboarding-tr-list">
+          {data.languages.map((l) => {
+            const st = data.translation_status?.[l.code]
+            const busy = busyLang === l.code
+            const done = st === 'done' || st === 'reviewed'
+            return (
+              <li key={l.code} className="onboarding-tr-row">
+                <span className="onboarding-tr-lang">{l.label}</span>
+                <span className={`onboarding-tr-status onboarding-tr-status--${st ?? 'none'}`}>
+                  {statusLabel(st)}
+                </span>
+                <div className="onboarding-tr-actions">
+                  {st === 'done' && (
+                    <button type="button" className="translation-review-btn" disabled={busy}
+                            onClick={() => review(l.code, true)}>
+                      {t('authoring.translate.markReviewed')}
+                    </button>
+                  )}
+                  {st === 'reviewed' && (
+                    <button type="button" className="add-dashed-btn" disabled={busy}
+                            onClick={() => review(l.code, false)}>
+                      {t('authoring.translate.unmarkReviewed')}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="add-dashed-btn"
+                    disabled={busy || st === 'pending' || !data.has_questions}
+                    onClick={() => translate(l.code, done)}
+                  >
+                    {st === 'pending'
+                      ? t('authoring.translate.translating')
+                      : done
+                        ? t('authoring.translate.retranslate')
+                        : t('admin.onboardingTr.translate')}
+                  </button>
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 // ── System tab ────────────────────────────────────────────────────────────────
 
 function SystemTab() {
@@ -375,6 +491,7 @@ function SystemTab() {
         {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
+      <OnboardingTranslationsCard />
     </div>
   )
 }
