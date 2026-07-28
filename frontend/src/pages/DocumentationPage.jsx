@@ -1,6 +1,5 @@
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Brain, Wrench, Compass, ExternalLink, Download, FileText, Scale } from 'lucide-react'
+import { Brain, Wrench, Compass, ExternalLink, Download, FileText } from 'lucide-react'
 import FeedbackWidget from '../components/FeedbackWidget'
 import './DocumentationPage.css'
 
@@ -65,15 +64,6 @@ export default function DocumentationPage() {
             <a href={GUIDE_PDF} target="_blank" rel="noreferrer">{t('documentation.openGuide')}</a>
           </p>
         </object>
-      </section>
-
-      {/* Legal */}
-      <section className="doc-legal">
-        <Scale size={16} />
-        <span>{t('legal.docLabel')}</span>
-        <Link to="/terms">{t('legal.termsTitle')}</Link>
-        <span className="doc-legal-dot">·</span>
-        <Link to="/privacy">{t('legal.privacyTitle')}</Link>
       </section>
 
       {/* Feedback */}
