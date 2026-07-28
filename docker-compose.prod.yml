@@ -17,6 +17,18 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
+  # SSH tunnel to the self-hosted Ollama used for course content translation.
+  # The private key lives on the host at ./docker/ollama-tunnel/keys/id_ed25519
+  # (not in git). Reachable inside the network as http://ollama-tunnel:11434.
+  ollama-tunnel:
+    build: ./docker/ollama-tunnel
+    environment:
+      SSH_REMOTE_USER: ${SSH_REMOTE_USER:-ngrammatikos}
+      SSH_REMOTE_HOST: ${SSH_REMOTE_HOST:-147.102.17.66}
+    volumes:
+      - ./docker/ollama-tunnel/keys:/keys:ro
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
@@ -35,12 +47,15 @@ services:
       EMAIL_USE_SSL: ${EMAIL_USE_SSL:-False}
       EMAIL_USE_TLS: ${EMAIL_USE_TLS:-True}
       DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-AIDEA <info@aidea-hub.eu>}
+      OLLAMA_URL: http://ollama-tunnel:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3-translator}
     volumes:
       - static_files:/app/staticfiles
       - media_files:/app/media
     depends_on:
       - db
       - redis
+      - ollama-tunnel
     restart: unless-stopped
 
   celery:
@@ -52,10 +67,13 @@ services:
       REDIS_URL: redis://redis:6379/0
       SECRET_KEY: ${SECRET_KEY}
       DEBUG: "False"
+      OLLAMA_URL: http://ollama-tunnel:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3-translator}
     command: uv run celery -A aidea worker -l warning
     depends_on:
       - db
       - redis
+      - ollama-tunnel
     restart: unless-stopped
 
   celery-beat:
