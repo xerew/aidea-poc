@@ -62,3 +62,14 @@ def can_edit_published(user, course):
     profile = getattr(user, 'profile', None)
     is_admin = profile is not None and profile.user_type == UserProfile.UserType.ADMIN
     return course.created_by_id == user.id or is_admin
+
+
+def can_review_translation(user, course):
+    """Who may sign off a translation as human-reviewed: the course author,
+    admins, and AIDEA partners."""
+    profile = getattr(user, 'profile', None)
+    if profile is None:
+        return False
+    if profile.user_type in (UserProfile.UserType.ADMIN, UserProfile.UserType.AIDEA_PARTNER):
+        return True
+    return course.created_by_id == user.id

@@ -5,8 +5,14 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseEditHistory, LearningPillar
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
 from hub.translation import LANGUAGE_NAMES
+from hub.translation_sync import resync_course_meta
 
-from .permissions import IsContentCreator, can_edit_published
+from .permissions import (
+    IsContentCreator,
+    IsReviewer,
+    can_edit_published,
+    can_review_translation,
+)
 
 TRANSLATABLE_COURSE_FIELDS = ['title', 'description', 'learning_outcomes']
 
@@ -101,6 +107,12 @@ class AuthoringCourseDetailView(APIView):
         if changes:
             CourseEditHistory.objects.create(course=course, editor=request.user, changes=changes)
 
+        # A change to any translatable course-level field invalidates existing
+        # translations of those fields and auto-re-translates just them.
+        if any(f in changes for f in TRANSLATABLE_COURSE_FIELDS):
+            course.refresh_from_db()
+            resync_course_meta(course)
+
         course.refresh_from_db()
         return Response(CourseAuthoringSerializer(course).data)
 
@@ -188,3 +200,40 @@ class AuthoringCourseTranslateView(APIView):
         from hub.tasks import translate_course
         translate_course.delay(course.id, language)
         return Response({'translation_status': course.translation_status}, status=status.HTTP_202_ACCEPTED)
+
+
+class AuthoringTranslationReviewView(APIView):
+    """POST /authoring/courses/<pk>/translation-review/ {language, reviewed}
+    — mark a completed translation as human-reviewed (valid), or clear it.
+    Allowed for the course author, admins and AIDEA partners."""
+    permission_classes = [IsReviewer]
+
+    def post(self, request, pk):
+        try:
+            course = Course.objects.get(pk=pk)
+        except Course.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not can_review_translation(request.user, course):
+            return Response(
+                {'detail': 'You cannot review this course\'s translations.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        language = request.data.get('language')
+        current = (course.translation_status or {}).get(language)
+        if current is None:
+            return Response({'detail': 'That language has no translation.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        reviewed = request.data.get('reviewed', True)
+        if reviewed:
+            if current not in ('done', 'reviewed'):
+                return Response(
+                    {'detail': 'Only a completed translation can be marked reviewed.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            course.translation_status[language] = 'reviewed'
+        elif current == 'reviewed':
+            course.translation_status[language] = 'done'
+
+        course.save(update_fields=['translation_status'])
+        return Response({'translation_status': course.translation_status})

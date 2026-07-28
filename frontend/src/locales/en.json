@@ -626,7 +626,11 @@
       "reconfirm": "Re-translating will overwrite any manual edits made to this language. Continue?",
       "reviewNote": "Machine-translated — review recommended.",
       "sourceLanguageLabel": "Source language",
-      "saveOriginalFirst": "Save this item in the original language before translating it."
+      "saveOriginalFirst": "Save this item in the original language before translating it.",
+      "statusReviewed": "Reviewed",
+      "markReviewed": "Mark as human-reviewed",
+      "unmarkReviewed": "Remove reviewed mark",
+      "reviewedNote": "Reviewed by a human — this translation is valid."
     }
   },
   "reviews": {

@@ -448,56 +448,117 @@ def recompute_all_recommendations() -> None:
         compute_user_recommendations.delay(uid)
 
 
+# ── Translation helpers (per-unit; used by both full and partial jobs) ────────
+
+def _tr_quiz(quiz_data, src, target):
+    out = []
+    for q in quiz_data or []:
+        out.append({
+            'question': translate_text(q.get('question', ''), src, target),
+            'options': [
+                {'text': translate_text(o.get('text', ''), src, target), 'is_correct': bool(o.get('is_correct'))}
+                for o in q.get('options', [])
+            ],
+        })
+    return out
+
+
+def _translate_course_meta(course, target):
+    src = course.source_language
+    course.translations[target] = {
+        'title': translate_text(course.title, src, target),
+        'description': translate_text(course.description, src, target),
+        'learning_outcomes': [translate_text(o, src, target) for o in (course.learning_outcomes or [])],
+    }
+    course.save(update_fields=['translations'])
+
+
+def _translate_module(module, target):
+    src = module.course.source_language
+    module.translations[target] = {
+        'title': translate_text(module.title, src, target),
+        'description': translate_text(module.description, src, target),
+    }
+    module.save(update_fields=['translations'])
+
+
+def _translate_lesson(lesson, target):
+    src = lesson.module.course.source_language
+    blob = {
+        'title': translate_text(lesson.title, src, target),
+        'description': translate_text(lesson.description, src, target),
+    }
+    # `content` is prose only for text/assignment; for video/image/pdf it's a URL
+    # — translating it would mangle the link, so leave it to fall back.
+    if lesson.lesson_type in ('text', 'assignment'):
+        blob['content'] = translate_text(lesson.content, src, target)
+    elif lesson.lesson_type == 'quiz':
+        blob['quiz_data'] = _tr_quiz(lesson.quiz_data, src, target)
+    lesson.translations[target] = blob
+    lesson.save(update_fields=['translations'])
+
+
+def _finish(course, target, work):
+    """Run a translation unit of work, then flip the course-level status to
+    'done' (needs human re-review) or 'failed'."""
+    from hub.translation import TranslationError
+    try:
+        work()
+        course.translation_status[target] = 'done'
+    except TranslationError as exc:
+        logger.error('Translation of course %s into %s failed: %s', course.id, target, exc)
+        course.translation_status[target] = 'failed'
+    course.save(update_fields=['translation_status'])
+
+
 @shared_task
 def translate_course(course_id: int, target: str) -> None:
+    """Full course translation (initial 'Translate to X')."""
     from hub.models import Course
-    from hub.translation import TranslationError
 
     try:
         course = Course.objects.prefetch_related('modules__lessons').get(pk=course_id)
     except Course.DoesNotExist:
         return
-    src = course.source_language
 
-    def tr(text):
-        return translate_text(text, src, target)
-
-    def tr_quiz(quiz_data):
-        out = []
-        for q in quiz_data or []:
-            out.append({
-                'question': tr(q.get('question', '')),
-                'options': [
-                    {'text': tr(o.get('text', '')), 'is_correct': bool(o.get('is_correct'))}
-                    for o in q.get('options', [])
-                ],
-            })
-        return out
-
-    try:
-        course.translations[target] = {
-            'title': tr(course.title),
-            'description': tr(course.description),
-            'learning_outcomes': [tr(o) for o in (course.learning_outcomes or [])],
-        }
+    def work():
+        _translate_course_meta(course, target)
         for module in course.modules.all():
-            module.translations[target] = {'title': tr(module.title), 'description': tr(module.description)}
-            module.save(update_fields=['translations'])
+            _translate_module(module, target)
             for lesson in module.lessons.all():
-                blob = {'title': tr(lesson.title), 'description': tr(lesson.description)}
-                # `content` is prose only for text/assignment; for video/image/pdf
-                # it's a URL — translating it would mangle the link, so leave it
-                # to fall back to the original.
-                if lesson.lesson_type in ('text', 'assignment'):
-                    blob['content'] = tr(lesson.content)
-                elif lesson.lesson_type == 'quiz':
-                    blob['quiz_data'] = tr_quiz(lesson.quiz_data)
-                lesson.translations[target] = blob
-                lesson.save(update_fields=['translations'])
-        course.translation_status[target] = 'done'
-    except TranslationError as exc:
-        logger.error(
-            'Translation of course %s into %s failed: %s', course_id, target, exc,
-        )
-        course.translation_status[target] = 'failed'
-    course.save(update_fields=['translations', 'translation_status'])
+                _translate_lesson(lesson, target)
+
+    _finish(course, target, work)
+
+
+@shared_task
+def translate_course_meta(course_id: int, target: str) -> None:
+    """Re-translate only the course-level fields (title/description/outcomes)."""
+    from hub.models import Course
+    try:
+        course = Course.objects.get(pk=course_id)
+    except Course.DoesNotExist:
+        return
+    _finish(course, target, lambda: _translate_course_meta(course, target))
+
+
+@shared_task
+def translate_module_meta(module_id: int, target: str) -> None:
+    """Re-translate only one module's fields."""
+    from hub.models import Module
+    try:
+        module = Module.objects.select_related('course').get(pk=module_id)
+    except Module.DoesNotExist:
+        return
+    _finish(module.course, target, lambda: _translate_module(module, target))
+
+
+@shared_task
+def translate_lesson_meta(lesson_id: int, target: str) -> None:
+    """Re-translate only one lesson's fields."""
+    from hub.models import Lesson
+    try:
+        lesson = Lesson.objects.select_related('module__course').get(pk=lesson_id)
+    except Lesson.DoesNotExist:
+        return
+    _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))

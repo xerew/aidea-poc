@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseEditHistory, Module
 from hub.serializers import ModuleAuthoringSerializer, ModuleWithLessonsSerializer
 from hub.translation import LANGUAGE_NAMES
+from hub.translation_sync import resync_module
 
 from .permissions import IsContentCreator, can_edit_published
 
@@ -39,6 +40,8 @@ class AuthoringModuleView(APIView):
             editor=request.user,
             changes={'module_added': {'title': module.title, 'order': module.order}},
         )
+        # New content → translate the new module into any already-translated languages.
+        resync_module(module)
         return Response(ModuleAuthoringSerializer(module).data, status=status.HTTP_201_CREATED)
 
 
@@ -94,6 +97,8 @@ class AuthoringModuleDetailView(APIView):
                 editor=request.user,
                 changes={'module_edited': {'module_title': module.title, 'fields': changes}},
             )
+        if any(f in changes for f in TRANSLATABLE_MODULE_FIELDS):
+            resync_module(module)
         return Response(ModuleAuthoringSerializer(module).data)
 
     def delete(self, request, pk, module_pk):

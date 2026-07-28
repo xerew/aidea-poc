@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { Languages } from 'lucide-react'
+import { Languages, Check } from 'lucide-react'
 import client from '../../api/client'
 import { LANGUAGES } from '../../i18n'
 import './TranslationBar.css'
@@ -75,6 +75,18 @@ export default function TranslationBar({
     }
   }
 
+  const reviewTranslation = async (lang, reviewed) => {
+    setBusy(true)
+    try {
+      const res = await client.post(
+        `/authoring/courses/${courseId}/translation-review/`, { language: lang, reviewed },
+      )
+      onStatusUpdate(res.data.translation_status ?? {})
+    } catch { /* ignore */ } finally {
+      setBusy(false)
+    }
+  }
+
   const otherLanguages = LANGUAGES.filter((l) => l.code !== sourceLanguage)
   const sourceLabel = LANGUAGES.find((l) => l.code === sourceLanguage)?.label ?? sourceLanguage
   const activeLabel = LANGUAGES.find((l) => l.code === activeLang)?.label ?? activeLang
@@ -109,6 +121,7 @@ export default function TranslationBar({
               <span className={`translation-status translation-status--${st ?? 'none'}`}>
                 {st === 'pending' && t('authoring.translate.statusPending')}
                 {st === 'done' && t('authoring.translate.statusDone')}
+                {st === 'reviewed' && t('authoring.translate.statusReviewed')}
                 {st === 'failed' && t('authoring.translate.statusFailed')}
                 {!st && t('authoring.translate.statusNone')}
               </span>
@@ -124,18 +137,39 @@ export default function TranslationBar({
           ) : (
             <>
               {activeStatus === 'done' && <p className="translation-review-note">{t('authoring.translate.reviewNote')}</p>}
+              {activeStatus === 'reviewed' && (
+                <p className="translation-reviewed-note">
+                  <Check size={14} /> {t('authoring.translate.reviewedNote')}
+                </p>
+              )}
               {activeStatus === 'failed' && <p className="translation-failed-note">{t('authoring.translate.translateFailed')}</p>}
+
               {!disabled && (
-                <button
-                  type="button"
-                  className="add-dashed-btn"
-                  disabled={busy}
-                  onClick={() => triggerTranslate(activeLang, activeStatus === 'done')}
-                >
-                  {activeStatus === 'done'
-                    ? t('authoring.translate.retranslate')
-                    : t('authoring.translate.translateTo', { language: activeLabel })}
-                </button>
+                <div className="translation-actions">
+                  {/* Human review: valid once a person confirms the LLM output. */}
+                  {activeStatus === 'done' && (
+                    <button type="button" className="translation-review-btn" disabled={busy}
+                            onClick={() => reviewTranslation(activeLang, true)}>
+                      <Check size={14} /> {t('authoring.translate.markReviewed')}
+                    </button>
+                  )}
+                  {activeStatus === 'reviewed' && (
+                    <button type="button" className="add-dashed-btn" disabled={busy}
+                            onClick={() => reviewTranslation(activeLang, false)}>
+                      {t('authoring.translate.unmarkReviewed')}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="add-dashed-btn"
+                    disabled={busy}
+                    onClick={() => triggerTranslate(activeLang, activeStatus === 'done' || activeStatus === 'reviewed')}
+                  >
+                    {activeStatus === 'done' || activeStatus === 'reviewed'
+                      ? t('authoring.translate.retranslate')
+                      : t('authoring.translate.translateTo', { language: activeLabel })}
+                  </button>
+                </div>
               )}
             </>
           )}
