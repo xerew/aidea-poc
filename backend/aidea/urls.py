@@ -21,7 +21,10 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.static import serve
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Django admin lives under /django-admin/ so the SPA can own /admin/* for
+    # its own Admin Panel routes (e.g. /admin/users) without the reverse proxy
+    # sending those refreshes to Django.
+    path('django-admin/', admin.site.urls),
     path('api/', include('hub.urls')),
     path('api/analytics/', include('analytics.urls')),
 ]

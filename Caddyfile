@@ -9,7 +9,7 @@ www.{$DOMAIN:localhost} {
     handle /api/* {
         reverse_proxy backend:8000
     }
-    handle /admin/* {
+    handle /django-admin/* {
         reverse_proxy backend:8000
     }
     handle /static/* {
