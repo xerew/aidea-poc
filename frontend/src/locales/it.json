@@ -96,8 +96,7 @@
       "signIn": "Accedi",
       "genericError": "Registrazione non riuscita. Riprova.",
       "acceptPrefix": "Ho letto e accetto i",
-      "acceptAnd": "e l'",
-      "emailConsent": "Creando un account, accetti che possiamo usare la tua email per inviarti comunicazioni su corsi, IA e aggiornamenti della piattaforma. Puoi annullare l'iscrizione in qualsiasi momento."
+      "acceptAnd": "e l'"
     },
     "password": {
       "rules": {

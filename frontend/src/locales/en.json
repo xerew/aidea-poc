@@ -96,8 +96,7 @@
       "signIn": "Sign in",
       "genericError": "Registration failed. Please try again.",
       "acceptPrefix": "I have read and accept the",
-      "acceptAnd": "and the",
-      "emailConsent": "By creating an account, you agree that we may use your email to send you communications about courses, AI and platform updates. You can unsubscribe at any time."
+      "acceptAnd": "and the"
     },
     "password": {
       "rules": {

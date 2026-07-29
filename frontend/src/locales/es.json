@@ -96,8 +96,7 @@
       "signIn": "Iniciar sesión",
       "genericError": "No se pudo completar el registro. Inténtalo de nuevo.",
       "acceptPrefix": "He leído y acepto los",
-      "acceptAnd": "y la",
-      "emailConsent": "Al crear una cuenta, aceptas que usemos tu correo para enviarte comunicaciones sobre cursos, IA y novedades de la plataforma. Puedes darte de baja en cualquier momento."
+      "acceptAnd": "y la"
     },
     "password": {
       "rules": {

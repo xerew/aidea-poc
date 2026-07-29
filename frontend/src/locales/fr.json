@@ -96,8 +96,7 @@
       "signIn": "Se connecter",
       "genericError": "Échec de l'inscription. Veuillez réessayer.",
       "acceptPrefix": "J'ai lu et j'accepte les",
-      "acceptAnd": "et la",
-      "emailConsent": "En créant un compte, vous acceptez que nous utilisions votre e-mail pour vous envoyer des communications sur les cours, l'IA et les mises à jour de la plateforme. Vous pouvez vous désabonner à tout moment."
+      "acceptAnd": "et la"
     },
     "password": {
       "rules": {

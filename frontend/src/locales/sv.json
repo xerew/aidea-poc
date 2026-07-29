@@ -96,8 +96,7 @@
       "signIn": "Logga in",
       "genericError": "Registreringen misslyckades. Försök igen.",
       "acceptPrefix": "Jag har läst och godkänner",
-      "acceptAnd": "och",
-      "emailConsent": "Genom att skapa ett konto godkänner du att vi använder din e-post för att skicka meddelanden om kurser, AI och plattformsuppdateringar. Du kan avsluta prenumerationen när som helst."
+      "acceptAnd": "och"
     },
     "password": {
       "rules": {

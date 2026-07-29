@@ -96,8 +96,7 @@
       "signIn": "Kirjaudu sisään",
       "genericError": "Rekisteröinti epäonnistui. Yritä uudelleen.",
       "acceptPrefix": "Olen lukenut ja hyväksyn",
-      "acceptAnd": "ja",
-      "emailConsent": "Luomalla tilin hyväksyt, että voimme käyttää sähköpostiasi viestintään kursseista, tekoälystä ja alustan päivityksistä. Voit perua tilauksen milloin tahansa."
+      "acceptAnd": "ja"
     },
     "password": {
       "rules": {

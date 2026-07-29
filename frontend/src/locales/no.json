@@ -96,8 +96,7 @@
       "signIn": "Logg inn",
       "genericError": "Registrering mislyktes. Prøv igjen.",
       "acceptPrefix": "Jeg har lest og godtar",
-      "acceptAnd": "og",
-      "emailConsent": "Ved å opprette en konto godtar du at vi kan bruke e-posten din til å sende deg meldinger om kurs, KI og plattformoppdateringer. Du kan melde deg av når som helst."
+      "acceptAnd": "og"
     },
     "password": {
       "rules": {

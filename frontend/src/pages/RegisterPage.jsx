@@ -174,7 +174,6 @@ export default function RegisterPage() {
               <Link to="/privacy" target="_blank" rel="noreferrer">{t('legal.privacyTitle')}</Link>.
             </span>
           </label>
-          <p className="register-terms-note">{t('auth.register.emailConsent')}</p>
 
           <button type="submit" className="register-submit" disabled={!canSubmit}>
             {loading ? t('auth.register.submitting') : t('auth.register.submit')}
