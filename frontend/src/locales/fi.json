@@ -692,6 +692,11 @@
       "queued": "Suositusten päivitys lisätty jonoon.",
       "failed": "Päivitystä ei voitu lisätä jonoon. Yritä uudelleen."
     },
+    "djangoAdmin": {
+      "title": "Django-hallinta",
+      "description": "Avaa Django-hallintasivusto tietokannan tietueiden hallintaan suoraan (käyttäjät, kurssit, perehdytyskysymykset).",
+      "button": "Avaa Django-hallinta"
+    },
     "onboardingTr": {
       "title": "Perehdytyskysymysten käännökset",
       "description": "Käännä perehdytyksen osaamiskysymykset automaattisesti jokaiselle kielelle tekoälyllä. Tarkista jokainen kieli ja merkitse se ihmisen tarkistamaksi, kun käännös on oikein.",

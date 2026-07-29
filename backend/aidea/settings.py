@@ -246,7 +246,9 @@ JAZZMIN_SETTINGS = {
     'copyright': 'AIDEA by ICCS',
     'search_model': ['auth.User', 'hub.Course'],
     'topmenu_links': [
-        {'name': 'Platform', 'url': 'http://localhost:5173', 'new_window': True},
+        # Jump back to the SPA. Uses the configured frontend origin so it works
+        # in production (https://<domain>) as well as local dev (:5173).
+        {'name': '← Back to platform', 'url': FRONTEND_BASE_URL, 'new_window': False},
     ],
     'show_sidebar': True,
     'navigation_expanded': True,

@@ -198,6 +198,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .admin-approve-btn:hover {

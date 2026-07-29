@@ -692,6 +692,11 @@
       "queued": "Actualización de recomendaciones en cola.",
       "failed": "No se pudo poner en cola la actualización. Inténtalo de nuevo."
     },
+    "djangoAdmin": {
+      "title": "Administración de Django",
+      "description": "Abre el sitio de administración de Django para gestionar directamente los registros de la base de datos (usuarios, cursos, preguntas de incorporación).",
+      "button": "Abrir la administración de Django"
+    },
     "onboardingTr": {
       "title": "Traducciones de las preguntas de incorporación",
       "description": "Traduce automáticamente las preguntas de evaluación de incorporación a cada idioma con IA. Revisa cada idioma y márcalo como revisado por una persona cuando la traducción sea correcta.",

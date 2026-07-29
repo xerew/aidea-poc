@@ -692,6 +692,11 @@
       "queued": "Actualisation des recommandations mise en file d'attente.",
       "failed": "Impossible de lancer l'actualisation. Veuillez réessayer."
     },
+    "djangoAdmin": {
+      "title": "Administration Django",
+      "description": "Ouvrez le site d'administration Django pour gérer directement les enregistrements de la base de données (utilisateurs, cours, questions d'intégration).",
+      "button": "Ouvrir l'administration Django"
+    },
     "onboardingTr": {
       "title": "Traductions des questions d'intégration",
       "description": "Traduisez automatiquement les questions d'évaluation d'intégration dans chaque langue avec l'IA. Vérifiez chaque langue et marquez-la comme relue par un humain une fois la traduction correcte.",

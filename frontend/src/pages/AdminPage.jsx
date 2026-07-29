@@ -479,6 +479,13 @@ function SystemTab() {
   return (
     <div className="admin-system">
       <div className="admin-system-card">
+        <h2>{t('admin.djangoAdmin.title')}</h2>
+        <p className="admin-system-desc">{t('admin.djangoAdmin.description')}</p>
+        <a className="admin-approve-btn" href="/django-admin/">
+          {t('admin.djangoAdmin.button')}
+        </a>
+      </div>
+      <div className="admin-system-card">
         <h2>{t('admin.recompute.title')}</h2>
         <p className="admin-system-desc">{t('admin.recompute.description')}</p>
         <button

@@ -692,6 +692,11 @@
       "queued": "Aktualisierung der Empfehlungen eingereiht.",
       "failed": "Aktualisierung konnte nicht eingereiht werden. Bitte erneut versuchen."
     },
+    "djangoAdmin": {
+      "title": "Django-Administration",
+      "description": "Öffnen Sie die Django-Administrationsseite, um Datenbankeinträge direkt zu verwalten (Benutzer, Kurse, Onboarding-Fragen).",
+      "button": "Django-Administration öffnen"
+    },
     "onboardingTr": {
       "title": "Übersetzungen der Onboarding-Fragen",
       "description": "Übersetzen Sie die Onboarding-Kompetenzfragen automatisch mit KI in jede Sprache. Prüfen Sie jede Sprache und markieren Sie sie als von einem Menschen geprüft, sobald die Übersetzung korrekt ist.",

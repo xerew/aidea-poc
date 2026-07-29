@@ -692,6 +692,11 @@
       "queued": "Recommendation refresh queued.",
       "failed": "Could not queue the refresh. Please try again."
     },
+    "djangoAdmin": {
+      "title": "Django admin",
+      "description": "Open the Django admin site to manage database records directly (users, courses, onboarding questions).",
+      "button": "Open Django admin"
+    },
     "onboardingTr": {
       "title": "Onboarding question translations",
       "description": "Auto-translate the onboarding competency questions into each language with AI. Review each language and mark it as human-reviewed once the translation is correct.",
