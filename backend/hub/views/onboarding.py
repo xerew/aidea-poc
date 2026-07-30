@@ -60,6 +60,23 @@ def _active_dimensions():
     )
 
 
+def _used_current_window(user, config):
+    """True if the teacher already recorded an attempt within the currently-open
+    retake window — they get exactly one retake per window."""
+    if not config.retake_opened_at:
+        return False
+    latest = user.self_efficacy_attempts.order_by('-created_at').first()
+    return bool(latest and latest.created_at >= config.retake_opened_at)
+
+
+def can_retake(user, config):
+    return (
+        user.profile.self_efficacy_completed_at is not None
+        and config.retake_open
+        and not _used_current_window(user, config)
+    )
+
+
 def self_efficacy_payload(request, results=None):
     """Serialize the assessment for the current teacher: the dimensions/questions
     (localized), their saved answers, per-dimension scores and completion +
@@ -77,11 +94,11 @@ def self_efficacy_payload(request, results=None):
         dim['average'] = s.get('average')
         dim['band'] = s.get('band')
 
-    completed = profile.self_efficacy_completed_at is not None
+    config = SelfEfficacyConfig.get()
     return {
-        'completed': completed,
-        # Teachers can only redo the assessment while an admin has opened it.
-        'can_retake': completed and SelfEfficacyConfig.get().retake_open,
+        'completed': profile.self_efficacy_completed_at is not None,
+        # Teachers can redo the assessment only once per admin-opened window.
+        'can_retake': can_retake(request.user, config),
         'attempt_count': request.user.self_efficacy_attempts.count(),
         'answers': profile.self_efficacy_answers or {},
         'dimensions': dim_data,
@@ -190,16 +207,22 @@ class SelfEfficacyRetakeView(APIView):
     permission_classes = [IsTeacher]
 
     def post(self, request):
-        if not SelfEfficacyConfig.get().retake_open:
-            return Response(
-                {'detail': 'Retaking the assessment is not currently open.'},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        config = SelfEfficacyConfig.get()
         profile = request.user.profile
         if profile.self_efficacy_completed_at is None:
             return Response(
                 {'detail': 'No completed assessment to retake.'},
                 status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not config.retake_open:
+            return Response(
+                {'detail': 'Retaking the assessment is not currently open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        if _used_current_window(request.user, config):
+            return Response(
+                {'detail': 'You have already retaken the assessment this round.'},
+                status=status.HTTP_403_FORBIDDEN,
             )
         profile.self_efficacy_answers = {}
         profile.self_efficacy_completed_at = None

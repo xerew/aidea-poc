@@ -1,7 +1,10 @@
+from io import BytesIO
 from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
+from openpyxl import load_workbook
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -171,12 +174,16 @@ class SelfEfficacyAttemptAndRetakeTests(APITestCase):
         res = self.client.post(reverse('self-efficacy-retake'))
         self.assertEqual(res.status_code, 403)
 
+    def _open_window(self):
+        cfg = SelfEfficacyConfig.get()
+        cfg.retake_open = True
+        cfg.retake_opened_at = timezone.now()
+        cfg.save()
+
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_retake_when_open_keeps_history(self, _m):
         self._complete(4)  # attempt 1: high
-        cfg = SelfEfficacyConfig.get()
-        cfg.retake_open = True
-        cfg.save()
+        self._open_window()
 
         res = self.client.get(reverse('self-efficacy'))
         self.assertTrue(res.data['can_retake'])
@@ -191,8 +198,31 @@ class SelfEfficacyAttemptAndRetakeTests(APITestCase):
         self.user.profile.refresh_from_db()
         self.assertEqual(self.user.profile.competency_score, 1)  # re-placed from new attempt
 
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_only_one_retake_per_window(self, _m):
+        self._complete(4)
+        self._open_window()
+        self.client.post(reverse('self-efficacy-retake'))
+        self._complete(3)  # second attempt done within the window
+        # Window is still open, but this teacher has used their one retake.
+        res = self.client.get(reverse('self-efficacy'))
+        self.assertFalse(res.data['can_retake'])
+        again = self.client.post(reverse('self-efficacy-retake'))
+        self.assertEqual(again.status_code, 403)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_new_window_allows_another_retake(self, _m):
+        self._complete(4)
+        self._open_window()
+        self.client.post(reverse('self-efficacy-retake'))
+        self._complete(3)
+        # Admin opens a fresh window → the teacher may retake once more.
+        self._open_window()
+        res = self.client.get(reverse('self-efficacy'))
+        self.assertTrue(res.data['can_retake'])
+
     def test_retake_without_completion_rejected(self):
-        SelfEfficacyConfig.objects.create(retake_open=True)
+        self._open_window()
         res = self.client.post(reverse('self-efficacy-retake'))
         self.assertEqual(res.status_code, 400)
 
@@ -208,24 +238,47 @@ class AdminSelfEfficacyTests(APITestCase):
         self.client.force_authenticate(self.teacher)
         self.assertEqual(self.client.get(reverse('admin-self-efficacy')).status_code, 403)
 
-    def test_admin_toggles_retake(self):
+    def test_admin_toggles_retake_records_opened_at(self):
         self.client.force_authenticate(self.admin)
-        self.assertFalse(self.client.get(reverse('admin-self-efficacy')).data['retake_open'])
+        got = self.client.get(reverse('admin-self-efficacy')).data
+        self.assertFalse(got['retake_open'])
+        self.assertIsNone(got['retake_opened_at'])
         res = self.client.patch(reverse('admin-self-efficacy'), {'retake_open': True}, format='json')
         self.assertTrue(res.data['retake_open'])
+        self.assertIsNotNone(res.data['retake_opened_at'])  # window timestamp set
         self.assertTrue(SelfEfficacyConfig.get().retake_open)
 
     @patch('hub.tasks.compute_user_recommendations.delay')
-    def test_attempts_comparison_lists_user_history(self, _m):
+    def test_export_has_versioned_sheets(self, _m):
+        # Teacher completes, admin opens a window, teacher retakes → 2 attempts.
         self.client.force_authenticate(self.teacher)
         self.client.post(reverse('self-efficacy'), {'answers': all_answers(5)}, format='json')
+        cfg = SelfEfficacyConfig.get()
+        cfg.retake_open = True
+        cfg.retake_opened_at = timezone.now()
+        cfg.save()
+        self.client.post(reverse('self-efficacy-retake'))
+        self.client.post(reverse('self-efficacy'), {'answers': all_answers(2)}, format='json')
 
         self.client.force_authenticate(self.admin)
-        res = self.client.get(reverse('admin-self-efficacy-attempts'))
+        res = self.client.get(reverse('admin-self-efficacy-export'))
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(len(res.data['dimensions']), 6)
-        users = res.data['users']
-        self.assertEqual(len(users), 1)
-        self.assertEqual(users[0]['username'], 'teacher1')
-        self.assertEqual(len(users[0]['attempts']), 1)
-        self.assertEqual(users[0]['attempts'][0]['overall_band'], 'high')
+        self.assertIn('spreadsheetml', res['Content-Type'])
+
+        wb = load_workbook(BytesIO(res.content))
+        self.assertIn('AI Comp Version 1', wb.sheetnames)
+        self.assertIn('AI Comp Version 2', wb.sheetnames)
+        self.assertIn('Questions', wb.sheetnames)
+        ws = wb['AI Comp Version 1']
+        header = [c.value for c in ws[1]]
+        self.assertEqual(header[:5], ['User ID', 'Name', 'Username', 'Email', 'Date'])
+        self.assertIn('Q24', header)
+        self.assertIn('Competency score (0-6)', header)
+        # One data row for our single teacher on version 1.
+        self.assertEqual(ws.max_row, 2)
+        # The Questions reference sheet lists all 24 questions.
+        self.assertEqual(wb['Questions'].max_row, 25)  # header + 24
+
+    def test_export_requires_admin(self):
+        self.client.force_authenticate(self.teacher)
+        self.assertEqual(self.client.get(reverse('admin-self-efficacy-export')).status_code, 403)

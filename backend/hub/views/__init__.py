@@ -82,7 +82,7 @@ from .profile import (
 )
 from .public_profile import PublicProfileView
 from .recommendations import RecommendationEventView, RecommendationsView
-from .self_efficacy_admin import AdminSelfEfficacyAttemptsView, AdminSelfEfficacyView
+from .self_efficacy_admin import AdminSelfEfficacyExportView, AdminSelfEfficacyView
 from .study import (
     AdminStudyExportView,
     AdminStudyView,
@@ -152,7 +152,7 @@ __all__ = [
     'SelfEfficacyView',
     'SelfEfficacyRetakeView',
     'AdminSelfEfficacyView',
-    'AdminSelfEfficacyAttemptsView',
+    'AdminSelfEfficacyExportView',
     'PasswordResetConfirmView',
     'PasswordResetRequestView',
     'PathwayView',

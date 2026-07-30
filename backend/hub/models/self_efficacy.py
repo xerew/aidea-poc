@@ -4,9 +4,12 @@ from django.db import models
 
 class SelfEfficacyConfig(models.Model):
     """Singleton admin switch. When `retake_open` is True, teachers who already
-    completed the assessment may take it again (each completion is snapshotted
-    as a new attempt for comparison)."""
+    completed the assessment may take it again — but only once per window.
+    `retake_opened_at` records when the current window was opened so a teacher
+    who already retook within it cannot retake again (and admins can see when
+    they last opened it)."""
     retake_open = models.BooleanField(default=False)
+    retake_opened_at = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.pk = 1

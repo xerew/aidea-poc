@@ -11,7 +11,7 @@ from .views import (
     AdminFeedbackDetailView,
     AdminFeedbackListView,
     AdminRecomputeRecommendationsView,
-    AdminSelfEfficacyAttemptsView,
+    AdminSelfEfficacyExportView,
     AdminSelfEfficacyView,
     AdminStudyExportView,
     AdminStudyView,
@@ -144,7 +144,7 @@ urlpatterns = [
     path('admin/study/',                        AdminStudyView.as_view(),          name='admin-study'),
     path('admin/study/export/',                 AdminStudyExportView.as_view(),    name='admin-study-export'),
     path('admin/self-efficacy/',                AdminSelfEfficacyView.as_view(),         name='admin-self-efficacy'),
-    path('admin/self-efficacy/attempts/',       AdminSelfEfficacyAttemptsView.as_view(), name='admin-self-efficacy-attempts'),
+    path('admin/self-efficacy/export/',         AdminSelfEfficacyExportView.as_view(),   name='admin-self-efficacy-export'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/upload/', AuthoringUploadView.as_view(), name='authoring-upload'),
