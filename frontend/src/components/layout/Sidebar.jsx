@@ -12,19 +12,23 @@ const BASE_NAV = [
   { to: '/courses',   labelKey: 'nav.courses',    Icon: BookOpen },
   { to: '/learning',  labelKey: 'nav.myLearning',  Icon: GraduationCap },
   { to: '/pathway',   labelKey: 'nav.myPathway',   Icon: Map },
-  { to: '/analytics', labelKey: 'nav.analytics',   Icon: BarChart2 },
   { to: '/messages',  labelKey: 'nav.messages',    Icon: MessageCircle, badgeKey: 'messages' },
   { to: '/profile',   labelKey: 'nav.profile',     Icon: User },
   { to: '/documentation', labelKey: 'nav.documentation', Icon: FileText },
 ]
 
+const ANALYTICS_ITEM = { to: '/analytics',   labelKey: 'nav.analytics', Icon: BarChart2 }
 const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: PenLine }
 const ADMIN_ITEM     = { to: '/admin/users',  labelKey: 'nav.admin',     Icon: Shield  }
 const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: ClipboardCheck }
 
-// Content creators, AIDEA partners and admins share the content-creation nav
-// (authoring + reviews). Admins additionally get the Admin dashboard.
-const CREATOR_NAV = [...BASE_NAV.filter(item => item.to !== '/pathway'), REVIEWS_ITEM, AUTHORING_ITEM]
+// Content Analytics is a content-creation tool, so it's hidden from teachers.
+// Creators, AIDEA partners and admins share the content-creation nav (analytics
+// + reviews + authoring). Admins additionally get the Admin dashboard.
+const CREATOR_NAV = [
+  ...BASE_NAV.filter(item => item.to !== '/pathway'),
+  ANALYTICS_ITEM, REVIEWS_ITEM, AUTHORING_ITEM,
+]
 
 export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
