@@ -67,7 +67,7 @@ from .messaging import (
     ConversationListView,
     UnreadMessageCountView,
 )
-from .onboarding import OnboardingView, SelfEfficacyView
+from .onboarding import OnboardingView, SelfEfficacyRetakeView, SelfEfficacyView
 from .password_reset import PasswordResetConfirmView, PasswordResetRequestView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsReviewer, IsTeacher
@@ -82,6 +82,7 @@ from .profile import (
 )
 from .public_profile import PublicProfileView
 from .recommendations import RecommendationEventView, RecommendationsView
+from .self_efficacy_admin import AdminSelfEfficacyAttemptsView, AdminSelfEfficacyView
 from .study import (
     AdminStudyExportView,
     AdminStudyView,
@@ -149,6 +150,9 @@ __all__ = [
     'FeedbackView',
     'OnboardingView',
     'SelfEfficacyView',
+    'SelfEfficacyRetakeView',
+    'AdminSelfEfficacyView',
+    'AdminSelfEfficacyAttemptsView',
     'PasswordResetConfirmView',
     'PasswordResetRequestView',
     'PathwayView',

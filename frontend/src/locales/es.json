@@ -696,6 +696,23 @@
       "description": "Abre el sitio de administración de Django para gestionar directamente los registros de la base de datos (usuarios, cursos, preguntas de incorporación).",
       "button": "Abrir la administración de Django"
     },
+    "selfEfficacy": {
+      "title": "Evaluación de competencias en IA",
+      "description": "Los docentes completan la autoevaluación una vez. Abre una ventana para que respondan de nuevo — cada finalización se guarda para poder comparar con el tiempo.",
+      "allowRetake": "Permitir que los docentes repitan la evaluación",
+      "openHint": "Abierto — quienes terminaron pueden responder de nuevo.",
+      "closedHint": "Cerrado — los docentes ven sus resultados pero no pueden cambiar respuestas.",
+      "viewHistory": "Ver historial de intentos",
+      "noAttempts": "Ningún docente ha completado la evaluación todavía.",
+      "teacher": "Docente",
+      "attempts": "Intentos",
+      "first": "Primero",
+      "latest": "Último",
+      "change": "Cambio",
+      "details": "Detalles",
+      "hide": "Ocultar",
+      "date": "Fecha"
+    },
     "searchUsers": "Buscar por nombre, usuario o correo",
     "searchRequests": "Buscar por solicitante",
     "noMatch": "Sin coincidencias.",

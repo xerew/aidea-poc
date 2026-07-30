@@ -1,8 +1,9 @@
 from django.utils import timezone
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import OnboardingDimension
+from hub.models import OnboardingDimension, SelfEfficacyAttempt, SelfEfficacyConfig
 from hub.models.pathway import LearningPath, UserLearningPath
 from hub.self_efficacy import BAND_TO_COMPETENCY, compute_results
 from hub.serializers.onboarding import (
@@ -59,6 +60,38 @@ def _active_dimensions():
     )
 
 
+def self_efficacy_payload(request, results=None):
+    """Serialize the assessment for the current teacher: the dimensions/questions
+    (localized), their saved answers, per-dimension scores and completion +
+    retake state."""
+    profile = request.user.profile
+    dimensions = list(_active_dimensions())
+    if results is None:
+        results = compute_results(profile.self_efficacy_answers, dimensions)
+    scores = {d['slug']: d for d in results['dimensions']}
+    dim_data = OnboardingDimensionSerializer(
+        dimensions, many=True, context={'lang': profile.language},
+    ).data
+    for dim in dim_data:
+        s = scores.get(dim['slug'], {})
+        dim['average'] = s.get('average')
+        dim['band'] = s.get('band')
+
+    completed = profile.self_efficacy_completed_at is not None
+    return {
+        'completed': completed,
+        # Teachers can only redo the assessment while an admin has opened it.
+        'can_retake': completed and SelfEfficacyConfig.get().retake_open,
+        'attempt_count': request.user.self_efficacy_attempts.count(),
+        'answers': profile.self_efficacy_answers or {},
+        'dimensions': dim_data,
+        'overall_average': results['overall_average'],
+        'overall_band': results['overall_band'],
+        'answered': results['answered'],
+        'total': results['total'],
+    }
+
+
 class OnboardingView(APIView):
     """Quick profile step (subject/teaching level/goals) completed at
     registration. The AI self-efficacy assessment is separate and skippable."""
@@ -102,54 +135,73 @@ class SelfEfficacyView(APIView):
     """GET  → the 6 dimensions with their questions, the learner's saved answers
               and (if all answered) their per-dimension scores and bands.
        POST → merge submitted answers (partial saves allowed). Once every active
-              question is answered, finalize: set competency_score from the
-              overall band and re-place the learner."""
+              question is answered, finalize: snapshot the attempt, set
+              competency_score from the overall band and re-place the learner.
+              A completed assessment is read-only until an admin opens a retake."""
     permission_classes = [IsTeacher]
 
-    def _payload(self, request, results=None):
-        profile = request.user.profile
-        dimensions = list(_active_dimensions())
-        if results is None:
-            results = compute_results(profile.self_efficacy_answers, dimensions)
-        scores = {d['slug']: d for d in results['dimensions']}
-        dim_data = OnboardingDimensionSerializer(
-            dimensions, many=True, context={'lang': profile.language},
-        ).data
-        for dim in dim_data:
-            s = scores.get(dim['slug'], {})
-            dim['average'] = s.get('average')
-            dim['band'] = s.get('band')
-        return {
-            'completed': profile.self_efficacy_completed_at is not None,
-            'answers': profile.self_efficacy_answers or {},
-            'dimensions': dim_data,
-            'overall_average': results['overall_average'],
-            'overall_band': results['overall_band'],
-            'answered': results['answered'],
-            'total': results['total'],
-        }
-
     def get(self, request):
-        return Response(self._payload(request))
+        return Response(self_efficacy_payload(request))
 
     def post(self, request):
+        profile = request.user.profile
+        if profile.self_efficacy_completed_at is not None:
+            return Response(
+                {'detail': 'Assessment already completed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         serializer = SelfEfficacySubmitSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         incoming = serializer.validated_data['answers']
 
-        profile = request.user.profile
         merged = {str(k): v for k, v in (profile.self_efficacy_answers or {}).items()}
         merged.update({str(k): v for k, v in incoming.items()})
         profile.self_efficacy_answers = merged
 
         results = compute_results(merged, list(_active_dimensions()))
         finalized = False
-        if results['completed'] and profile.self_efficacy_completed_at is None:
+        if results['completed']:
             profile.self_efficacy_completed_at = timezone.now()
             finalized = True
         profile.save(update_fields=['self_efficacy_answers', 'self_efficacy_completed_at'])
 
         if finalized:
-            finalize_placement(request.user, BAND_TO_COMPETENCY[results['overall_band']])
+            competency = BAND_TO_COMPETENCY[results['overall_band']]
+            SelfEfficacyAttempt.objects.create(
+                user=request.user,
+                answers=merged,
+                dimension_scores={
+                    d['slug']: {'average': d['average'], 'band': d['band']}
+                    for d in results['dimensions']
+                },
+                overall_average=results['overall_average'],
+                overall_band=results['overall_band'],
+                competency_score=competency,
+            )
+            finalize_placement(request.user, competency)
 
-        return Response(self._payload(request, results))
+        return Response(self_efficacy_payload(request, results))
+
+
+class SelfEfficacyRetakeView(APIView):
+    """POST → start a fresh attempt. Allowed only while an admin has opened the
+    retake window; the previous attempt stays in the history."""
+    permission_classes = [IsTeacher]
+
+    def post(self, request):
+        if not SelfEfficacyConfig.get().retake_open:
+            return Response(
+                {'detail': 'Retaking the assessment is not currently open.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        profile = request.user.profile
+        if profile.self_efficacy_completed_at is None:
+            return Response(
+                {'detail': 'No completed assessment to retake.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile.self_efficacy_answers = {}
+        profile.self_efficacy_completed_at = None
+        profile.save(update_fields=['self_efficacy_answers', 'self_efficacy_completed_at'])
+        return Response(self_efficacy_payload(request))

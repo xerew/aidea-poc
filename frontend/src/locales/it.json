@@ -696,6 +696,23 @@
       "description": "Apri il sito di amministrazione Django per gestire direttamente i record del database (utenti, corsi, domande di onboarding).",
       "button": "Apri amministrazione Django"
     },
+    "selfEfficacy": {
+      "title": "Valutazione delle competenze sull'IA",
+      "description": "Gli insegnanti completano l'autovalutazione una volta. Apri una finestra per farli rispondere di nuovo — ogni completamento viene salvato per confrontare nel tempo.",
+      "allowRetake": "Consenti agli insegnanti di ripetere la valutazione",
+      "openHint": "Aperto — chi ha completato può rispondere di nuovo.",
+      "closedHint": "Chiuso — gli insegnanti vedono i risultati ma non possono cambiare le risposte.",
+      "viewHistory": "Visualizza cronologia dei tentativi",
+      "noAttempts": "Nessun insegnante ha ancora completato la valutazione.",
+      "teacher": "Insegnante",
+      "attempts": "Tentativi",
+      "first": "Primo",
+      "latest": "Ultimo",
+      "change": "Variazione",
+      "details": "Dettagli",
+      "hide": "Nascondi",
+      "date": "Data"
+    },
     "searchUsers": "Cerca per nome, nome utente o email",
     "searchRequests": "Cerca per richiedente",
     "noMatch": "Nessun risultato.",

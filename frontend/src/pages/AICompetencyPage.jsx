@@ -18,7 +18,6 @@ export default function AICompetencyPage() {
   const [data, setData]       = useState(null)
   const [answers, setAnswers] = useState({})   // { "<qid>": 1-5 }
   const [saving, setSaving]   = useState(false)
-  const [results, setResults] = useState(false) // showing the results view
   const [error, setError]     = useState('')
 
   useEffect(() => {
@@ -29,7 +28,6 @@ export default function AICompetencyPage() {
         if (cancelled) return
         setData(res.data)
         setAnswers(res.data.answers || {})
-        if (res.data.completed) setResults(true)
       } catch (err) {
         if (!cancelled) {
           setError(err.response?.status === 403
@@ -56,7 +54,6 @@ export default function AICompetencyPage() {
       setData(res.data)
       setAnswers(res.data.answers || {})
       if (res.data.completed) {
-        setResults(true)
         updateUser({
           profile: {
             ...user.profile,
@@ -66,6 +63,21 @@ export default function AICompetencyPage() {
       } else if (!finish) {
         navigate('/profile')
       }
+    } catch {
+      setError(t('aiCompetency.saveError'))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Start a fresh attempt — only reachable while an admin has opened the retake.
+  const retake = async () => {
+    setSaving(true)
+    setError('')
+    try {
+      const res = await client.post('/self-efficacy/retake/')
+      setData(res.data)
+      setAnswers(res.data.answers || {})
     } catch {
       setError(t('aiCompetency.saveError'))
     } finally {
@@ -84,8 +96,8 @@ export default function AICompetencyPage() {
 
   const bandLabel = (band) => band ? t(`aiCompetency.bands.${band}`) : '—'
 
-  // ── Results view ─────────────────────────────────────────────────────────
-  if (results) {
+  // ── Results view (always shown once completed; read-only) ─────────────────
+  if (data.completed) {
     return (
       <div className="aic-page">
         <div className="aic-header">
@@ -120,9 +132,12 @@ export default function AICompetencyPage() {
         </div>
 
         <div className="aic-footer">
-          <button className="aic-btn aic-btn--ghost" onClick={() => setResults(false)}>
-            {t('aiCompetency.retake')}
-          </button>
+          {/* Redoing answers is only possible while an admin has opened it. */}
+          {data.can_retake && (
+            <button className="aic-btn aic-btn--ghost" onClick={retake} disabled={saving}>
+              {saving ? t('aiCompetency.saving') : t('aiCompetency.retake')}
+            </button>
+          )}
           <button className="aic-btn aic-btn--primary" onClick={() => navigate('/profile')}>
             {t('aiCompetency.backToProfile')}
           </button>

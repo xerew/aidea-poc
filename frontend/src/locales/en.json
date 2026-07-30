@@ -696,6 +696,23 @@
       "description": "Open the Django admin site to manage database records directly (users, courses, onboarding questions).",
       "button": "Open Django admin"
     },
+    "selfEfficacy": {
+      "title": "AI Competency assessment",
+      "description": "Teachers complete the self-efficacy assessment once. Open a retake window to let them answer again — every completion is saved so you can compare over time.",
+      "allowRetake": "Allow teachers to retake the assessment",
+      "openHint": "Open — teachers who finished can answer again.",
+      "closedHint": "Closed — teachers can view their results but not change answers.",
+      "viewHistory": "View attempt history",
+      "noAttempts": "No teacher has completed the assessment yet.",
+      "teacher": "Teacher",
+      "attempts": "Attempts",
+      "first": "First",
+      "latest": "Latest",
+      "change": "Change",
+      "details": "Details",
+      "hide": "Hide",
+      "date": "Date"
+    },
     "searchUsers": "Search by name, username or email",
     "searchRequests": "Search by requestor",
     "noMatch": "No matches.",

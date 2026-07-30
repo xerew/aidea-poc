@@ -696,6 +696,23 @@
       "description": "Åpne Django-administrasjonsnettstedet for å administrere databaseoppføringer direkte (brukere, kurs, introduksjonsspørsmål).",
       "button": "Åpne Django-administrasjon"
     },
+    "selfEfficacy": {
+      "title": "Vurdering av AI-kompetanse",
+      "description": "Lærere gjennomfører selvvurderingen én gang. Åpne et vindu så de kan svare på nytt — hver fullføring lagres slik at du kan sammenligne over tid.",
+      "allowRetake": "La lærere ta vurderingen på nytt",
+      "openHint": "Åpent — de som er ferdige kan svare på nytt.",
+      "closedHint": "Lukket — lærere ser resultatene sine, men kan ikke endre svar.",
+      "viewHistory": "Vis forsøkshistorikk",
+      "noAttempts": "Ingen lærer har fullført vurderingen ennå.",
+      "teacher": "Lærer",
+      "attempts": "Forsøk",
+      "first": "Første",
+      "latest": "Siste",
+      "change": "Endring",
+      "details": "Detaljer",
+      "hide": "Skjul",
+      "date": "Dato"
+    },
     "searchUsers": "Søk etter navn, brukernavn eller e-post",
     "searchRequests": "Søk etter forespør",
     "noMatch": "Ingen treff.",

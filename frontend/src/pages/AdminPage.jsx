@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -344,6 +344,147 @@ function RequestsTab() {
   )
 }
 
+// ── AI Competency assessment (System tab) ──────────────────────────────────────
+
+function SelfEfficacyAdminCard() {
+  const { t } = useTranslation()
+  const [retakeOpen, setRetakeOpen] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [history, setHistory] = useState(null)          // {dimensions, users}
+  const [loadingHistory, setLoadingHistory] = useState(false)
+  const [expanded, setExpanded] = useState(null)        // expanded user_id
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await client.get('/admin/self-efficacy/')
+        if (!cancelled) setRetakeOpen(res.data.retake_open)
+      } catch { /* ignore */ }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const toggle = async () => {
+    setSaving(true)
+    try {
+      const res = await client.patch('/admin/self-efficacy/', { retake_open: !retakeOpen })
+      setRetakeOpen(res.data.retake_open)
+    } catch { /* ignore */ } finally { setSaving(false) }
+  }
+
+  const loadHistory = async () => {
+    setLoadingHistory(true)
+    try {
+      const res = await client.get('/admin/self-efficacy/attempts/')
+      setHistory(res.data)
+    } catch { /* ignore */ } finally { setLoadingHistory(false) }
+  }
+
+  const bandLabel = (b) => b ? t(`aiCompetency.bands.${b}`) : '—'
+  const fmt = (v) => (v == null ? '—' : v.toFixed(2))
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.selfEfficacy.title')}</h2>
+      <p className="admin-system-desc">{t('admin.selfEfficacy.description')}</p>
+
+      <label className="admin-toggle-row">
+        <input
+          type="checkbox"
+          checked={!!retakeOpen}
+          disabled={retakeOpen === null || saving}
+          onChange={toggle}
+        />
+        <span>{t('admin.selfEfficacy.allowRetake')}</span>
+      </label>
+      <p className="admin-system-desc">
+        {retakeOpen ? t('admin.selfEfficacy.openHint') : t('admin.selfEfficacy.closedHint')}
+      </p>
+
+      {!history ? (
+        <button className="admin-approve-btn" onClick={loadHistory} disabled={loadingHistory}>
+          {loadingHistory ? t('common.loading') : t('admin.selfEfficacy.viewHistory')}
+        </button>
+      ) : history.users.length === 0 ? (
+        <span className="admin-feedback">{t('admin.selfEfficacy.noAttempts')}</span>
+      ) : (
+        <div className="se-history">
+          <table className="se-table">
+            <thead>
+              <tr>
+                <th>{t('admin.selfEfficacy.teacher')}</th>
+                <th>{t('admin.selfEfficacy.attempts')}</th>
+                <th>{t('admin.selfEfficacy.first')}</th>
+                <th>{t('admin.selfEfficacy.latest')}</th>
+                <th>{t('admin.selfEfficacy.change')}</th>
+                <th aria-hidden="true"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.users.map((u) => {
+                const first = u.attempts[0]
+                const latest = u.attempts[u.attempts.length - 1]
+                const delta = (latest.overall_average ?? 0) - (first.overall_average ?? 0)
+                const isOpen = expanded === u.user_id
+                return (
+                  <Fragment key={u.user_id}>
+                    <tr>
+                      <td>{u.name}<span className="se-username">@{u.username}</span></td>
+                      <td>{u.attempts.length}</td>
+                      <td>{fmt(first.overall_average)}</td>
+                      <td>
+                        {fmt(latest.overall_average)}{' '}
+                        <span className={`se-badge se-band--${latest.overall_band}`}>{bandLabel(latest.overall_band)}</span>
+                      </td>
+                      <td className={`se-delta${delta > 0 ? ' up' : delta < 0 ? ' down' : ''}`}>
+                        {u.attempts.length < 2 ? '—' : `${delta > 0 ? '▲ +' : delta < 0 ? '▼ ' : ''}${delta.toFixed(2)}`}
+                      </td>
+                      <td>
+                        <button className="se-expand" onClick={() => setExpanded(isOpen ? null : u.user_id)}>
+                          {isOpen ? t('admin.selfEfficacy.hide') : t('admin.selfEfficacy.details')}
+                        </button>
+                      </td>
+                    </tr>
+                    {isOpen && (
+                      <tr className="se-detail-row">
+                        <td colSpan={6}>
+                          <div className="se-detail-scroll">
+                            <table className="se-detail-table">
+                              <thead>
+                                <tr>
+                                  <th>{t('admin.selfEfficacy.date')}</th>
+                                  <th>{t('aiCompetency.overall')}</th>
+                                  {history.dimensions.map((d) => <th key={d.slug}>{d.name}</th>)}
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {u.attempts.map((a, i) => (
+                                  <tr key={i}>
+                                    <td>{new Date(a.created_at).toLocaleDateString()}</td>
+                                    <td><strong>{fmt(a.overall_average)}</strong></td>
+                                    {history.dimensions.map((d) => (
+                                      <td key={d.slug}>{fmt(a.dimensions?.[d.slug]?.average)}</td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── System tab ────────────────────────────────────────────────────────────────
 
 function SystemTab() {
@@ -382,6 +523,7 @@ function SystemTab() {
         {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
+      <SelfEfficacyAdminCard />
     </div>
   )
 }

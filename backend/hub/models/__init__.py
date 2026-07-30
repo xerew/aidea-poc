@@ -16,6 +16,7 @@ from .recommendations import (
     RecommendationConfig,
     RecommendationEvent,
 )
+from .self_efficacy import SelfEfficacyAttempt, SelfEfficacyConfig
 from .study import (
     StudyAssessmentOption,
     StudyAssessmentQuestion,
@@ -51,6 +52,8 @@ __all__ = [
     'PreferenceQuestion',
     'RecommendationConfig',
     'RecommendationEvent',
+    'SelfEfficacyAttempt',
+    'SelfEfficacyConfig',
     'StudyAssessmentOption',
     'StudyAssessmentQuestion',
     'StudyConfig',

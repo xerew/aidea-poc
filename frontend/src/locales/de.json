@@ -696,6 +696,23 @@
       "description": "Öffnen Sie die Django-Administrationsseite, um Datenbankeinträge direkt zu verwalten (Benutzer, Kurse, Onboarding-Fragen).",
       "button": "Django-Administration öffnen"
     },
+    "selfEfficacy": {
+      "title": "KI-Kompetenzbewertung",
+      "description": "Lehrkräfte führen die Selbsteinschätzung einmal durch. Öffnen Sie ein Fenster, damit sie erneut antworten können — jeder Abschluss wird gespeichert, sodass Sie im Zeitverlauf vergleichen können.",
+      "allowRetake": "Lehrkräften erlauben, die Bewertung zu wiederholen",
+      "openHint": "Offen — wer fertig ist, kann erneut antworten.",
+      "closedHint": "Geschlossen — Lehrkräfte sehen ihre Ergebnisse, können aber die Antworten nicht ändern.",
+      "viewHistory": "Versuchsverlauf anzeigen",
+      "noAttempts": "Noch keine Lehrkraft hat die Bewertung abgeschlossen.",
+      "teacher": "Lehrkraft",
+      "attempts": "Versuche",
+      "first": "Erster",
+      "latest": "Letzter",
+      "change": "Veränderung",
+      "details": "Details",
+      "hide": "Ausblenden",
+      "date": "Datum"
+    },
     "searchUsers": "Nach Name, Benutzername oder E-Mail suchen",
     "searchRequests": "Nach Antragsteller suchen",
     "noMatch": "Keine Treffer.",

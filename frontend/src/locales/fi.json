@@ -696,6 +696,23 @@
       "description": "Avaa Django-hallintasivusto tietokannan tietueiden hallintaan suoraan (käyttäjät, kurssit, perehdytyskysymykset).",
       "button": "Avaa Django-hallinta"
     },
+    "selfEfficacy": {
+      "title": "Tekoälyosaamisen arviointi",
+      "description": "Opettajat tekevät itsearvioinnin kerran. Avaa uusintaikkuna, jotta he voivat vastata uudelleen — jokainen suoritus tallennetaan vertailua varten.",
+      "allowRetake": "Salli opettajien tehdä arviointi uudelleen",
+      "openHint": "Avoinna — arvioinnin tehneet voivat vastata uudelleen.",
+      "closedHint": "Suljettu — opettajat näkevät tuloksensa mutta eivät voi muuttaa vastauksia.",
+      "viewHistory": "Näytä yritysten historia",
+      "noAttempts": "Kukaan opettaja ei ole vielä suorittanut arviointia.",
+      "teacher": "Opettaja",
+      "attempts": "Yritykset",
+      "first": "Ensimmäinen",
+      "latest": "Viimeisin",
+      "change": "Muutos",
+      "details": "Tiedot",
+      "hide": "Piilota",
+      "date": "Päivämäärä"
+    },
     "searchUsers": "Hae nimellä, käyttäjätunnuksella tai sähköpostilla",
     "searchRequests": "Hae pyytäjän mukaan",
     "noMatch": "Ei osumia.",

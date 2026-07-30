@@ -5,7 +5,13 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hub.models import OnboardingDimension, OnboardingQuestion, UserProfile
+from hub.models import (
+    OnboardingDimension,
+    OnboardingQuestion,
+    SelfEfficacyAttempt,
+    SelfEfficacyConfig,
+    UserProfile,
+)
 from hub.models.pathway import LearningPath, UserLearningPath
 
 
@@ -127,3 +133,99 @@ class SelfEfficacyPostTests(APITestCase):
     def test_unknown_question_rejected(self):
         res = self.client.post(reverse('self-efficacy'), {'answers': {'999999': 3}}, format='json')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class SelfEfficacyAttemptAndRetakeTests(APITestCase):
+    def setUp(self):
+        self.user = make_teacher()
+        make_paths()
+        self.admin = User.objects.create_user(username='se_admin', password='pass')
+        UserProfile.objects.create(user=self.admin, user_type=UserProfile.UserType.ADMIN)
+        self.client.force_authenticate(self.user)
+
+    def _complete(self, value=4):
+        return self.client.post(reverse('self-efficacy'), {'answers': all_answers(value)}, format='json')
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_completion_snapshots_an_attempt(self, _m):
+        self._complete(4)
+        attempts = SelfEfficacyAttempt.objects.filter(user=self.user)
+        self.assertEqual(attempts.count(), 1)
+        a = attempts.first()
+        self.assertEqual(a.overall_band, 'high')       # 4.0
+        self.assertEqual(a.competency_score, 5)
+        self.assertEqual(len(a.answers), 24)
+        self.assertIn('ai-knowledge', a.dimension_scores)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_completed_assessment_is_read_only(self, _m):
+        self._complete(4)
+        # Any further submit is rejected until an admin opens a retake.
+        first = OnboardingQuestion.objects.filter(is_active=True).first()
+        res = self.client.post(reverse('self-efficacy'), {'answers': {str(first.id): 1}}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_retake_blocked_when_closed(self, _m):
+        self._complete(4)
+        res = self.client.post(reverse('self-efficacy-retake'))
+        self.assertEqual(res.status_code, 403)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_retake_when_open_keeps_history(self, _m):
+        self._complete(4)  # attempt 1: high
+        cfg = SelfEfficacyConfig.get()
+        cfg.retake_open = True
+        cfg.save()
+
+        res = self.client.get(reverse('self-efficacy'))
+        self.assertTrue(res.data['can_retake'])
+
+        retake = self.client.post(reverse('self-efficacy-retake'))
+        self.assertEqual(retake.status_code, 200)
+        self.assertFalse(retake.data['completed'])
+        self.assertEqual(retake.data['answers'], {})   # fresh
+
+        self._complete(1)  # attempt 2: low
+        self.assertEqual(SelfEfficacyAttempt.objects.filter(user=self.user).count(), 2)
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.competency_score, 1)  # re-placed from new attempt
+
+    def test_retake_without_completion_rejected(self):
+        SelfEfficacyConfig.objects.create(retake_open=True)
+        res = self.client.post(reverse('self-efficacy-retake'))
+        self.assertEqual(res.status_code, 400)
+
+
+class AdminSelfEfficacyTests(APITestCase):
+    def setUp(self):
+        self.teacher = make_teacher()
+        make_paths()
+        self.admin = User.objects.create_user(username='se_admin2', password='pass')
+        UserProfile.objects.create(user=self.admin, user_type=UserProfile.UserType.ADMIN)
+
+    def test_toggle_requires_admin(self):
+        self.client.force_authenticate(self.teacher)
+        self.assertEqual(self.client.get(reverse('admin-self-efficacy')).status_code, 403)
+
+    def test_admin_toggles_retake(self):
+        self.client.force_authenticate(self.admin)
+        self.assertFalse(self.client.get(reverse('admin-self-efficacy')).data['retake_open'])
+        res = self.client.patch(reverse('admin-self-efficacy'), {'retake_open': True}, format='json')
+        self.assertTrue(res.data['retake_open'])
+        self.assertTrue(SelfEfficacyConfig.get().retake_open)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_attempts_comparison_lists_user_history(self, _m):
+        self.client.force_authenticate(self.teacher)
+        self.client.post(reverse('self-efficacy'), {'answers': all_answers(5)}, format='json')
+
+        self.client.force_authenticate(self.admin)
+        res = self.client.get(reverse('admin-self-efficacy-attempts'))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data['dimensions']), 6)
+        users = res.data['users']
+        self.assertEqual(len(users), 1)
+        self.assertEqual(users[0]['username'], 'teacher1')
+        self.assertEqual(len(users[0]['attempts']), 1)
+        self.assertEqual(users[0]['attempts'][0]['overall_band'], 'high')

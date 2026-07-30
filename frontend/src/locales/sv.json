@@ -696,6 +696,23 @@
       "description": "Öppna Django-administrationswebbplatsen för att hantera databasposter direkt (användare, kurser, introduktionsfrågor).",
       "button": "Öppna Django-administration"
     },
+    "selfEfficacy": {
+      "title": "Bedömning av AI-kompetens",
+      "description": "Lärare gör självskattningen en gång. Öppna ett fönster så att de kan svara igen — varje slutförande sparas så att du kan jämföra över tid.",
+      "allowRetake": "Tillåt lärare att göra om bedömningen",
+      "openHint": "Öppet — de som är klara kan svara igen.",
+      "closedHint": "Stängt — lärare ser sina resultat men kan inte ändra svar.",
+      "viewHistory": "Visa försökshistorik",
+      "noAttempts": "Ingen lärare har slutfört bedömningen ännu.",
+      "teacher": "Lärare",
+      "attempts": "Försök",
+      "first": "Första",
+      "latest": "Senaste",
+      "change": "Förändring",
+      "details": "Detaljer",
+      "hide": "Dölj",
+      "date": "Datum"
+    },
     "searchUsers": "Sök på namn, användarnamn eller e-post",
     "searchRequests": "Sök på begärare",
     "noMatch": "Inga träffar.",
