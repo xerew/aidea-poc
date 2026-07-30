@@ -49,3 +49,6 @@ Thumbs.db
 # Ollama tunnel SSH private key
 docker/ollama-tunnel/keys/*
 !docker/ollama-tunnel/keys/.gitkeep
+
+# Local database backups (docker db-backup service)
+/backups/
