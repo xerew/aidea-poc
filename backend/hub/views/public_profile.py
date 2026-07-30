@@ -47,6 +47,7 @@ class PublicProfileView(APIView):
         data.update({
             'bio': profile.bio,
             'subject_name': profile.subject.name if profile.subject else '',
+            'subject_slug': profile.subject.slug if profile.subject else '',
             'teaching_level': profile.get_teaching_level_display() if profile.teaching_level else '',
             'school': profile.school,
             'country': profile.country,

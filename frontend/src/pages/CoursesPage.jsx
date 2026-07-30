@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { subjectLabel } from '../lib/subjects'
 import './CoursesPage.css'
 
 // Pillar names come from the API (content) and stay untranslated in Phase 1,
@@ -60,7 +61,7 @@ function CourseCard({ course }) {
       {course.subjects?.length > 0 && (
         <div className="course-subjects">
           {course.subjects.slice(0, 3).map((s) => (
-            <span key={s.id} className="subject-tag">{s.name}</span>
+            <span key={s.id} className="subject-tag">{subjectLabel(s, t)}</span>
           ))}
         </div>
       )}

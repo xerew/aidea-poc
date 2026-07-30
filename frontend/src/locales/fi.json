@@ -939,5 +939,24 @@
       "moderate": "Kohtalainen",
       "high": "Korkea"
     }
+  },
+  "subjects": {
+    "mathematics": "Matematiikka",
+    "physics": "Fysiikka",
+    "chemistry": "Kemia",
+    "biology": "Biologia",
+    "astronomy": "Tähtitiede",
+    "computer-science": "Tietojenkäsittelytiede",
+    "engineering-technology": "Tekniikka ja teknologia",
+    "geography": "Maantiede",
+    "history": "Historia",
+    "social-studies": "Yhteiskuntaoppi",
+    "economics-business": "Talous ja liiketoiminta",
+    "languages": "Kielet",
+    "literature-english": "Kirjallisuus ja englanti",
+    "arts": "Taiteet",
+    "music": "Musiikki",
+    "physical-education": "Liikunta",
+    "general": "Yleinen / Kaikki"
   }
 }

@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Circle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import client from '../api/client'
+import { subjectLabel } from '../lib/subjects'
 import './CourseDetailPage.css'
 
 const PILLAR_STYLES = {
@@ -109,7 +110,7 @@ export default function CourseDetailPage() {
       {course.subjects?.length > 0 && (
         <div className="detail-subjects">
           {course.subjects.map((s) => (
-            <span key={s.id} className="subject-tag">{s.name}</span>
+            <span key={s.id} className="subject-tag">{subjectLabel(s, t)}</span>
           ))}
         </div>
       )}

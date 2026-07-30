@@ -14,6 +14,7 @@ import { useAccessRequest } from '../context/AccessRequestContext'
 import { COUNTRIES, getFlagEmoji } from '../data/countries'
 import client from '../api/client'
 import { getAvatarSrc } from '../lib/avatar'
+import { subjectLabel } from '../lib/subjects'
 import './ProfilePage.css'
 
 function useSectionSave(endpoint, method = 'patch') {
@@ -126,7 +127,7 @@ function PersonalInfoSection() {
             <label>{t('profile.personalInfo.subjectDepartment')}</label>
             <select value={form.subject ?? ''} onChange={set('subject')}>
               <option value="">{t('profile.personalInfo.subjectOptions.select')}</option>
-              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              {subjects.map(s => <option key={s.id} value={s.id}>{subjectLabel(s, t)}</option>)}
             </select>
           </div>
           <div className="profile-field">

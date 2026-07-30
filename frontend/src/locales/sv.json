@@ -939,5 +939,24 @@
       "moderate": "Måttlig",
       "high": "Hög"
     }
+  },
+  "subjects": {
+    "mathematics": "Matematik",
+    "physics": "Fysik",
+    "chemistry": "Kemi",
+    "biology": "Biologi",
+    "astronomy": "Astronomi",
+    "computer-science": "Datavetenskap",
+    "engineering-technology": "Teknik och teknologi",
+    "geography": "Geografi",
+    "history": "Historia",
+    "social-studies": "Samhällskunskap",
+    "economics-business": "Ekonomi och företagande",
+    "languages": "Språk",
+    "literature-english": "Litteratur och engelska",
+    "arts": "Konst",
+    "music": "Musik",
+    "physical-education": "Idrott och hälsa",
+    "general": "Allmänt / Alla"
   }
 }

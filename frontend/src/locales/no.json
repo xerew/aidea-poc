@@ -939,5 +939,24 @@
       "moderate": "Moderat",
       "high": "Høy"
     }
+  },
+  "subjects": {
+    "mathematics": "Matematikk",
+    "physics": "Fysikk",
+    "chemistry": "Kjemi",
+    "biology": "Biologi",
+    "astronomy": "Astronomi",
+    "computer-science": "Informatikk",
+    "engineering-technology": "Ingeniørfag og teknologi",
+    "geography": "Geografi",
+    "history": "Historie",
+    "social-studies": "Samfunnsfag",
+    "economics-business": "Økonomi og næringsliv",
+    "languages": "Språk",
+    "literature-english": "Litteratur og engelsk",
+    "arts": "Kunst",
+    "music": "Musikk",
+    "physical-education": "Kroppsøving",
+    "general": "Generelt / Alle"
   }
 }

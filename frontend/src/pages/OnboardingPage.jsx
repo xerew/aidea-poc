@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
+import { subjectLabel } from '../lib/subjects'
 import './OnboardingPage.css'
 
 const STEP_DEFS = [
@@ -161,7 +162,7 @@ export default function OnboardingPage() {
             >
               <option value="" disabled>{t('onboarding.selectSubject')}</option>
               {subjects.map(s => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id}>{subjectLabel(s, t)}</option>
               ))}
             </select>
           )}

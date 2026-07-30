@@ -9,6 +9,7 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { MESSAGING_ENABLED } from '../config'
 import { getAvatarSrc } from '../lib/avatar'
+import { subjectLabel } from '../lib/subjects'
 import { getFlagEmoji, COUNTRIES } from '../data/countries'
 import './PublicProfilePage.css'
 
@@ -110,7 +111,7 @@ export default function PublicProfilePage() {
   if (profile.subject_name) {
     details.push(
       <DetailRow key="subject" icon={GraduationCap}>
-        {profile.subject_name}
+        {subjectLabel({ slug: profile.subject_slug, name: profile.subject_name }, t)}
         {profile.teaching_level ? ` · ${profile.teaching_level}` : ''}
       </DetailRow>,
     )

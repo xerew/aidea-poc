@@ -939,5 +939,24 @@
       "moderate": "Μέτρια",
       "high": "Υψηλή"
     }
+  },
+  "subjects": {
+    "mathematics": "Μαθηματικά",
+    "physics": "Φυσική",
+    "chemistry": "Χημεία",
+    "biology": "Βιολογία",
+    "astronomy": "Αστρονομία",
+    "computer-science": "Πληροφορική",
+    "engineering-technology": "Μηχανική & Τεχνολογία",
+    "geography": "Γεωγραφία",
+    "history": "Ιστορία",
+    "social-studies": "Κοινωνικές Επιστήμες",
+    "economics-business": "Οικονομικά & Επιχειρήσεις",
+    "languages": "Γλώσσες",
+    "literature-english": "Λογοτεχνία & Αγγλικά",
+    "arts": "Τέχνες",
+    "music": "Μουσική",
+    "physical-education": "Φυσική Αγωγή",
+    "general": "Γενικά / Όλα"
   }
 }

@@ -56,6 +56,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'email':        user.email,
             'subject':      instance.subject_id,
             'subject_name': instance.subject.name if instance.subject else '',
+            'subject_slug': instance.subject.slug if instance.subject else '',
             'gender':       instance.gender,
             'country':      instance.country,
             'school':       instance.school,

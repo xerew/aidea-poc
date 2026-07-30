@@ -939,5 +939,24 @@
       "moderate": "Moderate",
       "high": "High"
     }
+  },
+  "subjects": {
+    "mathematics": "Mathematics",
+    "physics": "Physics",
+    "chemistry": "Chemistry",
+    "biology": "Biology",
+    "astronomy": "Astronomy",
+    "computer-science": "Computer Science",
+    "engineering-technology": "Engineering & Technology",
+    "geography": "Geography",
+    "history": "History",
+    "social-studies": "Social Studies",
+    "economics-business": "Economics & Business",
+    "languages": "Languages",
+    "literature-english": "Literature & English",
+    "arts": "Arts",
+    "music": "Music",
+    "physical-education": "Physical Education",
+    "general": "General / All"
   }
 }

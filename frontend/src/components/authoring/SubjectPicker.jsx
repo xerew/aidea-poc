@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
+import { subjectLabel } from '../../lib/subjects'
 import './SubjectPicker.css'
 
 /**
@@ -31,7 +32,7 @@ export default function SubjectPicker({ subjects, selectedIds, onChange, disable
             onClick={() => toggle(s.id)}
             disabled={disabled}
           >
-            {s.name}
+            {subjectLabel(s, t)}
           </button>
         ))}
       </div>
