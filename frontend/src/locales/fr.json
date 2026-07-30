@@ -913,5 +913,39 @@
     "privacyTitle": "Politique de confidentialité",
     "lastUpdated": "Dernière mise à jour : {{date}}",
     "docLabel": "Mentions légales :"
+  },
+  "aiCompetency": {
+    "title": "Auto-évaluation des compétences en IA",
+    "subtitle": "Évaluez votre degré de confiance pour chaque affirmation. Il n'y a pas de bonnes ou de mauvaises réponses — vous pouvez enregistrer et continuer à tout moment.",
+    "answeredOf": "{{answered}} sur {{total}} répondues",
+    "skipForNow": "Passer pour l'instant",
+    "saveAndExit": "Enregistrer et continuer plus tard",
+    "saving": "Enregistrement…",
+    "finish": "Terminer",
+    "resultsTitle": "Votre profil de compétences en IA",
+    "resultsSubtitle": "Votre sentiment d'efficacité sur les six dimensions.",
+    "overall": "Global",
+    "retake": "Revoir les réponses",
+    "backToProfile": "Retour au profil",
+    "teachersOnly": "L'évaluation des compétences en IA est réservée aux enseignants.",
+    "loadError": "Impossible de charger l'évaluation.",
+    "saveError": "Impossible d'enregistrer vos réponses. Veuillez réessayer.",
+    "cardTitle": "Compétences en IA",
+    "cardDescription": "Une auto-évaluation de 24 questions couvrant six dimensions de l'enseignement avec l'IA.",
+    "viewResults": "Voir mes résultats",
+    "continue": "Continuer vos compétences en IA ({{answered}}/{{total}})",
+    "start": "Commencer vos compétences en IA",
+    "likert": {
+      "stronglyDisagree": "Pas du tout d'accord",
+      "disagree": "Pas d'accord",
+      "neither": "Ni d'accord ni pas d'accord",
+      "agree": "D'accord",
+      "stronglyAgree": "Tout à fait d'accord"
+    },
+    "bands": {
+      "low": "Faible",
+      "moderate": "Modéré",
+      "high": "Élevé"
+    }
   }
 }

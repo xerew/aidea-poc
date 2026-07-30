@@ -913,5 +913,39 @@
     "privacyTitle": "Informativa sulla privacy",
     "lastUpdated": "Ultimo aggiornamento: {{date}}",
     "docLabel": "Note legali:"
+  },
+  "aiCompetency": {
+    "title": "Autovalutazione delle competenze sull'IA",
+    "subtitle": "Valuta quanto ti senti sicuro riguardo a ciascuna affermazione. Non ci sono risposte giuste o sbagliate — puoi salvare e continuare in qualsiasi momento.",
+    "answeredOf": "{{answered}} di {{total}} completate",
+    "skipForNow": "Salta per ora",
+    "saveAndExit": "Salva e continua più tardi",
+    "saving": "Salvataggio…",
+    "finish": "Termina",
+    "resultsTitle": "Il tuo profilo di competenze sull'IA",
+    "resultsSubtitle": "La tua autoefficacia nelle sei dimensioni.",
+    "overall": "Complessivo",
+    "retake": "Rivedi le risposte",
+    "backToProfile": "Torna al profilo",
+    "teachersOnly": "La valutazione delle competenze sull'IA è disponibile per gli insegnanti.",
+    "loadError": "Impossibile caricare la valutazione.",
+    "saveError": "Impossibile salvare le tue risposte. Riprova.",
+    "cardTitle": "Competenze sull'IA",
+    "cardDescription": "Un'autovalutazione di 24 domande su sei dimensioni dell'insegnamento con l'IA.",
+    "viewResults": "Vedi i miei risultati",
+    "continue": "Continua le tue competenze sull'IA ({{answered}}/{{total}})",
+    "start": "Inizia le tue competenze sull'IA",
+    "likert": {
+      "stronglyDisagree": "Del tutto in disaccordo",
+      "disagree": "In disaccordo",
+      "neither": "Né d'accordo né in disaccordo",
+      "agree": "D'accordo",
+      "stronglyAgree": "Del tutto d'accordo"
+    },
+    "bands": {
+      "low": "Bassa",
+      "moderate": "Moderata",
+      "high": "Alta"
+    }
   }
 }

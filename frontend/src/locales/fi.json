@@ -913,5 +913,39 @@
     "privacyTitle": "Tietosuojakäytäntö",
     "lastUpdated": "Viimeksi päivitetty: {{date}}",
     "docLabel": "Oikeudelliset:"
+  },
+  "aiCompetency": {
+    "title": "Tekoälyosaamisen itsearviointi",
+    "subtitle": "Arvioi, kuinka varma olet kustakin väittämästä. Oikeita tai vääriä vastauksia ei ole — voit tallentaa ja jatkaa milloin tahansa.",
+    "answeredOf": "{{answered}} / {{total}} vastattu",
+    "skipForNow": "Ohita toistaiseksi",
+    "saveAndExit": "Tallenna ja jatka myöhemmin",
+    "saving": "Tallennetaan…",
+    "finish": "Valmis",
+    "resultsTitle": "Tekoälyosaamisen profiilisi",
+    "resultsSubtitle": "Pystyvyytesi kuudessa ulottuvuudessa.",
+    "overall": "Yhteensä",
+    "retake": "Tarkista vastaukset",
+    "backToProfile": "Takaisin profiiliin",
+    "teachersOnly": "Tekoälyosaamisen arviointi on tarkoitettu opettajille.",
+    "loadError": "Arviointia ei voitu ladata.",
+    "saveError": "Vastauksiasi ei voitu tallentaa. Yritä uudelleen.",
+    "cardTitle": "Tekoälyosaaminen",
+    "cardDescription": "24 kysymyksen itsearviointi kuudessa tekoälyn opetuksen ulottuvuudessa.",
+    "viewResults": "Näytä tulokseni",
+    "continue": "Jatka tekoälyosaamistasi ({{answered}}/{{total}})",
+    "start": "Aloita tekoälyosaamisesi",
+    "likert": {
+      "stronglyDisagree": "Täysin eri mieltä",
+      "disagree": "Eri mieltä",
+      "neither": "En samaa enkä eri mieltä",
+      "agree": "Samaa mieltä",
+      "stronglyAgree": "Täysin samaa mieltä"
+    },
+    "bands": {
+      "low": "Matala",
+      "moderate": "Kohtalainen",
+      "high": "Korkea"
+    }
   }
 }

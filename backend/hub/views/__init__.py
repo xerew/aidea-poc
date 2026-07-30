@@ -67,7 +67,7 @@ from .messaging import (
     ConversationListView,
     UnreadMessageCountView,
 )
-from .onboarding import OnboardingView
+from .onboarding import OnboardingView, SelfEfficacyView
 from .onboarding_translations import AdminOnboardingTranslationsView
 from .password_reset import PasswordResetConfirmView, PasswordResetRequestView
 from .pathway import PathwayView
@@ -150,6 +150,7 @@ __all__ = [
     'FeedbackUploadView',
     'FeedbackView',
     'OnboardingView',
+    'SelfEfficacyView',
     'PasswordResetConfirmView',
     'PasswordResetRequestView',
     'PathwayView',

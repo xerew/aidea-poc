@@ -1,0 +1,129 @@
+.aic-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+}
+
+.aic-header { margin-bottom: 1.5rem; }
+.aic-title { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.35rem; }
+.aic-subtitle { color: #64748b; margin: 0 0 1rem; font-size: 0.95rem; }
+.aic-loading, .aic-error { color: #64748b; }
+.aic-error { color: #b91c1c; }
+
+/* Progress */
+.aic-progress { display: flex; align-items: center; gap: 0.75rem; }
+.aic-progress-track { flex: 1; height: 8px; background: #e2e8f0; border-radius: 9999px; overflow: hidden; }
+.aic-progress-fill { height: 100%; background: #2563eb; border-radius: 9999px; transition: width 0.2s; }
+.aic-progress-label { font-size: 0.8rem; color: #64748b; white-space: nowrap; }
+
+/* Dimension */
+.aic-dimension { margin: 1.75rem 0; }
+.aic-dimension-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.aic-question {
+  padding: 0.85rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.aic-question-text { margin: 0 0 0.6rem; font-size: 0.95rem; font-weight: 500; }
+
+/* Likert row */
+.aic-likert {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+}
+.aic-likert-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+  transition: border-color 0.12s, background 0.12s;
+}
+.aic-likert-opt:hover { border-color: #93c5fd; }
+.aic-likert-opt--on { border-color: #2563eb; background: #eff6ff; }
+.aic-likert-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid #cbd5e1; flex-shrink: 0;
+}
+.aic-likert-opt--on .aic-likert-dot { border-color: #2563eb; background: #2563eb; }
+.aic-likert-label { font-size: 0.68rem; line-height: 1.2; color: #475569; }
+.aic-likert-opt--on .aic-likert-label { color: #1e40af; font-weight: 600; }
+
+/* Footer */
+.aic-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.aic-footer-right { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.aic-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.aic-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.aic-btn--primary { background: #2563eb; color: #fff; }
+.aic-btn--primary:hover:not(:disabled) { background: #1d4ed8; }
+.aic-btn--ghost { background: #fff; border-color: #cbd5e1; color: #334155; }
+.aic-btn--ghost:hover:not(:disabled) { background: #f8fafc; }
+
+/* Results */
+.aic-overall {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+.aic-overall-label { font-weight: 600; }
+.aic-overall-band { font-weight: 700; margin-left: auto; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.03em; }
+.aic-overall-avg { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+.aic-results { display: flex; flex-direction: column; gap: 1rem; }
+.aic-result-row { display: flex; flex-direction: column; gap: 0.35rem; }
+.aic-result-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.aic-result-name { font-weight: 600; font-size: 0.95rem; }
+.aic-badge {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  padding: 0.1rem 0.55rem; border-radius: 9999px; letter-spacing: 0.02em;
+}
+.aic-bar-track { height: 10px; background: #e2e8f0; border-radius: 9999px; overflow: hidden; }
+.aic-bar-fill { height: 100%; border-radius: 9999px; transition: width 0.3s; }
+.aic-result-avg { font-size: 0.78rem; color: #64748b; font-variant-numeric: tabular-nums; }
+
+/* Band colours (shared by badges, bars and the overall banner) */
+.aic-band--low    { background: #fee2e2; color: #991b1b; }
+.aic-band--moderate { background: #fef9c3; color: #854d0e; }
+.aic-band--high   { background: #dcfce7; color: #166534; }
+.aic-bar-fill.aic-band--low      { background: #ef4444; }
+.aic-bar-fill.aic-band--moderate { background: #eab308; }
+.aic-bar-fill.aic-band--high     { background: #22c55e; }
+
+@media (max-width: 560px) {
+  .aic-likert-label { font-size: 0.6rem; }
+  .aic-likert-opt { padding: 0.45rem 0.15rem; }
+}

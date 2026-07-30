@@ -913,5 +913,39 @@
     "privacyTitle": "Integritetspolicy",
     "lastUpdated": "Senast uppdaterad: {{date}}",
     "docLabel": "Juridiskt:"
+  },
+  "aiCompetency": {
+    "title": "Självskattning av AI-kompetens",
+    "subtitle": "Skatta hur säker du känner dig kring varje påstående. Det finns inga rätt eller fel — du kan spara och fortsätta när som helst.",
+    "answeredOf": "{{answered}} av {{total}} besvarade",
+    "skipForNow": "Hoppa över för nu",
+    "saveAndExit": "Spara och fortsätt senare",
+    "saving": "Sparar…",
+    "finish": "Slutför",
+    "resultsTitle": "Din AI-kompetensprofil",
+    "resultsSubtitle": "Din självförmåga inom de sex dimensionerna.",
+    "overall": "Totalt",
+    "retake": "Granska svar",
+    "backToProfile": "Tillbaka till profilen",
+    "teachersOnly": "AI-kompetensbedömningen är tillgänglig för lärare.",
+    "loadError": "Det gick inte att läsa in bedömningen.",
+    "saveError": "Det gick inte att spara dina svar. Försök igen.",
+    "cardTitle": "AI-kompetens",
+    "cardDescription": "En självskattning med 24 frågor över sex dimensioner av att undervisa med AI.",
+    "viewResults": "Visa mina resultat",
+    "continue": "Fortsätt din AI-kompetens ({{answered}}/{{total}})",
+    "start": "Börja din AI-kompetens",
+    "likert": {
+      "stronglyDisagree": "Instämmer inte alls",
+      "disagree": "Instämmer inte",
+      "neither": "Varken instämmer eller inte",
+      "agree": "Instämmer",
+      "stronglyAgree": "Instämmer helt"
+    },
+    "bands": {
+      "low": "Låg",
+      "moderate": "Måttlig",
+      "high": "Hög"
+    }
   }
 }

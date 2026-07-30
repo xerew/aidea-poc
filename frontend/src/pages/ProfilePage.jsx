@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Camera, Check, X, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -645,6 +646,77 @@ function CompetencyBadge() {
   )
 }
 
+// ── AI self-efficacy assessment card ──────────────────────────────────────────
+
+function AICompetencySection() {
+  const { t } = useTranslation()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [data, setData]     = useState(null)
+  const [loaded, setLoaded] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await client.get('/self-efficacy/')
+        if (!cancelled) setData(res.data)
+      } catch { /* non-teachers get 403 — the card is hidden below */ }
+      finally { if (!cancelled) setLoaded(true) }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  // Self-efficacy is a teacher instrument.
+  if (user?.profile?.user_type !== 'teacher') return null
+  if (!loaded) {
+    return (
+      <section className="profile-card">
+        <h2>{t('aiCompetency.cardTitle')}</h2>
+        <p className="profile-loading">{t('common.loading')}</p>
+      </section>
+    )
+  }
+  if (!data) return null
+
+  const answered = data.answered ?? 0
+  const total = data.total ?? 24
+  const started = answered > 0
+
+  return (
+    <section className="profile-card">
+      <h2>{t('aiCompetency.cardTitle')}</h2>
+      <p className="profile-loading">{t('aiCompetency.cardDescription')}</p>
+
+      {data.completed ? (
+        <>
+          <div className="aic-profile-grid">
+            {data.dimensions.map(d => (
+              <div key={d.slug} className="aic-profile-chip">
+                <span className="aic-profile-dim">{d.name}</span>
+                <span className={`aic-profile-badge aic-band--${d.band}`}>
+                  {d.band ? t(`aiCompetency.bands.${d.band}`) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button className="profile-outline-btn" style={{ marginTop: '1rem' }}
+                  onClick={() => navigate('/ai-competency')}>
+            {t('aiCompetency.viewResults')}
+          </button>
+        </>
+      ) : (
+        <button className="profile-finder-btn" style={{ marginTop: '1rem' }}
+                onClick={() => navigate('/ai-competency')}>
+          <Sparkles size={14} /> {started
+            ? t('aiCompetency.continue', { answered, total })
+            : t('aiCompetency.start')}
+        </button>
+      )}
+    </section>
+  )
+}
+
 // ── Avatar with upload ────────────────────────────────────────────────────────
 
 function ProfileAvatar() {
@@ -752,6 +824,7 @@ export default function ProfilePage() {
 
       <ProfileAvatar />
       <PersonalInfoSection />
+      <AICompetencySection />
       <PreferencesSection />
       <PrivacySection />
       <SecuritySection />

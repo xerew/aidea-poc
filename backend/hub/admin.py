@@ -19,7 +19,7 @@ from .models import (
     LessonProgress,
     LessonSession,
     Module,
-    OnboardingOption,
+    OnboardingDimension,
     OnboardingQuestion,
     PreferenceOption,
     PreferenceQuestion,
@@ -173,19 +173,29 @@ class AccessRequestAdmin(admin.ModelAdmin):
         self.message_user(request, f'{count} request(s) denied.', messages.WARNING)
 
 
-# ── Onboarding competency questions ───────────────────────────────────────────
+# ── Onboarding self-efficacy assessment ───────────────────────────────────────
 
-class OnboardingOptionInline(admin.TabularInline):
-    model = OnboardingOption
-    extra = 2
-    fields = ['text', 'translations', 'score', 'order']
+class OnboardingQuestionInline(admin.TabularInline):
+    model = OnboardingQuestion
+    extra = 4
+    fields = ['text', 'translations', 'order', 'is_active']
+
+
+@admin.register(OnboardingDimension)
+class OnboardingDimensionAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'slug', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    prepopulated_fields = {'slug': ('name',)}
+    fields = ['name', 'slug', 'translations', 'order', 'is_active']
+    inlines = [OnboardingQuestionInline]
 
 
 @admin.register(OnboardingQuestion)
 class OnboardingQuestionAdmin(admin.ModelAdmin):
-    list_display  = ['text', 'order', 'is_active']
+    list_display  = ['text', 'dimension', 'order', 'is_active']
     list_editable = ['order', 'is_active']
-    inlines = [OnboardingOptionInline]
+    list_filter   = ['dimension', 'is_active']
+    fields = ['dimension', 'text', 'translations', 'order', 'is_active']
 
 
 # ── Subjects ──────────────────────────────────────────────────────────────────

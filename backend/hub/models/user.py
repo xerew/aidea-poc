@@ -54,6 +54,11 @@ class UserProfile(models.Model):
     teaching_level       = models.CharField(max_length=20, choices=TeachingLevel.choices, blank=True)
     goals                = models.JSONField(default=list, blank=True)
     onboarding_completed = models.BooleanField(default=False)
+    # AI self-efficacy assessment: saved incrementally so it can be paused and
+    # resumed. {question_id: 1-5}. completed_at is set once every active
+    # question has an answer.
+    self_efficacy_answers      = models.JSONField(default=dict, blank=True)
+    self_efficacy_completed_at = models.DateTimeField(null=True, blank=True)
     preferred_pillars    = models.JSONField(default=list, blank=True)
     learning_style       = models.CharField(
         max_length=20, choices=LearningStyle.choices, blank=True,

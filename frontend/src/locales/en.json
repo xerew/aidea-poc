@@ -913,5 +913,39 @@
     "privacyTitle": "Privacy Policy",
     "lastUpdated": "Last updated: {{date}}",
     "docLabel": "Legal:"
+  },
+  "aiCompetency": {
+    "title": "AI Competency Self-Assessment",
+    "subtitle": "Rate how confident you feel about each statement. There are no right or wrong answers — you can save and continue any time.",
+    "answeredOf": "{{answered}} of {{total}} answered",
+    "skipForNow": "Skip for now",
+    "saveAndExit": "Save & continue later",
+    "saving": "Saving…",
+    "finish": "Finish",
+    "resultsTitle": "Your AI Competency Profile",
+    "resultsSubtitle": "Your self-efficacy across the six dimensions.",
+    "overall": "Overall",
+    "retake": "Review answers",
+    "backToProfile": "Back to profile",
+    "teachersOnly": "The AI competency assessment is available to teachers.",
+    "loadError": "Could not load the assessment.",
+    "saveError": "Could not save your answers. Please try again.",
+    "cardTitle": "AI Competency",
+    "cardDescription": "A 24-question self-efficacy assessment across six dimensions of teaching with AI.",
+    "viewResults": "View my results",
+    "continue": "Continue your AI Competency ({{answered}}/{{total}})",
+    "start": "Start your AI Competency",
+    "likert": {
+      "stronglyDisagree": "Strongly disagree",
+      "disagree": "Disagree",
+      "neither": "Neither agree nor disagree",
+      "agree": "Agree",
+      "stronglyAgree": "Strongly agree"
+    },
+    "bands": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High"
+    }
   }
 }

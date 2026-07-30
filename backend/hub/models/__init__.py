@@ -6,7 +6,7 @@ from .enrollment import Enrollment, LessonProgress
 from .feedback import Feedback
 from .history import CourseEditHistory
 from .messaging import Conversation, Message
-from .onboarding_quiz import OnboardingConfig, OnboardingOption, OnboardingQuestion
+from .onboarding_quiz import OnboardingConfig, OnboardingDimension, OnboardingQuestion
 from .pathway import LearningPath, LearningPathCourse, UserLearningPath
 from .preference_quiz import PreferenceOption, PreferenceQuestion
 from .recommendations import (
@@ -46,7 +46,7 @@ __all__ = [
     'LessonSession',
     'Module',
     'OnboardingConfig',
-    'OnboardingOption',
+    'OnboardingDimension',
     'OnboardingQuestion',
     'PreferenceOption',
     'PreferenceQuestion',

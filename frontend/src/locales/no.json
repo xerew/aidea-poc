@@ -913,5 +913,39 @@
     "privacyTitle": "Personvernerklæring",
     "lastUpdated": "Sist oppdatert: {{date}}",
     "docLabel": "Juridisk:"
+  },
+  "aiCompetency": {
+    "title": "Selvvurdering av AI-kompetanse",
+    "subtitle": "Vurder hvor trygg du føler deg på hvert utsagn. Det finnes ingen riktige eller gale svar — du kan lagre og fortsette når som helst.",
+    "answeredOf": "{{answered}} av {{total}} besvart",
+    "skipForNow": "Hopp over for nå",
+    "saveAndExit": "Lagre og fortsett senere",
+    "saving": "Lagrer…",
+    "finish": "Fullfør",
+    "resultsTitle": "Din AI-kompetanseprofil",
+    "resultsSubtitle": "Din mestringstro på de seks dimensjonene.",
+    "overall": "Totalt",
+    "retake": "Se gjennom svar",
+    "backToProfile": "Tilbake til profilen",
+    "teachersOnly": "AI-kompetansevurderingen er tilgjengelig for lærere.",
+    "loadError": "Kunne ikke laste vurderingen.",
+    "saveError": "Kunne ikke lagre svarene dine. Prøv igjen.",
+    "cardTitle": "AI-kompetanse",
+    "cardDescription": "En selvvurdering med 24 spørsmål på tvers av seks dimensjoner av å undervise med AI.",
+    "viewResults": "Se resultatene mine",
+    "continue": "Fortsett AI-kompetansen din ({{answered}}/{{total}})",
+    "start": "Start AI-kompetansen din",
+    "likert": {
+      "stronglyDisagree": "Helt uenig",
+      "disagree": "Uenig",
+      "neither": "Verken enig eller uenig",
+      "agree": "Enig",
+      "stronglyAgree": "Helt enig"
+    },
+    "bands": {
+      "low": "Lav",
+      "moderate": "Moderat",
+      "high": "Høy"
+    }
   }
 }

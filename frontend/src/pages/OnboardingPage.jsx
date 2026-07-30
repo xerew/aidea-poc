@@ -49,13 +49,11 @@ export default function OnboardingPage() {
   const [step, setStep]       = useState(0)
   const [answers, setAnswers] = useState({})
   const [subjects, setSubjects] = useState([])
-  const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
 
   useEffect(() => {
     client.get('/subjects/').then(res => setSubjects(res.data)).catch(() => {})
-    client.get('/onboarding/').then(res => setQuestions(res.data.questions ?? [])).catch(() => {})
   }, [])
 
   const resolveStatic = (s) => ({
@@ -67,20 +65,11 @@ export default function OnboardingPage() {
     })),
   })
 
-  // Admin-editable competency questions (from the API) sit between the fixed
-  // teaching-level step and the final goals step.
-  const questionSteps = questions.map(q => ({
-    key: `q_${q.id}`,
-    type: 'question',
-    questionId: q.id,
-    question: q.text,
-    options: q.options.map(o => ({ value: String(o.id), label: o.text })),
-  }))
-
+  // Quick profile setup only — the AI self-efficacy assessment is a separate,
+  // skippable step the teacher can start (or resume) afterwards.
   const STEPS = [
     resolveStatic(STEP_DEFS[0]),  // subject
     resolveStatic(STEP_DEFS[1]),  // teaching level
-    ...questionSteps,
     resolveStatic(STEP_DEFS[2]),  // goals
   ]
 
@@ -108,15 +97,9 @@ export default function OnboardingPage() {
     setLoading(true)
     setError('')
     try {
-      const questionAnswers = {}
-      questions.forEach(q => {
-        const optionId = answers[`q_${q.id}`]
-        if (optionId != null) questionAnswers[q.id] = Number(optionId)
-      })
       const { data } = await client.post('/onboarding/', {
         subject:        answers.subject,
         teaching_level: answers.teaching_level,
-        answers:        questionAnswers,
         goals:          answers.goals || [],
       })
       // Sync the freshly-computed competency into the cached user so the
@@ -128,7 +111,8 @@ export default function OnboardingPage() {
           competency_score: data.competency_score,
         },
       })
-      navigate('/')
+      // Offer the AI self-efficacy assessment next (it has its own skip).
+      navigate('/ai-competency')
     } catch (err) {
       setError(err.response?.data?.detail || t('onboarding.genericError'))
       setLoading(false)

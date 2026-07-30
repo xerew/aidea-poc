@@ -9,6 +9,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import TermsPage from './pages/TermsPage'
 import PrivacyPage from './pages/PrivacyPage'
 import OnboardingPage from './pages/OnboardingPage'
+import AICompetencyPage from './pages/AICompetencyPage'
 import HomePage from './pages/HomePage'
 import CoursesPage from './pages/CoursesPage'
 import CourseDetailPage from './pages/CourseDetailPage'
@@ -81,6 +82,7 @@ export default function App() {
             <Route path="/pathway"              element={<PathwayPage />} />
             <Route path="/analytics"            element={<AnalyticsPage />} />
             <Route path="/profile"              element={<ProfilePage />} />
+            <Route path="/ai-competency"        element={<AICompetencyPage />} />
             <Route path="/users/:id"            element={<PublicProfilePage />} />
             <Route path="/documentation"       element={<DocumentationPage />} />
             {MESSAGING_ENABLED && <Route path="/messages"         element={<MessagesPage />} />}

@@ -913,5 +913,39 @@
     "privacyTitle": "Datenschutzerklärung",
     "lastUpdated": "Zuletzt aktualisiert: {{date}}",
     "docLabel": "Rechtliches:"
+  },
+  "aiCompetency": {
+    "title": "Selbsteinschätzung der KI-Kompetenz",
+    "subtitle": "Bewerten Sie, wie sicher Sie sich bei jeder Aussage fühlen. Es gibt keine richtigen oder falschen Antworten — Sie können jederzeit speichern und fortfahren.",
+    "answeredOf": "{{answered}} von {{total}} beantwortet",
+    "skipForNow": "Vorerst überspringen",
+    "saveAndExit": "Speichern und später fortfahren",
+    "saving": "Wird gespeichert…",
+    "finish": "Abschließen",
+    "resultsTitle": "Ihr KI-Kompetenzprofil",
+    "resultsSubtitle": "Ihre Selbstwirksamkeit in den sechs Dimensionen.",
+    "overall": "Gesamt",
+    "retake": "Antworten überprüfen",
+    "backToProfile": "Zurück zum Profil",
+    "teachersOnly": "Die KI-Kompetenzbewertung steht Lehrkräften zur Verfügung.",
+    "loadError": "Die Bewertung konnte nicht geladen werden.",
+    "saveError": "Ihre Antworten konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+    "cardTitle": "KI-Kompetenz",
+    "cardDescription": "Eine Selbsteinschätzung mit 24 Fragen über sechs Dimensionen des Unterrichtens mit KI.",
+    "viewResults": "Meine Ergebnisse ansehen",
+    "continue": "Setzen Sie Ihre KI-Kompetenz fort ({{answered}}/{{total}})",
+    "start": "Starten Sie Ihre KI-Kompetenz",
+    "likert": {
+      "stronglyDisagree": "Stimme überhaupt nicht zu",
+      "disagree": "Stimme nicht zu",
+      "neither": "Weder noch",
+      "agree": "Stimme zu",
+      "stronglyAgree": "Stimme voll zu"
+    },
+    "bands": {
+      "low": "Niedrig",
+      "moderate": "Mittel",
+      "high": "Hoch"
+    }
   }
 }

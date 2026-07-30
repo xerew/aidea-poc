@@ -913,5 +913,39 @@
     "privacyTitle": "Política de privacidad",
     "lastUpdated": "Última actualización: {{date}}",
     "docLabel": "Legal:"
+  },
+  "aiCompetency": {
+    "title": "Autoevaluación de competencias en IA",
+    "subtitle": "Valora tu nivel de confianza en cada afirmación. No hay respuestas correctas o incorrectas — puedes guardar y continuar en cualquier momento.",
+    "answeredOf": "{{answered}} de {{total}} respondidas",
+    "skipForNow": "Omitir por ahora",
+    "saveAndExit": "Guardar y continuar más tarde",
+    "saving": "Guardando…",
+    "finish": "Finalizar",
+    "resultsTitle": "Tu perfil de competencias en IA",
+    "resultsSubtitle": "Tu autoeficacia en las seis dimensiones.",
+    "overall": "General",
+    "retake": "Revisar respuestas",
+    "backToProfile": "Volver al perfil",
+    "teachersOnly": "La evaluación de competencias en IA está disponible para docentes.",
+    "loadError": "No se pudo cargar la evaluación.",
+    "saveError": "No se pudieron guardar tus respuestas. Inténtalo de nuevo.",
+    "cardTitle": "Competencias en IA",
+    "cardDescription": "Una autoevaluación de 24 preguntas en seis dimensiones de la enseñanza con IA.",
+    "viewResults": "Ver mis resultados",
+    "continue": "Continúa tus competencias en IA ({{answered}}/{{total}})",
+    "start": "Comienza tus competencias en IA",
+    "likert": {
+      "stronglyDisagree": "Totalmente en desacuerdo",
+      "disagree": "En desacuerdo",
+      "neither": "Ni de acuerdo ni en desacuerdo",
+      "agree": "De acuerdo",
+      "stronglyAgree": "Totalmente de acuerdo"
+    },
+    "bands": {
+      "low": "Baja",
+      "moderate": "Moderada",
+      "high": "Alta"
+    }
   }
 }

@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 from hub.models import (
     OnboardingConfig,
-    OnboardingOption,
+    OnboardingDimension,
     OnboardingQuestion,
     UserProfile,
 )
@@ -22,21 +22,22 @@ def make_user(username, user_type):
 
 class TranslateOnboardingTaskTests(TestCase):
     def setUp(self):
-        self.q = OnboardingQuestion.objects.create(text='How familiar are you with AI?', order=1)
-        self.o1 = OnboardingOption.objects.create(question=self.q, text='Not at all', score=0, order=1)
-        self.o2 = OnboardingOption.objects.create(question=self.q, text='Very familiar', score=2, order=2)
+        self.dim = OnboardingDimension.objects.create(name='AI Knowledge', slug='ai-knowledge-t', order=1)
+        self.q = OnboardingQuestion.objects.create(
+            dimension=self.dim, text='I can explain what AI is.', order=1)
         # An inactive question must be skipped.
-        self.inactive = OnboardingQuestion.objects.create(text='Old', order=9, is_active=False)
+        self.inactive = OnboardingQuestion.objects.create(
+            dimension=self.dim, text='Old', order=9, is_active=False)
 
     @patch('hub.tasks.translate_text', side_effect=lambda text, src, dst: f'[{dst}] {text}')
-    def test_translates_active_questions_and_options(self, _m):
+    def test_translates_active_dimensions_and_questions(self, _m):
         from hub.tasks import translate_onboarding
         translate_onboarding('el')
+        self.dim.refresh_from_db()
         self.q.refresh_from_db()
-        self.o1.refresh_from_db()
         self.inactive.refresh_from_db()
-        self.assertEqual(self.q.translations['el'], '[el] How familiar are you with AI?')
-        self.assertEqual(self.o1.translations['el'], '[el] Not at all')
+        self.assertEqual(self.dim.translations['el'], '[el] AI Knowledge')
+        self.assertEqual(self.q.translations['el'], '[el] I can explain what AI is.')
         self.assertEqual(OnboardingConfig.get().translation_status['el'], 'done')
         # Inactive question left untouched.
         self.assertEqual(self.inactive.translations, {})
