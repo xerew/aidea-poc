@@ -51,11 +51,11 @@ class SelfEfficacyGetTests(APITestCase):
             self.assertEqual(len(dim['questions']), 4)
             self.assertEqual(set(dim['questions'][0].keys()), {'id', 'text'})
 
-    def test_content_creator_forbidden(self):
+    def test_content_creator_can_access(self):
         creator = User.objects.create_user(username='cc', password='pass')
         UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
         self.client.force_authenticate(creator)
-        self.assertEqual(self.client.get(reverse('self-efficacy')).status_code, 403)
+        self.assertEqual(self.client.get(reverse('self-efficacy')).status_code, 200)
 
     def test_localized_to_user_language(self):
         dim = OnboardingDimension.objects.filter(is_active=True).first()
@@ -136,6 +136,17 @@ class SelfEfficacyPostTests(APITestCase):
     def test_unknown_question_rejected(self):
         res = self.client.post(reverse('self-efficacy'), {'answers': {'999999': 3}}, format='json')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_content_creator_completes_without_learning_path(self):
+        creator = User.objects.create_user(username='cc2', password='pass')
+        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.client.force_authenticate(creator)
+        res = self.client.post(reverse('self-efficacy'), {'answers': all_answers(5)}, format='json')
+        self.assertTrue(res.data['completed'])
+        creator.profile.refresh_from_db()
+        self.assertEqual(creator.profile.competency_score, 5)   # recorded
+        self.assertEqual(SelfEfficacyAttempt.objects.filter(user=creator).count(), 1)
+        self.assertFalse(UserLearningPath.objects.filter(user=creator).exists())  # no placement
 
 
 class SelfEfficacyAttemptAndRetakeTests(APITestCase):

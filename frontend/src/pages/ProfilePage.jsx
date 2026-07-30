@@ -668,8 +668,8 @@ function AICompetencySection() {
     return () => { cancelled = true }
   }, [])
 
-  // Self-efficacy is a teacher instrument.
-  if (user?.profile?.user_type !== 'teacher') return null
+  // Available to every role (teachers, content creators, partners, admins).
+  if (!user) return null
   if (!loaded) {
     return (
       <section className="profile-card">

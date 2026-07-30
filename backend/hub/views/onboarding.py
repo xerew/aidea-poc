@@ -1,9 +1,15 @@
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import OnboardingDimension, SelfEfficacyAttempt, SelfEfficacyConfig
+from hub.models import (
+    OnboardingDimension,
+    SelfEfficacyAttempt,
+    SelfEfficacyConfig,
+    UserProfile,
+)
 from hub.models.pathway import LearningPath, UserLearningPath
 from hub.self_efficacy import BAND_TO_COMPETENCY, compute_results
 from hub.serializers.onboarding import (
@@ -172,8 +178,10 @@ class SelfEfficacyView(APIView):
        POST → merge submitted answers (partial saves allowed). Once every active
               question is answered, finalize: snapshot the attempt, set
               competency_score from the overall band and re-place the learner.
-              A completed assessment is read-only until an admin opens a retake."""
-    permission_classes = [IsTeacher]
+              A completed assessment is read-only until an admin opens a retake.
+       Open to every signed-in user (teachers, content creators, partners,
+       admins) — only teachers additionally get a learning-path placement."""
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         return Response(self_efficacy_payload(request))
@@ -230,7 +238,13 @@ class SelfEfficacyView(APIView):
                 overall_band=results['overall_band'],
                 competency_score=competency,
             )
-            finalize_placement(request.user, competency)
+            if profile.user_type == UserProfile.UserType.TEACHER:
+                # Teachers get re-placed on a learning path; other roles just
+                # record their competency.
+                finalize_placement(request.user, competency)
+            else:
+                profile.competency_score = competency
+                profile.save(update_fields=['competency_score'])
 
         return Response(self_efficacy_payload(request))
 
@@ -238,7 +252,7 @@ class SelfEfficacyView(APIView):
 class SelfEfficacyRetakeView(APIView):
     """POST → start a fresh attempt. Allowed only while an admin has opened the
     retake window; the previous attempt stays in the history."""
-    permission_classes = [IsTeacher]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         config = SelfEfficacyConfig.get()
