@@ -190,13 +190,35 @@ class SelfEfficacyAttemptAndRetakeTests(APITestCase):
 
         retake = self.client.post(reverse('self-efficacy-retake'))
         self.assertEqual(retake.status_code, 200)
-        self.assertFalse(retake.data['completed'])
-        self.assertEqual(retake.data['answers'], {})   # fresh
+        self.assertTrue(retake.data['completed'])    # old review kept
+        self.assertTrue(retake.data['retaking'])
+        self.assertEqual(retake.data['answers'], {})  # fresh draft
 
         self._complete(1)  # attempt 2: low
         self.assertEqual(SelfEfficacyAttempt.objects.filter(user=self.user).count(), 2)
         self.user.profile.refresh_from_db()
         self.assertEqual(self.user.profile.competency_score, 1)  # re-placed from new attempt
+        self.assertFalse(self.user.profile.self_efficacy_retaking)
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_paused_retake_keeps_old_review(self, _m):
+        self._complete(4)  # attempt 1: high, competency 5
+        self._open_window()
+        self.client.post(reverse('self-efficacy-retake'))  # start
+
+        # Answer a few, then walk away (no finish).
+        ids = list(all_answers(1))
+        partial = {str(ids[0]): 1, str(ids[1]): 1, str(ids[2]): 1}
+        self.client.post(reverse('self-efficacy'), {'answers': partial}, format='json')
+
+        res = self.client.get(reverse('self-efficacy'))
+        self.assertTrue(res.data['completed'])         # still completed
+        self.assertTrue(res.data['retaking'])
+        self.assertEqual(res.data['overall_band'], 'high')  # OLD review, not the draft
+        self.assertEqual(len(res.data['answers']), 3)  # draft resumes where left off
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.competency_score, 5)  # unchanged until finish
+        self.assertEqual(SelfEfficacyAttempt.objects.filter(user=self.user).count(), 1)
 
     @patch('hub.tasks.compute_user_recommendations.delay')
     def test_only_one_retake_per_window(self, _m):

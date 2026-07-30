@@ -18,6 +18,7 @@ export default function AICompetencyPage() {
   const [data, setData]       = useState(null)
   const [answers, setAnswers] = useState({})   // { "<qid>": 1-5 }
   const [saving, setSaving]   = useState(false)
+  const [editing, setEditing] = useState(false) // in the questionnaire (retake in progress)
   const [error, setError]     = useState('')
 
   useEffect(() => {
@@ -53,7 +54,9 @@ export default function AICompetencyPage() {
       const res = await client.post('/self-efficacy/', { answers })
       setData(res.data)
       setAnswers(res.data.answers || {})
-      if (res.data.completed) {
+      // Fully finished (first completion or a finished retake) → show results.
+      if (res.data.completed && !res.data.retaking) {
+        setEditing(false)
         updateUser({
           profile: {
             ...user.profile,
@@ -71,6 +74,7 @@ export default function AICompetencyPage() {
   }
 
   // Start a fresh attempt — only reachable while an admin has opened the retake.
+  // The completed results stay intact server-side until the retake is finished.
   const retake = async () => {
     setSaving(true)
     setError('')
@@ -78,6 +82,7 @@ export default function AICompetencyPage() {
       const res = await client.post('/self-efficacy/retake/')
       setData(res.data)
       setAnswers(res.data.answers || {})
+      setEditing(true)
     } catch {
       setError(t('aiCompetency.saveError'))
     } finally {
@@ -96,8 +101,8 @@ export default function AICompetencyPage() {
 
   const bandLabel = (band) => band ? t(`aiCompetency.bands.${band}`) : '—'
 
-  // ── Results view (always shown once completed; read-only) ─────────────────
-  if (data.completed) {
+  // ── Results view (shown once completed unless actively retaking) ──────────
+  if (data.completed && !editing) {
     return (
       <div className="aic-page">
         <div className="aic-header">
@@ -132,8 +137,13 @@ export default function AICompetencyPage() {
         </div>
 
         <div className="aic-footer">
-          {/* Redoing answers is only possible while an admin has opened it. */}
-          {data.can_retake && (
+          {/* A retake already in progress resumes its draft; otherwise a new
+              retake can only be started while an admin has opened the window. */}
+          {data.retaking ? (
+            <button className="aic-btn aic-btn--ghost" onClick={() => setEditing(true)} disabled={saving}>
+              {t('aiCompetency.resume')}
+            </button>
+          ) : data.can_retake && (
             <button className="aic-btn aic-btn--ghost" onClick={retake} disabled={saving}>
               {saving ? t('aiCompetency.saving') : t('aiCompetency.retake')}
             </button>

@@ -70,22 +70,40 @@ def _used_current_window(user, config):
 
 
 def can_retake(user, config):
+    """Whether the teacher may START a fresh retake (not already retaking, one
+    per admin-opened window)."""
+    profile = user.profile
     return (
-        user.profile.self_efficacy_completed_at is not None
+        profile.self_efficacy_completed_at is not None
+        and not profile.self_efficacy_retaking
         and config.retake_open
         and not _used_current_window(user, config)
     )
 
 
-def self_efficacy_payload(request, results=None):
+def self_efficacy_payload(request):
     """Serialize the assessment for the current teacher: the dimensions/questions
-    (localized), their saved answers, per-dimension scores and completion +
-    retake state."""
+    (localized), the working answers, per-dimension scores and completion +
+    retake state.
+
+    While a retake is in progress the questionnaire shows the draft answers, but
+    the results bars keep showing the last COMPLETED attempt — so a teacher who
+    pauses mid-retake still sees their old review until they finish."""
     profile = request.user.profile
     dimensions = list(_active_dimensions())
-    if results is None:
-        results = compute_results(profile.self_efficacy_answers, dimensions)
-    scores = {d['slug']: d for d in results['dimensions']}
+    completed = profile.self_efficacy_completed_at is not None
+    retaking = profile.self_efficacy_retaking
+
+    # The questionnaire edits the draft while retaking, else the live answers.
+    working = profile.self_efficacy_draft if retaking else (profile.self_efficacy_answers or {})
+    working_results = compute_results(working, dimensions)
+
+    # The results view reflects the last completed attempt (or the in-progress
+    # answers for a first-timer who has nothing completed yet).
+    display_source = profile.self_efficacy_answers if completed else working
+    display_results = compute_results(display_source, dimensions)
+
+    scores = {d['slug']: d for d in display_results['dimensions']}
     dim_data = OnboardingDimensionSerializer(
         dimensions, many=True, context={'lang': profile.language},
     ).data
@@ -96,16 +114,16 @@ def self_efficacy_payload(request, results=None):
 
     config = SelfEfficacyConfig.get()
     return {
-        'completed': profile.self_efficacy_completed_at is not None,
-        # Teachers can redo the assessment only once per admin-opened window.
+        'completed': completed,
+        'retaking': retaking,
         'can_retake': can_retake(request.user, config),
         'attempt_count': request.user.self_efficacy_attempts.count(),
-        'answers': profile.self_efficacy_answers or {},
+        'answers': working,
+        'answered': working_results['answered'],
+        'total': working_results['total'],
         'dimensions': dim_data,
-        'overall_average': results['overall_average'],
-        'overall_band': results['overall_band'],
-        'answered': results['answered'],
-        'total': results['total'],
+        'overall_average': display_results['overall_average'],
+        'overall_band': display_results['overall_band'],
     }
 
 
@@ -162,7 +180,9 @@ class SelfEfficacyView(APIView):
 
     def post(self, request):
         profile = request.user.profile
-        if profile.self_efficacy_completed_at is not None:
+        retaking = profile.self_efficacy_retaking
+        # A completed assessment is read-only unless the teacher is mid-retake.
+        if profile.self_efficacy_completed_at is not None and not retaking:
             return Response(
                 {'detail': 'Assessment already completed.'},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -172,16 +192,30 @@ class SelfEfficacyView(APIView):
         serializer.is_valid(raise_exception=True)
         incoming = serializer.validated_data['answers']
 
-        merged = {str(k): v for k, v in (profile.self_efficacy_answers or {}).items()}
+        # A retake edits the draft; a first-timer edits the live answers.
+        current = profile.self_efficacy_draft if retaking else profile.self_efficacy_answers
+        merged = {str(k): v for k, v in (current or {}).items()}
         merged.update({str(k): v for k, v in incoming.items()})
-        profile.self_efficacy_answers = merged
 
         results = compute_results(merged, list(_active_dimensions()))
-        finalized = False
-        if results['completed']:
-            profile.self_efficacy_completed_at = timezone.now()
-            finalized = True
-        profile.save(update_fields=['self_efficacy_answers', 'self_efficacy_completed_at'])
+        finalized = results['completed']
+
+        if retaking:
+            profile.self_efficacy_draft = merged
+            if finalized:
+                # Promote the draft to the live, completed answers.
+                profile.self_efficacy_answers = merged
+                profile.self_efficacy_completed_at = timezone.now()
+                profile.self_efficacy_retaking = False
+                profile.self_efficacy_draft = {}
+        else:
+            profile.self_efficacy_answers = merged
+            if finalized:
+                profile.self_efficacy_completed_at = timezone.now()
+        profile.save(update_fields=[
+            'self_efficacy_answers', 'self_efficacy_completed_at',
+            'self_efficacy_draft', 'self_efficacy_retaking',
+        ])
 
         if finalized:
             competency = BAND_TO_COMPETENCY[results['overall_band']]
@@ -198,7 +232,7 @@ class SelfEfficacyView(APIView):
             )
             finalize_placement(request.user, competency)
 
-        return Response(self_efficacy_payload(request, results))
+        return Response(self_efficacy_payload(request))
 
 
 class SelfEfficacyRetakeView(APIView):
@@ -214,6 +248,9 @@ class SelfEfficacyRetakeView(APIView):
                 {'detail': 'No completed assessment to retake.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        # Already mid-retake — just resume the existing draft.
+        if profile.self_efficacy_retaking:
+            return Response(self_efficacy_payload(request))
         if not config.retake_open:
             return Response(
                 {'detail': 'Retaking the assessment is not currently open.'},
@@ -224,7 +261,9 @@ class SelfEfficacyRetakeView(APIView):
                 {'detail': 'You have already retaken the assessment this round.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
-        profile.self_efficacy_answers = {}
-        profile.self_efficacy_completed_at = None
-        profile.save(update_fields=['self_efficacy_answers', 'self_efficacy_completed_at'])
+        # Start a fresh draft; the completed answers/results stay untouched until
+        # the retake is finished.
+        profile.self_efficacy_retaking = True
+        profile.self_efficacy_draft = {}
+        profile.save(update_fields=['self_efficacy_retaking', 'self_efficacy_draft'])
         return Response(self_efficacy_payload(request))

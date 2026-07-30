@@ -59,6 +59,10 @@ class UserProfile(models.Model):
     # question has an answer.
     self_efficacy_answers      = models.JSONField(default=dict, blank=True)
     self_efficacy_completed_at = models.DateTimeField(null=True, blank=True)
+    # A retake in progress writes here (not to the fields above), so the already
+    # completed results stay intact until the retake is actually finished.
+    self_efficacy_draft        = models.JSONField(default=dict, blank=True)
+    self_efficacy_retaking     = models.BooleanField(default=False)
     preferred_pillars    = models.JSONField(default=list, blank=True)
     learning_style       = models.CharField(
         max_length=20, choices=LearningStyle.choices, blank=True,
