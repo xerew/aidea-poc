@@ -696,14 +696,6 @@
       "description": "Apri il sito di amministrazione Django per gestire direttamente i record del database (utenti, corsi, domande di onboarding).",
       "button": "Apri amministrazione Django"
     },
-    "onboardingTr": {
-      "title": "Traduzioni delle domande di onboarding",
-      "description": "Traduci automaticamente le domande di valutazione di onboarding in ogni lingua con l'IA. Controlla ogni lingua e contrassegnala come rivista da una persona quando la traduzione è corretta.",
-      "noQuestions": "Non ci sono domande di onboarding attive da tradurre.",
-      "loadFailed": "Impossibile caricare lo stato della traduzione.",
-      "translate": "Traduci",
-      "reconfirm": "Ritradurre questa lingua? Qualsiasi contrassegno di revisione umana verrà rimosso e la traduzione IA sarà rigenerata."
-    },
     "searchUsers": "Cerca per nome, nome utente o email",
     "searchRequests": "Cerca per richiedente",
     "noMatch": "Nessun risultato.",

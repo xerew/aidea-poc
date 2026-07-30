@@ -10,7 +10,6 @@ from .views import (
     AdminAccessRequestReviewView,
     AdminFeedbackDetailView,
     AdminFeedbackListView,
-    AdminOnboardingTranslationsView,
     AdminRecomputeRecommendationsView,
     AdminStudyExportView,
     AdminStudyView,
@@ -140,7 +139,6 @@ urlpatterns = [
     path('admin/feedback/<int:pk>/',            AdminFeedbackDetailView.as_view(), name='admin-feedback-detail'),
     path('admin/study/',                        AdminStudyView.as_view(),          name='admin-study'),
     path('admin/study/export/',                 AdminStudyExportView.as_view(),    name='admin-study-export'),
-    path('admin/onboarding-translations/',      AdminOnboardingTranslationsView.as_view(), name='admin-onboarding-translations'),
     # Authoring (content_creator only)
     path('authoring/pillars/', AuthoringPillarsView.as_view(), name='authoring-pillars'),
     path('authoring/upload/', AuthoringUploadView.as_view(), name='authoring-upload'),

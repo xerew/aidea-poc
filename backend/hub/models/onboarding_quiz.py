@@ -1,24 +1,6 @@
 from django.db import models
 
 
-class OnboardingConfig(models.Model):
-    """Singleton holding the per-language translation status of the onboarding
-    assessment: {lang_code: 'pending'|'done'|'reviewed'|'failed'}."""
-    translation_status = models.JSONField(default=dict, blank=True)
-
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super().save(*args, **kwargs)
-
-    @classmethod
-    def get(cls):
-        obj, _ = cls.objects.get_or_create(pk=1)
-        return obj
-
-    def __str__(self):
-        return 'Onboarding configuration'
-
-
 class OnboardingDimension(models.Model):
     """One of the AI self-efficacy dimensions (e.g. AI Knowledge, AI Ethics).
 

@@ -19,8 +19,6 @@ from .models import (
     LessonProgress,
     LessonSession,
     Module,
-    OnboardingDimension,
-    OnboardingQuestion,
     PreferenceOption,
     PreferenceQuestion,
     StudyAssessmentOption,
@@ -171,31 +169,6 @@ class AccessRequestAdmin(admin.ModelAdmin):
             reviewed_at=timezone.now(),
         )
         self.message_user(request, f'{count} request(s) denied.', messages.WARNING)
-
-
-# ── Onboarding self-efficacy assessment ───────────────────────────────────────
-
-class OnboardingQuestionInline(admin.TabularInline):
-    model = OnboardingQuestion
-    extra = 4
-    fields = ['text', 'translations', 'order', 'is_active']
-
-
-@admin.register(OnboardingDimension)
-class OnboardingDimensionAdmin(admin.ModelAdmin):
-    list_display  = ['name', 'slug', 'order', 'is_active']
-    list_editable = ['order', 'is_active']
-    prepopulated_fields = {'slug': ('name',)}
-    fields = ['name', 'slug', 'translations', 'order', 'is_active']
-    inlines = [OnboardingQuestionInline]
-
-
-@admin.register(OnboardingQuestion)
-class OnboardingQuestionAdmin(admin.ModelAdmin):
-    list_display  = ['text', 'dimension', 'order', 'is_active']
-    list_editable = ['order', 'is_active']
-    list_filter   = ['dimension', 'is_active']
-    fields = ['dimension', 'text', 'translations', 'order', 'is_active']
 
 
 # ── Subjects ──────────────────────────────────────────────────────────────────

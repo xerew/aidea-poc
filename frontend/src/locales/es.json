@@ -696,14 +696,6 @@
       "description": "Abre el sitio de administración de Django para gestionar directamente los registros de la base de datos (usuarios, cursos, preguntas de incorporación).",
       "button": "Abrir la administración de Django"
     },
-    "onboardingTr": {
-      "title": "Traducciones de las preguntas de incorporación",
-      "description": "Traduce automáticamente las preguntas de evaluación de incorporación a cada idioma con IA. Revisa cada idioma y márcalo como revisado por una persona cuando la traducción sea correcta.",
-      "noQuestions": "No hay preguntas de incorporación activas para traducir.",
-      "loadFailed": "No se pudo cargar el estado de la traducción.",
-      "translate": "Traducir",
-      "reconfirm": "¿Volver a traducir este idioma? Se eliminará cualquier marca de revisión humana y se regenerará la traducción de IA."
-    },
     "searchUsers": "Buscar por nombre, usuario o correo",
     "searchRequests": "Buscar por solicitante",
     "noMatch": "Sin coincidencias.",

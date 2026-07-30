@@ -68,7 +68,6 @@ from .messaging import (
     UnreadMessageCountView,
 )
 from .onboarding import OnboardingView, SelfEfficacyView
-from .onboarding_translations import AdminOnboardingTranslationsView
 from .password_reset import PasswordResetConfirmView, PasswordResetRequestView
 from .pathway import PathwayView
 from .permissions import IsContentCreator, IsReviewer, IsTeacher
@@ -100,7 +99,6 @@ __all__ = [
     'AdminAccessRequestListView',
     'AdminRecomputeRecommendationsView',
     'AdminAccessRequestReviewView',
-    'AdminOnboardingTranslationsView',
     'AdminUserListView',
     'AdminUserRoleView',
     'AssignmentSubmitView',

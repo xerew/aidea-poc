@@ -696,14 +696,6 @@
       "description": "Öppna Django-administrationswebbplatsen för att hantera databasposter direkt (användare, kurser, introduktionsfrågor).",
       "button": "Öppna Django-administration"
     },
-    "onboardingTr": {
-      "title": "Översättningar av introduktionsfrågor",
-      "description": "Översätt automatiskt introduktionens kompetensfrågor till varje språk med AI. Granska varje språk och markera det som granskat av en människa när översättningen är korrekt.",
-      "noQuestions": "Det finns inga aktiva introduktionsfrågor att översätta.",
-      "loadFailed": "Det gick inte att läsa in översättningsstatusen.",
-      "translate": "Översätt",
-      "reconfirm": "Översätta det här språket igen? Eventuell markering för mänsklig granskning tas bort och AI-översättningen genereras på nytt."
-    },
     "searchUsers": "Sök på namn, användarnamn eller e-post",
     "searchRequests": "Sök på begärare",
     "noMatch": "Inga träffar.",

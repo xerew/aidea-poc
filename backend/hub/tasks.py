@@ -580,30 +580,3 @@ def translate_lesson_meta(lesson_id: int, target: str) -> None:
     except Lesson.DoesNotExist:
         return
     _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))
-
-
-# Onboarding questions are authored in English; the translation source is fixed.
-ONBOARDING_SOURCE_LANGUAGE = 'en'
-
-
-@shared_task
-def translate_onboarding(target: str) -> None:
-    """Translate every active self-efficacy dimension and question into `target`
-    with Ollama, then flip the onboarding-level status to 'done' (needs human
-    review) or 'failed'. Started by an admin, never automatically."""
-    from hub.models import OnboardingConfig, OnboardingDimension, OnboardingQuestion
-    from hub.translation import TranslationError
-
-    src = ONBOARDING_SOURCE_LANGUAGE
-    OnboardingConfig.get()  # ensure the singleton row exists for the status merge
-    try:
-        for dimension in OnboardingDimension.objects.filter(is_active=True):
-            _merge_json(OnboardingDimension, dimension.pk, 'translations', target,
-                        translate_text(dimension.name, src, target))
-        for question in OnboardingQuestion.objects.filter(is_active=True):
-            _merge_json(OnboardingQuestion, question.pk, 'translations', target,
-                        translate_text(question.text, src, target))
-        _merge_json(OnboardingConfig, 1, 'translation_status', target, 'done')
-    except TranslationError as exc:
-        logger.error('Onboarding translation into %s failed: %s', target, exc)
-        _merge_json(OnboardingConfig, 1, 'translation_status', target, 'failed')
