@@ -10,6 +10,9 @@ from rest_framework.views import APIView
 from hub.models import OnboardingDimension, SelfEfficacyAttempt, SelfEfficacyConfig
 from hub.views.permissions import IsAdmin
 
+# Self-efficacy bands are shown to users as competency levels.
+BAND_LABELS = {'low': 'Beginner', 'moderate': 'Intermediate', 'high': 'Advanced'}
+
 
 class AdminSelfEfficacyView(APIView):
     """GET/PATCH the retake switch. Opening it (off → on) starts a new window,
@@ -75,7 +78,9 @@ class AdminSelfEfficacyExportView(APIView):
                  timezone.localtime(attempt.created_at).strftime('%Y-%m-%d %H:%M')]
                 + [answers.get(str(q.id), '') for (_d, q) in questions]
                 + [dims.get(dim.slug, {}).get('average', '') for dim in dimensions]
-                + [attempt.overall_average, attempt.overall_band, attempt.competency_score]
+                + [attempt.overall_average,
+                   BAND_LABELS.get(attempt.overall_band, attempt.overall_band),
+                   attempt.competency_score]
             )
 
         wb = Workbook()

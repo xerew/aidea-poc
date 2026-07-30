@@ -946,9 +946,9 @@
       "stronglyAgree": "Helt enig"
     },
     "bands": {
-      "low": "Lav",
-      "moderate": "Moderat",
-      "high": "Høy"
+      "low": "Nybegynner",
+      "moderate": "Middels",
+      "high": "Avansert"
     }
   },
   "subjects": {

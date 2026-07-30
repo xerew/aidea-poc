@@ -946,9 +946,9 @@
       "stronglyAgree": "Instämmer helt"
     },
     "bands": {
-      "low": "Låg",
-      "moderate": "Måttlig",
-      "high": "Hög"
+      "low": "Nybörjare",
+      "moderate": "Medel",
+      "high": "Avancerad"
     }
   },
   "subjects": {

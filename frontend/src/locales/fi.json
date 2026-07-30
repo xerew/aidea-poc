@@ -946,9 +946,9 @@
       "stronglyAgree": "Täysin samaa mieltä"
     },
     "bands": {
-      "low": "Matala",
-      "moderate": "Kohtalainen",
-      "high": "Korkea"
+      "low": "Aloittelija",
+      "moderate": "Keskitaso",
+      "high": "Edistynyt"
     }
   },
   "subjects": {

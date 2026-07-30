@@ -946,9 +946,9 @@
       "stronglyAgree": "Stimme voll zu"
     },
     "bands": {
-      "low": "Niedrig",
-      "moderate": "Mittel",
-      "high": "Hoch"
+      "low": "Anfänger",
+      "moderate": "Fortgeschritten",
+      "high": "Experte"
     }
   },
   "subjects": {

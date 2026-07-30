@@ -946,9 +946,9 @@
       "stronglyAgree": "Strongly agree"
     },
     "bands": {
-      "low": "Low",
-      "moderate": "Moderate",
-      "high": "High"
+      "low": "Beginner",
+      "moderate": "Intermediate",
+      "high": "Advanced"
     }
   },
   "subjects": {
