@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from hub.i18n import language_for_country
 from hub.models import UserProfile
 
 _PASSWORD_RULES = [
@@ -83,7 +82,9 @@ class RegisterSerializer(serializers.Serializer):
                 avatar_initials=initials,
                 gender=gender,
                 country=country,
-                language=language_for_country(country),
+                # New accounts always start in English; the user can switch
+                # language themselves from their profile.
+                language=UserProfile.Language.EN,
                 accepted_terms_at=timezone.now(),
             )
         return user

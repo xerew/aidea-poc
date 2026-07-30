@@ -42,7 +42,9 @@ class ProfileLanguageApiTests(APITestCase):
         res = self.client.patch('/api/profile/language/', {'language': 'xx'}, format='json')
         self.assertEqual(res.status_code, 400)
 
-    def test_register_defaults_language_from_country(self):
+    def test_register_always_defaults_to_english(self):
+        # The country is stored but must not change the UI language — new
+        # accounts always start in English and switch it themselves.
         res = self.client.post('/api/auth/register/', {
             'username': 'greek_teacher', 'password': 'Str0ng!pass9',
             'confirm_password': 'Str0ng!pass9', 'email': 'g@example.com',
@@ -50,4 +52,6 @@ class ProfileLanguageApiTests(APITestCase):
             'accept_terms': True,
         }, format='json')
         self.assertEqual(res.status_code, 201, res.data)
-        self.assertEqual(User.objects.get(username='greek_teacher').profile.language, 'el')
+        profile = User.objects.get(username='greek_teacher').profile
+        self.assertEqual(profile.language, 'en')
+        self.assertEqual(profile.country, 'GR')  # country still saved
