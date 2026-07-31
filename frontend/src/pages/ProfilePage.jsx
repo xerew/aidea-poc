@@ -650,7 +650,8 @@ function CompetencyBadge() {
 // ── AI self-efficacy assessment card ──────────────────────────────────────────
 
 function AICompetencySection() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.language?.split('-')[0]
   const { user } = useAuth()
   const navigate = useNavigate()
   const [data, setData]     = useState(null)
@@ -660,13 +661,13 @@ function AICompetencySection() {
     let cancelled = false
     ;(async () => {
       try {
-        const res = await client.get('/self-efficacy/')
+        const res = await client.get('/self-efficacy/', { params: { lang } })
         if (!cancelled) setData(res.data)
       } catch { /* non-teachers get 403 — the card is hidden below */ }
       finally { if (!cancelled) setLoaded(true) }
     })()
     return () => { cancelled = true }
-  }, [])
+  }, [lang])
 
   // Available to every role (teachers, content creators, partners, admins).
   if (!user) return null

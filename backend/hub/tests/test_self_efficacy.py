@@ -57,6 +57,16 @@ class SelfEfficacyGetTests(APITestCase):
         self.client.force_authenticate(creator)
         self.assertEqual(self.client.get(reverse('self-efficacy')).status_code, 200)
 
+    def test_lang_query_param_overrides_profile_language(self):
+        # profile.language defaults to 'en'; ?lang=el must still localize
+        # (covers the just-after-registration case where profile lags the UI).
+        name_en = self.client.get(reverse('self-efficacy')).data['dimensions'][0]['name']
+        res_el = self.client.get(reverse('self-efficacy'), {'lang': 'el'})
+        name_el = res_el.data['dimensions'][0]['name']
+        dim = OnboardingDimension.objects.filter(is_active=True).order_by('order').first()
+        self.assertEqual(name_el, dim.translations['el'])  # seeded Greek name
+        self.assertNotEqual(name_el, name_en)
+
     def test_localized_to_user_language(self):
         dim = OnboardingDimension.objects.filter(is_active=True).first()
         dim.translations = {'el': 'Γνώση ΤΝ'}

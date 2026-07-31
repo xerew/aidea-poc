@@ -12,7 +12,10 @@ const LIKERT_KEYS = ['stronglyDisagree', 'disagree', 'neither', 'agree', 'strong
 const BAND_TO_SCORE = { low: 1, moderate: 3, high: 5 }
 
 export default function AICompetencyPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  // Localize backend content (dimension names, questions) to the active UI
+  // language, which can be ahead of the stored profile language after register.
+  const lang = i18n.language?.split('-')[0]
   const navigate = useNavigate()
   const { user, updateUser } = useAuth()
   const [data, setData]       = useState(null)
@@ -25,7 +28,7 @@ export default function AICompetencyPage() {
     let cancelled = false
     ;(async () => {
       try {
-        const res = await client.get('/self-efficacy/')
+        const res = await client.get('/self-efficacy/', { params: { lang } })
         if (cancelled) return
         setData(res.data)
         setAnswers(res.data.answers || {})
@@ -38,7 +41,7 @@ export default function AICompetencyPage() {
       }
     })()
     return () => { cancelled = true }
-  }, [t])
+  }, [t, lang])
 
   const total = data?.total ?? 24
   const answeredCount = Object.keys(answers).length
@@ -51,7 +54,7 @@ export default function AICompetencyPage() {
     setSaving(true)
     setError('')
     try {
-      const res = await client.post('/self-efficacy/', { answers })
+      const res = await client.post('/self-efficacy/', { answers }, { params: { lang } })
       setData(res.data)
       setAnswers(res.data.answers || {})
       // Fully finished (first completion or a finished retake) → show results.
@@ -79,7 +82,7 @@ export default function AICompetencyPage() {
     setSaving(true)
     setError('')
     try {
-      const res = await client.post('/self-efficacy/retake/')
+      const res = await client.post('/self-efficacy/retake/', null, { params: { lang } })
       setData(res.data)
       setAnswers(res.data.answers || {})
       setEditing(true)

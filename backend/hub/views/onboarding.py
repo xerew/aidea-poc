@@ -109,9 +109,15 @@ def self_efficacy_payload(request):
     display_source = profile.self_efficacy_answers if completed else working
     display_results = compute_results(display_source, dimensions)
 
+    # Localize to the language the user is actually viewing in: the frontend
+    # sends its active UI language (?lang=), which can be ahead of the stored
+    # profile.language right after registration/switching. Fall back to the
+    # profile language, then to the English base text.
+    lang = request.query_params.get('lang') or profile.language
+
     scores = {d['slug']: d for d in display_results['dimensions']}
     dim_data = OnboardingDimensionSerializer(
-        dimensions, many=True, context={'lang': profile.language},
+        dimensions, many=True, context={'lang': lang},
     ).data
     for dim in dim_data:
         s = scores.get(dim['slug'], {})
