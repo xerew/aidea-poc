@@ -17,6 +17,12 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
+.onboarding-lang {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
 .onboarding-header {
   margin-bottom: 2rem;
 }

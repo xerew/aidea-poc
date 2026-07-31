@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import { subjectLabel } from '../lib/subjects'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 import './OnboardingPage.css'
 
 const STEP_DEFS = [
@@ -123,6 +124,9 @@ export default function OnboardingPage() {
   return (
     <div className="onboarding-container">
       <div className="onboarding-card">
+        <div className="onboarding-lang">
+          <LanguageSwitcher />
+        </div>
         <div className="onboarding-header">
           <h1 className="onboarding-title">{t('onboarding.title')}</h1>
           <p className="onboarding-subtitle">
