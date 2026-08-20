@@ -812,7 +812,8 @@ export default function ModuleEditorPage() {
 
   const isAuthor = courseAuthorId != null && user?.id === courseAuthorId
   const isAdmin = user?.profile?.user_type === 'admin'
-  const locked = isPublished && !isAuthor && !isAdmin
+  // Only the author (or an admin) may edit a course — draft or published.
+  const locked = !isAuthor && !isAdmin
 
   return (
     <div className="module-editor-page">

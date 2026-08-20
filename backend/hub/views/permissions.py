@@ -55,10 +55,10 @@ class IsReviewer(BasePermission):
         )
 
 
-def can_edit_published(user, course):
-    """Published courses may be edited by their author, or by an admin (who
-    manages everything). Content creators and partners can still edit their own
-    published courses via the author check."""
+def can_edit_course(user, course):
+    """Who may edit or publish a course (draft or published) and its modules,
+    lessons and translations: only the author, or an admin (who manages
+    everything). Other content creators / partners cannot touch it."""
     profile = getattr(user, 'profile', None)
     is_admin = profile is not None and profile.user_type == UserProfile.UserType.ADMIN
     return course.created_by_id == user.id or is_admin

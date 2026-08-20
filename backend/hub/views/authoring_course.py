@@ -10,7 +10,7 @@ from hub.translation_sync import resync_course_meta
 from .permissions import (
     IsContentCreator,
     IsReviewer,
-    can_edit_published,
+    can_edit_course,
     can_review_translation,
 )
 
@@ -67,9 +67,9 @@ class AuthoringCourseDetailView(APIView):
         course = self._get_course(pk)
         if not course:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if course.is_published and not can_edit_published(request.user, course):
+        if not can_edit_course(request.user, course):
             return Response(
-                {'detail': 'Published courses can only be edited by their author.'},
+                {'detail': 'Only the author can edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -141,6 +141,11 @@ class AuthoringCoursePublishView(APIView):
             course = Course.objects.get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not can_edit_course(request.user, course):
+            return Response(
+                {'detail': 'Only the author can publish this course.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         if course.is_published:
             return Response({'detail': 'Course is already published.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -164,9 +169,9 @@ class AuthoringCourseUnpublishView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         if not course.is_published:
             return Response({'detail': 'Course is not published.'}, status=status.HTTP_400_BAD_REQUEST)
-        if not can_edit_published(request.user, course):
+        if not can_edit_course(request.user, course):
             return Response(
-                {'detail': 'Published courses can only be unpublished by their author.'},
+                {'detail': 'Only the author can unpublish this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -188,7 +193,7 @@ class AuthoringCourseTranslateView(APIView):
             course = Course.objects.get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if course.is_published and not can_edit_published(request.user, course):
+        if not can_edit_course(request.user, course):
             return Response({'detail': 'Only the author can translate this course.'},
                             status=status.HTTP_403_FORBIDDEN)
         language = request.data.get('language')

@@ -525,6 +525,7 @@
       "confirmPublish": "Diesen Kurs veröffentlichen? Lernende sehen ihn sofort. Als Autor bzw. Autorin können Sie ihn weiterhin bearbeiten oder die Veröffentlichung aufheben.",
       "confirmUnpublish": "Veröffentlichung dieses Kurses aufheben? Lernende sehen ihn dann nicht mehr im Katalog.",
       "publishedBannerLocked": "Dieser Kurs ist veröffentlicht — nur der Autor bzw. die Autorin kann ihn bearbeiten.",
+      "readOnlyBanner": "Sie können diesen Kurs ansehen, aber nur sein Autor kann ihn bearbeiten.",
       "publishedBannerUnlocked": "Dieser Kurs ist veröffentlicht — Ihre Änderungen werden sofort live geschaltet.",
       "authorLabel": "Autor/in: {{name}}",
       "modulePlaceholder": "Modultitel",

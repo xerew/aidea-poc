@@ -525,6 +525,7 @@
       "confirmPublish": "Pubblicare questo corso? Gli studenti lo vedranno immediatamente. Come autore potrai comunque modificarlo o rimuoverne la pubblicazione.",
       "confirmUnpublish": "Rimuovere la pubblicazione di questo corso? Gli studenti non lo vedranno più nel catalogo.",
       "publishedBannerLocked": "Questo corso è pubblicato — solo l'autore può modificarlo.",
+      "readOnlyBanner": "Puoi visualizzare questo corso, ma solo il suo autore può modificarlo.",
       "publishedBannerUnlocked": "Questo corso è pubblicato — le tue modifiche vengono pubblicate immediatamente.",
       "authorLabel": "Autore: {{name}}",
       "modulePlaceholder": "Titolo del modulo",

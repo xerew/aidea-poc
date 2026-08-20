@@ -26,7 +26,7 @@ class AuthoringModuleCreateTestCase(AuthoringTestCase):
         self.assertEqual(module.order, 3)
 
     def test_first_module_gets_order_one(self):
-        empty_course = Course.objects.create(title='Empty', pillar=self.pillar1)
+        empty_course = Course.objects.create(title='Empty', pillar=self.pillar1, created_by=self.creator)
         url = reverse('authoring-module-create', kwargs={'pk': empty_course.pk})
         response = self.client.post(url, {'title': 'First', 'duration_minutes': 20})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -222,6 +222,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
     def test_create_lesson_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
+        self._login_as(self.other_creator)  # a non-author is locked out
         response = self.client.post(self.url, self.valid_payload)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -378,6 +379,7 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
     def test_patch_lesson_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
+        self._login_as(self.other_creator)  # a non-author is locked out
         response = self.client.patch(self.url, {'title': 'Hacked'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -405,6 +407,7 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
     def test_delete_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
+        self._login_as(self.other_creator)  # a non-author is locked out
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -629,6 +632,7 @@ class AuthoringModuleReorderTestCase(AuthoringTestCase):
     def test_reorder_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
+        self._login_as(self.other_creator)  # a non-author is locked out
         response = self.client.patch(
             self.url, {'order': [self.module1.pk, self.module2.pk]}, format='json',
         )
@@ -717,6 +721,7 @@ class AuthoringLessonReorderTestCase(AuthoringTestCase):
     def test_reorder_on_published_course_returns_403(self):
         self.course.is_published = True
         self.course.save()
+        self._login_as(self.other_creator)  # a non-author is locked out
         response = self.client.patch(
             self.url, {'order': [self.lesson1.pk, self.lesson2.pk]}, format='json',
         )

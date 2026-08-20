@@ -525,6 +525,7 @@
       "confirmPublish": "Julkaistaanko tämä kurssi? Oppijat näkevät sen heti. Tekijänä voit silti muokata sitä tai poistaa sen julkaisusta.",
       "confirmUnpublish": "Poistetaanko tämä kurssi julkaisusta? Oppijat eivät enää näe sitä kurssiluettelossa.",
       "publishedBannerLocked": "Tämä kurssi on julkaistu — vain sen tekijä voi muokata sitä.",
+      "readOnlyBanner": "Voit tarkastella tätä kurssia, mutta vain sen tekijä voi muokata sitä.",
       "publishedBannerUnlocked": "Tämä kurssi on julkaistu — muutoksesi tulevat näkyviin heti.",
       "authorLabel": "Tekijä: {{name}}",
       "modulePlaceholder": "Moduulin nimi",

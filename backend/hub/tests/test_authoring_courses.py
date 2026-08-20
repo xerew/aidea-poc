@@ -14,6 +14,10 @@ class AuthoringTestCase(APITestCase):
         self.creator = User.objects.create_user(username='creator1', password='testpass123')
         UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
 
+        # A second content creator who is NOT the author of self.course.
+        self.other_creator = User.objects.create_user(username='creator2', password='testpass123')
+        UserProfile.objects.create(user=self.other_creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+
         self.teacher = User.objects.create_user(username='teacher1', password='testpass123')
         UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
 
@@ -30,6 +34,7 @@ class AuthoringTestCase(APITestCase):
             level='beginner',
             duration_hours=4,
             learning_outcomes=['Outcome A', 'Outcome B'],
+            created_by=self.creator,
         )
         self.module1 = Module.objects.create(
             title='Module 1', description='First module.', course=self.course,
@@ -206,15 +211,49 @@ class CoursePublishTestCase(AuthoringTestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+    def test_non_author_creator_cannot_publish(self):
+        self._login_as(self.other_creator)
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.course.refresh_from_db()
+        self.assertFalse(self.course.is_published)
+
+
+# ── Draft courses are author-locked too ───────────────────────────────────────
+
+class DraftCourseAuthorLockTestCase(AuthoringTestCase):
+    """A content creator cannot edit or publish another creator's DRAFT course."""
+
+    def setUp(self):
+        super().setUp()
+        self._login_as(self.other_creator)  # not the author of self.course
+
+    def test_non_author_cannot_patch_draft_course(self):
+        url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
+        res = self.client.patch(url, {'title': 'Nope'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.title, 'Intro to AI')
+
+    def test_non_author_cannot_add_module_to_draft(self):
+        url = reverse('authoring-module-create', kwargs={'pk': self.course.pk})
+        res = self.client.post(url, {'title': 'New', 'duration_minutes': 10}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_author_can_still_read_draft(self):
+        url = reverse('authoring-course-detail', kwargs={'pk': self.course.pk})
+        self.assertEqual(self.client.get(url).status_code, status.HTTP_200_OK)
+
 
 # ── Locked editing after publish ──────────────────────────────────────────────
 
 class PublishedCourseLockTestCase(AuthoringTestCase):
-    """Once published, courses and their modules cannot be mutated."""
+    """A non-author content creator cannot mutate someone else's published
+    course or its modules (they may only read it)."""
 
     def setUp(self):
         super().setUp()
-        self._login_as(self.creator)
+        self._login_as(self.other_creator)
         self.course.is_published = True
         self.course.save()
 

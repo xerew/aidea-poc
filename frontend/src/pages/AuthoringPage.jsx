@@ -177,7 +177,7 @@ export default function AuthoringPage() {
                     className="edit-btn"
                     onClick={() => navigate(`/authoring/courses/${course.id}`)}
                   >
-                    <Pencil size={14} /> {course.is_published && course.created_by_id !== user?.id && user?.profile?.user_type !== 'admin' ? t('authoring.view') : t('authoring.edit')}
+                    <Pencil size={14} /> {course.created_by_id !== user?.id && user?.profile?.user_type !== 'admin' ? t('authoring.view') : t('authoring.edit')}
                   </button>
                   <button
                     className="authoring-export-btn"

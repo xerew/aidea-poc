@@ -525,6 +525,7 @@
       "confirmPublish": "Publish this course? Learners will see it immediately. As the author you can still edit or unpublish it.",
       "confirmUnpublish": "Unpublish this course? Learners will no longer see it in the catalog.",
       "publishedBannerLocked": "This course is published — only its author can edit it.",
+      "readOnlyBanner": "You can view this course, but only its author can edit it.",
       "publishedBannerUnlocked": "This course is published — your edits go live immediately.",
       "authorLabel": "Author: {{name}}",
       "modulePlaceholder": "Module title",

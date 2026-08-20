@@ -340,7 +340,8 @@ export default function CourseEditorPage() {
   const pillarColor = PILLAR_COLOR[currentPillar?.slug] ?? 'blue'
   const isAuthor = author.id != null && user?.id === author.id
   const isAdmin = user?.profile?.user_type === 'admin'
-  const locked = isPublished && !isAuthor && !isAdmin
+  // Only the author (or an admin) may edit a course — draft or published.
+  const locked = !isAuthor && !isAdmin
 
   return (
     <div className="course-editor">
@@ -357,6 +358,14 @@ export default function CourseEditorPage() {
           {locked
             ? t('authoring.editor.publishedBannerLocked')
             : t('authoring.editor.publishedBannerUnlocked')}
+        </div>
+      )}
+
+      {/* Read-only banner for a draft you didn't author */}
+      {locked && !isPublished && (
+        <div className="published-banner">
+          <Lock size={14} />
+          {t('authoring.editor.readOnlyBanner')}
         </div>
       )}
 

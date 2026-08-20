@@ -8,7 +8,7 @@ from hub.serializers import ModuleAuthoringSerializer, ModuleWithLessonsSerializ
 from hub.translation import LANGUAGE_NAMES
 from hub.translation_sync import resync_module
 
-from .permissions import IsContentCreator, can_edit_published
+from .permissions import IsContentCreator, can_edit_course
 
 TRANSLATABLE_MODULE_FIELDS = ['title', 'description']
 
@@ -22,9 +22,9 @@ class AuthoringModuleView(APIView):
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        if course.is_published and not can_edit_published(request.user, course):
+        if not can_edit_course(request.user, course):
             return Response(
-                {'detail': 'Published courses can only be edited by their author.'},
+                {'detail': 'Only the author can edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -58,9 +58,9 @@ class AuthoringModuleDetailView(APIView):
         module = self._get_module(pk, module_pk)
         if not module:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if module.course.is_published and not can_edit_published(request.user, module.course):
+        if not can_edit_course(request.user, module.course):
             return Response(
-                {'detail': 'Published courses can only be edited by their author.'},
+                {'detail': 'Only the author can edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -105,9 +105,9 @@ class AuthoringModuleDetailView(APIView):
         module = self._get_module(pk, module_pk)
         if not module:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if module.course.is_published and not can_edit_published(request.user, module.course):
+        if not can_edit_course(request.user, module.course):
             return Response(
-                {'detail': 'Published courses can only be edited by their author.'},
+                {'detail': 'Only the author can edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -130,9 +130,9 @@ class AuthoringModuleReorderView(APIView):
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        if course.is_published and not can_edit_published(request.user, course):
+        if not can_edit_course(request.user, course):
             return Response(
-                {'detail': 'Published courses can only be edited by their author.'},
+                {'detail': 'Only the author can edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

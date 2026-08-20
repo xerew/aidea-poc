@@ -525,6 +525,7 @@
       "confirmPublish": "Publisere dette kurset? Elever vil se det umiddelbart. Som forfatter kan du fortsatt redigere eller avpublisere det.",
       "confirmUnpublish": "Avpublisere dette kurset? Elever vil ikke lenger se det i katalogen.",
       "publishedBannerLocked": "Dette kurset er publisert — kun forfatteren kan redigere det.",
+      "readOnlyBanner": "Du kan se dette kurset, men bare forfatteren kan redigere det.",
       "publishedBannerUnlocked": "Dette kurset er publisert — endringene dine publiseres umiddelbart.",
       "authorLabel": "Forfatter: {{name}}",
       "modulePlaceholder": "Modultittel",
