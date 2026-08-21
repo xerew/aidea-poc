@@ -9,8 +9,15 @@ import logging
 from django.conf import settings
 from django.core import signing
 from django.core.mail import send_mail
+from django.utils.html import escape
 
 logger = logging.getLogger(__name__)
+
+
+def _html_text(value):
+    """Escape user-supplied text for safe inclusion in an HTML email, keeping
+    line breaks."""
+    return escape(value or '').replace('\n', '<br>')
 
 # ── Email-verification token (stateless, signed, 7-day expiry) ────────────────
 _VERIFY_SALT = 'aidea.email-verify'
@@ -170,7 +177,7 @@ def send_assignment_reviewed_email(submission):
         f'reviewed and {outcome}.',
     ]
     if submission.feedback:
-        paragraphs.append(f'<strong>Reviewer feedback:</strong><br>{submission.feedback}')
+        paragraphs.append(f'<strong>Reviewer feedback:</strong><br>{_html_text(submission.feedback)}')
     if not approved:
         paragraphs.append('Open the lesson to make the requested changes and resubmit.')
     _send(
@@ -183,3 +190,35 @@ def send_assignment_reviewed_email(submission):
         cta_label='Open the lesson',
         cta_link=link,
     )
+
+
+def send_access_request_email(access_request):
+    """Notify every admin that a user has requested content-creator access."""
+    from django.contrib.auth.models import User
+
+    requester = access_request.user
+    req_name = requester.get_full_name() or requester.username
+    contact = requester.email or requester.username
+    link = f'{settings.FRONTEND_BASE_URL}/admin/users'
+    admins = (
+        User.objects.filter(profile__user_type='admin', is_active=True)
+        .exclude(email='')
+    )
+    for admin in admins:
+        _send(
+            to=admin.email,
+            subject='New content-creator access request',
+            name=admin.get_full_name() or admin.username,
+            tag='Access request',
+            heading='New content-creator access request',
+            paragraphs=[
+                f'<strong>{_html_text(req_name)}</strong> ({_html_text(contact)}) has '
+                'requested content-creator access.',
+                f'<strong>Their message:</strong><br>{_html_text(access_request.message)}',
+                'Review it in the Admin panel under Access Requests, where you can '
+                'approve it as a content creator or an AIDEA partner.',
+            ],
+            cta_label='Open the Admin panel',
+            cta_link=link,
+        )
+

@@ -74,6 +74,26 @@ class VerifyEmailTests(APITestCase):
         self.assertEqual(len(mail.outbox), 0)
 
 
+class AccessRequestEmailTests(APITestCase):
+    def setUp(self):
+        for name in ('admin_a', 'admin_b'):
+            u = User.objects.create_user(username=name, email=f'{name}@example.com', password='pw')
+            UserProfile.objects.create(user=u, user_type=UserProfile.UserType.ADMIN)
+        # An admin without an email is skipped.
+        noemail = User.objects.create_user(username='admin_c', password='pw')
+        UserProfile.objects.create(user=noemail, user_type=UserProfile.UserType.ADMIN)
+        self.teacher = User.objects.create_user(username='wants_access', email='w@example.com', password='pw')
+        UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
+
+    def test_request_emails_all_admins_with_email(self):
+        self.client.force_authenticate(self.teacher)
+        res = self.client.post(reverse('access-request'), {'message': 'I make courses.'}, format='json')
+        self.assertEqual(res.status_code, 201)
+        recipients = sorted(m.to[0] for m in mail.outbox)
+        self.assertEqual(recipients, ['admin_a@example.com', 'admin_b@example.com'])
+        self.assertIn('access request', mail.outbox[0].subject.lower())
+
+
 class AssignmentReviewedEmailTests(APITestCase):
     def setUp(self):
         self.reviewer = User.objects.create_user(username='rev', password='pw')

@@ -28,6 +28,8 @@ class AccessRequestView(APIView):
         if not message:
             return Response({'error': 'message is required.'}, status=400)
         req = AccessRequest.objects.create(user=request.user, message=message)
+        from hub.emails import send_access_request_email
+        send_access_request_email(req)
         return Response(AccessRequestSerializer(req).data, status=201)
 
 
