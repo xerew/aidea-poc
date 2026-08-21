@@ -219,4 +219,7 @@ class ReviewActionView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        from hub.emails import send_assignment_reviewed_email
+        send_assignment_reviewed_email(submission)
+
         return Response(AssignmentSubmissionSerializer(submission).data)

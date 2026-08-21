@@ -793,7 +793,10 @@
     "openInNewTab": "Åpne i ny fane ↗ (hvis forhåndsvisningen ikke lastes)"
   },
   "layout": {
-    "denialBanner": "Forespørselen din om tilgang som innholdsskaper ble avslått: «{{reason}}»"
+    "denialBanner": "Forespørselen din om tilgang som innholdsskaper ble avslått: «{{reason}}»",
+    "verifyBanner": "Bekreft e-postadressen din for å sikre kontoen din.",
+    "verifyResend": "Send e-post på nytt",
+    "verifyResent": "Bekreftelses-e-post sendt."
   },
   "search": {
     "noResults": "Ingen kurs funnet"
@@ -970,5 +973,14 @@
     "music": "Musikk",
     "physical-education": "Kroppsøving",
     "general": "Generelt / Alle"
+  },
+  "verifyEmail": {
+    "verifying": "Bekrefter e-posten din…",
+    "successTitle": "E-post bekreftet",
+    "successBody": "Takk — e-postadressen din er nå bekreftet.",
+    "errorTitle": "Ugyldig eller utløpt lenke",
+    "errorBody": "Denne bekreftelseslenken er ugyldig eller har utløpt. Du kan be om en ny fra banneret i appen.",
+    "goToApp": "Fortsett til AIDEA",
+    "goToLogin": "Gå til innlogging"
   }
 }

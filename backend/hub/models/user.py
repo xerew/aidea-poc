@@ -47,6 +47,7 @@ class UserProfile(models.Model):
     user                 = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type            = models.CharField(max_length=20, choices=UserType.choices, default=UserType.TEACHER)
     avatar_initials      = models.CharField(max_length=4, blank=True)
+    email_verified       = models.BooleanField(default=False)
     competency_score     = models.PositiveSmallIntegerField(default=0)
     subject              = models.ForeignKey(
         'hub.Subject', on_delete=models.SET_NULL, null=True, blank=True, related_name='teachers',

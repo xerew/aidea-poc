@@ -793,7 +793,10 @@
     "openInNewTab": "Avaa uudessa välilehdessä ↗ (jos esikatselu ei lataudu)"
   },
   "layout": {
-    "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”"
+    "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”",
+    "verifyBanner": "Vahvista sähköpostiosoitteesi suojataksesi tilisi.",
+    "verifyResend": "Lähetä sähköposti uudelleen",
+    "verifyResent": "Vahvistussähköposti lähetetty."
   },
   "search": {
     "noResults": "Kursseja ei löytynyt"
@@ -970,5 +973,14 @@
     "music": "Musiikki",
     "physical-education": "Liikunta",
     "general": "Yleinen / Kaikki"
+  },
+  "verifyEmail": {
+    "verifying": "Vahvistetaan sähköpostiasi…",
+    "successTitle": "Sähköposti vahvistettu",
+    "successBody": "Kiitos — sähköpostiosoitteesi on nyt vahvistettu.",
+    "errorTitle": "Linkki virheellinen tai vanhentunut",
+    "errorBody": "Tämä vahvistuslinkki on virheellinen tai vanhentunut. Voit pyytää uuden sovelluksen ilmoituspalkista.",
+    "goToApp": "Jatka AIDEAan",
+    "goToLogin": "Siirry kirjautumiseen"
   }
 }

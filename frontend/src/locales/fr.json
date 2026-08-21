@@ -793,7 +793,10 @@
     "openInNewTab": "Ouvrir dans un nouvel onglet ↗ (si l’aperçu ne se charge pas)"
   },
   "layout": {
-    "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »"
+    "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »",
+    "verifyBanner": "Veuillez confirmer votre adresse e-mail pour sécuriser votre compte.",
+    "verifyResend": "Renvoyer l'e-mail",
+    "verifyResent": "E-mail de confirmation envoyé."
   },
   "search": {
     "noResults": "Aucun cours trouvé"
@@ -970,5 +973,14 @@
     "music": "Musique",
     "physical-education": "Éducation physique",
     "general": "Général / Tout"
+  },
+  "verifyEmail": {
+    "verifying": "Confirmation de votre e-mail…",
+    "successTitle": "E-mail confirmé",
+    "successBody": "Merci — votre adresse e-mail est maintenant confirmée.",
+    "errorTitle": "Lien invalide ou expiré",
+    "errorBody": "Ce lien de confirmation est invalide ou a expiré. Vous pouvez en demander un nouveau depuis la bannière de l'application.",
+    "goToApp": "Continuer vers AIDEA",
+    "goToLogin": "Aller à la connexion"
   }
 }

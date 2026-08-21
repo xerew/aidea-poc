@@ -104,7 +104,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model  = UserProfile
         fields = ['user_type', 'avatar_initials', 'onboarding_completed',
                   'preferred_pillars', 'learning_style', 'gender', 'country', 'avatar_url',
-                  'competency_score', 'language']
+                  'competency_score', 'language', 'email_verified']
 
 
 class UserSerializer(serializers.ModelSerializer):

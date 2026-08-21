@@ -793,7 +793,10 @@
     "openInNewTab": "Öppna i ny flik ↗ (om förhandsvisningen inte laddas)"
   },
   "layout": {
-    "denialBanner": "Din begäran om åtkomst som innehållsskapare avslogs: ”{{reason}}”"
+    "denialBanner": "Din begäran om åtkomst som innehållsskapare avslogs: ”{{reason}}”",
+    "verifyBanner": "Bekräfta din e-postadress för att skydda ditt konto.",
+    "verifyResend": "Skicka e-post igen",
+    "verifyResent": "Bekräftelsemejl skickat."
   },
   "search": {
     "noResults": "Inga kurser hittades"
@@ -970,5 +973,14 @@
     "music": "Musik",
     "physical-education": "Idrott och hälsa",
     "general": "Allmänt / Alla"
+  },
+  "verifyEmail": {
+    "verifying": "Bekräftar din e-post…",
+    "successTitle": "E-post bekräftad",
+    "successBody": "Tack — din e-postadress är nu bekräftad.",
+    "errorTitle": "Länken är ogiltig eller har gått ut",
+    "errorBody": "Den här bekräftelselänken är ogiltig eller har gått ut. Du kan begära en ny från bannern i appen.",
+    "goToApp": "Fortsätt till AIDEA",
+    "goToLogin": "Gå till inloggning"
   }
 }

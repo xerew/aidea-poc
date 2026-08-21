@@ -793,7 +793,10 @@
     "openInNewTab": "Abrir en una pestaña nueva ↗ (si la vista previa no carga)"
   },
   "layout": {
-    "denialBanner": "Tu solicitud de acceso como Creador de contenido fue rechazada: «{{reason}}»"
+    "denialBanner": "Tu solicitud de acceso como Creador de contenido fue rechazada: «{{reason}}»",
+    "verifyBanner": "Confirma tu dirección de correo electrónico para proteger tu cuenta.",
+    "verifyResend": "Reenviar correo",
+    "verifyResent": "Correo de confirmación enviado."
   },
   "search": {
     "noResults": "No se encontraron cursos"
@@ -970,5 +973,14 @@
     "music": "Música",
     "physical-education": "Educación física",
     "general": "General / Todo"
+  },
+  "verifyEmail": {
+    "verifying": "Confirmando tu correo…",
+    "successTitle": "Correo confirmado",
+    "successBody": "Gracias — tu dirección de correo ya está confirmada.",
+    "errorTitle": "Enlace no válido o caducado",
+    "errorBody": "Este enlace de confirmación no es válido o ha caducado. Puedes solicitar uno nuevo desde el aviso en la aplicación.",
+    "goToApp": "Continuar a AIDEA",
+    "goToLogin": "Ir a iniciar sesión"
   }
 }

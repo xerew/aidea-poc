@@ -68,6 +68,7 @@ from .views import (
     RecommendationEventView,
     RecommendationsView,
     RegisterView,
+    ResendVerificationView,
     ReviewActionView,
     ReviewQueueView,
     SelfEfficacyRetakeView,
@@ -78,6 +79,7 @@ from .views import (
     SubjectsView,
     SubmissionUploadView,
     UnreadMessageCountView,
+    VerifyEmailView,
 )
 
 urlpatterns = [
@@ -86,6 +88,8 @@ urlpatterns = [
     path('auth/logout/', LogoutView.as_view(), name='auth-logout'),
     path('auth/me/', MeView.as_view(), name='auth-me'),
     path('auth/register/', RegisterView.as_view(), name='auth-register'),
+    path('auth/verify-email/', VerifyEmailView.as_view(), name='auth-verify-email'),
+    path('auth/verify-email/resend/', ResendVerificationView.as_view(), name='auth-verify-email-resend'),
     path('auth/password-reset/', PasswordResetRequestView.as_view(), name='auth-password-reset'),
     path('auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='auth-password-reset-confirm'),
     path('courses/', CoursesView.as_view(), name='courses'),

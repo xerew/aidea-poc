@@ -17,7 +17,14 @@ from .assignments import (
     ReviewQueueView,
     SubmissionUploadView,
 )
-from .auth import LoginView, LogoutView, MeView, RegisterView
+from .auth import (
+    LoginView,
+    LogoutView,
+    MeView,
+    RegisterView,
+    ResendVerificationView,
+    VerifyEmailView,
+)
 from .authoring_course import (
     AuthoringCourseDetailView,
     AuthoringCoursePublishView,
@@ -140,6 +147,8 @@ __all__ = [
     'LogoutView',
     'MeView',
     'RegisterView',
+    'VerifyEmailView',
+    'ResendVerificationView',
     'ConversationDetailView',
     'ConversationListView',
     'UnreadMessageCountView',

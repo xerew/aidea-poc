@@ -793,7 +793,10 @@
     "openInNewTab": "Open in new tab ↗ (if the preview does not load)"
   },
   "layout": {
-    "denialBanner": "Your Content Creator access request was denied: “{{reason}}”"
+    "denialBanner": "Your Content Creator access request was denied: “{{reason}}”",
+    "verifyBanner": "Please confirm your email address to secure your account.",
+    "verifyResend": "Resend email",
+    "verifyResent": "Confirmation email sent."
   },
   "search": {
     "noResults": "No courses found"
@@ -970,5 +973,14 @@
     "music": "Music",
     "physical-education": "Physical Education",
     "general": "General / All"
+  },
+  "verifyEmail": {
+    "verifying": "Confirming your email…",
+    "successTitle": "Email confirmed",
+    "successBody": "Thanks — your email address is now confirmed.",
+    "errorTitle": "Link invalid or expired",
+    "errorBody": "This confirmation link is invalid or has expired. You can request a new one from the banner in the app.",
+    "goToApp": "Continue to AIDEA",
+    "goToLogin": "Go to login"
   }
 }
