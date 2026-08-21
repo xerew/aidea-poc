@@ -144,6 +144,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Celery
 REDIS_URL = os.getenv('REDIS_URL', '')
+
+# Shared cache — backs DRF throttling so login/reset limits hold across all
+# gunicorn workers. Redis in production; in-memory locally / in tests.
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'KEY_PREFIX': 'aidea',
+        }
+    }
+
 CELERY_BROKER_URL = REDIS_URL or 'memory://'
 CELERY_RESULT_BACKEND = REDIS_URL or 'cache+memory://'
 if 'test' in sys.argv or not REDIS_URL:
@@ -225,7 +237,21 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    # Applied only to the auth endpoints that opt in via throttle_classes.
+    'DEFAULT_THROTTLE_RATES': {
+        'login_user':      '10/min',   # per account being logged into
+        'login_ip':        '60/min',   # per source IP (backstop; roomy for school NAT)
+        'pw_reset_email':  '3/hour',   # per target email
+        'pw_reset_ip':     '15/hour',  # per source IP (backstop)
+    },
 }
+
+# Throttling off by default under the test runner; test_throttling opts in with
+# override_settings so ordinary tests can log in freely.
+if 'test' in sys.argv:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'] = {
+        key: None for key in REST_FRAMEWORK['DEFAULT_THROTTLE_RATES']
+    }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),

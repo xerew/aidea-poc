@@ -13,6 +13,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.throttling import PasswordResetEmailThrottle, PasswordResetIPThrottle
+
 logger = logging.getLogger(__name__)
 
 
@@ -86,6 +88,8 @@ class PasswordResetRequestView(APIView):
     email addresses have accounts.
     """
     permission_classes = [AllowAny]
+    # Limit reset requests per target email and per source IP.
+    throttle_classes = [PasswordResetEmailThrottle, PasswordResetIPThrottle]
 
     def post(self, request):
         email = str(request.data.get('email', '')).strip()

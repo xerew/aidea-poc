@@ -5,11 +5,14 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from hub.serializers import AideaTokenObtainPairSerializer, RegisterSerializer, UserSerializer
+from hub.throttling import LoginIPThrottle, LoginUserThrottle
 
 
 class LoginView(TokenObtainPairView):
     permission_classes = [AllowAny]
     serializer_class = AideaTokenObtainPairSerializer
+    # Brute-force protection: cap attempts per account and per source IP.
+    throttle_classes = [LoginUserThrottle, LoginIPThrottle]
 
 
 class LogoutView(APIView):
