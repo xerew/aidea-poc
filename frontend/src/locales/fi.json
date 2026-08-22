@@ -754,6 +754,16 @@
       "declined": "Kieltäytyi",
       "questions": "Kysymykset",
       "export": "Vie tiedot (XLSX)"
+    },
+    "maintenance": {
+      "title": "Huoltobanneri",
+      "description": "Näytä kaikille käyttäjille ilmoitus, että alusta on huollon vuoksi poissa käytöstä suunniteltuna ajankohtana.",
+      "enabled": "Näytä huoltobanneri",
+      "from": "Alkaa",
+      "to": "Päättyy",
+      "message": "Syy (valinnainen)",
+      "messagePlaceholder": "esim. alustan päivitys",
+      "save": "Tallenna banneri"
     }
   },
   "analytics": {
@@ -808,7 +818,9 @@
     "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”",
     "verifyBanner": "Vahvista sähköpostiosoitteesi suojataksesi tilisi.",
     "verifyResend": "Lähetä sähköposti uudelleen",
-    "verifyResent": "Vahvistussähköposti lähetetty."
+    "verifyResent": "Vahvistussähköposti lähetetty.",
+    "maintenanceBanner": "Suunniteltu huolto: AIDEA ei ole käytettävissä {{start}} – {{end}}.",
+    "maintenanceBannerGeneric": "Suunniteltu huolto on tulossa."
   },
   "search": {
     "noResults": "Kursseja ei löytynyt"

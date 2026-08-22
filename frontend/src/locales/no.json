@@ -754,6 +754,16 @@
       "declined": "Avslo",
       "questions": "Spørsmål",
       "export": "Eksporter data (XLSX)"
+    },
+    "maintenance": {
+      "title": "Vedlikeholdsbanner",
+      "description": "Vis alle brukere en melding om at plattformen er utilgjengelig for vedlikehold i et planlagt tidsrom.",
+      "enabled": "Vis vedlikeholdsbanner",
+      "from": "Fra",
+      "to": "Til",
+      "message": "Årsak (valgfritt)",
+      "messagePlaceholder": "f.eks. plattformoppdatering",
+      "save": "Lagre banner"
     }
   },
   "analytics": {
@@ -808,7 +818,9 @@
     "denialBanner": "Forespørselen din om tilgang som innholdsskaper ble avslått: «{{reason}}»",
     "verifyBanner": "Bekreft e-postadressen din for å sikre kontoen din.",
     "verifyResend": "Send e-post på nytt",
-    "verifyResent": "Bekreftelses-e-post sendt."
+    "verifyResent": "Bekreftelses-e-post sendt.",
+    "maintenanceBanner": "Planlagt vedlikehold: AIDEA vil være utilgjengelig fra {{start}} til {{end}}.",
+    "maintenanceBannerGeneric": "Planlagt vedlikehold er planlagt."
   },
   "search": {
     "noResults": "Ingen kurs funnet"

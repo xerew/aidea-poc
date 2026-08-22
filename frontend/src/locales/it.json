@@ -754,6 +754,16 @@
       "declined": "Rifiutato",
       "questions": "Domande",
       "export": "Esporta dati (XLSX)"
+    },
+    "maintenance": {
+      "title": "Banner di manutenzione",
+      "description": "Mostra a tutti gli utenti un avviso che la piattaforma sarà offline per manutenzione durante un periodo programmato.",
+      "enabled": "Mostra il banner di manutenzione",
+      "from": "Da",
+      "to": "A",
+      "message": "Motivo (facoltativo)",
+      "messagePlaceholder": "es. aggiornamento della piattaforma",
+      "save": "Salva banner"
     }
   },
   "analytics": {
@@ -808,7 +818,9 @@
     "denialBanner": "La tua richiesta di accesso come Creatore di contenuti è stata rifiutata: «{{reason}}»",
     "verifyBanner": "Conferma il tuo indirizzo email per proteggere il tuo account.",
     "verifyResend": "Invia di nuovo l'email",
-    "verifyResent": "Email di conferma inviata."
+    "verifyResent": "Email di conferma inviata.",
+    "maintenanceBanner": "Manutenzione programmata: AIDEA non sarà disponibile dal {{start}} al {{end}}.",
+    "maintenanceBannerGeneric": "È prevista una manutenzione programmata."
   },
   "search": {
     "noResults": "Nessun corso trovato"

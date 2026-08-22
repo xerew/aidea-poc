@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AlertTriangle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import client from '../../api/client'
 import { AccessRequestProvider, useAccessRequest } from '../../context/AccessRequestContext'
@@ -25,6 +26,39 @@ function DenialBanner() {
       >
         ×
       </button>
+    </div>
+  )
+}
+
+function MaintenanceBanner() {
+  const { t, i18n } = useTranslation()
+  const [notice, setNotice] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await client.get('/maintenance/')
+        if (!cancelled && res.data.active) setNotice(res.data)
+      } catch { /* ignore */ }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  if (!notice) return null
+  const fmt = (iso) =>
+    iso ? new Date(iso).toLocaleString(i18n.language, { dateStyle: 'medium', timeStyle: 'short' }) : ''
+  const hasWindow = notice.starts_at && notice.ends_at
+
+  return (
+    <div className="maintenance-banner">
+      <AlertTriangle size={16} className="maintenance-banner-icon" />
+      <span>
+        {hasWindow
+          ? t('layout.maintenanceBanner', { start: fmt(notice.starts_at), end: fmt(notice.ends_at) })
+          : t('layout.maintenanceBannerGeneric')}
+        {notice.message ? ` ${notice.message}` : ''}
+      </span>
     </div>
   )
 }
@@ -75,6 +109,7 @@ function LayoutInner() {
       )}
       <div className="layout-body">
         <Header onMenuClick={() => setDrawerOpen((o) => !o)} />
+        <MaintenanceBanner />
         <StudyGate />
         <VerifyEmailBanner />
         <DenialBanner />

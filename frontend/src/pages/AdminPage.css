@@ -608,3 +608,24 @@
 .psy-alpha--good { color: #166534; }
 .psy-alpha--ok   { color: #854d0e; }
 .psy-alpha--weak { color: #991b1b; }
+
+/* Maintenance banner form */
+.maint-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  max-width: 340px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+.maint-field input,
+.maint-field textarea {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 400;
+}
+.maint-field textarea { resize: vertical; }

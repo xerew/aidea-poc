@@ -754,6 +754,16 @@
       "declined": "Refusé",
       "questions": "Questions",
       "export": "Exporter les données (XLSX)"
+    },
+    "maintenance": {
+      "title": "Bannière de maintenance",
+      "description": "Afficher à tous les utilisateurs un avis indiquant que la plateforme sera indisponible pour maintenance pendant une période programmée.",
+      "enabled": "Afficher la bannière de maintenance",
+      "from": "De",
+      "to": "À",
+      "message": "Raison (facultatif)",
+      "messagePlaceholder": "ex. mise à jour de la plateforme",
+      "save": "Enregistrer la bannière"
     }
   },
   "analytics": {
@@ -808,7 +818,9 @@
     "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »",
     "verifyBanner": "Veuillez confirmer votre adresse e-mail pour sécuriser votre compte.",
     "verifyResend": "Renvoyer l'e-mail",
-    "verifyResent": "E-mail de confirmation envoyé."
+    "verifyResent": "E-mail de confirmation envoyé.",
+    "maintenanceBanner": "Maintenance programmée : AIDEA sera indisponible du {{start}} au {{end}}.",
+    "maintenanceBannerGeneric": "Une maintenance est programmée."
   },
   "search": {
     "noResults": "Aucun cours trouvé"

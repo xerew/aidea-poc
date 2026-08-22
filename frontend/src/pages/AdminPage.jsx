@@ -498,6 +498,88 @@ function SelfEfficacyResearchCard() {
   )
 }
 
+// ── Maintenance banner (System tab) ─────────────────────────────────────────────
+
+function toLocalInput(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+function MaintenanceCard() {
+  const { t } = useTranslation()
+  const [form, setForm] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await client.get('/admin/maintenance/')
+        if (!cancelled) setForm({
+          enabled: res.data.enabled,
+          message: res.data.message || '',
+          starts_at: toLocalInput(res.data.starts_at),
+          ends_at: toLocalInput(res.data.ends_at),
+        })
+      } catch { /* ignore */ }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  if (!form) return null
+  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+
+  const save = async () => {
+    setSaving(true)
+    setSaved(false)
+    try {
+      await client.patch('/admin/maintenance/', {
+        enabled: form.enabled,
+        message: form.message,
+        starts_at: form.starts_at ? new Date(form.starts_at).toISOString() : null,
+        ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null,
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } catch { /* ignore */ } finally { setSaving(false) }
+  }
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.maintenance.title')}</h2>
+      <p className="admin-system-desc">{t('admin.maintenance.description')}</p>
+
+      <label className="admin-toggle-row">
+        <input type="checkbox" checked={form.enabled} onChange={(e) => set('enabled', e.target.checked)} />
+        <span>{t('admin.maintenance.enabled')}</span>
+      </label>
+
+      <label className="maint-field">
+        {t('admin.maintenance.from')}
+        <input type="datetime-local" value={form.starts_at} onChange={(e) => set('starts_at', e.target.value)} />
+      </label>
+      <label className="maint-field">
+        {t('admin.maintenance.to')}
+        <input type="datetime-local" value={form.ends_at} onChange={(e) => set('ends_at', e.target.value)} />
+      </label>
+      <label className="maint-field">
+        {t('admin.maintenance.message')}
+        <textarea rows={2} value={form.message}
+                  onChange={(e) => set('message', e.target.value)}
+                  placeholder={t('admin.maintenance.messagePlaceholder')} />
+      </label>
+
+      <button className="admin-approve-btn" onClick={save} disabled={saving}>
+        {saving ? t('common.saving') : t('admin.maintenance.save')}
+      </button>
+      {saved && <span className="admin-feedback success">{t('common.savedSuccess')}</span>}
+    </div>
+  )
+}
+
 // ── System tab ────────────────────────────────────────────────────────────────
 
 function SystemTab() {
@@ -536,6 +618,7 @@ function SystemTab() {
         {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
+      <MaintenanceCard />
     </div>
   )
 }

@@ -754,6 +754,16 @@
       "declined": "Abgelehnt",
       "questions": "Fragen",
       "export": "Daten exportieren (XLSX)"
+    },
+    "maintenance": {
+      "title": "Wartungsbanner",
+      "description": "Zeigen Sie allen Nutzern einen Hinweis, dass die Plattform während eines geplanten Zeitraums wegen Wartung nicht verfügbar ist.",
+      "enabled": "Wartungsbanner anzeigen",
+      "from": "Von",
+      "to": "Bis",
+      "message": "Grund (optional)",
+      "messagePlaceholder": "z. B. Plattform-Update",
+      "save": "Banner speichern"
     }
   },
   "analytics": {
@@ -808,7 +818,9 @@
     "denialBanner": "Ihre Anfrage für den Zugang als Content Creator wurde abgelehnt: „{{reason}}“",
     "verifyBanner": "Bitte bestätigen Sie Ihre E-Mail-Adresse, um Ihr Konto zu schützen.",
     "verifyResend": "E-Mail erneut senden",
-    "verifyResent": "Bestätigungs-E-Mail gesendet."
+    "verifyResent": "Bestätigungs-E-Mail gesendet.",
+    "maintenanceBanner": "Geplante Wartung: AIDEA ist von {{start}} bis {{end}} nicht verfügbar.",
+    "maintenanceBannerGeneric": "Eine geplante Wartung ist vorgesehen."
   },
   "search": {
     "noResults": "Keine Kurse gefunden"

@@ -5,6 +5,7 @@ from .content import Course, LearningPillar, Lesson, Module
 from .enrollment import Enrollment, LessonProgress
 from .feedback import Feedback
 from .history import CourseEditHistory
+from .maintenance import MaintenanceNotice
 from .messaging import Conversation, Message
 from .onboarding_quiz import OnboardingDimension, OnboardingQuestion
 from .pathway import LearningPath, LearningPathCourse, UserLearningPath
@@ -40,6 +41,7 @@ __all__ = [
     'Message',
     'LearnerActivityConfig',
     'LearningPath',
+    'MaintenanceNotice',
     'LearningPathCourse',
     'LearningPillar',
     'Lesson',

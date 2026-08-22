@@ -69,6 +69,7 @@ from .learner import (
     MyLearningView,
     QuizCheckView,
 )
+from .maintenance import AdminMaintenanceView, MaintenanceView
 from .messaging import (
     ConversationDetailView,
     ConversationListView,
@@ -162,6 +163,8 @@ __all__ = [
     'FeedbackMineView',
     'FeedbackUploadView',
     'FeedbackView',
+    'MaintenanceView',
+    'AdminMaintenanceView',
     'OnboardingView',
     'SelfEfficacyView',
     'SelfEfficacyRetakeView',
