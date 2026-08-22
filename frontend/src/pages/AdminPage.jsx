@@ -344,7 +344,7 @@ function RequestsTab() {
   )
 }
 
-// ── AI Competency assessment (System tab) ──────────────────────────────────────
+// ── AI Competency assessment (Research tab) ──────────────────────────────────────
 
 function SelfEfficacyAdminCard() {
   const { t, i18n } = useTranslation()
@@ -419,7 +419,7 @@ function SelfEfficacyAdminCard() {
   )
 }
 
-// ── Scale reliability & research data (System tab) ──────────────────────────────
+// ── Scale reliability & research data (Research tab) ──────────────────────────────
 
 function SelfEfficacyResearchCard() {
   const { t } = useTranslation()
@@ -536,8 +536,6 @@ function SystemTab() {
         {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
-      <SelfEfficacyAdminCard />
-      <SelfEfficacyResearchCard />
     </div>
   )
 }
@@ -823,6 +821,12 @@ function ResearchTab() {
       </div>
 
       <button className="admin-approve-btn admin-export-btn" onClick={exportData}>{t('admin.research.export')}</button>
+
+      {/* AI Competency assessment: retake window + data + scale reliability */}
+      <div className="admin-system" style={{ marginTop: '1.75rem' }}>
+        <SelfEfficacyAdminCard />
+        <SelfEfficacyResearchCard />
+      </div>
     </div>
   )
 }
