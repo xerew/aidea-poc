@@ -707,6 +707,18 @@
       "lastOpened": "Retake window last opened: {{date}}",
       "neverOpened": "The retake window has never been opened."
     },
+    "psychometrics": {
+      "title": "Scale reliability & research data",
+      "description": "Cronbach's α and a research-ready CSV of the self-efficacy scale, computed over each teacher's first completed assessment.",
+      "compute": "Compute reliability",
+      "downloadCsv": "Download research data (CSV)",
+      "basedOn": "Based on {{n}} participants (first attempt each).",
+      "needMore": "At least 2 completed assessments are needed (currently {{n}}).",
+      "dimension": "Dimension",
+      "alpha": "α",
+      "overall": "Overall (24 items)",
+      "alphaHint": "α ≥ .70 acceptable · ≥ .80 good · ≥ .90 excellent"
+    },
     "searchUsers": "Search by name, username or email",
     "searchRequests": "Search by requestor",
     "noMatch": "No matches.",

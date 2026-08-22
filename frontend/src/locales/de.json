@@ -707,6 +707,18 @@
       "lastOpened": "Wiederholungsfenster zuletzt geöffnet: {{date}}",
       "neverOpened": "Das Wiederholungsfenster wurde noch nie geöffnet."
     },
+    "psychometrics": {
+      "title": "Skalen-Reliabilität & Forschungsdaten",
+      "description": "Cronbachs α und eine forschungsfertige CSV der Selbstwirksamkeitsskala, berechnet über die erste abgeschlossene Bewertung jeder Lehrkraft.",
+      "compute": "Reliabilität berechnen",
+      "downloadCsv": "Forschungsdaten herunterladen (CSV)",
+      "basedOn": "Basierend auf {{n}} Teilnehmenden (jeweils erster Versuch).",
+      "needMore": "Mindestens 2 abgeschlossene Bewertungen erforderlich (derzeit {{n}}).",
+      "dimension": "Dimension",
+      "alpha": "α",
+      "overall": "Gesamt (24 Items)",
+      "alphaHint": "α ≥ .70 akzeptabel · ≥ .80 gut · ≥ .90 exzellent"
+    },
     "searchUsers": "Nach Name, Benutzername oder E-Mail suchen",
     "searchRequests": "Nach Antragsteller suchen",
     "noMatch": "Keine Treffer.",

@@ -602,3 +602,9 @@
   text-align: left; white-space: nowrap;
 }
 .se-detail-table th { color: #64748b; font-weight: 600; font-size: 0.68rem; }
+
+/* Reliability (Cronbach's alpha) cells */
+.psy-alpha { font-variant-numeric: tabular-nums; font-weight: 700; }
+.psy-alpha--good { color: #166534; }
+.psy-alpha--ok   { color: #854d0e; }
+.psy-alpha--weak { color: #991b1b; }

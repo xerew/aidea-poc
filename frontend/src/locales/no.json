@@ -707,6 +707,18 @@
       "lastOpened": "Vinduet sist åpnet: {{date}}",
       "neverOpened": "Vinduet for ny gjennomføring er aldri åpnet."
     },
+    "psychometrics": {
+      "title": "Skalaens reliabilitet og forskningsdata",
+      "description": "Cronbachs α og en forskningsklar CSV av mestringstro-skalaen, beregnet på hver lærers første fullførte vurdering.",
+      "compute": "Beregn reliabilitet",
+      "downloadCsv": "Last ned forskningsdata (CSV)",
+      "basedOn": "Basert på {{n}} deltakere (første forsøk hver).",
+      "needMore": "Minst 2 fullførte vurderinger kreves (nå {{n}}).",
+      "dimension": "Dimensjon",
+      "alpha": "α",
+      "overall": "Totalt (24 elementer)",
+      "alphaHint": "α ≥ .70 akseptabel · ≥ .80 god · ≥ .90 utmerket"
+    },
     "searchUsers": "Søk etter navn, brukernavn eller e-post",
     "searchRequests": "Søk etter forespør",
     "noMatch": "Ingen treff.",

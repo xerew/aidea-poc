@@ -89,7 +89,12 @@ from .profile import (
 )
 from .public_profile import PublicProfileView
 from .recommendations import RecommendationEventView, RecommendationsView
-from .self_efficacy_admin import AdminSelfEfficacyExportView, AdminSelfEfficacyView
+from .self_efficacy_admin import (
+    AdminSelfEfficacyExportView,
+    AdminSelfEfficacyPsychometricsView,
+    AdminSelfEfficacyResearchExportView,
+    AdminSelfEfficacyView,
+)
 from .study import (
     AdminStudyExportView,
     AdminStudyView,
@@ -162,6 +167,8 @@ __all__ = [
     'SelfEfficacyRetakeView',
     'AdminSelfEfficacyView',
     'AdminSelfEfficacyExportView',
+    'AdminSelfEfficacyPsychometricsView',
+    'AdminSelfEfficacyResearchExportView',
     'PasswordResetConfirmView',
     'PasswordResetRequestView',
     'PathwayView',

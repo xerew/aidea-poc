@@ -419,6 +419,85 @@ function SelfEfficacyAdminCard() {
   )
 }
 
+// ── Scale reliability & research data (System tab) ──────────────────────────────
+
+function SelfEfficacyResearchCard() {
+  const { t } = useTranslation()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res = await client.get('/admin/self-efficacy/psychometrics/')
+      setData(res.data)
+    } catch { /* ignore */ } finally { setLoading(false) }
+  }
+
+  const download = async () => {
+    setDownloading(true)
+    try {
+      const res = await client.get('/admin/self-efficacy/research-export/', { responseType: 'blob' })
+      const url = URL.createObjectURL(res.data)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'aidea-self-efficacy-research.csv'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(url)
+    } catch { /* ignore */ } finally { setDownloading(false) }
+  }
+
+  const fmt = (a) => (a == null ? '—' : a.toFixed(2))
+  const cls = (a) => (a == null ? '' : a >= 0.7 ? 'good' : a >= 0.5 ? 'ok' : 'weak')
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.psychometrics.title')}</h2>
+      <p className="admin-system-desc">{t('admin.psychometrics.description')}</p>
+      <div className="admin-request-actions">
+        <button className="admin-approve-btn" onClick={load} disabled={loading}>
+          {loading ? t('common.loading') : t('admin.psychometrics.compute')}
+        </button>
+        <button className="add-dashed-btn" onClick={download} disabled={downloading}>
+          {downloading ? t('common.loading') : t('admin.psychometrics.downloadCsv')}
+        </button>
+      </div>
+
+      {data && (data.n < 2 ? (
+        <span className="admin-feedback">{t('admin.psychometrics.needMore', { n: data.n })}</span>
+      ) : (
+        <div className="se-history">
+          <p className="admin-system-desc">{t('admin.psychometrics.basedOn', { n: data.n })}</p>
+          <table className="se-table">
+            <thead>
+              <tr>
+                <th>{t('admin.psychometrics.dimension')}</th>
+                <th>{t('admin.psychometrics.alpha')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>{t('admin.psychometrics.overall')}</strong></td>
+                <td className={`psy-alpha psy-alpha--${cls(data.overall_alpha)}`}>{fmt(data.overall_alpha)}</td>
+              </tr>
+              {data.dimensions.map((d) => (
+                <tr key={d.slug}>
+                  <td>{d.name}</td>
+                  <td className={`psy-alpha psy-alpha--${cls(d.alpha)}`}>{fmt(d.alpha)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="admin-system-desc">{t('admin.psychometrics.alphaHint')}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── System tab ────────────────────────────────────────────────────────────────
 
 function SystemTab() {
@@ -458,6 +537,7 @@ function SystemTab() {
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
       <SelfEfficacyAdminCard />
+      <SelfEfficacyResearchCard />
     </div>
   )
 }

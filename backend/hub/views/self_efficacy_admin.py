@@ -1,5 +1,6 @@
+import csv
 from collections import defaultdict
-from io import BytesIO
+from io import BytesIO, StringIO
 
 from django.http import HttpResponse
 from django.utils import timezone
@@ -8,7 +9,31 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hub.models import OnboardingDimension, SelfEfficacyAttempt, SelfEfficacyConfig
+from hub.psychometrics import compute_scale_reliability
 from hub.views.permissions import IsAdmin
+
+
+def _active_dimensions():
+    return list(
+        OnboardingDimension.objects.filter(is_active=True)
+        .order_by('order').prefetch_related('questions')
+    )
+
+
+def _first_attempt_per_user():
+    """One SelfEfficacyAttempt per user — their earliest (baseline) — so a
+    reliability/validation analysis uses independent observations."""
+    seen, firsts = set(), []
+    for attempt in (
+        SelfEfficacyAttempt.objects
+        .select_related('user__profile__subject')
+        .order_by('user_id', 'created_at')
+    ):
+        if attempt.user_id in seen:
+            continue
+        seen.add(attempt.user_id)
+        firsts.append(attempt)
+    return firsts
 
 # Self-efficacy bands are shown to users as competency levels.
 BAND_LABELS = {'low': 'Beginner', 'moderate': 'Intermediate', 'high': 'Advanced'}
@@ -108,4 +133,67 @@ class AdminSelfEfficacyExportView(APIView):
             content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         )
         response['Content-Disposition'] = 'attachment; filename="aidea-ai-competency.xlsx"'
+        return response
+
+
+class AdminSelfEfficacyPsychometricsView(APIView):
+    """GET → classical-test-theory reliability of the self-efficacy scale
+    (Cronbach's alpha per dimension + overall, item stats, inter-dimension
+    correlations), computed over each teacher's first completed attempt."""
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        dimensions = _active_dimensions()
+        responses = [
+            {int(k): v for k, v in (a.answers or {}).items()}
+            for a in _first_attempt_per_user()
+        ]
+        return Response(compute_scale_reliability(responses, dimensions))
+
+
+class AdminSelfEfficacyResearchExportView(APIView):
+    """GET → research-ready CSV: one pseudonymous row per participant (first
+    attempt) with demographics, the 24 item scores, the six dimension means and
+    the overall mean — a wide data matrix for R/SPSS (reliability, EFA/CFA)."""
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        dimensions = _active_dimensions()
+        dim_questions = [
+            (dim, sorted((q for q in dim.questions.all() if q.is_active), key=lambda q: q.order))
+            for dim in dimensions
+        ]
+        flat = [q for _dim, qs in dim_questions for q in qs]
+        qcodes = [f'Q{i}' for i in range(1, len(flat) + 1)]
+
+        buffer = StringIO()
+        writer = csv.writer(buffer)
+        writer.writerow(
+            ['participant', 'subject', 'teaching_level', 'country', 'language', 'date']
+            + qcodes
+            + [f'{dim.slug}_mean' for dim in dimensions]
+            + ['overall_mean']
+        )
+
+        def mean(values):
+            return round(sum(values) / len(values), 3) if values else ''
+
+        for idx, attempt in enumerate(_first_attempt_per_user(), start=1):
+            profile = attempt.user.profile
+            answers = {int(k): v for k, v in (attempt.answers or {}).items()}
+            row = [
+                f'P{idx:04d}',
+                profile.subject.slug if profile.subject else '',
+                profile.teaching_level or '',
+                profile.country or '',
+                profile.language,
+                attempt.created_at.strftime('%Y-%m-%d'),
+            ]
+            row += [answers.get(q.id, '') for q in flat]
+            row += [mean([answers[q.id] for q in qs if q.id in answers]) for _dim, qs in dim_questions]
+            row.append(mean([answers[q.id] for q in flat if q.id in answers]))
+            writer.writerow(row)
+
+        response = HttpResponse(buffer.getvalue(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="aidea-self-efficacy-research.csv"'
         return response

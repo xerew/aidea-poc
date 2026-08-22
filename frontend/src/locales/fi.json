@@ -707,6 +707,18 @@
       "lastOpened": "Uusintaikkuna avattu viimeksi: {{date}}",
       "neverOpened": "Uusintaikkunaa ei ole koskaan avattu."
     },
+    "psychometrics": {
+      "title": "Asteikon luotettavuus ja tutkimusdata",
+      "description": "Cronbachin α ja tutkimusvalmis CSV minäpystyvyysasteikosta, laskettuna kunkin opettajan ensimmäisestä suoritetusta arvioinnista.",
+      "compute": "Laske luotettavuus",
+      "downloadCsv": "Lataa tutkimusdata (CSV)",
+      "basedOn": "Perustuu {{n}} osallistujaan (kunkin ensimmäinen yritys).",
+      "needMore": "Tarvitaan vähintään 2 suoritettua arviointia (nyt {{n}}).",
+      "dimension": "Ulottuvuus",
+      "alpha": "α",
+      "overall": "Yhteensä (24 osiota)",
+      "alphaHint": "α ≥ .70 hyväksyttävä · ≥ .80 hyvä · ≥ .90 erinomainen"
+    },
     "searchUsers": "Hae nimellä, käyttäjätunnuksella tai sähköpostilla",
     "searchRequests": "Hae pyytäjän mukaan",
     "noMatch": "Ei osumia.",

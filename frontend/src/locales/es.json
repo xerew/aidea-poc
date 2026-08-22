@@ -707,6 +707,18 @@
       "lastOpened": "Última apertura de la ventana: {{date}}",
       "neverOpened": "La ventana de repetición nunca se ha abierto."
     },
+    "psychometrics": {
+      "title": "Fiabilidad de la escala y datos de investigación",
+      "description": "El α de Cronbach y un CSV listo para investigación de la escala de autoeficacia, calculados sobre la primera evaluación completada de cada docente.",
+      "compute": "Calcular fiabilidad",
+      "downloadCsv": "Descargar datos de investigación (CSV)",
+      "basedOn": "Basado en {{n}} participantes (primer intento de cada uno).",
+      "needMore": "Se necesitan al menos 2 evaluaciones completadas (actualmente {{n}}).",
+      "dimension": "Dimensión",
+      "alpha": "α",
+      "overall": "General (24 ítems)",
+      "alphaHint": "α ≥ .70 aceptable · ≥ .80 bueno · ≥ .90 excelente"
+    },
     "searchUsers": "Buscar por nombre, usuario o correo",
     "searchRequests": "Buscar por solicitante",
     "noMatch": "Sin coincidencias.",

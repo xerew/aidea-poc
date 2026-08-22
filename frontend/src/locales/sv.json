@@ -707,6 +707,18 @@
       "lastOpened": "Fönstret senast öppnat: {{date}}",
       "neverOpened": "Fönstret för omgörning har aldrig öppnats."
     },
+    "psychometrics": {
+      "title": "Skalans reliabilitet och forskningsdata",
+      "description": "Cronbachs α och en forskningsfärdig CSV av självförmågeskalan, beräknad på varje lärares första slutförda bedömning.",
+      "compute": "Beräkna reliabilitet",
+      "downloadCsv": "Ladda ner forskningsdata (CSV)",
+      "basedOn": "Baserat på {{n}} deltagare (första försöket vardera).",
+      "needMore": "Minst 2 slutförda bedömningar krävs (nu {{n}}).",
+      "dimension": "Dimension",
+      "alpha": "α",
+      "overall": "Totalt (24 items)",
+      "alphaHint": "α ≥ .70 godtagbar · ≥ .80 bra · ≥ .90 utmärkt"
+    },
     "searchUsers": "Sök på namn, användarnamn eller e-post",
     "searchRequests": "Sök på begärare",
     "noMatch": "Inga träffar.",
