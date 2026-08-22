@@ -23,6 +23,7 @@ from .study import (
     StudyAssessmentQuestion,
     StudyConfig,
     StudyParticipant,
+    StudyPreregistration,
 )
 from .subject import Subject
 from .user import UserProfile
@@ -60,6 +61,7 @@ __all__ = [
     'StudyAssessmentQuestion',
     'StudyConfig',
     'StudyParticipant',
+    'StudyPreregistration',
     'Subject',
     'UserLearningPath',
     'UserProfile',

@@ -27,6 +27,30 @@ class StudyConfig(models.Model):
         return obj
 
 
+class StudyPreregistration(models.Model):
+    """Singleton open-science pre-registration: a locked, timestamped snapshot of
+    the study design (config + questions) plus the stated hypothesis, so the
+    analysis plan is fixed before data collection."""
+    hypothesis  = models.TextField(blank=True)
+    snapshot    = models.JSONField(default=dict, blank=True)  # design at lock time
+    locked_at   = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Study pre-registration'
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return f'Pre-registration ({"locked" if self.locked_at else "unlocked"})'
+
+
 class StudyAssessmentQuestion(models.Model):
     """One question of the dedicated pre/post knowledge test."""
     text  = models.TextField()

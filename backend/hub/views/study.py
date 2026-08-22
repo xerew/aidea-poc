@@ -16,9 +16,11 @@ from hub.models import (
     StudyAssessmentQuestion,
     StudyConfig,
     StudyParticipant,
+    StudyPreregistration,
     UserProfile,
 )
 from hub.study_logic import assign_group
+from hub.study_stats import compute_study_results
 
 from .permissions import IsAdmin
 
@@ -267,3 +269,66 @@ class AdminStudyExportView(APIView):
         )
         response['Content-Disposition'] = 'attachment; filename="aidea-study-export.xlsx"'
         return response
+
+
+def _design_snapshot():
+    """Canonical snapshot of the current study design, for pre-registration and
+    change detection."""
+    config = StudyConfig.get()
+    questions = []
+    for q in StudyAssessmentQuestion.objects.prefetch_related('options').order_by('order', 'id'):
+        questions.append({
+            'id': q.id,
+            'text': q.text,
+            'options': [
+                {'id': o.id, 'text': o.text, 'is_correct': o.is_correct}
+                for o in q.options.all().order_by('order', 'id')
+            ],
+        })
+    return {
+        'enabled': config.enabled,
+        'control_path_id': config.control_path_id,
+        'questions': questions,
+    }
+
+
+class AdminStudyStatsView(APIView):
+    """GET → CONSORT counts, per-group descriptives, gain t-test + Cohen's d and
+    the pre-score-adjusted ANCOVA for the adaptive-vs-fixed comparison."""
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        return Response(compute_study_results(StudyParticipant.objects.all()))
+
+
+class AdminStudyPreregistrationView(APIView):
+    """GET  → hypothesis, lock timestamp, and whether the design changed since.
+       PATCH {hypothesis} → save the hypothesis (draft, does not lock).
+       POST  → lock: snapshot the current design with a timestamp."""
+    permission_classes = [IsAdmin]
+
+    def _payload(self, prereg):
+        changed = bool(prereg.locked_at) and prereg.snapshot != _design_snapshot()
+        return {
+            'hypothesis': prereg.hypothesis,
+            'locked_at': prereg.locked_at.isoformat() if prereg.locked_at else None,
+            'changed_since_lock': changed,
+        }
+
+    def get(self, request):
+        return Response(self._payload(StudyPreregistration.get()))
+
+    def patch(self, request):
+        prereg = StudyPreregistration.get()
+        prereg.hypothesis = str(request.data.get('hypothesis') or '').strip()
+        prereg.save(update_fields=['hypothesis'])
+        return Response(self._payload(prereg))
+
+    def post(self, request):
+        prereg = StudyPreregistration.get()
+        if 'hypothesis' in request.data:
+            prereg.hypothesis = str(request.data.get('hypothesis') or '').strip()
+        prereg.snapshot = _design_snapshot()
+        prereg.locked_at = timezone.now()
+        prereg.save()
+        return Response(self._payload(prereg))

@@ -172,3 +172,133 @@ class StudyExperienceBranchTests(APITestCase):
         self.client.force_authenticate(self.teacher)
         res = self.client.get('/api/recommendations/')
         self.assertEqual(res.data, [])
+
+
+class StudyStatsTests(APITestCase):
+    """CONSORT counts, per-group descriptives, gain t-test/Cohen's d and ANCOVA
+    over a hand-built participant fixture."""
+
+    def _p(self, username, group, pre, post, in_study=True):
+        u = make_teacher(username)
+        return StudyParticipant.objects.create(
+            user=u, in_study=in_study, group=group if in_study else '',
+            pre_score=pre, post_score=post,
+        )
+
+    def setUp(self):
+        self.config = StudyConfig.get()
+        self.config.enabled = True
+        self.config.save()
+        self.admin = make_admin()
+        # Adaptive: bigger gains than fixed.
+        self._p('a1', 'adaptive', 2, 8)
+        self._p('a2', 'adaptive', 3, 8)
+        self._p('a3', 'adaptive', 4, 9)
+        self._p('f1', 'fixed', 2, 5)
+        self._p('f2', 'fixed', 3, 5)
+        self._p('f3', 'fixed', 4, 6)
+        # Attrition: consented + did pre but no post.
+        self._p('a4', 'adaptive', 5, None)
+        # Declined.
+        self._p('d1', 'fixed', None, None, in_study=False)
+
+    def _stats(self):
+        self.client.force_authenticate(self.admin)
+        res = self.client.get('/api/admin/study/stats/')
+        self.assertEqual(res.status_code, 200)
+        return res.data
+
+    def test_consort_counts(self):
+        c = self._stats()['consort']
+        self.assertEqual(c['enrolled'], 8)
+        self.assertEqual(c['consented'], 7)
+        self.assertEqual(c['declined'], 1)
+        self.assertEqual(c['adaptive']['allocated'], 4)
+        self.assertEqual(c['adaptive']['pre_done'], 4)
+        self.assertEqual(c['adaptive']['post_done'], 3)
+        self.assertEqual(c['adaptive']['analyzed'], 3)
+        self.assertEqual(c['adaptive']['attrition'], 1)
+        self.assertEqual(c['fixed']['allocated'], 3)
+        self.assertEqual(c['fixed']['analyzed'], 3)
+        self.assertEqual(c['fixed']['attrition'], 0)
+
+    def test_group_descriptives(self):
+        groups = self._stats()['groups']
+        a = groups['adaptive']
+        self.assertEqual(a['n'], 3)               # only completers
+        self.assertEqual(a['pre_mean'], 3.0)
+        self.assertAlmostEqual(a['post_mean'], 8.33, places=2)
+        self.assertAlmostEqual(a['gain_mean'], 5.33, places=2)
+        f = groups['fixed']
+        self.assertEqual(f['n'], 3)
+        self.assertAlmostEqual(f['gain_mean'], 2.33, places=2)
+
+    def test_gain_test_and_cohens_d(self):
+        gt = self._stats()['gain_test']
+        self.assertAlmostEqual(gt['mean_diff'], 3.0, places=2)  # 5.33 - 2.33
+        self.assertIsNotNone(gt['cohens_d'])
+        self.assertGreater(gt['cohens_d'], 0)     # adaptive gained more
+        self.assertIn('p', gt)
+        self.assertIn('t', gt)
+
+    def test_ancova_keys_and_direction(self):
+        an = self._stats()['ancova']
+        for key in ('adjusted_diff', 'se', 't', 'df', 'p',
+                    'adjusted_mean_adaptive', 'adjusted_mean_fixed'):
+            self.assertIn(key, an)
+        self.assertGreater(an['adjusted_diff'], 0)  # adaptive higher, adjusting for pre
+        self.assertEqual(an['df'], 6 - 3)           # n(6) - params(3)
+
+    def test_stats_admin_only(self):
+        teacher = make_teacher('nope')
+        self.client.force_authenticate(teacher)
+        self.assertEqual(self.client.get('/api/admin/study/stats/').status_code, 403)
+
+
+class StudyPreregistrationTests(APITestCase):
+    def setUp(self):
+        self.config = StudyConfig.get()
+        self.config.enabled = True
+        self.config.save()
+        self.admin = make_admin()
+        self.teacher = make_teacher('preg_t')
+
+    def test_starts_unlocked(self):
+        self.client.force_authenticate(self.admin)
+        data = self.client.get('/api/admin/study/preregister/').data
+        self.assertIsNone(data['locked_at'])
+        self.assertFalse(data['changed_since_lock'])
+
+    def test_patch_saves_hypothesis_without_locking(self):
+        self.client.force_authenticate(self.admin)
+        data = self.client.patch(
+            '/api/admin/study/preregister/', {'hypothesis': 'Adaptive > fixed'}, format='json',
+        ).data
+        self.assertEqual(data['hypothesis'], 'Adaptive > fixed')
+        self.assertIsNone(data['locked_at'])
+
+    def test_lock_snapshots_design(self):
+        build_assessment(2)
+        self.client.force_authenticate(self.admin)
+        data = self.client.post(
+            '/api/admin/study/preregister/', {'hypothesis': 'H1'}, format='json',
+        ).data
+        self.assertIsNotNone(data['locked_at'])
+        self.assertEqual(data['hypothesis'], 'H1')
+        self.assertFalse(data['changed_since_lock'])
+
+    def test_change_detected_after_lock(self):
+        build_assessment(2)
+        self.client.force_authenticate(self.admin)
+        self.client.post('/api/admin/study/preregister/', {'hypothesis': 'H1'}, format='json')
+        # Alter the design after locking.
+        build_assessment(1)
+        data = self.client.get('/api/admin/study/preregister/').data
+        self.assertTrue(data['changed_since_lock'])
+
+    def test_prereg_admin_only(self):
+        self.client.force_authenticate(self.teacher)
+        self.assertEqual(self.client.get('/api/admin/study/preregister/').status_code, 403)
+        self.assertEqual(
+            self.client.post('/api/admin/study/preregister/', {}, format='json').status_code, 403,
+        )

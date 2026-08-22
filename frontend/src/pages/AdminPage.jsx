@@ -834,6 +834,203 @@ function StatTile({ label, value }) {
 }
 StatTile.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.node.isRequired }
 
+// ── Study results: CONSORT flow + primary/secondary analyses ────────────────────
+
+function StudyResultsCard() {
+  const { t } = useTranslation()
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res = await client.get('/admin/study/stats/')
+      setData(res.data)
+    } catch { /* ignore */ } finally { setLoading(false) }
+  }
+
+  const num = (v, d = 2) => (v == null ? '—' : Number(v).toFixed(d))
+  const p = (v) => (v == null ? '—' : v < 0.001 ? '< 0.001' : Number(v).toFixed(4))
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.study.results.title')}</h2>
+      <p className="admin-system-desc">{t('admin.study.results.description')}</p>
+      <div className="admin-request-actions">
+        <button className="admin-approve-btn" onClick={load} disabled={loading}>
+          {loading ? t('common.loading') : t('admin.study.results.compute')}
+        </button>
+      </div>
+
+      {data && (
+        <div className="se-history">
+          {/* CONSORT participant flow */}
+          <h3 className="study-h3">{t('admin.study.results.consortTitle')}</h3>
+          <table className="se-table study-table">
+            <thead>
+              <tr>
+                <th>{t('admin.study.results.stage')}</th>
+                <th>{t('admin.research.adaptive')}</th>
+                <th>{t('admin.research.fixed')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>{t('admin.study.results.allocated')}</td><td>{data.consort.adaptive.allocated}</td><td>{data.consort.fixed.allocated}</td></tr>
+              <tr><td>{t('admin.study.results.preDone')}</td><td>{data.consort.adaptive.pre_done}</td><td>{data.consort.fixed.pre_done}</td></tr>
+              <tr><td>{t('admin.study.results.postDone')}</td><td>{data.consort.adaptive.post_done}</td><td>{data.consort.fixed.post_done}</td></tr>
+              <tr><td>{t('admin.study.results.analyzed')}</td><td>{data.consort.adaptive.analyzed}</td><td>{data.consort.fixed.analyzed}</td></tr>
+              <tr className="study-attrition"><td>{t('admin.study.results.attrition')}</td><td>{data.consort.adaptive.attrition}</td><td>{data.consort.fixed.attrition}</td></tr>
+            </tbody>
+          </table>
+          <p className="admin-system-desc">
+            {t('admin.study.results.flowSummary', {
+              enrolled: data.consort.enrolled,
+              consented: data.consort.consented,
+              declined: data.consort.declined,
+            })}
+          </p>
+
+          {/* Per-group descriptives */}
+          <h3 className="study-h3">{t('admin.study.results.descTitle')}</h3>
+          <table className="se-table study-table">
+            <thead>
+              <tr>
+                <th>{t('admin.study.results.group')}</th>
+                <th>n</th>
+                <th>{t('admin.study.results.pre')}</th>
+                <th>{t('admin.study.results.post')}</th>
+                <th>{t('admin.study.results.gain')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {['adaptive', 'fixed'].map((g) => (
+                <tr key={g}>
+                  <td>{t(`admin.research.${g}`)}</td>
+                  <td>{data.groups[g].n}</td>
+                  <td>{num(data.groups[g].pre_mean)} ± {num(data.groups[g].pre_sd)}</td>
+                  <td>{num(data.groups[g].post_mean)} ± {num(data.groups[g].post_sd)}</td>
+                  <td>{num(data.groups[g].gain_mean)} ± {num(data.groups[g].gain_sd)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="admin-system-desc">{t('admin.study.results.meanSdHint')}</p>
+
+          {/* ANCOVA — primary */}
+          <h3 className="study-h3">{t('admin.study.results.ancovaTitle')}</h3>
+          <span className="study-badge study-badge--primary">{t('admin.study.results.primary')}</span>
+          {data.ancova ? (
+            <table className="se-table study-table study-stats-table">
+              <tbody>
+                <tr><td>{t('admin.study.results.adjDiff')}</td><td>{num(data.ancova.adjusted_diff)}</td></tr>
+                <tr><td>{t('admin.study.results.adjMeans')}</td><td>{num(data.ancova.adjusted_mean_adaptive)} vs {num(data.ancova.adjusted_mean_fixed)}</td></tr>
+                <tr><td>t (df={data.ancova.df})</td><td>{num(data.ancova.t)}</td></tr>
+                <tr><td>SE</td><td>{num(data.ancova.se, 3)}</td></tr>
+                <tr className={data.ancova.p != null && data.ancova.p < 0.05 ? 'study-sig' : ''}><td>p</td><td>{p(data.ancova.p)}</td></tr>
+              </tbody>
+            </table>
+          ) : <p className="admin-system-desc">{t('admin.study.results.notEnough')}</p>}
+          <p className="admin-system-desc">{t('admin.study.results.ancovaHint')}</p>
+
+          {/* Gain-score t-test — secondary */}
+          <h3 className="study-h3">{t('admin.study.results.gainTitle')}</h3>
+          <span className="study-badge">{t('admin.study.results.secondary')}</span>
+          {data.gain_test ? (
+            <table className="se-table study-table study-stats-table">
+              <tbody>
+                <tr><td>{t('admin.study.results.meanDiff')}</td><td>{num(data.gain_test.mean_diff)}</td></tr>
+                <tr><td>{t('admin.study.results.cohensD')}</td><td>{num(data.gain_test.cohens_d)}</td></tr>
+                <tr><td>t</td><td>{num(data.gain_test.t)}</td></tr>
+                <tr className={data.gain_test.p != null && data.gain_test.p < 0.05 ? 'study-sig' : ''}><td>p</td><td>{p(data.gain_test.p)}</td></tr>
+              </tbody>
+            </table>
+          ) : <p className="admin-system-desc">{t('admin.study.results.notEnough')}</p>}
+          <p className="admin-system-desc">{t('admin.study.results.gainHint')}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Pre-registration: locked, timestamped design snapshot + hypothesis ───────────
+
+function StudyPreregCard() {
+  const { t } = useTranslation()
+  const [data, setData] = useState(null)
+  const [hypothesis, setHypothesis] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const apply = (d) => {
+    setData(d)
+    setHypothesis(d.hypothesis || '')
+  }
+
+  useEffect(() => {
+    client.get('/admin/study/preregister/').then(res => apply(res.data)).catch(() => setData(null))
+  }, [])
+
+  const save = async () => {
+    setBusy(true)
+    try {
+      const res = await client.patch('/admin/study/preregister/', { hypothesis })
+      apply(res.data)
+    } catch { /* ignore */ } finally { setBusy(false) }
+  }
+
+  const lock = async () => {
+    if (!window.confirm(t('admin.study.prereg.lockConfirm'))) return
+    setBusy(true)
+    try {
+      const res = await client.post('/admin/study/preregister/', { hypothesis })
+      apply(res.data)
+    } catch { /* ignore */ } finally { setBusy(false) }
+  }
+
+  if (!data) return null
+  const locked = !!data.locked_at
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.study.prereg.title')}</h2>
+      <p className="admin-system-desc">{t('admin.study.prereg.description')}</p>
+
+      <label className="admin-research-field">
+        <span>{t('admin.study.prereg.hypothesis')}</span>
+        <textarea
+          className="study-prereg-textarea"
+          rows={3}
+          value={hypothesis}
+          disabled={busy}
+          placeholder={t('admin.study.prereg.hypothesisPlaceholder')}
+          onChange={(e) => setHypothesis(e.target.value)}
+        />
+      </label>
+
+      {locked ? (
+        <div className="study-prereg-status">
+          <span className="study-badge study-badge--locked">
+            {t('admin.study.prereg.lockedAt', { date: new Date(data.locked_at).toLocaleString() })}
+          </span>
+          {data.changed_since_lock && (
+            <p className="admin-research-warn">{t('admin.study.prereg.changedWarn')}</p>
+          )}
+        </div>
+      ) : (
+        <p className="admin-system-desc">{t('admin.study.prereg.unlocked')}</p>
+      )}
+
+      <div className="admin-request-actions">
+        <button className="add-dashed-btn" onClick={save} disabled={busy}>
+          {t('admin.study.prereg.saveDraft')}
+        </button>
+        <button className="admin-approve-btn" onClick={lock} disabled={busy}>
+          {locked ? t('admin.study.prereg.relock') : t('admin.study.prereg.lock')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function ResearchTab() {
   const { t } = useTranslation()
   const [data, setData] = useState(null)
@@ -904,6 +1101,12 @@ function ResearchTab() {
       </div>
 
       <button className="admin-approve-btn admin-export-btn" onClick={exportData}>{t('admin.research.export')}</button>
+
+      {/* CONSORT flow + primary/secondary analyses, and the pre-registration lock */}
+      <div className="admin-system" style={{ marginTop: '1.75rem' }}>
+        <StudyResultsCard />
+        <StudyPreregCard />
+      </div>
 
       {/* AI Competency assessment: retake window + data + scale reliability */}
       <div className="admin-system" style={{ marginTop: '1.75rem' }}>

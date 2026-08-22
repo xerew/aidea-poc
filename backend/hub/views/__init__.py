@@ -98,6 +98,8 @@ from .self_efficacy_admin import (
 )
 from .study import (
     AdminStudyExportView,
+    AdminStudyPreregistrationView,
+    AdminStudyStatsView,
     AdminStudyView,
     StudyAssessmentView,
     StudyConsentView,
@@ -178,6 +180,8 @@ __all__ = [
     'PreferenceQuizView',
     'PublicProfileView',
     'AdminStudyExportView',
+    'AdminStudyStatsView',
+    'AdminStudyPreregistrationView',
     'AdminStudyView',
     'StudyAssessmentView',
     'StudyConsentView',
