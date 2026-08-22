@@ -63,6 +63,8 @@ class FeedbackView(APIView):
             user=request.user, stream=_stream_for(request.user),
             category=category, message=message, attachments=attachments,
         )
+        from hub.emails import send_feedback_email
+        send_feedback_email(feedback)
         return Response(
             FeedbackSerializer(feedback).data, status=status.HTTP_201_CREATED,
         )

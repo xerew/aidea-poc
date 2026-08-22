@@ -222,3 +222,35 @@ def send_access_request_email(access_request):
             cta_link=link,
         )
 
+
+def send_feedback_email(feedback):
+    """Notify every admin that a user submitted feedback (bug, suggestion, …)."""
+    from django.contrib.auth.models import User
+
+    user = feedback.user
+    name = user.get_full_name() or user.username
+    contact = user.email or user.username
+    category = feedback.get_category_display()
+    stream = feedback.get_stream_display()
+    link = f'{settings.FRONTEND_BASE_URL}/admin/users'
+    admins = (
+        User.objects.filter(profile__user_type='admin', is_active=True)
+        .exclude(email='')
+    )
+    for admin in admins:
+        _send(
+            to=admin.email,
+            subject=f'New feedback: {category}',
+            name=admin.get_full_name() or admin.username,
+            tag='New feedback',
+            heading=f'New {category.lower()} submitted',
+            paragraphs=[
+                f'<strong>{_html_text(name)}</strong> ({_html_text(contact)}) submitted '
+                f'{_html_text(category.lower())} via the {_html_text(stream.lower())} stream.',
+                f'<strong>Message:</strong><br>{_html_text(feedback.message)}',
+                'Review and triage it in the Admin panel under Feedback.',
+            ],
+            cta_label='Open the Admin panel',
+            cta_link=link,
+        )
+

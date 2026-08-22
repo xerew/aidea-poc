@@ -94,6 +94,25 @@ class AccessRequestEmailTests(APITestCase):
         self.assertIn('access request', mail.outbox[0].subject.lower())
 
 
+class FeedbackEmailTests(APITestCase):
+    def setUp(self):
+        for name in ('fb_admin1', 'fb_admin2'):
+            u = User.objects.create_user(username=name, email=f'{name}@example.com', password='pw')
+            UserProfile.objects.create(user=u, user_type=UserProfile.UserType.ADMIN)
+        self.teacher = User.objects.create_user(username='fb_user', email='u@example.com', password='pw')
+        UserProfile.objects.create(user=self.teacher, user_type=UserProfile.UserType.TEACHER)
+
+    def test_new_feedback_emails_all_admins(self):
+        self.client.force_authenticate(self.teacher)
+        res = self.client.post(
+            reverse('feedback'), {'category': 'bug', 'message': 'Button is broken.'}, format='json',
+        )
+        self.assertEqual(res.status_code, 201)
+        recipients = sorted(m.to[0] for m in mail.outbox)
+        self.assertEqual(recipients, ['fb_admin1@example.com', 'fb_admin2@example.com'])
+        self.assertIn('feedback', mail.outbox[0].subject.lower())
+
+
 class AssignmentReviewedEmailTests(APITestCase):
     def setUp(self):
         self.reviewer = User.objects.create_user(username='rev', password='pw')
