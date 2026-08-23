@@ -915,6 +915,7 @@
     "funding": "Finansieras av Europeiska unionen via Erasmus+ och Horizon Europe.",
     "guideTitle": "Användarguide",
     "guideDesc": "Hur varje användartyp arbetar med plattformen.",
+    "guideLanguage": "Guidens språk",
     "openGuide": "Öppna guiden",
     "downloadGuide": "Ladda ner PDF",
     "pdfFallback": "Din webbläsare kan inte visa PDF-filen."

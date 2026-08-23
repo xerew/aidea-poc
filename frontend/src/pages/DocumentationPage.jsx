@@ -1,9 +1,24 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Brain, Wrench, Compass, ExternalLink, Download, FileText } from 'lucide-react'
+import { Brain, Wrench, Compass, ExternalLink, Download, FileText, Languages } from 'lucide-react'
 import FeedbackWidget from '../components/FeedbackWidget'
 import './DocumentationPage.css'
 
-const GUIDE_PDF = '/aidea-user-guide.pdf'
+// Languages the guide PDF is built in (docs/build_user_guide_pdf.py), with their
+// native names. Falls back to English for anything not listed here.
+const GUIDE_LANGS = [
+  { code: 'en', name: 'English' },
+  { code: 'el', name: 'Ελληνικά' },
+  { code: 'fr', name: 'Français' },
+  { code: 'es', name: 'Español' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'fi', name: 'Suomi' },
+  { code: 'sv', name: 'Svenska' },
+  { code: 'no', name: 'Norsk' },
+  { code: 'de', name: 'Deutsch' },
+]
+
+const guidePdf = (lang) => `/aidea-user-guide.${lang}.pdf`
 
 const PILLARS = [
   { key: 'about', Icon: Brain },
@@ -12,7 +27,12 @@ const PILLARS = [
 ]
 
 export default function DocumentationPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const uiLang = i18n.language?.split('-')[0]
+  const initial = GUIDE_LANGS.some(l => l.code === uiLang) ? uiLang : 'en'
+  const [lang, setLang] = useState(initial)
+  const pdf = guidePdf(lang)
 
   return (
     <div className="doc-page">
@@ -49,19 +69,31 @@ export default function DocumentationPage() {
             </div>
           </div>
           <div className="doc-guide-actions">
-            <a className="doc-btn doc-btn--primary" href={GUIDE_PDF} target="_blank" rel="noreferrer">
+            <label className="doc-lang">
+              <Languages size={16} />
+              <span className="doc-lang-label">{t('documentation.guideLanguage')}</span>
+              <select
+                className="doc-lang-select"
+                value={lang}
+                onChange={(e) => setLang(e.target.value)}
+                aria-label={t('documentation.guideLanguage')}
+              >
+                {GUIDE_LANGS.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
+              </select>
+            </label>
+            <a className="doc-btn doc-btn--primary" href={pdf} target="_blank" rel="noreferrer">
               <ExternalLink size={16} /> {t('documentation.openGuide')}
             </a>
-            <a className="doc-btn" href={GUIDE_PDF} download>
+            <a className="doc-btn" href={pdf} download>
               <Download size={16} /> {t('documentation.downloadGuide')}
             </a>
           </div>
         </div>
 
-        <object className="doc-pdf" data={GUIDE_PDF} type="application/pdf" aria-label={t('documentation.guideTitle')}>
+        <object className="doc-pdf" data={pdf} type="application/pdf" aria-label={t('documentation.guideTitle')}>
           <p className="doc-pdf-fallback">
             {t('documentation.pdfFallback')}{' '}
-            <a href={GUIDE_PDF} target="_blank" rel="noreferrer">{t('documentation.openGuide')}</a>
+            <a href={pdf} target="_blank" rel="noreferrer">{t('documentation.openGuide')}</a>
           </p>
         </object>
       </section>

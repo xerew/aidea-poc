@@ -915,6 +915,7 @@
     "funding": "Rahoittaa Euroopan unioni Erasmus+- ja Horizon Europe -ohjelmien kautta.",
     "guideTitle": "Käyttöopas",
     "guideDesc": "Miten kukin käyttäjätyyppi käyttää alustaa.",
+    "guideLanguage": "Oppaan kieli",
     "openGuide": "Avaa opas",
     "downloadGuide": "Lataa PDF",
     "pdfFallback": "Selaimesi ei voi näyttää PDF-tiedostoa."

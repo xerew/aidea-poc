@@ -915,6 +915,7 @@
     "funding": "Gefördert von der Europäischen Union über Erasmus+ und Horizon Europe.",
     "guideTitle": "Benutzerhandbuch",
     "guideDesc": "Wie jeder Benutzertyp mit der Plattform arbeitet.",
+    "guideLanguage": "Sprache des Handbuchs",
     "openGuide": "Handbuch öffnen",
     "downloadGuide": "PDF herunterladen",
     "pdfFallback": "Ihr Browser kann das PDF nicht anzeigen."

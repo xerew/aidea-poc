@@ -915,6 +915,7 @@
     "funding": "Finanziato dall'Unione Europea tramite Erasmus+ e Horizon Europe.",
     "guideTitle": "Guida per l'utente",
     "guideDesc": "Come ogni tipo di utente utilizza la piattaforma.",
+    "guideLanguage": "Lingua della guida",
     "openGuide": "Apri la guida",
     "downloadGuide": "Scarica il PDF",
     "pdfFallback": "Il tuo browser non può visualizzare il PDF."
