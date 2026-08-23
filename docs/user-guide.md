@@ -14,6 +14,7 @@ user can do.
 - [For content creators](#for-content-creators)
 - [For administrators](#for-administrators)
 - [For AIDEA partners (reviewers)](#for-aidea-partners-reviewers)
+- [Sending feedback](#sending-feedback)
 - [Frequently asked questions](#frequently-asked-questions)
 
 ---
@@ -50,16 +51,24 @@ If you don't have an account yet:
 
 1. On the sign-in screen, select **Register** to open the sign-up form.
 2. Enter your first and last name, a username, your email address and a
-   password (you can also add your gender and country).
-3. After registering, you'll answer a few short onboarding questions so the
-   platform can gauge your starting AI competency and personalise your pathway.
+   password (you can also add your gender and country), and accept the Terms of
+   Service and Privacy Policy.
+3. We'll send a **verification email** — open it and confirm your address. Until
+   you do, a reminder banner appears in the app, and you can resend the email
+   from there.
+4. You'll then answer a few short onboarding questions so the platform can
+   personalise your pathway.
 
 ## Signing in and choosing your language
 
 1. Open the platform and sign in with your username and password.
 2. The interface is available in **nine languages**: English, Greek, French,
    Spanish, Italian, Finnish, Swedish, Norwegian and German. Use the language
-   switcher in the header to change it at any time — your choice is remembered.
+   switcher in the header — or on the onboarding screen — to change it at any
+   time; your choice is remembered.
+
+Forgot your password? Select **Forgot your password?** on the sign-in screen and
+we'll email you a link to set a new one.
 
 Course content can also be offered in your language when a creator has
 translated it; otherwise it falls back to the original language.
@@ -74,11 +83,11 @@ The first time you sign in, a short setup wizard runs (about two minutes):
 
 1. **Your subject** — pick the subject you mainly teach.
 2. **Teaching level** — primary, secondary, higher education, vocational or adult education.
-3. **Knowledge check** — a few questions that estimate your current AI competency.
-4. **Learning goals** — what you want to get out of the platform (select all that apply).
+3. **Learning goals** — what you want to get out of the platform (select all that apply).
 
-When you finish, AIDEA calculates your **AI competency level** (Beginner,
-Intermediate or Advanced) and builds your personalised pathway.
+When you finish, AIDEA builds your personalised pathway and invites you to the
+**AI Competency self-assessment** (see below). You can take it straight away or
+skip it for now and return whenever you like.
 
 ### 2. Home
 
@@ -144,17 +153,29 @@ On your **Profile** you can manage:
 
 Your profile header also shows your current **AI competency level and score**.
 
-### 8. Your AI competency
+### 8. Your AI Competency self-assessment
 
-Your competency score (0–6) starts from the onboarding knowledge check and
-changes over time:
+AIDEA offers an **AI Competency self-assessment**: **24 short statements**
+grouped into **six areas** of AI competency. For each statement you say how much
+you agree, from **Strongly disagree** to **Strongly agree**.
 
-- Completing courses **raises** it.
-- It can **drop** if you repeatedly fail quizzes, move very slowly, or abandon a
-  course mid-way for a long time.
+- You can **Skip for now**, **Save and exit** to resume later, or **Finish** once
+  every statement is answered.
+- When you finish you get a **results page**: an **overall level** — Beginner,
+  Intermediate or Advanced — plus a breakdown showing your level and average in
+  each of the six areas.
+- Your overall level appears on your **Profile** and, together with your
+  activity, shapes your recommendations and pathway.
+- You can reopen the assessment any time from your **Profile**. Your previous
+  results stay in place until a fresh attempt is finished, and you can **retake**
+  it once a new attempt has been made available to you.
 
-When your score crosses into a new band (Beginner / Intermediate / Advanced),
-your recommendations and pathway adjust.
+The AI Competency assessment is available to everyone — teachers, content
+creators, AIDEA partners and administrators.
+
+Your competency level can also **change over time**: completing courses and
+staying active keeps it current, while a long period of inactivity can lower it.
+When it crosses into a new band, your recommendations and pathway adjust.
 
 ### 9. Requesting content-creator access
 
@@ -273,6 +294,19 @@ approve it — which marks that lesson complete for the teacher — or return it
 
 ---
 
+## Sending feedback
+
+You can send feedback at any time from the **Documentation** page:
+
+1. Choose a **category** — bug, suggestion, general feedback, feature request or
+   content issue.
+2. Write your **message**, and optionally **attach** an image or file, or **add a
+   link**.
+3. **Submit**. Your past submissions are listed there so you can track what
+   you've sent.
+
+---
+
 ## Frequently asked questions
 
 **I don't see Authoring or Content Analytics.**
@@ -294,3 +328,24 @@ always in your chosen language.
 
 **Can I change the onboarding questions?**
 Only administrators can, via the Django admin. See *For administrators*.
+
+**I forgot my password.**
+Select **Forgot your password?** on the sign-in screen. We'll email you a link to
+set a new one.
+
+**I was asked to verify my email.**
+After registering, open the verification email we sent and confirm your address.
+Until you do, a reminder banner appears in the app; you can resend the email from
+that banner.
+
+**There's a maintenance notice at the top of the page.**
+Occasionally the team schedules maintenance. When that happens, a banner shows
+the planned window so you know when the platform may be briefly unavailable.
+
+**I was invited to take part in a study.**
+From time to time, teachers may be invited to join a research study with a short
+pre/post questionnaire. Taking part is optional — you can decline and keep using
+the platform normally.
+
+**Where do I send feedback or report a problem?**
+Open the **Documentation** page and use the feedback form. See *Sending feedback*.
