@@ -81,7 +81,17 @@ export default function PrivacyPage() {
         or advertising cookies.
       </p>
 
-      <h2>10. Changes and complaints</h2>
+      <h2>10. Analytics</h2>
+      <p>
+        We use Matomo, a privacy-friendly analytics tool that we host ourselves on our own
+        infrastructure within the European Union, to understand how the platform is used (for
+        example, which pages are visited) so that we can improve it. Matomo runs{' '}
+        <strong>without cookies</strong>, anonymises IP addresses, and we do not share this data
+        with any third party. The legal basis is our legitimate interest in maintaining and
+        improving an educational platform.
+      </p>
+
+      <h2>11. Changes and complaints</h2>
       <p>
         We may update this Policy; material changes will be notified through the platform. If you
         believe your data has been handled improperly, you may lodge a complaint with your national
