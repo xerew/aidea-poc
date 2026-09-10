@@ -118,6 +118,10 @@ services:
       target: prod
       args:
         VITE_API_URL: ${VITE_API_URL:?VITE_API_URL is required}
+        # Optional web analytics (empty = disabled). See docker-compose.matomo.yml.
+        VITE_ANALYTICS_PROVIDER: ${VITE_ANALYTICS_PROVIDER:-}
+        VITE_MATOMO_URL: ${VITE_MATOMO_URL:-}
+        VITE_MATOMO_SITE_ID: ${VITE_MATOMO_SITE_ID:-}
     restart: unless-stopped
 
   caddy:
@@ -130,6 +134,7 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/caddy/conf.d/placeholder.caddy:/etc/caddy/conf.d/placeholder.caddy:ro
       - static_files:/srv/static
       - media_files:/srv/media
       - caddy_data:/data

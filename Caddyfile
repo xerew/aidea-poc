@@ -1,5 +1,9 @@
 # Caddyfile — production reverse proxy
 
+# Optional extra sites (e.g. self-hosted Matomo). Empty by default: the glob
+# matches nothing until docker-compose.matomo.yml mounts a snippet here.
+import /etc/caddy/conf.d/*.caddy
+
 # Redirect www → apex so both addresses work (Caddy still gets a cert for www).
 www.{$DOMAIN:localhost} {
     redir https://{$DOMAIN:localhost}{uri} permanent

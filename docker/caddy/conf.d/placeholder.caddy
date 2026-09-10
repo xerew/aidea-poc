@@ -1,0 +1,6 @@
+# Placeholder so the `import /etc/caddy/conf.d/*.caddy` glob in the main
+# Caddyfile always matches at least one file (an empty glob would error and
+# take the proxy down). Optional site snippets — e.g. self-hosted Matomo,
+# mounted by docker-compose.matomo.yml — sit alongside this file.
+#
+# Intentionally contains no site blocks.

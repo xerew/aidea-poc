@@ -1,0 +1,50 @@
+# docker-compose.matomo.yml — opt-in, self-hosted Matomo web analytics.
+#
+# Zero cost, cookieless, GDPR-friendly, data stays on your VM. This file is an
+# overlay: it does nothing unless you explicitly include it, so the default
+# production stack is unaffected.
+#
+# Enable (after the prerequisites in docs/matomo-setup.md):
+#   docker compose -f docker-compose.prod.yml -f docker-compose.matomo.yml up -d
+#
+# Required env vars (in your root .env):
+#   MATOMO_DB_PASSWORD, MATOMO_DB_ROOT_PASSWORD
+services:
+  matomo-db:
+    image: mariadb:11
+    command: --max-allowed-packet=64MB
+    environment:
+      MARIADB_DATABASE: matomo
+      MARIADB_USER: matomo
+      MARIADB_PASSWORD: ${MATOMO_DB_PASSWORD:?MATOMO_DB_PASSWORD is required}
+      MARIADB_ROOT_PASSWORD: ${MATOMO_DB_ROOT_PASSWORD:?MATOMO_DB_ROOT_PASSWORD is required}
+    volumes:
+      - matomo_db_data:/var/lib/mysql
+    restart: unless-stopped
+
+  matomo:
+    image: matomo:5-apache
+    environment:
+      MATOMO_DATABASE_HOST: matomo-db
+      MATOMO_DATABASE_ADAPTER: mysql
+      MATOMO_DATABASE_TABLES_PREFIX: matomo_
+      MATOMO_DATABASE_USERNAME: matomo
+      MATOMO_DATABASE_PASSWORD: ${MATOMO_DB_PASSWORD:?MATOMO_DB_PASSWORD is required}
+      MATOMO_DATABASE_DBNAME: matomo
+    volumes:
+      - matomo_data:/var/www/html
+    depends_on:
+      - matomo-db
+    restart: unless-stopped
+
+  # Mount the analytics site snippet into Caddy (the main Caddyfile imports
+  # /etc/caddy/conf.d/*.caddy). Merges with the caddy service in the prod file.
+  caddy:
+    volumes:
+      - ./docker/caddy/analytics.caddy:/etc/caddy/conf.d/analytics.caddy:ro
+    depends_on:
+      - matomo
+
+volumes:
+  matomo_db_data:
+  matomo_data:

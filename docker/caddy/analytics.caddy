@@ -1,0 +1,6 @@
+# Self-hosted Matomo, served at analytics.<DOMAIN> with automatic HTTPS.
+# Mounted into the Caddy container by docker-compose.matomo.yml, and picked up
+# by the `import /etc/caddy/conf.d/*.caddy` line in the main Caddyfile.
+analytics.{$DOMAIN:localhost} {
+    reverse_proxy matomo:80
+}
