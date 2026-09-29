@@ -38,3 +38,22 @@ class LessonProgress(models.Model):
 
     def __str__(self):
         return f'{self.user.username} → {self.lesson.title}'
+
+
+class ResourceProgress(models.Model):
+    """Per user × resource progress (replaces LessonProgress). Activity/module/
+    course completion is derived by aggregating these."""
+    user               = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resource_progress')
+    resource           = models.ForeignKey('hub.Resource', on_delete=models.CASCADE, related_name='progress_records')
+    completed_at       = models.DateTimeField(null=True, blank=True)
+    time_spent_seconds = models.IntegerField(null=True, blank=True)
+    quiz_score         = models.FloatField(null=True, blank=True)
+    quiz_answers       = models.JSONField(default=list)
+    engagement_data    = models.JSONField(default=dict)
+    updated_at         = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'resource')
+
+    def __str__(self):
+        return f'{self.user.username} → {self.resource}'

@@ -2,7 +2,7 @@ from .access_request import AccessRequest
 from .activity import LearnerActivityConfig, LessonSession
 from .assignment import AssignmentSubmission
 from .content import Course, CourseCollaborator, LearningPillar, Lesson, Module, Resource
-from .enrollment import Enrollment, LessonProgress
+from .enrollment import Enrollment, LessonProgress, ResourceProgress
 from .feedback import Feedback
 from .history import CourseEditHistory
 from .maintenance import MaintenanceNotice
@@ -48,6 +48,7 @@ __all__ = [
     'LearningPillar',
     'Lesson',
     'LessonProgress',
+    'ResourceProgress',
     'LessonSession',
     'Module',
     'Resource',

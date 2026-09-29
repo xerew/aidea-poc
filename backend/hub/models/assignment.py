@@ -12,6 +12,11 @@ class AssignmentSubmission(models.Model):
 
     user         = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignment_submissions')
     lesson       = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='submissions')
+    # Repointed to the assignment resource by the data migration; becomes the
+    # canonical target in Phase 2 (lesson kept as the rollback window).
+    resource     = models.ForeignKey(
+        'hub.Resource', on_delete=models.CASCADE, null=True, blank=True, related_name='submissions',
+    )
     text         = models.TextField(blank=True)
     # List of attachment blocks: {'type': 'image'|'file'|'video', 'url': str, 'name': str}.
     attachments  = models.JSONField(default=list, blank=True)
