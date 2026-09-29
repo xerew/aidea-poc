@@ -10,6 +10,22 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-29-activities-resources-design.md`
 
+## Plan revision (2026-09-29, middle path)
+
+Agreed adjustments to reduce risk without losing structural value:
+- **Rename the model** `Lesson`→`Activity` (cheap `RenameModel`), but **keep the
+  `/lessons/` endpoint paths** — no API break, no dead deep-links. Task 1.6 and
+  Phase 2 keep URL paths as `/lessons/…`; only identifiers/serializers/UI labels
+  change.
+- **Keep the legacy columns** (`lesson_type/content/media_items/quiz_data`,
+  `LessonProgress`, `AssignmentSubmission.lesson`) at cutover — they are the
+  rollback window. Task 1.6 does NOT drop them; a separate cleanup migration
+  drops them weeks later once stable.
+- **Progress parity gate:** after the data migration, assert every existing
+  `Enrollment.progress_pct` is unchanged.
+- Prep (done): recommendation `IntegrityError` fixed on `master`; work proceeds
+  on branch `feature/activities-resources`.
+
 ## Global Constraints
 
 - Runner: `.venv/Scripts/uv.exe run manage.py …` from `backend/` (or global `~/.local/bin/uv.exe`). Tests: `… test hub analytics`. Lint: `ruff check hub analytics` (E501 ignored; `--fix` for import order).

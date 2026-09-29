@@ -80,6 +80,38 @@ class CourseCollaborator(models.Model):
         return f'{self.user.username} — {self.get_role_display()} on {self.course.title}'
 
 
+class Resource(models.Model):
+    """One content block inside an Activity (currently `Lesson`). An activity
+    owns an ordered list of resources, each of a single type. Payload lives in
+    typed columns; only the ones relevant to `type` are used."""
+    class Type(models.TextChoices):
+        TEXT       = 'text',       'Text'
+        VIDEO      = 'video',      'Video'
+        IMAGE      = 'image',      'Image'
+        PDF        = 'pdf',        'PDF'
+        QUIZ       = 'quiz',       'Quiz'
+        ASSIGNMENT = 'assignment', 'Assignment'
+
+    # FK targets `Lesson` for now; renamed to `Activity` in the rename migration.
+    activity     = models.ForeignKey('hub.Lesson', on_delete=models.CASCADE, related_name='resources')
+    type         = models.CharField(max_length=20, choices=Type.choices)
+    order        = models.PositiveSmallIntegerField(default=0)
+    is_required  = models.BooleanField(default=True)
+    title        = models.CharField(max_length=200, blank=True)
+    content      = models.TextField(blank=True)                 # text
+    url          = models.CharField(max_length=500, blank=True)  # video/image/pdf
+    caption      = models.CharField(max_length=300, blank=True)
+    quiz_data    = models.JSONField(default=list, blank=True)    # quiz
+    instructions = models.TextField(blank=True)                  # assignment
+    translations = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f'{self.activity.title} — {self.get_type_display()}'
+
+
 class Module(models.Model):
     title            = models.CharField(max_length=200)
     description      = models.TextField(blank=True)
