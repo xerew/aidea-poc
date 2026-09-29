@@ -10,6 +10,19 @@ from hub.translation import translate_text
 logger = logging.getLogger(__name__)
 
 
+def _upsert_recommendation(user, course_id, score, reason, source):
+    """Idempotent write of one recommendation. CourseRecommendation is unique on
+    (user, course), but the personal and CF passes are separate writers that can
+    each select the same course (and overlapping recompute triggers can race), so
+    a plain create() would raise IntegrityError. update_or_create keeps a single
+    row per (user, course) — last writer wins."""
+    from hub.models.recommendations import CourseRecommendation
+    CourseRecommendation.objects.update_or_create(
+        user=user, course_id=course_id,
+        defaults={'score': score, 'reason': reason, 'source': source},
+    )
+
+
 def _merge_json(model_cls, pk, field, key, value):
     """Atomically set field[key]=value on a JSONField dict under a row lock.
 
@@ -250,18 +263,16 @@ def compute_user_recommendations(user_id: int) -> None:
             break
 
     # ── Write personal recommendations ───────────────────────────────────
-    CourseRecommendation.objects.filter(user=user, source='personal').delete()
-
     subject_display = profile.subject.name if profile.subject else 'general'
     level_name = ('beginner', 'intermediate', 'advanced')[level_num]
-    for course, similarity in filtered:
-        CourseRecommendation.objects.create(
-            user=user,
-            course=course,
-            score=similarity,
-            reason=f"Matches your {level_name} level and {subject_display} focus",
-            source='personal',
-        )
+    with transaction.atomic():
+        CourseRecommendation.objects.filter(user=user, source='personal').delete()
+        for course, similarity in filtered:
+            _upsert_recommendation(
+                user, course.id, similarity,
+                f"Matches your {level_name} level and {subject_display} focus",
+                'personal',
+            )
 
     # ── Trigger CF task ───────────────────────────────────────────────────
     compute_cf_recommendations.delay(user_id)
@@ -326,18 +337,16 @@ def compute_cf_recommendations(user_id: int) -> None:
         .order_by('-n')[:3]
     )
 
-    CourseRecommendation.objects.filter(user=user, source='cf').delete()
-
     subject_display = profile.subject.name if profile.subject else 'teachers'
-    for item in top_courses:
-        pct = round(item['n'] / group_size * 100)
-        CourseRecommendation.objects.create(
-            user=user,
-            course_id=item['course_id'],
-            score=item['n'] / group_size,
-            reason=f"{pct}% of {subject_display} teachers also enrolled",
-            source='cf',
-        )
+    with transaction.atomic():
+        CourseRecommendation.objects.filter(user=user, source='cf').delete()
+        for item in top_courses:
+            pct = round(item['n'] / group_size * 100)
+            _upsert_recommendation(
+                user, item['course_id'], item['n'] / group_size,
+                f"{pct}% of {subject_display} teachers also enrolled",
+                'cf',
+            )
 
 
 @shared_task
