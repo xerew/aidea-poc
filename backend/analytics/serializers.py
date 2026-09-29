@@ -44,7 +44,10 @@ class CourseAnalyticsSerializer(serializers.ModelSerializer):
         profile = request.user.profile
         if profile.user_type in (UserProfile.UserType.ADMIN, UserProfile.UserType.AIDEA_PARTNER):
             return True
-        return obj.created_by_id == request.user.id
+        return (
+            obj.created_by_id == request.user.id
+            or obj.id in self.context.get('editable_course_ids', set())
+        )
 
     def _enrollments(self, obj):
         cache = self.context.setdefault('_enrollment_cache', {})

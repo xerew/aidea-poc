@@ -12,6 +12,7 @@ from .permissions import (
     IsReviewer,
     can_edit_course,
     can_review_translation,
+    can_translate_course,
 )
 
 TRANSLATABLE_COURSE_FIELDS = ['title', 'description', 'learning_outcomes']
@@ -31,10 +32,12 @@ class AuthoringCoursesView(APIView):
         qs = (
             Course.objects
             .select_related('pillar', 'created_by')
-            .prefetch_related('modules')
+            .prefetch_related('modules', 'collaborators__user')
             .order_by('pillar__order', 'title')
         )
-        return Response(CourseAuthoringSerializer(qs, many=True).data)
+        return Response(
+            CourseAuthoringSerializer(qs, many=True, context={'request': request}).data,
+        )
 
     def post(self, request):
         serializer = CourseAuthoringSerializer(data=request.data)
@@ -45,7 +48,7 @@ class AuthoringCoursesView(APIView):
             editor=request.user,
             changes={'course_created': {'title': course.title}},
         )
-        return Response(CourseAuthoringSerializer(course).data, status=status.HTTP_201_CREATED)
+        return Response(CourseAuthoringSerializer(course, context={'request': request}).data, status=status.HTTP_201_CREATED)
 
 
 class AuthoringCourseDetailView(APIView):
@@ -53,7 +56,12 @@ class AuthoringCourseDetailView(APIView):
 
     def _get_course(self, pk):
         try:
-            return Course.objects.prefetch_related('modules').select_related('pillar').get(pk=pk)
+            return (
+                Course.objects
+                .prefetch_related('modules', 'collaborators__user')
+                .select_related('pillar')
+                .get(pk=pk)
+            )
         except Course.DoesNotExist:
             return None
 
@@ -61,19 +69,26 @@ class AuthoringCourseDetailView(APIView):
         course = self._get_course(pk)
         if not course:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        return Response(CourseAuthoringSerializer(course).data)
+        return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
     def patch(self, request, pk):
         course = self._get_course(pk)
         if not course:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if not can_edit_course(request.user, course):
+
+        lang = request.query_params.get('lang')
+        # Editing a translation needs translate rights; editing source content
+        # needs full edit rights.
+        allowed = (
+            can_translate_course(request.user, course) if lang
+            else can_edit_course(request.user, course)
+        )
+        if not allowed:
             return Response(
-                {'detail': 'Only the author can edit this course.'},
+                {'detail': 'You do not have permission to edit this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        lang = request.query_params.get('lang')
         if lang:
             if lang not in LANGUAGE_NAMES or lang == course.source_language:
                 return Response(
@@ -85,7 +100,7 @@ class AuthoringCourseDetailView(APIView):
                     blob[field] = request.data[field]
             course.translations[lang] = blob
             course.save(update_fields=['translations'])
-            return Response(CourseAuthoringSerializer(course).data)
+            return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
         serializer = CourseAuthoringSerializer(course, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -114,7 +129,7 @@ class AuthoringCourseDetailView(APIView):
             resync_course_meta(course)
 
         course.refresh_from_db()
-        return Response(CourseAuthoringSerializer(course).data)
+        return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
     def delete(self, request, pk):
         course = self._get_course(pk)
@@ -156,7 +171,7 @@ class AuthoringCoursePublishView(APIView):
             editor=request.user,
             changes={'course_published': {'title': course.title}},
         )
-        return Response(CourseAuthoringSerializer(course).data)
+        return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
 
 class AuthoringCourseUnpublishView(APIView):
@@ -182,7 +197,7 @@ class AuthoringCourseUnpublishView(APIView):
             editor=request.user,
             changes={'course_unpublished': {'title': course.title}},
         )
-        return Response(CourseAuthoringSerializer(course).data)
+        return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
 
 class AuthoringCourseTranslateView(APIView):
@@ -193,8 +208,8 @@ class AuthoringCourseTranslateView(APIView):
             course = Course.objects.get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if not can_edit_course(request.user, course):
-            return Response({'detail': 'Only the author can translate this course.'},
+        if not can_translate_course(request.user, course):
+            return Response({'detail': 'You do not have permission to translate this course.'},
                             status=status.HTTP_403_FORBIDDEN)
         language = request.data.get('language')
         valid = set(LANGUAGE_NAMES) - {course.source_language}

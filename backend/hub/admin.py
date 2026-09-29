@@ -8,6 +8,7 @@ from .models import (
     AccessRequest,
     AssignmentSubmission,
     Course,
+    CourseCollaborator,
     CourseEditHistory,
     Enrollment,
     Feedback,
@@ -45,7 +46,7 @@ class UserProfileInline(admin.StackedInline):
     verbose_name_plural = 'Profile'
     fields = [
         'user_type', 'gender', 'country',
-        'avatar_initials', 'competency_score', 'onboarding_completed',
+        'avatar_initials', 'competency_score', 'onboarding_completed', 'email_verified',
         'subject', 'school', 'phone', 'location',
         'preferred_pillars', 'learning_style', 'weekly_learning_goal',
         'email_notifications', 'progress_reminders', 'profile_public', 'share_progress',
@@ -82,13 +83,13 @@ admin.site.register(User, CustomUserAdmin)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['get_full_name', 'get_username', 'get_email', 'user_type', 'gender', 'country', 'competency_score', 'onboarding_completed']
-    list_filter  = ['user_type', 'gender', 'country', 'onboarding_completed']
-    list_editable = ['user_type']
+    list_display = ['get_full_name', 'get_username', 'get_email', 'user_type', 'gender', 'country', 'competency_score', 'onboarding_completed', 'email_verified']
+    list_filter  = ['user_type', 'gender', 'country', 'onboarding_completed', 'email_verified']
+    list_editable = ['user_type', 'email_verified']
     search_fields = ['user__username', 'user__first_name', 'user__last_name', 'user__email']
     readonly_fields = ['avatar_initials', 'competency_score']
     fieldsets = [
-        ('Identity', {'fields': ['user', 'user_type', 'avatar_initials', 'competency_score']}),
+        ('Identity', {'fields': ['user', 'user_type', 'avatar_initials', 'competency_score', 'email_verified']}),
         ('Personal', {'fields': ['gender', 'country', 'subject', 'teaching_level', 'school', 'phone', 'location', 'goals']}),
         ('Learning', {'fields': ['preferred_pillars', 'learning_style', 'weekly_learning_goal', 'onboarding_completed']}),
         ('Notifications', {'fields': ['email_notifications', 'progress_reminders', 'profile_public', 'share_progress']}),
@@ -197,6 +198,14 @@ class ModuleInline(admin.TabularInline):
     ordering = ['order']
 
 
+class CourseCollaboratorInline(admin.TabularInline):
+    model = CourseCollaborator
+    extra = 0
+    fields = ['user', 'role', 'added_by', 'created_at']
+    readonly_fields = ['created_at']
+    autocomplete_fields = ['user', 'added_by']
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display  = ['title', 'pillar', 'level', 'content_format', 'is_published', 'created_by', 'created_at']
@@ -204,7 +213,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['title', 'description']
     readonly_fields = ['created_at']
     filter_horizontal = ['subjects']
-    inlines = [ModuleInline]
+    inlines = [ModuleInline, CourseCollaboratorInline]
     actions = ['publish_courses', 'unpublish_courses']
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):

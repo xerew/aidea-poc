@@ -197,6 +197,11 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     created_by_id = serializers.IntegerField(source='created_by.id', read_only=True, default=None)
     created_by_name = serializers.SerializerMethodField()
+    collaborators = serializers.SerializerMethodField()
+    my_role = serializers.SerializerMethodField()
+    can_edit = serializers.SerializerMethodField()
+    can_translate = serializers.SerializerMethodField()
+    can_manage = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -205,6 +210,7 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
             'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
             'subjects', 'subject_ids', 'created_by_id', 'created_by_name',
             'source_language', 'translations', 'translation_status',
+            'collaborators', 'my_role', 'can_edit', 'can_translate', 'can_manage',
         ]
         read_only_fields = ['is_published', 'translations', 'translation_status']
 
@@ -212,6 +218,50 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
         if not obj.created_by:
             return 'AIDEA team'
         return obj.created_by.get_full_name() or obj.created_by.username
+
+    def _user(self):
+        request = self.context.get('request')
+        return request.user if request else None
+
+    def get_collaborators(self, obj):
+        return [
+            {
+                'user_id': c.user_id,
+                'username': c.user.username,
+                'name': c.user.get_full_name() or c.user.username,
+                'role': c.role,
+                'role_display': c.get_role_display(),
+            }
+            for c in obj.collaborators.all()
+        ]
+
+    def get_my_role(self, obj):
+        # 'author' | 'co_editor' | 'translator' | None — the viewer's relation
+        # to this course (prefetched; no extra queries).
+        user = self._user()
+        if user is None:
+            return None
+        if obj.created_by_id == user.id:
+            return 'author'
+        for c in obj.collaborators.all():
+            if c.user_id == user.id:
+                return c.role
+        return None
+
+    def get_can_edit(self, obj):
+        from hub.views.permissions import can_edit_course
+        user = self._user()
+        return bool(user and can_edit_course(user, obj))
+
+    def get_can_translate(self, obj):
+        from hub.views.permissions import can_translate_course
+        user = self._user()
+        return bool(user and can_translate_course(user, obj))
+
+    def get_can_manage(self, obj):
+        from hub.views.permissions import can_manage_course
+        user = self._user()
+        return bool(user and can_manage_course(user, obj))
 
 
 class CourseEditHistorySerializer(serializers.ModelSerializer):

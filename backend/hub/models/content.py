@@ -56,6 +56,30 @@ class Course(models.Model):
         return self.title
 
 
+class CourseCollaborator(models.Model):
+    """Grants a content creator / AIDEA partner rights on a course they did not
+    author: a co-editor (full editing, like the author) or a translator (may
+    only add and edit translations, not the source content)."""
+    class Role(models.TextChoices):
+        CO_EDITOR  = 'co_editor',  'Co-editor'
+        TRANSLATOR = 'translator', 'Translator'
+
+    course     = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='collaborators')
+    user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='course_collaborations')
+    role       = models.CharField(max_length=20, choices=Role.choices)
+    added_by   = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name='+',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('course', 'user')
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f'{self.user.username} — {self.get_role_display()} on {self.course.title}'
+
+
 class Module(models.Model):
     title            = models.CharField(max_length=200)
     description      = models.TextField(blank=True)

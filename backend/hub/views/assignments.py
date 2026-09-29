@@ -2,15 +2,23 @@ import os
 import uuid
 
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import AssignmentSubmission, Course, Enrollment, Lesson, UserProfile
+from hub.models import (
+    AssignmentSubmission,
+    Course,
+    CourseCollaborator,
+    Enrollment,
+    Lesson,
+    UserProfile,
+)
 from hub.serializers.assignments import AssignmentSubmissionSerializer, ReviewQueueSerializer
 
-from .permissions import IsReviewer
+from .permissions import IsReviewer, can_edit_course
 
 # Attachments a learner may upload with a submission.
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
@@ -20,9 +28,14 @@ MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
 
 
 def _reviewer_scope(queryset, user):
-    """Creators see their own courses' submissions; partners/admins see all."""
+    """Creators see submissions for courses they authored or co-edit;
+    partners/admins see all."""
     if user.profile.user_type == UserProfile.UserType.CONTENT_CREATOR:
-        return queryset.filter(lesson__module__course__created_by=user)
+        return queryset.filter(
+            Q(lesson__module__course__created_by=user)
+            | Q(lesson__module__course__collaborators__user=user,
+                lesson__module__course__collaborators__role=CourseCollaborator.Role.CO_EDITOR),
+        ).distinct()
     return queryset
 
 
@@ -164,10 +177,10 @@ class ReviewActionView(APIView):
         course = submission.lesson.module.course
         if (
             request.user.profile.user_type == UserProfile.UserType.CONTENT_CREATOR
-            and course.created_by_id != request.user.id
+            and not can_edit_course(request.user, course)
         ):
             return Response(
-                {'detail': 'You can only review submissions to your own courses.'},
+                {'detail': 'You can only review submissions to courses you author or co-edit.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
         if submission.status != AssignmentSubmission.Status.PENDING:

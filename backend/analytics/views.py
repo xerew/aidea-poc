@@ -1,12 +1,13 @@
 from io import BytesIO
 
+from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.text import slugify
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, Enrollment, LessonProgress, UserProfile
+from hub.models import Course, CourseCollaborator, Enrollment, LessonProgress, UserProfile
 from hub.views.permissions import IsContentCreator
 
 from .reports import build_analytics_workbook, build_course_teacher_report
@@ -17,11 +18,22 @@ XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 def scoped_courses(user):
     """Which courses' analytics a user may see: admins and AIDEA partners see
-    every course; content creators see only the ones they authored."""
+    every course; content creators see the ones they authored or co-edit."""
     qs = Course.objects.select_related('created_by', 'pillar')
     if user.profile.user_type in (UserProfile.UserType.ADMIN, UserProfile.UserType.AIDEA_PARTNER):
         return qs
-    return qs.filter(created_by=user)
+    return qs.filter(
+        Q(created_by=user)
+        | Q(collaborators__user=user, collaborators__role=CourseCollaborator.Role.CO_EDITOR),
+    ).distinct()
+
+
+def co_editor_course_ids(user):
+    return set(
+        CourseCollaborator.objects.filter(
+            user=user, role=CourseCollaborator.Role.CO_EDITOR,
+        ).values_list('course_id', flat=True)
+    )
 
 
 class AnalyticsOverviewView(APIView):
@@ -59,7 +71,8 @@ class AnalyticsOverviewView(APIView):
         }
 
         courses_data = CourseAnalyticsSerializer(
-            courses, many=True, context={'request': request},
+            courses, many=True,
+            context={'request': request, 'editable_course_ids': co_editor_course_ids(request.user)},
         ).data
 
         return Response({'summary': summary, 'courses': courses_data})

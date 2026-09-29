@@ -51,6 +51,11 @@ from .authoring_xlsx import (
     AuthoringCourseImportView,
     AuthoringCourseTemplateView,
 )
+from .collaborators import (
+    AuthoringCollaboratorCandidatesView,
+    AuthoringCourseCollaboratorDetailView,
+    AuthoringCourseCollaboratorsView,
+)
 from .feedback import (
     AdminFeedbackDetailView,
     AdminFeedbackListView,
@@ -139,6 +144,9 @@ __all__ = [
     'AuthoringModuleView',
     'AuthoringPillarsView',
     'AuthoringUploadView',
+    'AuthoringCollaboratorCandidatesView',
+    'AuthoringCourseCollaboratorsView',
+    'AuthoringCourseCollaboratorDetailView',
     'CourseDetailView',
     'CourseEnrollView',
     'CourseLearnView',
