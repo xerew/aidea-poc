@@ -39,14 +39,17 @@ def migrate_lessons_to_resources(apps, schema_editor):
                 translations=_pick('content'),
             )
 
-        for mi in (lesson.media_items or []):
+        media = lesson.media_items if isinstance(lesson.media_items, list) else []
+        for mi in media:
+            if not isinstance(mi, dict):
+                continue
             mtype = mi.get('type')
             if mtype in ('image', 'video', 'pdf') and mi.get('url'):
                 order += 1
                 Resource.objects.create(
                     activity_id=lesson.id, type=mtype, order=order,
                     is_required=lesson.is_required,
-                    url=mi.get('url', ''), caption=mi.get('caption', ''),
+                    url=mi.get('url', ''), caption=str(mi.get('caption', '') or ''),
                 )
 
         if lesson.lesson_type == 'quiz':

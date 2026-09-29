@@ -78,6 +78,22 @@ class ContentMigrationTest(TestCase):
         self.assertEqual([r.type for r in res], ['assignment'])
         self.assertEqual(res[0].instructions, 'do this')
 
+    def test_malformed_media_items_are_skipped(self):
+        """Real prod data (lesson 310) has malformed media_items — a non-list,
+        non-dict items, or items missing a url must not crash the migration."""
+        bad_list = Lesson.objects.create(
+            module=self.module, title='BadList', lesson_type='text', order=5,
+            content='c', media_items='not-a-list',
+        )
+        bad_items = Lesson.objects.create(
+            module=self.module, title='BadItems', lesson_type='text', order=6,
+            content='c', media_items=['x', {'type': 'video'}, {'type': 'video', 'url': 'ok.mp4'}],
+        )
+        self._run_content()
+        self.assertEqual([r.type for r in bad_list.resources.all()], ['text'])
+        # only the well-formed video survives
+        self.assertEqual([r.type for r in bad_items.resources.order_by('order')], ['text', 'video'])
+
 
 class ProgressMigrationTest(TestCase):
     def setUp(self):
