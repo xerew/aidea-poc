@@ -540,7 +540,8 @@
       "deleting": "Raderar…",
       "confirmDelete": "Radera den här kursen permanent? Alla moduler, lektioner och anmälningar går förlorade. Detta kan inte ångras.",
       "subjectsLabel": "Ämnen",
-      "subjectsHint": "Vilka lärare är kursen för? Välj alla som gäller."
+      "subjectsHint": "Vilka lärare är kursen för? Välj alla som gäller.",
+      "translatorBanner": "Du kan bara redigera översättningar; originalinnehållet är skrivskyddat."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbyggare",
@@ -634,6 +635,18 @@
       "markReviewed": "Markera som granskad av människa",
       "unmarkReviewed": "Ta bort granskningsmärke",
       "reviewedNote": "Granskad av en människa — denna översättning är giltig."
+    },
+    "collab": {
+      "title": "Medarbetare",
+      "description": "Lägg till innehållsskapare eller AIDEA-partner för att hjälpa till att hantera eller översätta kursen.",
+      "none": "Inga medarbetare ännu.",
+      "searchPlaceholder": "Sök skapare eller partner...",
+      "add": "Lägg till",
+      "remove": "Ta bort",
+      "role": {
+        "co_editor": "Medredaktör",
+        "translator": "Översättare"
+      }
     }
   },
   "reviews": {

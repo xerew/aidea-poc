@@ -1,0 +1,46 @@
+.collab-panel {
+  margin-top: 1.75rem;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface, #fff);
+}
+.collab-title {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 1.05rem; margin: 0 0 0.3rem;
+}
+.collab-desc { color: var(--color-text-muted); font-size: 0.85rem; margin: 0 0 0.9rem; }
+.collab-empty { color: var(--color-text-muted); font-size: 0.85rem; font-style: italic; }
+
+.collab-list { list-style: none; padding: 0; margin: 0 0 1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.collab-row {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.45rem 0.6rem; border: 1px solid var(--color-border); border-radius: 8px;
+}
+.collab-name { font-weight: 600; }
+.collab-badge {
+  font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+  padding: 0.1rem 0.5rem; border-radius: 9999px;
+}
+.collab-badge--co_editor { background: #dbeafe; color: #1e40af; }
+.collab-badge--translator { background: #dcfce7; color: #166534; }
+.collab-row .icon-btn { margin-left: auto; }
+
+.collab-add { display: flex; gap: 0.5rem; align-items: flex-start; flex-wrap: wrap; }
+.collab-search-wrap { position: relative; flex: 1 1 240px; }
+.collab-search {
+  width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--color-border);
+  border-radius: 8px; font: inherit; font-size: 0.88rem;
+}
+.collab-candidates {
+  position: absolute; z-index: 5; top: 100%; left: 0; right: 0; margin: 0.2rem 0 0; padding: 0.25rem;
+  list-style: none; background: #fff; border: 1px solid var(--color-border); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); max-height: 220px; overflow-y: auto;
+}
+.collab-candidates button {
+  width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+  padding: 0.4rem 0.55rem; border-radius: 6px; font-size: 0.88rem;
+}
+.collab-candidates button:hover { background: #f1f5f9; }
+.collab-cand-user { color: var(--color-text-muted); font-size: 0.78rem; }
+.collab-role { padding: 0.5rem 0.6rem; border: 1px solid var(--color-border); border-radius: 8px; font: inherit; }

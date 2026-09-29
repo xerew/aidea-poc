@@ -540,7 +540,8 @@
       "deleting": "Poistetaan…",
       "confirmDelete": "Poistetaanko tämä kurssi pysyvästi? Kaikki moduulit, oppitunnit ja ilmoittautumiset menetetään. Tätä ei voi kumota.",
       "subjectsLabel": "Oppiaineet",
-      "subjectsHint": "Keille opettajille tämä kurssi on tarkoitettu? Valitse kaikki sopivat."
+      "subjectsHint": "Keille opettajille tämä kurssi on tarkoitettu? Valitse kaikki sopivat.",
+      "translatorBanner": "Voit muokata vain käännöksiä; alkuperäinen sisältö on vain luettavissa."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Tietovisan luonti",
@@ -634,6 +635,18 @@
       "markReviewed": "Merkitse ihmisen tarkistamaksi",
       "unmarkReviewed": "Poista tarkistusmerkintä",
       "reviewedNote": "Ihmisen tarkistama — tämä käännös on kelvollinen."
+    },
+    "collab": {
+      "title": "Yhteistyökumppanit",
+      "description": "Lisää sisällöntuottajia tai AIDEA-kumppaneita auttamaan tämän kurssin hallinnassa tai kääntämisessä.",
+      "none": "Ei vielä yhteistyökumppaneita.",
+      "searchPlaceholder": "Hae tekijöitä tai kumppaneita...",
+      "add": "Lisää",
+      "remove": "Poista",
+      "role": {
+        "co_editor": "Osatoimittaja",
+        "translator": "Kääntäjä"
+      }
     }
   },
   "reviews": {

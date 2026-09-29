@@ -164,6 +164,11 @@ export default function AuthoringPage() {
                     <span className={`status-badge ${course.is_published ? 'status-badge--published' : 'status-badge--draft'}`}>
                       {course.is_published ? t('authoring.published') : t('authoring.draft')}
                     </span>
+                    {(course.my_role === 'co_editor' || course.my_role === 'translator') && (
+                      <span className={`collab-badge collab-badge--${course.my_role}`}>
+                        {t(`authoring.collab.role.${course.my_role}`)}
+                      </span>
+                    )}
                   </div>
                   <div className="authoring-course-meta">
                     <span><Clock size={13} /> {course.duration_hours}h</span>

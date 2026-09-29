@@ -7,7 +7,6 @@ import {
   Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
-import { useAuth } from '../context/AuthContext'
 import RichTextEditor from '../components/lesson/RichTextEditor'
 import HtmlContent from '../components/lesson/HtmlContent'
 import MediaItem from '../components/lesson/MediaItem'
@@ -504,11 +503,10 @@ export default function ModuleEditorPage() {
   const { t } = useTranslation()
   const { id: courseId, moduleId } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const [module, setModule] = useState(null)
   const [isPublished, setIsPublished] = useState(false)
-  const [courseAuthorId, setCourseAuthorId] = useState(null)
+  const [caps, setCaps] = useState({ canEdit: false, canTranslate: false })
   const [lessons, setLessons] = useState([])
   const [selectedLessonId, setSelectedLessonId] = useState(null)
   const [moduleForm, setModuleForm] = useState({ title: '', description: '' })
@@ -539,7 +537,10 @@ export default function ModuleEditorPage() {
         setModuleForm({ title: m.title, description: m.description })
         setLessons(m.lessons.map((l) => ({ ...l, isDirty: false, isNew: false, saving: false })))
         setIsPublished(courseRes.data.is_published)
-        setCourseAuthorId(courseRes.data.created_by_id)
+        setCaps({
+          canEdit: !!courseRes.data.can_edit,
+          canTranslate: !!courseRes.data.can_translate,
+        })
         setSourceLanguage(courseRes.data.source_language ?? 'en')
         setTranslationStatus(courseRes.data.translation_status ?? {})
       })
@@ -810,10 +811,10 @@ export default function ModuleEditorPage() {
   if (error) return <p className="page-error">{error}</p>
   if (!module) return <p className="page-loading">{t('common.loading')}</p>
 
-  const isAuthor = courseAuthorId != null && user?.id === courseAuthorId
-  const isAdmin = user?.profile?.user_type === 'admin'
-  // Only the author (or an admin) may edit a course — draft or published.
-  const locked = !isAuthor && !isAdmin
+  // Field lock is mode-aware: source edits need edit rights, translation edits
+  // need translate rights (co-editors edit everything; translators only
+  // translations).
+  const locked = translating ? !caps.canTranslate : !caps.canEdit
 
   return (
     <div className="module-editor-page">
@@ -859,7 +860,7 @@ export default function ModuleEditorPage() {
         onSelectLang={setActiveLang}
         onStatusUpdate={setTranslationStatus}
         onTranslated={reloadTranslations}
-        disabled={locked}
+        disabled={!caps.canTranslate}
       />
 
       <div className="module-editor-layout">

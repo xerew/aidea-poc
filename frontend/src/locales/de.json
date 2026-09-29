@@ -540,7 +540,8 @@
       "deleting": "Löschen…",
       "confirmDelete": "Diesen Kurs endgültig löschen? Alle Module, Lektionen und Einschreibungen gehen verloren. Dies kann nicht rückgängig gemacht werden.",
       "subjectsLabel": "Fächer",
-      "subjectsHint": "Für welche Lehrkräfte ist dieser Kurs? Wähle alle zutreffenden aus."
+      "subjectsHint": "Für welche Lehrkräfte ist dieser Kurs? Wähle alle zutreffenden aus.",
+      "translatorBanner": "Sie können nur Übersetzungen bearbeiten; der Originalinhalt ist schreibgeschützt."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz-Editor",
@@ -634,6 +635,18 @@
       "markReviewed": "Als von Mensch geprüft markieren",
       "unmarkReviewed": "Prüfmarkierung entfernen",
       "reviewedNote": "Von einem Menschen geprüft — diese Übersetzung ist gültig."
+    },
+    "collab": {
+      "title": "Mitwirkende",
+      "description": "Fügen Sie Content-Ersteller oder AIDEA-Partner hinzu, um bei der Verwaltung oder Übersetzung dieses Kurses zu helfen.",
+      "none": "Noch keine Mitwirkenden.",
+      "searchPlaceholder": "Ersteller oder Partner suchen...",
+      "add": "Hinzufügen",
+      "remove": "Entfernen",
+      "role": {
+        "co_editor": "Mitherausgeber",
+        "translator": "Übersetzer"
+      }
     }
   },
   "reviews": {

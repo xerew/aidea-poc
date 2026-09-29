@@ -540,7 +540,8 @@
       "deleting": "Suppression…",
       "confirmDelete": "Supprimer définitivement ce cours ? Tous les modules, leçons et inscriptions seront perdus. Cette action est irréversible.",
       "subjectsLabel": "Matières",
-      "subjectsHint": "À quels enseignants ce cours s'adresse-t-il ? Sélectionnez tout ce qui s'applique."
+      "subjectsHint": "À quels enseignants ce cours s'adresse-t-il ? Sélectionnez tout ce qui s'applique.",
+      "translatorBanner": "Vous ne pouvez modifier que les traductions ; le contenu original est en lecture seule."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Créateur de quiz",
@@ -634,6 +635,18 @@
       "markReviewed": "Marquer comme vérifié par un humain",
       "unmarkReviewed": "Retirer la marque de vérification",
       "reviewedNote": "Vérifié par un humain — cette traduction est valide."
+    },
+    "collab": {
+      "title": "Collaborateurs",
+      "description": "Ajoutez des créateurs de contenu ou des partenaires AIDEA pour aider à gérer ou traduire ce cours.",
+      "none": "Aucun collaborateur pour l'instant.",
+      "searchPlaceholder": "Rechercher des créateurs ou partenaires...",
+      "add": "Ajouter",
+      "remove": "Retirer",
+      "role": {
+        "co_editor": "Co-éditeur",
+        "translator": "Traducteur"
+      }
     }
   },
   "reviews": {

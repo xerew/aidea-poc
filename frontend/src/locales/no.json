@@ -540,7 +540,8 @@
       "deleting": "Sletter…",
       "confirmDelete": "Slette dette kurset permanent? Alle moduler, leksjoner og påmeldinger går tapt. Dette kan ikke angres.",
       "subjectsLabel": "Fag",
-      "subjectsHint": "Hvilke lærere er dette kurset for? Velg alle som passer."
+      "subjectsHint": "Hvilke lærere er dette kurset for? Velg alle som passer.",
+      "translatorBanner": "Du kan bare redigere oversettelser; originalinnholdet er skrivebeskyttet."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbygger",
@@ -634,6 +635,18 @@
       "markReviewed": "Merk som vurdert av menneske",
       "unmarkReviewed": "Fjern vurderingsmerke",
       "reviewedNote": "Vurdert av et menneske — denne oversettelsen er gyldig."
+    },
+    "collab": {
+      "title": "Samarbeidspartnere",
+      "description": "Legg til innholdsskapere eller AIDEA-partnere for å hjelpe med å administrere eller oversette dette kurset.",
+      "none": "Ingen samarbeidspartnere ennå.",
+      "searchPlaceholder": "Søk etter skapere eller partnere...",
+      "add": "Legg til",
+      "remove": "Fjern",
+      "role": {
+        "co_editor": "Medredaktør",
+        "translator": "Oversetter"
+      }
     }
   },
   "reviews": {

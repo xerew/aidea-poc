@@ -540,7 +540,8 @@
       "deleting": "Eliminando…",
       "confirmDelete": "¿Eliminar este curso de forma permanente? Se perderán todos los módulos, lecciones e inscripciones. No se puede deshacer.",
       "subjectsLabel": "Asignaturas",
-      "subjectsHint": "¿Para qué docentes es este curso? Selecciona todas las que correspondan."
+      "subjectsHint": "¿Para qué docentes es este curso? Selecciona todas las que correspondan.",
+      "translatorBanner": "Solo puede editar traducciones; el contenido original es de solo lectura."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Creador de Cuestionarios",
@@ -634,6 +635,18 @@
       "markReviewed": "Marcar como revisado por humano",
       "unmarkReviewed": "Quitar marca de revisión",
       "reviewedNote": "Revisado por un humano: esta traducción es válida."
+    },
+    "collab": {
+      "title": "Colaboradores",
+      "description": "Añada creadores de contenido o socios de AIDEA para ayudar a gestionar o traducir este curso.",
+      "none": "Aún no hay colaboradores.",
+      "searchPlaceholder": "Buscar creadores o socios...",
+      "add": "Añadir",
+      "remove": "Quitar",
+      "role": {
+        "co_editor": "Coeditor",
+        "translator": "Traductor"
+      }
     }
   },
   "reviews": {

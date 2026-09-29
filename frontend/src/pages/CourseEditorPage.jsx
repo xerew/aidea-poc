@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Clock, BookOpen, CheckCircle2, Plus, Trash2, Save, Lock, Pencil, GripVertical } from 'lucide-react'
 import client from '../api/client'
-import { useAuth } from '../context/AuthContext'
 import { LANGUAGES } from '../i18n'
 import TranslationBar from '../components/authoring/TranslationBar'
 import SubjectPicker from '../components/authoring/SubjectPicker'
+import CollaboratorsPanel from '../components/authoring/CollaboratorsPanel'
 import './CourseEditorPage.css'
 
 const PILLAR_COLOR = {
@@ -19,7 +19,6 @@ export default function CourseEditorPage() {
   const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
-  const { user } = useAuth()
 
   const [pillars, setPillars] = useState([])
   const [subjects, setSubjects] = useState([])
@@ -27,6 +26,9 @@ export default function CourseEditorPage() {
   const [isPublished, setIsPublished] = useState(false)
   const [modules, setModules] = useState([])
   const [author, setAuthor] = useState({ id: null, name: '' })
+  // Capabilities for the current viewer, from the API (author/admin/co-editor
+  // get canEdit; translators get canTranslate only; owner/admin get canManage).
+  const [caps, setCaps] = useState({ canEdit: false, canTranslate: false, canManage: false })
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [unpublishing, setUnpublishing] = useState(false)
@@ -65,6 +67,7 @@ export default function CourseEditorPage() {
         setTranslationStatus(c.translation_status ?? {})
         setModules(c.modules.map((m) => ({ ...m, isDirty: false, isNew: false, saving: false })))
         setAuthor({ id: c.created_by_id, name: c.created_by_name })
+        setCaps({ canEdit: !!c.can_edit, canTranslate: !!c.can_translate, canManage: !!c.can_manage })
         setPillars(pillarsRes.data)
         setSubjects(subjectsRes.data)
       })
@@ -338,10 +341,12 @@ export default function CourseEditorPage() {
 
   const currentPillar = pillars.find((p) => p.id === form.pillar_id)
   const pillarColor = PILLAR_COLOR[currentPillar?.slug] ?? 'blue'
-  const isAuthor = author.id != null && user?.id === author.id
-  const isAdmin = user?.profile?.user_type === 'admin'
-  // Only the author (or an admin) may edit a course — draft or published.
-  const locked = !isAuthor && !isAdmin
+  const { canEdit, canTranslate, canManage } = caps
+  const isTranslatorOnly = canTranslate && !canEdit
+  // Field lock is mode-aware: editing source content needs edit rights, while
+  // editing a translation needs translate rights. A co-editor edits everything;
+  // a translator edits only translations.
+  const locked = translating ? !canTranslate : !canEdit
 
   return (
     <div className="course-editor">
@@ -355,14 +360,22 @@ export default function CourseEditorPage() {
       {isPublished && (
         <div className="published-banner">
           <Lock size={14} />
-          {locked
-            ? t('authoring.editor.publishedBannerLocked')
-            : t('authoring.editor.publishedBannerUnlocked')}
+          {canEdit
+            ? t('authoring.editor.publishedBannerUnlocked')
+            : t('authoring.editor.publishedBannerLocked')}
         </div>
       )}
 
-      {/* Read-only banner for a draft you didn't author */}
-      {locked && !isPublished && (
+      {/* Translator: source is read-only, translations are editable */}
+      {isTranslatorOnly && (
+        <div className="published-banner">
+          <Lock size={14} />
+          {t('authoring.editor.translatorBanner')}
+        </div>
+      )}
+
+      {/* Read-only banner: no edit or translate rights */}
+      {!canEdit && !canTranslate && !isPublished && (
         <div className="published-banner">
           <Lock size={14} />
           {t('authoring.editor.readOnlyBanner')}
@@ -378,7 +391,7 @@ export default function CourseEditorPage() {
         onSelectLang={setActiveLang}
         onStatusUpdate={setTranslationStatus}
         onTranslated={reloadTranslations}
-        disabled={locked}
+        disabled={!canTranslate}
       />
 
       {/* Hero row */}
@@ -424,17 +437,17 @@ export default function CourseEditorPage() {
             <button className="enroll-btn enroll-btn--outline" onClick={handleSaveCourse} disabled={saving}>
               {saving ? t('common.saving') : t('authoring.editor.saveChanges')}
             </button>
-            {!isPublished && (
+            {!isPublished && canEdit && (
               <button className="enroll-btn" onClick={handlePublish} disabled={publishing}>
                 {publishing ? t('authoring.editor.publishing') : t('authoring.editor.publish')}
               </button>
             )}
-            {isPublished && (isAuthor || isAdmin) && (
+            {isPublished && canEdit && (
               <button className="enroll-btn enroll-btn--outline" onClick={handleUnpublish} disabled={unpublishing}>
                 {unpublishing ? t('authoring.editor.unpublishing') : t('authoring.editor.unpublish')}
               </button>
             )}
-            {(isAuthor || isAdmin) && (
+            {canManage && (
               <button className="enroll-btn enroll-btn--danger" onClick={handleDeleteCourse} disabled={deleting}>
                 <Trash2 size={14} /> {deleting ? t('authoring.editor.deleting') : t('authoring.editor.deleteCourse')}
               </button>
@@ -614,6 +627,9 @@ export default function CourseEditorPage() {
           </button>
         )}
       </section>
+
+      {/* Collaborators — owner/admin only */}
+      {canManage && <CollaboratorsPanel courseId={id} />}
 
     </div>
   )

@@ -540,7 +540,8 @@
       "deleting": "Deleting…",
       "confirmDelete": "Delete this course permanently? All modules, lessons and enrollments will be lost. This cannot be undone.",
       "subjectsLabel": "Subjects",
-      "subjectsHint": "Which teachers is this course for? Select all that apply."
+      "subjectsHint": "Which teachers is this course for? Select all that apply.",
+      "translatorBanner": "You can edit translations only; the original content is read-only."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz Builder",
@@ -634,6 +635,18 @@
       "markReviewed": "Mark as human-reviewed",
       "unmarkReviewed": "Remove reviewed mark",
       "reviewedNote": "Reviewed by a human — this translation is valid."
+    },
+    "collab": {
+      "title": "Collaborators",
+      "description": "Add content creators or AIDEA partners to help manage or translate this course.",
+      "none": "No collaborators yet.",
+      "searchPlaceholder": "Search creators or partners...",
+      "add": "Add",
+      "remove": "Remove",
+      "role": {
+        "co_editor": "Co-editor",
+        "translator": "Translator"
+      }
     }
   },
   "reviews": {

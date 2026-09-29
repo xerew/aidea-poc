@@ -219,3 +219,11 @@
   .authoring-course-row { flex-direction: column; align-items: flex-start; }
   .authoring-course-actions { width: 100%; flex-wrap: wrap; }
 }
+
+/* Collaborator role badge on course rows (co-editor / translator) */
+.collab-badge {
+  font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+  padding: 0.1rem 0.45rem; border-radius: 9999px;
+}
+.collab-badge--co_editor { background: #dbeafe; color: #1e40af; }
+.collab-badge--translator { background: #dcfce7; color: #166534; }
