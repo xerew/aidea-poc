@@ -3,7 +3,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Activity, CourseEditHistory, Module
+from hub.models import Activity, CourseEditHistory, Module, Resource
 from hub.serializers import LessonSerializer
 from hub.translation import LANGUAGE_NAMES
 from hub.translation_sync import resync_lesson
@@ -11,6 +11,21 @@ from hub.translation_sync import resync_lesson
 from .permissions import IsContentCreator, can_edit_course
 
 TRANSLATABLE_LESSON_FIELDS = ['title', 'description', 'content', 'quiz_data']
+
+
+def _seed_resources(activity):
+    """Every activity holds at least one resource: build them from any legacy
+    payload sent (older clients), else start with one empty resource of the
+    chosen type for the author to fill in."""
+    has_payload = (
+        (activity.content or '').strip() or activity.media_items or activity.quiz_data
+    )
+    if has_payload:
+        from hub.content_migration_logic import build_resources_for_lesson
+        build_resources_for_lesson(activity, Resource)
+        return
+    rtype = activity.lesson_type if activity.lesson_type in Resource.Type.values else 'text'
+    Resource.objects.create(activity=activity, type=rtype, order=1, is_required=activity.is_required)
 
 
 class AuthoringLessonView(APIView):
@@ -35,6 +50,7 @@ class AuthoringLessonView(APIView):
             Activity.objects.filter(module=module).aggregate(Max('order'))['order__max'] or 0
         ) + 1
         lesson = serializer.save(module=module, order=next_order)
+        _seed_resources(lesson)
 
         CourseEditHistory.objects.create(
             course=module.course,

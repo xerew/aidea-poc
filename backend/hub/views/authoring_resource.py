@@ -125,6 +125,12 @@ class AuthoringResourceDetailView(APIView):
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         if not can_edit_course(request.user, resource.activity.module.course):
             return Response({'detail': 'You cannot edit this course.'}, status=status.HTTP_403_FORBIDDEN)
+        # An activity with no resources could never be completed.
+        if not Resource.objects.filter(activity=resource.activity).exclude(pk=resource.pk).exists():
+            return Response(
+                {'detail': 'An activity needs at least one resource.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         resource.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

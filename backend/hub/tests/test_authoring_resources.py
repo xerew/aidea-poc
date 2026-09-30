@@ -64,11 +64,26 @@ class AuthoringResourceTests(CollaboratorBase):
         self.assertEqual(res.status_code, 403)
 
     def test_author_deletes_resource(self):
+        self._mk()
         r = self._mk()
         self._login_as(self.creator)
         res = self.client.delete(self._detail_url(r))
         self.assertEqual(res.status_code, 204)
         self.assertFalse(Resource.objects.filter(pk=r.pk).exists())
+
+    def test_cannot_delete_last_resource(self):
+        r = self._mk()
+        self._login_as(self.creator)
+        res = self.client.delete(self._detail_url(r))
+        self.assertEqual(res.status_code, 400)
+        self.assertTrue(Resource.objects.filter(pk=r.pk).exists())
+
+    def test_new_activity_starts_with_a_resource_of_its_type(self):
+        self._login_as(self.creator)
+        url = reverse('authoring-lesson-create', kwargs={'pk': self.course.pk, 'module_pk': self.module1.pk})
+        res = self.client.post(url, {'title': 'Watch', 'lesson_type': 'video'}, format='json')
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual([r['type'] for r in res.data['resources']], ['video'])
 
     def test_reorder(self):
         r1 = self._mk(order=1)
