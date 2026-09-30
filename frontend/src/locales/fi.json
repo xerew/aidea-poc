@@ -58,11 +58,11 @@
   "auth": {
     "login": {
       "subtitle": "Opettajien tekoälykoulutusalusta",
-      "usernameLabel": "Käyttäjätunnus",
+      "usernameLabel": "Käyttäjätunnus tai sähköposti",
       "passwordLabel": "Salasana",
       "signIn": "Kirjaudu sisään",
       "signingIn": "Kirjaudutaan sisään…",
-      "invalidCredentials": "Virheellinen käyttäjätunnus tai salasana.",
+      "invalidCredentials": "Virheellinen käyttäjätunnus/sähköposti tai salasana.",
       "noAccount": "Eikö sinulla ole tiliä?",
       "createAccount": "Luo tili",
       "forgotPassword": "Unohditko salasanasi?"
@@ -262,7 +262,9 @@
         "preferNotSay": "En halua kertoa"
       },
       "bio": "Tietoa sinusta",
-      "bioPlaceholder": "Muutama sana itsestäsi — opetuksestasi, kiinnostuksen kohteistasi tai mitä toivot saavasi AIDEAsta."
+      "bioPlaceholder": "Muutama sana itsestäsi — opetuksestasi, kiinnostuksen kohteistasi tai mitä toivot saavasi AIDEAsta.",
+      "teachingLevel": "Opetusaste",
+      "selectTeachingLevel": "Valitse opetusaste"
     },
     "preferences": {
       "title": "Oppimismieltymykset",

@@ -116,7 +116,22 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AideaTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Sign in with a username or an email address."""
+
     def validate(self, attrs):
+        identifier = str(attrs.get(self.username_field) or '').strip()
+        # An email that isn't also someone's literal username: resolve it to the
+        # account it belongs to. Emails aren't unique in every legacy row, so pick
+        # the active account whose password matches.
+        if '@' in identifier and not User.objects.filter(username=identifier).exists():
+            password = attrs.get('password') or ''
+            match = next(
+                (u for u in User.objects.filter(email__iexact=identifier, is_active=True)
+                 if u.check_password(password)),
+                None,
+            )
+            if match:
+                attrs[self.username_field] = match.username
         data = super().validate(attrs)
         data['user'] = UserSerializer(self.user, context=self.context).data
         return data

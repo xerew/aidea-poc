@@ -31,6 +31,9 @@ class PasswordResetTests(APITestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn('reset-password', mail.outbox[0].body)
+        # The username is in the email so a user who forgot it can sign in.
+        self.assertIn('reset_u', mail.outbox[0].body)
+        self.assertIn('reset_u', mail.outbox[0].alternatives[0][0])
 
     def test_request_unknown_email_still_ok_and_no_mail(self):
         res = self.client.post('/api/auth/password-reset/', {'email': 'nobody@x.com'}, format='json')

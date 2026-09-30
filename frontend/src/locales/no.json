@@ -58,11 +58,11 @@
   "auth": {
     "login": {
       "subtitle": "Opplæringsplattform i AI for lærere",
-      "usernameLabel": "Brukernavn",
+      "usernameLabel": "Brukernavn eller e-post",
       "passwordLabel": "Passord",
       "signIn": "Logg inn",
       "signingIn": "Logger inn…",
-      "invalidCredentials": "Ugyldig brukernavn eller passord.",
+      "invalidCredentials": "Ugyldig brukernavn/e-post eller passord.",
       "noAccount": "Har du ikke en konto?",
       "createAccount": "Opprett en",
       "forgotPassword": "Glemt passordet?"
@@ -262,7 +262,9 @@
         "preferNotSay": "Ønsker ikke å oppgi"
       },
       "bio": "Om deg",
-      "bioPlaceholder": "Noen ord om deg — undervisningen din, interessene dine eller hva du håper å få ut av AIDEA."
+      "bioPlaceholder": "Noen ord om deg — undervisningen din, interessene dine eller hva du håper å få ut av AIDEA.",
+      "teachingLevel": "Undervisningsnivå",
+      "selectTeachingLevel": "Velg nivå"
     },
     "preferences": {
       "title": "Læringspreferanser",

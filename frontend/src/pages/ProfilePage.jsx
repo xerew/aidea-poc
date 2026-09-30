@@ -17,6 +17,15 @@ import { getAvatarSrc } from '../lib/avatar'
 import { subjectLabel } from '../lib/subjects'
 import './ProfilePage.css'
 
+// Same options as the onboarding "What level do you teach?" step.
+const TEACHING_LEVELS = [
+  { value: 'primary',    key: 'primary' },
+  { value: 'secondary',  key: 'secondary' },
+  { value: 'higher_ed',  key: 'higherEd' },
+  { value: 'vocational', key: 'vocational' },
+  { value: 'adult_ed',   key: 'adultEd' },
+]
+
 function useSectionSave(endpoint, method = 'patch') {
   const { t } = useTranslation()
   const [saving, setSaving] = useState(false)
@@ -70,7 +79,7 @@ function PersonalInfoSection() {
   const { user, updateUser } = useAuth()
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
+    subject: '', teaching_level: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
   })
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -128,6 +137,15 @@ function PersonalInfoSection() {
             <select value={form.subject ?? ''} onChange={set('subject')}>
               <option value="">{t('profile.personalInfo.subjectOptions.select')}</option>
               {subjects.map(s => <option key={s.id} value={s.id}>{subjectLabel(s, t)}</option>)}
+            </select>
+          </div>
+          <div className="profile-field">
+            <label>{t('profile.personalInfo.teachingLevel')}</label>
+            <select value={form.teaching_level ?? ''} onChange={set('teaching_level')}>
+              <option value="">{t('profile.personalInfo.selectTeachingLevel')}</option>
+              {TEACHING_LEVELS.map(({ value, key }) => (
+                <option key={value} value={value}>{t(`onboarding.questions.teachingLevel.options.${key}`)}</option>
+              ))}
             </select>
           </div>
           <div className="profile-field">

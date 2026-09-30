@@ -58,11 +58,11 @@
   "auth": {
     "login": {
       "subtitle": "Teacher AI Training Platform",
-      "usernameLabel": "Username",
+      "usernameLabel": "Username or email",
       "passwordLabel": "Password",
       "signIn": "Sign in",
       "signingIn": "Signing in…",
-      "invalidCredentials": "Invalid username or password.",
+      "invalidCredentials": "Invalid username/email or password.",
       "noAccount": "Don't have an account?",
       "createAccount": "Create one",
       "forgotPassword": "Forgot your password?"
@@ -262,7 +262,9 @@
         "preferNotSay": "Prefer not to say"
       },
       "bio": "About you",
-      "bioPlaceholder": "A few things about yourself — your teaching, interests, or what you hope to get from AIDEA."
+      "bioPlaceholder": "A few things about yourself — your teaching, interests, or what you hope to get from AIDEA.",
+      "teachingLevel": "Teaching level",
+      "selectTeachingLevel": "Select teaching level"
     },
     "preferences": {
       "title": "Learning Preferences",

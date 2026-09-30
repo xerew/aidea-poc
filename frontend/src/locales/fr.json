@@ -58,11 +58,11 @@
   "auth": {
     "login": {
       "subtitle": "Plateforme de formation des enseignants à l'IA",
-      "usernameLabel": "Nom d'utilisateur",
+      "usernameLabel": "Nom d'utilisateur ou e-mail",
       "passwordLabel": "Mot de passe",
       "signIn": "Se connecter",
       "signingIn": "Connexion en cours…",
-      "invalidCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
+      "invalidCredentials": "Nom d'utilisateur/e-mail ou mot de passe incorrect.",
       "noAccount": "Vous n'avez pas de compte ?",
       "createAccount": "Créer un compte",
       "forgotPassword": "Mot de passe oublié ?"
@@ -262,7 +262,9 @@
         "preferNotSay": "Préfère ne pas préciser"
       },
       "bio": "À propos de vous",
-      "bioPlaceholder": "Quelques mots sur vous — votre enseignement, vos centres d'intérêt ou ce que vous attendez d'AIDEA."
+      "bioPlaceholder": "Quelques mots sur vous — votre enseignement, vos centres d'intérêt ou ce que vous attendez d'AIDEA.",
+      "teachingLevel": "Niveau d’enseignement",
+      "selectTeachingLevel": "Choisissez un niveau"
     },
     "preferences": {
       "title": "Préférences d'apprentissage",
