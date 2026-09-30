@@ -477,7 +477,15 @@
     "yourNotesTitle": "Ihre Notizen",
     "markComplete": "Als abgeschlossen markieren",
     "pendingReview": "Überprüfung ausstehend",
-    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen."
+    "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen.",
+    "activity": "Aktivität",
+    "activityComplete": "Aktivität abgeschlossen ✓",
+    "resource": {
+      "optional": "Optional",
+      "done": "Erledigt",
+      "markDone": "Als erledigt markieren",
+      "progress": "{{done}} von {{total}} erledigt"
+    }
   },
   "authoring": {
     "title": "Kurserstellung",

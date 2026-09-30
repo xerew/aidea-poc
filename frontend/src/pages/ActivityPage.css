@@ -553,3 +553,48 @@
   /* Let the video-link row take the full width instead of forcing 220px. */
   .lp-attach-video { min-width: 100%; }
 }
+
+/* ─── Resources (ordered blocks inside an activity) ──────────────────────── */
+
+.lp-resource { margin-bottom: 28px; }
+
+.lp-resource-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.lp-resource-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+.lp-resource-optional {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  padding: 2px 9px;
+}
+.lp-resource-card { margin-bottom: 0; }
+.lp-resource--done .lp-resource-card { border-color: #d1fae5; }
+
+.lp-resource-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.lp-resource-btn { padding: 8px 22px; font-size: 0.84rem; }
+
+.lp-resource-count { margin-left: 4px; }
+
+@media (max-width: 640px) {
+  .lp-resource-footer { justify-content: stretch; }
+  .lp-resource-footer > * { flex: 1; text-align: center; }
+}

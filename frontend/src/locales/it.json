@@ -477,7 +477,15 @@
     "yourNotesTitle": "Le tue note",
     "markComplete": "Segna come completato",
     "pendingReview": "In attesa di revisione",
-    "unavailable": "Questo corso non è al momento disponibile — l'autore lo ha ritirato."
+    "unavailable": "Questo corso non è al momento disponibile — l'autore lo ha ritirato.",
+    "activity": "Attività",
+    "activityComplete": "Attività completata ✓",
+    "resource": {
+      "optional": "Facoltativo",
+      "done": "Fatto",
+      "markDone": "Segna come fatto",
+      "progress": "{{done}} di {{total}} completati"
+    }
   },
   "authoring": {
     "title": "Creazione dei corsi",

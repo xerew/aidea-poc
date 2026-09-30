@@ -15,7 +15,7 @@ import AICompetencyPage from './pages/AICompetencyPage'
 import HomePage from './pages/HomePage'
 import CoursesPage from './pages/CoursesPage'
 import CourseDetailPage from './pages/CourseDetailPage'
-import LessonPage, { LearnRedirect } from './pages/LessonPage'
+import ActivityPage, { LearnRedirect } from './pages/ActivityPage'
 import MyLearningPage from './pages/MyLearningPage'
 import PathwayPage from './pages/PathwayPage'
 import AnalyticsPage from './pages/AnalyticsPage'
@@ -99,7 +99,7 @@ export default function App() {
             <Route path="/reviews" element={<ReviewerRoute element={<ReviewsPage />} />} />
           </Route>
           <Route path="/courses/:id/learn"                element={<LearnRedirect />} />
-          <Route path="/courses/:courseId/learn/:lessonId" element={<LessonPage />} />
+          <Route path="/courses/:courseId/learn/:lessonId" element={<ActivityPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

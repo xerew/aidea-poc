@@ -210,16 +210,25 @@ class LessonLearnSerializer(serializers.ModelSerializer):
     """Lightweight serializer for lesson sidebar — includes per-user completion flag."""
     title = serializers.SerializerMethodField()
     is_completed = serializers.SerializerMethodField()
+    resource_types = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
-        fields = ['id', 'title', 'lesson_type', 'duration_minutes', 'order', 'is_completed']
+        fields = [
+            'id', 'title', 'lesson_type', 'duration_minutes', 'order', 'is_completed',
+            'resource_types',
+        ]
 
     def get_title(self, obj):
         return localized(obj, 'title', viewer_language(self.context))
 
     def get_is_completed(self, obj):
         return obj.id in self.context.get('completed_lesson_ids', set())
+
+    def get_resource_types(self, obj):
+        # Ordered and de-duplicated; drives the sidebar icon.
+        types = [r.type for r in sorted(obj.resources.all(), key=lambda r: r.order)]
+        return list(dict.fromkeys(types))
 
 
 class ModuleLearnSerializer(serializers.ModelSerializer):

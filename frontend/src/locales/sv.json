@@ -477,7 +477,15 @@
     "yourNotesTitle": "Dina anteckningar",
     "markComplete": "Markera som slutförd",
     "pendingReview": "Väntar på granskning",
-    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den."
+    "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den.",
+    "activity": "Aktivitet",
+    "activityComplete": "Aktiviteten är klar ✓",
+    "resource": {
+      "optional": "Valfri",
+      "done": "Klar",
+      "markDone": "Markera som klar",
+      "progress": "{{done}} av {{total}} klara"
+    }
   },
   "authoring": {
     "title": "Kursskapande",

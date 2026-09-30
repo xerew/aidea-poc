@@ -477,7 +477,15 @@
     "yourNotesTitle": "Vos notes",
     "markComplete": "Marquer comme terminé",
     "pendingReview": "En attente d'évaluation",
-    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié."
+    "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié.",
+    "activity": "Activité",
+    "activityComplete": "Activité terminée ✓",
+    "resource": {
+      "optional": "Facultatif",
+      "done": "Terminé",
+      "markDone": "Marquer comme terminé",
+      "progress": "{{done}} sur {{total}} terminés"
+    }
   },
   "authoring": {
     "title": "Création de cours",

@@ -477,7 +477,15 @@
     "yourNotesTitle": "Tus Notas",
     "markComplete": "Marcar como Completado",
     "pendingReview": "Pendiente de revisión",
-    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado."
+    "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado.",
+    "activity": "Actividad",
+    "activityComplete": "Actividad completada ✓",
+    "resource": {
+      "optional": "Opcional",
+      "done": "Hecho",
+      "markDone": "Marcar como hecho",
+      "progress": "{{done}} de {{total}} completados"
+    }
   },
   "authoring": {
     "title": "Creación de Cursos",

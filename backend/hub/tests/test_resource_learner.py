@@ -41,6 +41,15 @@ class ResourceLearnerTests(APITestCase):
         self.assertTrue(res.data['is_completed'])
         self.assertTrue(ResourceProgress.objects.filter(
             user=self.user, resource=self.r_text, completed_at__isnull=False).exists())
+        self.assertFalse(res.data['activity_completed'])  # quiz still pending
+
+        res = self.client.post(self._url('resource-complete', self.r_quiz),
+                               {'quiz_answers': [0]}, format='json')
+        self.assertTrue(res.data['activity_completed'])
+
+    def test_sidebar_lists_resource_types(self):
+        res = self.client.get(f'/api/courses/{self.course.pk}/learn/')
+        self.assertEqual(res.data['modules'][0]['lessons'][0]['resource_types'], ['text', 'quiz'])
 
     def test_quiz_check(self):
         res = self.client.post(self._url('resource-quiz-check', self.r_quiz),

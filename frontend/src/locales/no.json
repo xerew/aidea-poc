@@ -477,7 +477,15 @@
     "yourNotesTitle": "Dine notater",
     "markComplete": "Merk som fullført",
     "pendingReview": "Venter på vurdering",
-    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det."
+    "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det.",
+    "activity": "Aktivitet",
+    "activityComplete": "Aktiviteten er fullført ✓",
+    "resource": {
+      "optional": "Valgfri",
+      "done": "Fullført",
+      "markDone": "Merk som fullført",
+      "progress": "{{done}} av {{total}} fullført"
+    }
   },
   "authoring": {
     "title": "Kursforfatting",

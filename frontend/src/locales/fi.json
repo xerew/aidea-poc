@@ -477,7 +477,15 @@
     "yourNotesTitle": "Muistiinpanosi",
     "markComplete": "Merkitse suoritetuksi",
     "pendingReview": "Odottaa arviointia",
-    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta."
+    "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta.",
+    "activity": "Aktiviteetti",
+    "activityComplete": "Aktiviteetti suoritettu ✓",
+    "resource": {
+      "optional": "Valinnainen",
+      "done": "Valmis",
+      "markDone": "Merkitse valmiiksi",
+      "progress": "{{done}}/{{total}} suoritettu"
+    }
   },
   "authoring": {
     "title": "Kurssien sisällöntuotanto",

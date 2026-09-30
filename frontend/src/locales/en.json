@@ -477,7 +477,15 @@
     "yourNotesTitle": "Your Notes",
     "markComplete": "Mark Complete",
     "pendingReview": "Pending review",
-    "unavailable": "This course is currently unavailable — its author has unpublished it."
+    "unavailable": "This course is currently unavailable — its author has unpublished it.",
+    "activity": "Activity",
+    "activityComplete": "Activity complete ✓",
+    "resource": {
+      "optional": "Optional",
+      "done": "Done",
+      "markDone": "Mark as done",
+      "progress": "{{done}} of {{total}} completed"
+    }
   },
   "authoring": {
     "title": "Course Authoring",

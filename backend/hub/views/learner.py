@@ -102,7 +102,7 @@ class CourseLearnView(APIView):
 
     def get(self, request, pk):
         try:
-            course = Course.objects.prefetch_related('modules__lessons').get(
+            course = Course.objects.prefetch_related('modules__lessons__resources').get(
                 pk=pk, is_published=True,
             )
         except Course.DoesNotExist:
@@ -342,7 +342,7 @@ class ResourceCompleteView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        from hub.completion import record_resource_completion
+        from hub.completion import completed_activity_ids, record_resource_completion
         rp, progress_pct = record_resource_completion(
             request.user, enrollment, resource,
             quiz_answers_raw=request.data.get('quiz_answers', []),
@@ -351,6 +351,9 @@ class ResourceCompleteView(APIView):
         return Response({
             'resource_id': resource.id,
             'is_completed': True,
+            'activity_completed': resource.activity_id in completed_activity_ids(
+                request.user, enrollment.course,
+            ),
             'progress_pct': progress_pct,
             'quiz_results': rp.quiz_answers if resource.type == 'quiz' else None,
         })
