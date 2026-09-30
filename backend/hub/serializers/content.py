@@ -164,7 +164,15 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'title', 'description', 'order', 'duration_minutes']
+        fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'related_outcomes']
+
+    def validate_related_outcomes(self, value):
+        """Indices into the course's learning outcomes; de-duplicated, sorted."""
+        if not isinstance(value, list) or not all(
+            isinstance(i, int) and not isinstance(i, bool) and i >= 0 for i in value
+        ):
+            raise serializers.ValidationError('related_outcomes must be a list of outcome indices.')
+        return sorted(set(value))
 
 
 class ModuleAuthoringSerializer(ModuleSerializer):
@@ -184,7 +192,7 @@ class ModuleLocalizedSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['id', 'title', 'description', 'order', 'duration_minutes']
+        fields = ['id', 'title', 'description', 'order', 'duration_minutes', 'related_outcomes']
 
     def get_title(self, obj):
         from .localize import localized, viewer_language

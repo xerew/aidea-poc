@@ -29,7 +29,7 @@ class CoursesView(APIView):
         level  = request.query_params.get('level')
         search = request.query_params.get('search')
         if pillar:
-            qs = qs.filter(pillar__slug=pillar)
+            qs = qs.filter(Q(pillar__slug=pillar) | Q(additional_pillars__slug=pillar)).distinct()
         if level:
             qs = qs.filter(level=level)
         if search:

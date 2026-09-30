@@ -45,7 +45,7 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
         Course.objects
         .filter(is_published=True)
         .select_related('pillar')
-        .prefetch_related('subjects')
+        .prefetch_related('subjects', 'additional_pillars')
     )
 
     scored = []
@@ -55,9 +55,10 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
             continue  # too far above the teacher's competency
 
         score = 3.0 - abs(clevel - band)  # closeness to the teacher's band
-        if course.pillar.slug in preferred:
+        pillars = {course.pillar.slug, *(p.slug for p in course.additional_pillars.all())}
+        if pillars & preferred:
             score += W_PILLAR
-        if course.pillar.slug in goal_pillars:
+        if pillars & goal_pillars:
             score += W_GOAL
         if subject_id:
             subject_slugs = {s.slug for s in course.subjects.all()}

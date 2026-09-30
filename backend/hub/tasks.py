@@ -499,6 +499,9 @@ def _translate_course_meta(course, target):
         'description': translate_text(course.description, src, target),
         'learning_outcomes': [translate_text(o, src, target) for o in (course.learning_outcomes or [])],
     }
+    for field in ('cross_axis_relevance', 'prior_knowledge', 'target_audience_other', 'educational_level_other'):
+        if getattr(course, field):
+            blob[field] = translate_text(getattr(course, field), src, target)
     _merge_json(Course, course.pk, 'translations', target, blob)
 
 

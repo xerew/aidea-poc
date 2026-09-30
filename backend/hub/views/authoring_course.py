@@ -15,7 +15,27 @@ from .permissions import (
     can_translate_course,
 )
 
-TRANSLATABLE_COURSE_FIELDS = ['title', 'description', 'learning_outcomes']
+TRANSLATABLE_COURSE_FIELDS = [
+    'title', 'description', 'learning_outcomes',
+    'cross_axis_relevance', 'prior_knowledge', 'target_audience_other', 'educational_level_other',
+]
+TRACKED_COURSE_FIELDS = [
+    'title', 'description', 'level', 'duration_hours', 'learning_outcomes',
+    'cross_axis_relevance', 'target_audience', 'target_audience_other',
+    'educational_levels', 'educational_level_other', 'prior_knowledge',
+]
+
+
+def _prune_module_outcomes(course):
+    """Drop module links to learning outcomes that no longer exist. (The editor
+    re-indexes links itself when an outcome is removed; this is the safety net
+    for any other client.)"""
+    count = len(course.learning_outcomes or [])
+    for module in course.modules.all():
+        kept = [i for i in module.related_outcomes or [] if i < count]
+        if kept != (module.related_outcomes or []):
+            module.related_outcomes = kept
+            module.save(update_fields=['related_outcomes'])
 
 
 class AuthoringPillarsView(APIView):
@@ -32,7 +52,7 @@ class AuthoringCoursesView(APIView):
         qs = (
             Course.objects
             .select_related('pillar', 'created_by')
-            .prefetch_related('modules', 'collaborators__user')
+            .prefetch_related('modules', 'collaborators__user', 'additional_pillars')
             .order_by('pillar__order', 'title')
         )
         return Response(
@@ -58,7 +78,7 @@ class AuthoringCourseDetailView(APIView):
         try:
             return (
                 Course.objects
-                .prefetch_related('modules', 'collaborators__user')
+                .prefetch_related('modules', 'collaborators__user', 'additional_pillars')
                 .select_related('pillar')
                 .get(pk=pk)
             )
@@ -106,7 +126,7 @@ class AuthoringCourseDetailView(APIView):
         serializer.is_valid(raise_exception=True)
 
         changes = {}
-        for field in ['title', 'description', 'level', 'duration_hours', 'learning_outcomes']:
+        for field in TRACKED_COURSE_FIELDS:
             if field in serializer.validated_data:
                 old_val = getattr(course, field)
                 new_val = serializer.validated_data[field]
@@ -118,6 +138,9 @@ class AuthoringCourseDetailView(APIView):
                 changes['pillar'] = {'old': course.pillar.name, 'new': new_pillar.name}
 
         serializer.save()
+
+        if 'learning_outcomes' in changes:
+            _prune_module_outcomes(course)
 
         if changes:
             CourseEditHistory.objects.create(course=course, editor=request.user, changes=changes)

@@ -96,6 +96,7 @@ from .views import (
     UnreadMessageCountView,
     VerifyEmailView,
 )
+from .views.authoring_module_library import ModuleImportView, ModuleLibraryView
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
@@ -186,6 +187,8 @@ urlpatterns = [
     path('authoring/courses/<int:pk>/export/', AuthoringCourseExportView.as_view(), name='authoring-course-export'),
     path('authoring/courses/<int:pk>/modules/', AuthoringModuleView.as_view(), name='authoring-module-create'),
     path('authoring/courses/<int:pk>/modules/reorder/', AuthoringModuleReorderView.as_view(), name='authoring-module-reorder'),
+    path('authoring/courses/<int:pk>/modules/import/', ModuleImportView.as_view(), name='authoring-module-import'),
+    path('authoring/module-library/', ModuleLibraryView.as_view(), name='authoring-module-library'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/', AuthoringModuleDetailView.as_view(), name='authoring-module-detail'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/edit/', AuthoringModuleEditorView.as_view(), name='authoring-module-editor'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/', AuthoringLessonView.as_view(), name='authoring-lesson-create'),
