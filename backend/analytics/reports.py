@@ -7,6 +7,7 @@ engagement_data['quiz_selected'] (the option index the teacher picked).
 """
 import re
 
+from hub.completion import activity_time_seconds
 from hub.models import Enrollment, Resource, ResourceProgress
 
 
@@ -51,9 +52,9 @@ def _teacher_rows(course):
             rp.resource_id: rp
             for rp in ResourceProgress.objects.filter(
                 user=user, resource__activity__module__course=course,
-            )
+            ).select_related('resource')
         }
-        time_spent = sum((rp.time_spent_seconds or 0) for rp in progresses.values())
+        time_spent = activity_time_seconds(progresses.values())
 
         quizzes, scores = [], []
         for resource in quiz_resources:

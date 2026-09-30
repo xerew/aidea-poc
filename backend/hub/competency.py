@@ -2,7 +2,7 @@
 
 Spec: docs/superpowers/specs/2026-07-19-competency-decay-design.md
 """
-from hub.models import LearnerActivityConfig, LearningPath, LessonProgress, UserLearningPath
+from hub.models import LearnerActivityConfig, LearningPath, ResourceProgress, UserLearningPath
 
 SCORE_MIN = 0
 SCORE_MAX = 6
@@ -53,10 +53,10 @@ def course_completion_delta(user, course) -> int:
 
     if config.quiz_affects_competency:
         quiz_scores = list(
-            LessonProgress.objects.filter(
+            ResourceProgress.objects.filter(
                 user=user,
-                lesson__module__course=course,
-                lesson__lesson_type='quiz',
+                resource__activity__module__course=course,
+                resource__type='quiz',
                 quiz_score__isnull=False,
             ).values_list('quiz_score', flat=True)
         )
@@ -75,18 +75,25 @@ def course_completion_delta(user, course) -> int:
 
     if config.decay_enabled:
         timed = list(
-            LessonProgress.objects.filter(
+            ResourceProgress.objects.filter(
                 user=user,
-                lesson__module__course=course,
+                resource__activity__module__course=course,
                 completed_at__isnull=False,
                 time_spent_seconds__isnull=False,
-                lesson__duration_minutes__gt=0,
-            ).select_related('lesson')
+                resource__activity__duration_minutes__gt=0,
+            ).select_related('resource__activity')
         )
-        if timed:
+        # One pace ratio per activity: its time is the max over its resources.
+        per_activity = {}
+        for rp in timed:
+            act = rp.resource.activity
+            per_activity[act.id] = (
+                max(per_activity.get(act.id, (0, act))[0], rp.time_spent_seconds), act,
+            )
+        if per_activity:
             ratios = [
-                (lp.time_spent_seconds / 60) / lp.lesson.duration_minutes
-                for lp in timed
+                (secs / 60) / act.duration_minutes
+                for secs, act in per_activity.values()
             ]
             if sum(ratios) / len(ratios) > config.slow_ratio_threshold:
                 delta -= config.slow_penalty

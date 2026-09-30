@@ -12,6 +12,7 @@ from hub.models import (
     Module,
     UserProfile,
 )
+from hub.tests.helpers import complete_activity
 
 
 class LearnerProgressBase(APITestCase):
@@ -130,7 +131,7 @@ class CourseLearnViewTestCase(LearnerProgressBase):
         self.assertTrue(all(not lsn["is_completed"] for lsn in flat))
 
     def test_completed_lesson_shows_as_completed(self):
-        LessonProgress.objects.create(user=self.teacher, lesson=self.lesson1)
+        complete_activity(user=self.teacher, lesson=self.lesson1)
         response = self.client.get(self._learn_url())
         flat = {lsn["id"]: lsn for m in response.data["modules"] for lsn in m["lessons"]}
         self.assertTrue(flat[self.lesson1.pk]["is_completed"])
@@ -141,19 +142,19 @@ class CourseLearnViewTestCase(LearnerProgressBase):
         self.assertEqual(response.data["first_incomplete_lesson_id"], self.lesson1.pk)
 
     def test_first_incomplete_advances_after_completion(self):
-        LessonProgress.objects.create(user=self.teacher, lesson=self.lesson1)
+        complete_activity(user=self.teacher, lesson=self.lesson1)
         response = self.client.get(self._learn_url())
         self.assertEqual(response.data["first_incomplete_lesson_id"], self.lesson2.pk)
 
     def test_first_incomplete_is_last_lesson_when_all_done(self):
         for lesson in [self.lesson1, self.lesson2, self.lesson3, self.lesson4]:
-            LessonProgress.objects.create(user=self.teacher, lesson=lesson)
+            complete_activity(user=self.teacher, lesson=lesson)
         response = self.client.get(self._learn_url())
         self.assertEqual(response.data["first_incomplete_lesson_id"], self.lesson4.pk)
 
     def test_other_users_completions_not_visible(self):
         Enrollment.objects.create(user=self.other, course=self.course)
-        LessonProgress.objects.create(user=self.other, lesson=self.lesson1)
+        complete_activity(user=self.other, lesson=self.lesson1)
         response = self.client.get(self._learn_url())
         flat = {lsn["id"]: lsn for m in response.data["modules"] for lsn in m["lessons"]}
         self.assertFalse(flat[self.lesson1.pk]["is_completed"])
@@ -213,7 +214,7 @@ class LessonDetailViewTestCase(LearnerProgressBase):
         self.assertFalse(response.data["is_completed"])
 
     def test_is_completed_true_after_progress_created(self):
-        LessonProgress.objects.create(user=self.teacher, lesson=self.lesson1)
+        complete_activity(user=self.teacher, lesson=self.lesson1)
         response = self.client.get(self._lesson_url(self.lesson1))
         self.assertTrue(response.data["is_completed"])
 
@@ -336,7 +337,7 @@ class CompletedModuleIdsTests(APITestCase):
         return reverse("course-detail", kwargs={"pk": self.course.pk})
 
     def test_completed_module_ids(self):
-        LessonProgress.objects.create(user=self.user, lesson=self.l1)
+        complete_activity(user=self.user, lesson=self.l1)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["completed_module_ids"], [self.m1.id])
@@ -346,10 +347,10 @@ class CompletedModuleIdsTests(APITestCase):
         l1b = Activity.objects.create(
             module=self.m1, title="L1b", lesson_type="text", order=2, is_required=True,
         )
-        LessonProgress.objects.create(user=self.user, lesson=self.l1)
+        complete_activity(user=self.user, lesson=self.l1)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.data["completed_module_ids"], [])
 
-        LessonProgress.objects.create(user=self.user, lesson=l1b)
+        complete_activity(user=self.user, lesson=l1b)
         response = self.client.get(self._detail_url())
         self.assertEqual(response.data["completed_module_ids"], [self.m1.id])

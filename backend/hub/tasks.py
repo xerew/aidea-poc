@@ -84,7 +84,7 @@ def compute_user_recommendations(user_id: int) -> None:
     from pgvector.django import CosineDistance
     from sentence_transformers import SentenceTransformer
 
-    from hub.models.enrollment import Enrollment, LessonProgress
+    from hub.models.enrollment import Enrollment, ResourceProgress
     from hub.models.recommendations import (
         CourseEmbedding,
         CourseRecommendation,
@@ -151,12 +151,15 @@ def compute_user_recommendations(user_id: int) -> None:
     lesson_counts: dict[int, int] = {}
     if enrolled_ids:
         rows = (
-            LessonProgress.objects
-            .filter(user=user, lesson__module__course_id__in=enrolled_ids)
-            .values('lesson__module__course_id')
-            .annotate(n=Count('id'))
+            ResourceProgress.objects
+            .filter(
+                user=user, completed_at__isnull=False,
+                resource__activity__module__course_id__in=enrolled_ids,
+            )
+            .values('resource__activity__module__course_id')
+            .annotate(n=Count('resource__activity_id', distinct=True))
         )
-        lesson_counts = {r['lesson__module__course_id']: r['n'] for r in rows}
+        lesson_counts = {r['resource__activity__module__course_id']: r['n'] for r in rows}
 
     view_counts: dict[int, int] = {}
     rows = (

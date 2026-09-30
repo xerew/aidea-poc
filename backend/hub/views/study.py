@@ -8,10 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.completion import activity_time_seconds, completed_activity_ids
 from hub.models import (
     Enrollment,
-    LessonProgress,
     LessonSession,
+    ResourceProgress,
     StudyAssessmentOption,
     StudyAssessmentQuestion,
     StudyConfig,
@@ -240,9 +241,13 @@ class AdminStudyExportView(APIView):
         participants = StudyParticipant.objects.filter(in_study=True).select_related('user')
         for i, p in enumerate(participants, start=1):
             u = p.user
-            progress = list(LessonProgress.objects.filter(user=u))
-            times = [lp.time_spent_seconds for lp in progress if lp.time_spent_seconds]
-            quizzes = [lp.quiz_score for lp in progress if lp.quiz_score is not None]
+            progress = list(ResourceProgress.objects.filter(user=u).select_related('resource'))
+            total_secs = activity_time_seconds(progress)
+            quizzes = [rp.quiz_score for rp in progress if rp.quiz_score is not None]
+            activities_done = sum(
+                len(completed_activity_ids(u, e.course))
+                for e in Enrollment.objects.filter(user=u).select_related('course')
+            )
             days_active = LessonSession.objects.filter(user=u).dates('started_at', 'day').count()
             ws.append([
                 f'P{i:04d}',
@@ -252,8 +257,8 @@ class AdminStudyExportView(APIView):
                 p.post_score if p.post_score is not None else '',
                 p.gain if p.gain is not None else '',
                 Enrollment.objects.filter(user=u, progress_pct=100).count(),
-                sum(1 for lp in progress if lp.completed_at is not None),
-                round(sum(times) / 60, 1) if times else 0,
+                activities_done,
+                round(total_secs / 60, 1) if total_secs else 0,
                 round(sum(quizzes) / len(quizzes), 3) if quizzes else '',
                 days_active,
                 _dt(p.pre_completed_at),

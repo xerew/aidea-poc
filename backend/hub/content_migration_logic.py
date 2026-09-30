@@ -62,12 +62,19 @@ def build_resources_for_lesson(lesson, Resource):
 
 
 def migrate_progress_row(lp, Resource, ResourceProgress):
-    """Create ResourceProgress rows for every resource of the migrated activity."""
+    """Create ResourceProgress rows for every resource of the migrated activity.
+
+    Legacy semantics: a LessonProgress row *existing* means the lesson was
+    completed (progress counted rows, not completed_at) — seeded/demo rows have
+    completed_at NULL. So a missing timestamp still maps to "completed"."""
+    from django.utils import timezone
+
+    completed_at = lp.completed_at or timezone.now()
     for r in Resource.objects.filter(activity_id=lp.lesson_id):
         ResourceProgress.objects.get_or_create(
             user_id=lp.user_id, resource_id=r.id,
             defaults={
-                'completed_at': lp.completed_at,
+                'completed_at': completed_at,
                 'time_spent_seconds': lp.time_spent_seconds,
                 'quiz_score': lp.quiz_score if r.type == 'quiz' else None,
                 'quiz_answers': lp.quiz_answers if r.type == 'quiz' else [],

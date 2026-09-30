@@ -116,7 +116,8 @@ class AssignmentFlowTests(APITestCase):
     def test_lesson_detail_includes_submission(self):
         self._submit()
         res = self.client.get(f'/api/courses/{self.course.id}/lessons/{self.assignment.id}/')
-        self.assertEqual(res.data['assignment_submission']['status'], 'pending')
+        resource = next(r for r in res.data['resources'] if r['type'] == 'assignment')
+        self.assertEqual(resource['submission']['status'], 'pending')
 
     def test_queue_scoping(self):
         self._submit()

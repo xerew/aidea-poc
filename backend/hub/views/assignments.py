@@ -104,8 +104,11 @@ class AssignmentSubmitView(APIView):
             submission.save(update_fields=['text', 'attachments', 'status', 'updated_at'])
             created = False
         else:
+            from hub.completion import ensure_resources
+            ensure_resources(lesson)
             submission = AssignmentSubmission.objects.create(
                 user=request.user, lesson=lesson, text=text, attachments=attachments,
+                resource=lesson.resources.filter(type='assignment').first(),
             )
             created = True
 

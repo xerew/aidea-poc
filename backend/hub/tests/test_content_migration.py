@@ -142,3 +142,45 @@ class ProgressMappingTest(TestCase):
         assign_res = self.assignlesson.resources.get(type='assignment')
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.resource_id, assign_res.id)
+
+
+class ProgressParityTest(TestCase):
+    """The plan's parity gate: after migrating, recomputing progress from
+    resources must give each enrollment the same % the legacy lesson-count
+    calculation did — including partial progress across multi-resource
+    lessons and legacy rows whose completed_at is NULL."""
+
+    def setUp(self):
+        from hub.models import Enrollment
+        self.user = User.objects.create_user(username='parity', password='x')
+        pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
+        self.course = Course.objects.create(title='C', pillar=pillar)
+        module = Module.objects.create(title='M', course=self.course, order=1)
+        # A: text + 2 media → 3 resources. B: plain text → 1 resource.
+        self.a = Activity.objects.create(
+            module=module, title='A', lesson_type='text', order=1, content='x',
+            media_items=[{'type': 'image', 'url': 'i', 'caption': ''},
+                         {'type': 'video', 'url': 'v', 'caption': ''}],
+        )
+        self.b = Activity.objects.create(
+            module=module, title='B', lesson_type='text', order=2, content='y',
+        )
+        self.optional = Activity.objects.create(
+            module=module, title='Opt', lesson_type='text', order=3, content='z',
+            is_required=False,
+        )
+        # Legacy: only A done, recorded like the seed does (completed_at NULL).
+        LessonProgress.objects.create(user=self.user, lesson=self.a)
+        self.enrollment = Enrollment.objects.create(
+            user=self.user, course=self.course, progress_pct=50,  # legacy: 1 of 2 required
+        )
+
+    def test_partial_progress_is_preserved(self):
+        from hub.completion import completed_activity_ids, recompute_course_progress
+        for act in Activity.objects.all():
+            build_resources_for_lesson(act, Resource)
+        for lp in LessonProgress.objects.all():
+            migrate_progress_row(lp, Resource, ResourceProgress)
+
+        self.assertEqual(recompute_course_progress(self.user, self.enrollment), 50)
+        self.assertEqual(completed_activity_ids(self.user, self.course), {self.a.id})

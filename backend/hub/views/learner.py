@@ -8,7 +8,6 @@ from hub.models import (
     Course,
     Enrollment,
     LearningPillar,
-    LessonProgress,
     LessonSession,
     Resource,
 )
@@ -114,11 +113,8 @@ class CourseLearnView(APIView):
         except Enrollment.DoesNotExist:
             return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
 
-        completed_ids = set(
-            LessonProgress.objects.filter(
-                user=request.user, lesson__module__course=course,
-            ).values_list('lesson_id', flat=True)
-        )
+        from hub.completion import completed_activity_ids
+        completed_ids = completed_activity_ids(request.user, course)
 
         modules_data = ModuleLearnSerializer(
             course.modules.all(),
@@ -173,36 +169,45 @@ class LessonDetailView(APIView):
         )
         idx = all_ids.index(lesson.id)
 
-        is_completed = LessonProgress.objects.filter(
-            user=request.user, lesson=lesson,
-        ).exists()
+        from hub.completion import completed_activity_ids
+        from hub.models import AssignmentSubmission, ResourceProgress
+        from hub.serializers.assignments import AssignmentSubmissionSerializer
 
-        quiz_review = None
-        if lesson.lesson_type == 'quiz' and is_completed:
-            lp = LessonProgress.objects.filter(user=request.user, lesson=lesson).first()
-            if lp and lp.quiz_answers:
-                quiz_review = {
-                    'selected': (lp.engagement_data or {}).get('quiz_selected', []),
-                    'results': lp.quiz_answers,
+        is_completed = lesson.id in completed_activity_ids(request.user, course)
+
+        data = LessonLearnDetailSerializer(lesson, context={'request': request}).data
+        progress = {
+            rp.resource_id: rp
+            for rp in ResourceProgress.objects.filter(user=request.user, resource__activity=lesson)
+        }
+        submissions = {
+            sub.resource_id: sub
+            for sub in AssignmentSubmission.objects.filter(
+                user=request.user, resource__activity=lesson,
+            )
+        }
+        # Per-resource learner state: completion, quiz review, assignment submission.
+        for res in data['resources']:
+            rp = progress.get(res['id'])
+            res['is_completed'] = bool(rp and rp.completed_at)
+            res['quiz_review'] = (
+                {
+                    'selected': (rp.engagement_data or {}).get('quiz_selected', []),
+                    'results': rp.quiz_answers,
                 }
-
-        assignment_submission = None
-        if lesson.lesson_type == 'assignment':
-            from hub.models import AssignmentSubmission
-            from hub.serializers.assignments import AssignmentSubmissionSerializer
-            sub = AssignmentSubmission.objects.filter(user=request.user, lesson=lesson).first()
-            if sub:
-                assignment_submission = AssignmentSubmissionSerializer(sub).data
+                if res['type'] == 'quiz' and rp and rp.completed_at and rp.quiz_answers
+                else None
+            )
+            sub = submissions.get(res['id'])
+            res['submission'] = AssignmentSubmissionSerializer(sub).data if sub else None
 
         return Response({
-            **LessonLearnDetailSerializer(lesson, context={'request': request}).data,
+            **data,
             'module_id': lesson.module_id,
             'module_title': lesson.module.title,
             'is_completed': is_completed,
             'prev_lesson_id': all_ids[idx - 1] if idx > 0 else None,
             'next_lesson_id': all_ids[idx + 1] if idx < len(all_ids) - 1 else None,
-            'quiz_review': quiz_review,
-            'assignment_submission': assignment_submission,
         })
 
 

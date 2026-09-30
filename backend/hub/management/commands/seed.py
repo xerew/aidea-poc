@@ -61,6 +61,13 @@ class Command(BaseCommand):
             made += 1
         self.stdout.write(f'  Generated resources for {made} activities')
 
+        # The cohort is seeded as legacy LessonProgress rows; mirror them into
+        # ResourceProgress (idempotent) so completion shows on the resource path.
+        from hub.content_migration_logic import migrate_progress_row
+        from hub.models import ResourceProgress
+        for lp in LessonProgress.objects.all():
+            migrate_progress_row(lp, Resource, ResourceProgress)
+
     def _seed_pillars(self):
         for pillar_data in copy.deepcopy(PILLARS):
             courses_data = pillar_data.pop('courses')

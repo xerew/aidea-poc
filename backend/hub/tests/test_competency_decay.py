@@ -95,9 +95,9 @@ class CourseCompletionDeltaTests(TestCase):
         )
 
     def _progress(self, lesson, seconds=None, quiz_score=None):
-        from hub.models import LessonProgress
-        return LessonProgress.objects.create(
-            user=self.user, lesson=lesson,
+        from hub.tests.helpers import complete_activity
+        return complete_activity(
+            self.user, lesson,
             time_spent_seconds=seconds, quiz_score=quiz_score,
             completed_at=timezone.now(),
         )

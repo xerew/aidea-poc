@@ -108,4 +108,5 @@ class QuizCheckTests(TestCase):
         complete_url = f'/api/courses/{self.course.id}/lessons/{self.quiz.id}/complete/'
         self.client.post(complete_url, {'quiz_answers': [1]}, format='json')
         res = self.client.get(f'/api/courses/{self.course.id}/lessons/{self.quiz.id}/')
-        self.assertEqual(res.data['quiz_review'], {'selected': [1], 'results': [True]})
+        quiz = next(r for r in res.data['resources'] if r['type'] == 'quiz')
+        self.assertEqual(quiz['quiz_review'], {'selected': [1], 'results': [True]})
