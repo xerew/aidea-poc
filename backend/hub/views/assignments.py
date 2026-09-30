@@ -14,6 +14,7 @@ from hub.models import (
     Course,
     CourseCollaborator,
     Enrollment,
+    Resource,
     UserProfile,
 )
 from hub.serializers.assignments import AssignmentSubmissionSerializer, ReviewQueueSerializer
@@ -118,6 +119,65 @@ class AssignmentSubmitView(APIView):
         )
 
 
+class ResourceAssignmentSubmitView(APIView):
+    """POST .../lessons/<lesson_pk>/resources/<resource_pk>/submit-assignment/ —
+    learner submits/resubmits to an assignment resource."""
+
+    def post(self, request, pk, lesson_pk, resource_pk):
+        if not Enrollment.objects.filter(user=request.user, course_id=pk).exists():
+            if not Course.objects.filter(pk=pk).exists():
+                return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            resource = Resource.objects.select_related('activity__module').get(
+                pk=resource_pk, activity_id=lesson_pk,
+                activity__module__course_id=pk, type='assignment',
+            )
+        except Resource.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        text = str(request.data.get('text', '')).strip()
+        attachments, err = _clean_attachments(request.data.get('attachments'))
+        if err:
+            return Response({'detail': err}, status=status.HTTP_400_BAD_REQUEST)
+        if not text and not attachments:
+            return Response(
+                {'detail': 'Provide text or at least one attachment.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        submission = AssignmentSubmission.objects.filter(
+            user=request.user, resource=resource,
+        ).first()
+        if submission and submission.status == AssignmentSubmission.Status.APPROVED:
+            return Response(
+                {'detail': 'This assignment is already approved.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if submission:
+            submission.text = text
+            submission.attachments = attachments
+            submission.status = AssignmentSubmission.Status.PENDING
+            submission.save(update_fields=['text', 'attachments', 'status', 'updated_at'])
+            created = False
+        else:
+            submission = AssignmentSubmission.objects.create(
+                user=request.user, lesson=resource.activity, resource=resource,
+                text=text, attachments=attachments,
+            )
+            created = True
+
+        if resource.activity.module.llm_review_enabled:
+            from hub.llm_review import review_submission
+            review_submission(submission)
+
+        return Response(
+            AssignmentSubmissionSerializer(submission).data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
 class SubmissionUploadView(APIView):
     """POST /courses/<pk>/lessons/<lesson_pk>/submission-upload/ — store one
     attachment for an enrolled learner and return its URL, name and type."""
@@ -169,7 +229,7 @@ class ReviewActionView(APIView):
     def post(self, request, pk):
         try:
             submission = AssignmentSubmission.objects.select_related(
-                'user', 'lesson__module__course',
+                'user', 'lesson__module__course', 'resource__activity__module',
             ).get(pk=pk)
         except AssignmentSubmission.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -201,7 +261,7 @@ class ReviewActionView(APIView):
                 )
             from django.db import transaction
 
-            from hub.completion import record_lesson_completion
+            from hub.completion import record_lesson_completion, record_resource_completion
             with transaction.atomic():
                 submission.status = AssignmentSubmission.Status.APPROVED
                 if feedback:
@@ -210,11 +270,20 @@ class ReviewActionView(APIView):
                 submission.reviewed_at = timezone.now()
                 submission.save()
 
-                record_lesson_completion(
-                    submission.user, enrollment, submission.lesson,
-                    engagement_data={'submission': submission.text},
-                    advance_only=True,
-                )
+                # Prefer the resource-based path; fall back to the lesson for
+                # legacy submissions not yet repointed.
+                if submission.resource_id:
+                    record_resource_completion(
+                        submission.user, enrollment, submission.resource,
+                        engagement_data={'submission': submission.text},
+                        advance_only=True,
+                    )
+                else:
+                    record_lesson_completion(
+                        submission.user, enrollment, submission.lesson,
+                        engagement_data={'submission': submission.text},
+                        advance_only=True,
+                    )
         elif action == 'request_changes':
             if not feedback:
                 return Response(

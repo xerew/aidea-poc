@@ -13,6 +13,7 @@ from .admin import (
 )
 from .assignments import (
     AssignmentSubmitView,
+    ResourceAssignmentSubmitView,
     ReviewActionView,
     ReviewQueueView,
     SubmissionUploadView,
@@ -130,6 +131,7 @@ __all__ = [
     'AdminUserListView',
     'AdminUserRoleView',
     'AssignmentSubmitView',
+    'ResourceAssignmentSubmitView',
     'ReviewActionView',
     'ReviewQueueView',
     'SubmissionUploadView',
