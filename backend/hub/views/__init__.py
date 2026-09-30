@@ -45,6 +45,11 @@ from .authoring_module import (
     AuthoringModuleReorderView,
     AuthoringModuleView,
 )
+from .authoring_resource import (
+    AuthoringResourceDetailView,
+    AuthoringResourceReorderView,
+    AuthoringResourceView,
+)
 from .authoring_upload import AuthoringUploadView
 from .authoring_xlsx import (
     AuthoringCourseExportView,
@@ -144,6 +149,9 @@ __all__ = [
     'AuthoringModuleView',
     'AuthoringPillarsView',
     'AuthoringUploadView',
+    'AuthoringResourceView',
+    'AuthoringResourceDetailView',
+    'AuthoringResourceReorderView',
     'AuthoringCollaboratorCandidatesView',
     'AuthoringCourseCollaboratorsView',
     'AuthoringCourseCollaboratorDetailView',

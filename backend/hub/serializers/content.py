@@ -17,6 +17,9 @@ class ResourceSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['translations']
 
+    def validate_quiz_data(self, value):
+        return LessonSerializer().validate_quiz_data(value)
+
 
 class ResourceLearnSerializer(serializers.ModelSerializer):
     """Learner view of a resource — localized, with quiz answers stripped."""
