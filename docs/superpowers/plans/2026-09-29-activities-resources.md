@@ -211,11 +211,13 @@ Each task is TDD (write/adjust the failing test from the existing suite, impleme
 
 ## Phase 3 — Frontend + i18n (task list)
 
-- [ ] **Task 3.1 — Learner ActivityPage** (`ActivityPage.jsx` + `components/learner/ResourceView.jsx` per-type renderers): render resources in order with per-resource completion; per-resource quiz/assignment widgets.
-- [ ] **Task 3.2 — Authoring resources** (`ModuleEditorPage.jsx` + `components/authoring/ResourceEditor.jsx`): add/reorder resources with per-type editors; `is_required` toggle; per-resource translation editing (reuse language bar). Respect `can_edit`/`can_translate`/`can_manage` caps.
-- [ ] **Task 3.3 — Navigation & terminology** (`CourseDetailPage`, learn redirects, `MyLearningPage`, `PathwayPage`, `HomePage`): activity-level nav; "Continue learning" → next activity.
-- [ ] **Task 3.4 — i18n rename** (`locales/*.json` ×9): Lesson→Activity, add Resource keys; parity check green.
-- [ ] **Task 3.5 — Lint + build; commit.**
+- [x] **Task 3.1 — Learner ActivityPage** (`ActivityPage.jsx` + `components/learner/ResourceView.jsx` per-type renderers): render resources in order with per-resource completion; per-resource quiz/assignment widgets.
+- [x] **Task 3.2 — Authoring resources** (`ModuleEditorPage.jsx` + `components/authoring/ResourceEditor.jsx`): add/reorder resources with per-type editors; `is_required` toggle; per-resource translation editing (reuse language bar). Respect `can_edit`/`can_translate`/`can_manage` caps.
+- [x] **Task 3.3 — Navigation & terminology** (`CourseDetailPage`, learn redirects, `MyLearningPage`, `PathwayPage`, `HomePage`): activity-level nav; "Continue learning" → next activity.
+- [x] **Task 3.4 — i18n rename** (`locales/*.json` ×9): Lesson→Activity, add Resource keys; parity check green.
+- [x] **Task 3.5 — Lint + build; commit.**
+
+**Phase 3 notes:** every activity keeps ≥1 resource (seeded on create, last one undeletable); machine translation covers resources; navigation needed no structural change (learn redirect/continue already activity-level); unused editor keys pruned. Still deferred: resource-aware content XLSX, user-guide wording (lessons → activities), legacy-column cleanup migration.
 
 ## Cutover (after all phases pass)
 
