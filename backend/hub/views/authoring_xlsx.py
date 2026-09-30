@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, CourseEditHistory, Lesson, Module
+from hub.models import Activity, Course, CourseEditHistory, Module
 from hub.serializers import CourseAuthoringSerializer
 from hub.xlsx_transfer import MAX_IMPORT_BYTES, build_course_workbook, parse_course_workbook
 
@@ -97,7 +97,7 @@ class AuthoringCourseImportView(APIView):
                     translations=module_data.get('translations', {}),
                 )
                 for lesson_data in sorted(module_data['lessons'].values(), key=lambda lesson: lesson['order']):
-                    Lesson.objects.create(module=module, translations=lesson_data.get('translations', {}), **{
+                    Activity.objects.create(module=module, translations=lesson_data.get('translations', {}), **{
                         k: lesson_data[k] for k in (
                             'title', 'description', 'lesson_type', 'content',
                             'duration_minutes', 'order', 'is_required', 'quiz_data',

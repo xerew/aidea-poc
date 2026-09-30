@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .content import Course, Lesson, Module
+from .content import Activity, Course, Module
 
 
 class Enrollment(models.Model):
@@ -26,7 +26,7 @@ class Enrollment(models.Model):
 
 class LessonProgress(models.Model):
     user               = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lesson_progress')
-    lesson             = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='progress_records')
+    lesson             = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='progress_records')
     completed_at       = models.DateTimeField(null=True, blank=True)
     time_spent_seconds = models.IntegerField(null=True, blank=True)
     quiz_score         = models.FloatField(null=True, blank=True)

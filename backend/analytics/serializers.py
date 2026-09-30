@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from rest_framework import serializers
 
-from hub.models import Course, Enrollment, Lesson
+from hub.models import Activity, Course, Enrollment
 
 
 class CourseAnalyticsSerializer(serializers.ModelSerializer):
@@ -72,5 +72,5 @@ class CourseAnalyticsSerializer(serializers.ModelSerializer):
         return round(completed / len(enrollments) * 100)
 
     def get_avg_time_minutes(self, obj):
-        result = Lesson.objects.filter(module__course=obj).aggregate(total=Sum('duration_minutes'))
+        result = Activity.objects.filter(module__course=obj).aggregate(total=Sum('duration_minutes'))
         return result['total'] or 0

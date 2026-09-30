@@ -3,7 +3,7 @@ from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import CourseEditHistory, Lesson, Module
+from hub.models import Activity, CourseEditHistory, Module
 from hub.serializers import LessonSerializer
 from hub.translation import LANGUAGE_NAMES
 from hub.translation_sync import resync_lesson
@@ -32,7 +32,7 @@ class AuthoringLessonView(APIView):
         serializer = LessonSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         next_order = (
-            Lesson.objects.filter(module=module).aggregate(Max('order'))['order__max'] or 0
+            Activity.objects.filter(module=module).aggregate(Max('order'))['order__max'] or 0
         ) + 1
         lesson = serializer.save(module=module, order=next_order)
 
@@ -52,10 +52,10 @@ class AuthoringLessonDetailView(APIView):
 
     def _get_lesson(self, course_pk, module_pk, lesson_pk):
         try:
-            return Lesson.objects.select_related('module__course').get(
+            return Activity.objects.select_related('module__course').get(
                 pk=lesson_pk, module_id=module_pk, module__course_id=course_pk,
             )
-        except Lesson.DoesNotExist:
+        except Activity.DoesNotExist:
             return None
 
     def patch(self, request, pk, module_pk, lesson_pk):
@@ -173,7 +173,7 @@ class AuthoringLessonReorderView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        lessons = {lesson.pk: lesson for lesson in Lesson.objects.filter(module=module, pk__in=order)}
+        lessons = {lesson.pk: lesson for lesson in Activity.objects.filter(module=module, pk__in=order)}
         if len(lessons) != len(order):
             return Response({'detail': 'Invalid lesson IDs.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -187,4 +187,4 @@ class AuthoringLessonReorderView(APIView):
             editor=request.user,
             changes={'lessons_reordered': {'module_title': module.title, 'order': order}},
         )
-        return Response(LessonSerializer(Lesson.objects.filter(module=module), many=True).data)
+        return Response(LessonSerializer(Activity.objects.filter(module=module), many=True).data)

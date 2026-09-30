@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
     UserProfile,
@@ -65,10 +65,10 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         self.module1 = Module.objects.create(title='M1', course=self.course1, order=1)
         self.module2 = Module.objects.create(title='M2', course=self.course2, order=1)
 
-        self.lesson_text = Lesson.objects.create(
+        self.lesson_text = Activity.objects.create(
             title='L1', module=self.module1, lesson_type='text', duration_minutes=30, order=1,
         )
-        self.lesson_quiz = Lesson.objects.create(
+        self.lesson_quiz = Activity.objects.create(
             title='L2', module=self.module1, lesson_type='quiz', duration_minutes=20, order=2,
         )
 

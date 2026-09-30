@@ -81,9 +81,9 @@ class CourseCollaborator(models.Model):
 
 
 class Resource(models.Model):
-    """One content block inside an Activity (currently `Lesson`). An activity
-    owns an ordered list of resources, each of a single type. Payload lives in
-    typed columns; only the ones relevant to `type` are used."""
+    """One content block inside an Activity. An activity owns an ordered list of
+    resources, each of a single type. Payload lives in typed columns; only the
+    ones relevant to `type` are used."""
     class Type(models.TextChoices):
         TEXT       = 'text',       'Text'
         VIDEO      = 'video',      'Video'
@@ -92,8 +92,7 @@ class Resource(models.Model):
         QUIZ       = 'quiz',       'Quiz'
         ASSIGNMENT = 'assignment', 'Assignment'
 
-    # FK targets `Lesson` for now; renamed to `Activity` in the rename migration.
-    activity     = models.ForeignKey('hub.Lesson', on_delete=models.CASCADE, related_name='resources')
+    activity     = models.ForeignKey('hub.Activity', on_delete=models.CASCADE, related_name='resources')
     type         = models.CharField(max_length=20, choices=Type.choices)
     order        = models.PositiveSmallIntegerField(default=0)
     is_required  = models.BooleanField(default=True)
@@ -130,7 +129,7 @@ class Module(models.Model):
         return f'{self.course.title} — {self.title}'
 
 
-class Lesson(models.Model):
+class Activity(models.Model):
     class LessonType(models.TextChoices):
         TEXT       = 'text',       'Text'
         VIDEO      = 'video',      'Video'

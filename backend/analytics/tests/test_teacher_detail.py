@@ -7,10 +7,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
     UserProfile,
@@ -39,7 +39,7 @@ class TeacherDetailTests(APITestCase):
             duration_hours=1, is_published=True, created_by=self.creator,
         )
         self.module = Module.objects.create(title='M', course=self.course, order=1)
-        self.quiz = Lesson.objects.create(
+        self.quiz = Activity.objects.create(
             module=self.module, title='Quiz 1', lesson_type='quiz', order=1, is_required=True,
             quiz_data=[{
                 'question': 'What is 2+2?',

@@ -3,7 +3,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from hub.models import Course, Enrollment, LearningPillar
-from hub.models.content import Lesson, Module
+from hub.models.content import Activity, Module
 from hub.models.user import UserProfile
 
 
@@ -14,7 +14,7 @@ class EnrollmentCompletedAtTest(TestCase):
         pillar = LearningPillar.objects.create(name='PA', slug='pa', description='')
         self.course = Course.objects.create(title='TA', pillar=pillar)
         module = Module.objects.create(title='MA', course=self.course, order=1)
-        self.lesson = Lesson.objects.create(
+        self.lesson = Activity.objects.create(
             title='LA', module=module, order=1, is_required=True
         )
         self.enrollment = Enrollment.objects.create(user=self.user, course=self.course)
@@ -45,7 +45,7 @@ class EnrollmentCompletedAtTest(TestCase):
 
     def test_completed_at_not_set_on_partial_completion(self):
         module = self.course.modules.first()
-        Lesson.objects.create(title='LA2', module=module, order=2, is_required=True)
+        Activity.objects.create(title='LA2', module=module, order=2, is_required=True)
         self.client.post(
             f'/api/courses/{self.course.pk}/lessons/{self.lesson.pk}/complete/'
         )
@@ -76,7 +76,7 @@ class CompetencyProgressionTest(TestCase):
         pillar = LearningPillar.objects.create(name='PB', slug='pb', description='')
         self.course = Course.objects.create(title='TB', pillar=pillar)
         module = Module.objects.create(title='MB', course=self.course, order=1)
-        self.lesson = Lesson.objects.create(
+        self.lesson = Activity.objects.create(
             title='LB', module=module, order=1, is_required=True
         )
         Enrollment.objects.create(user=self.user, course=self.course)
@@ -92,7 +92,7 @@ class CompetencyProgressionTest(TestCase):
 
     def test_score_not_incremented_on_partial_completion(self):
         module = self.course.modules.first()
-        Lesson.objects.create(title='LB2', module=module, order=2, is_required=True)
+        Activity.objects.create(title='LB2', module=module, order=2, is_required=True)
         self.client.post(
             f'/api/courses/{self.course.pk}/lessons/{self.lesson.pk}/complete/'
         )

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hub.models import Lesson, Module
+from hub.models import Activity, Module
 
 from .localize import localized, viewer_language
 
@@ -9,7 +9,7 @@ MEDIA_ITEM_TYPES = {'image', 'video', 'pdf'}
 
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Lesson
+        model = Activity
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
@@ -79,7 +79,7 @@ class LessonLearnDetailSerializer(serializers.ModelSerializer):
     quiz_data = serializers.SerializerMethodField()
 
     class Meta:
-        model = Lesson
+        model = Activity
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
@@ -160,7 +160,7 @@ class LessonLearnSerializer(serializers.ModelSerializer):
     is_completed = serializers.SerializerMethodField()
 
     class Meta:
-        model = Lesson
+        model = Activity
         fields = ['id', 'title', 'lesson_type', 'duration_minutes', 'order', 'is_completed']
 
     def get_title(self, obj):

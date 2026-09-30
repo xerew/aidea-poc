@@ -2,10 +2,10 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
     UserProfile,
@@ -18,7 +18,7 @@ class LessonProgressFieldsTest(TestCase):
         pillar = LearningPillar.objects.create(name='P1', slug='p1', description='')
         course = Course.objects.create(title='C1', pillar=pillar)
         module = Module.objects.create(title='M1', course=course, order=1)
-        lesson = Lesson.objects.create(title='L1', module=module, order=1, is_required=True)
+        lesson = Activity.objects.create(title='L1', module=module, order=1, is_required=True)
         self.lp = LessonProgress.objects.create(user=user, lesson=lesson)
 
     def test_time_spent_seconds_null_by_default(self):
@@ -43,7 +43,7 @@ class LessonSessionTest(TestCase):
         pillar = LearningPillar.objects.create(name='P2', slug='p2', description='')
         course = Course.objects.create(title='C2', pillar=pillar)
         module = Module.objects.create(title='M2', course=course, order=1)
-        self.lesson = Lesson.objects.create(title='L2', module=module, order=1, is_required=True)
+        self.lesson = Activity.objects.create(title='L2', module=module, order=1, is_required=True)
 
     def test_session_created_with_started_at(self):
         from hub.models.activity import LessonSession
@@ -98,7 +98,7 @@ class LessonSessionOnOpenTest(TestCase):
         pillar = LearningPillar.objects.create(name='P3', slug='p3', description='')
         self.course = Course.objects.create(title='C3', pillar=pillar, is_published=True)
         module = Module.objects.create(title='M3', course=self.course, order=1)
-        self.lesson = Lesson.objects.create(title='L3', module=module, order=1, is_required=True)
+        self.lesson = Activity.objects.create(title='L3', module=module, order=1, is_required=True)
         from hub.models import Enrollment
         Enrollment.objects.create(user=self.user, course=self.course)
         self.client = APIClient()
@@ -133,10 +133,10 @@ class EngagementTrackingTest(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def _lesson(self, title, lesson_type='text', quiz_data=None):
-        return Lesson.objects.create(
+        return Activity.objects.create(
             title=title,
             module=self.module,
-            order=Lesson.objects.filter(module=self.module).count() + 1,
+            order=Activity.objects.filter(module=self.module).count() + 1,
             is_required=True,
             lesson_type=lesson_type,
             quiz_data=quiz_data or [],
@@ -262,10 +262,10 @@ class CompetencyWeightingTest(TestCase):
         pillar = LearningPillar.objects.create(name='P5', slug='p5', description='')
         self.course = Course.objects.create(title='C5', pillar=pillar)
         module = Module.objects.create(title='M5', course=self.course, order=1)
-        self.required_lesson = Lesson.objects.create(
+        self.required_lesson = Activity.objects.create(
             title='RL', module=module, order=1, is_required=True, lesson_type='text',
         )
-        self.quiz_lesson = Lesson.objects.create(
+        self.quiz_lesson = Activity.objects.create(
             title='QL',
             module=module,
             order=2,
@@ -328,7 +328,7 @@ class CompetencyWeightingTest(TestCase):
         pillar = LearningPillar.objects.create(name='P6', slug='p6', description='')
         course2 = Course.objects.create(title='C6', pillar=pillar)
         module2 = Module.objects.create(title='M6', course=course2, order=1)
-        lesson2 = Lesson.objects.create(
+        lesson2 = Activity.objects.create(
             title='L6', module=module2, order=1, is_required=True, lesson_type='text',
         )
         Enrollment.objects.create(user=self.user, course=course2)

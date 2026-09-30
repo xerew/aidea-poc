@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .content import Lesson
+from .content import Activity
 
 
 class AssignmentSubmission(models.Model):
@@ -11,7 +11,7 @@ class AssignmentSubmission(models.Model):
         CHANGES_REQUESTED = 'changes_requested', 'Changes requested'
 
     user         = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assignment_submissions')
-    lesson       = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='submissions')
+    lesson       = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='submissions')
     # Repointed to the assignment resource by the data migration; becomes the
     # canonical target in Phase 2 (lesson kept as the rollback window).
     resource     = models.ForeignKey(

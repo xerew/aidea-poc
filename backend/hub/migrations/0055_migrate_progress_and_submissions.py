@@ -1,5 +1,7 @@
 from django.db import migrations
 
+from hub.content_migration_logic import migrate_progress_row, repoint_submission
+
 
 def migrate_progress_and_submissions(apps, schema_editor):
     """Map LessonProgress → ResourceProgress (one per resource of the migrated
@@ -11,24 +13,10 @@ def migrate_progress_and_submissions(apps, schema_editor):
     AssignmentSubmission = apps.get_model('hub', 'AssignmentSubmission')
 
     for lp in LessonProgress.objects.all().iterator():
-        resources = list(Resource.objects.filter(activity_id=lp.lesson_id))
-        for r in resources:
-            ResourceProgress.objects.get_or_create(
-                user_id=lp.user_id, resource_id=r.id,
-                defaults={
-                    'completed_at': lp.completed_at,
-                    'time_spent_seconds': lp.time_spent_seconds,
-                    'quiz_score': lp.quiz_score if r.type == 'quiz' else None,
-                    'quiz_answers': lp.quiz_answers if r.type == 'quiz' else [],
-                    'engagement_data': lp.engagement_data or {},
-                },
-            )
+        migrate_progress_row(lp, Resource, ResourceProgress)
 
     for sub in AssignmentSubmission.objects.filter(resource__isnull=True).iterator():
-        res = Resource.objects.filter(activity_id=sub.lesson_id, type='assignment').first()
-        if res:
-            sub.resource_id = res.id
-            sub.save(update_fields=['resource'])
+        repoint_submission(sub, Resource)
 
 
 def noop_reverse(apps, schema_editor):

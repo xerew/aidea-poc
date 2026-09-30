@@ -9,11 +9,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from hub.models import (
+    Activity,
     AssignmentSubmission,
     Course,
     CourseCollaborator,
     Enrollment,
-    Lesson,
     UserProfile,
 )
 from hub.serializers.assignments import AssignmentSubmissionSerializer, ReviewQueueSerializer
@@ -70,8 +70,8 @@ class AssignmentSubmitView(APIView):
                 return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
             return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
         try:
-            lesson = Lesson.objects.select_related('module').get(pk=lesson_pk, module__course_id=pk)
-        except Lesson.DoesNotExist:
+            lesson = Activity.objects.select_related('module').get(pk=lesson_pk, module__course_id=pk)
+        except Activity.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
         if lesson.lesson_type != 'assignment':
             return Response(

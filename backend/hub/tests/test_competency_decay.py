@@ -15,14 +15,14 @@ from hub.models import (
 
 
 def _make_course_with_lesson(pillar_slug='pdec2', duration_minutes=10):
-    from hub.models import Lesson, Module
+    from hub.models import Activity, Module
     pillar = LearningPillar.objects.create(name='P2', slug=pillar_slug, order=2)
     course = Course.objects.create(
         title=f'C-{pillar_slug}', pillar=pillar, level='beginner',
         duration_hours=1, is_published=True,
     )
     module = Module.objects.create(course=course, title='M', order=1)
-    lesson = Lesson.objects.create(
+    lesson = Activity.objects.create(
         module=module, title='L', lesson_type='text', order=1,
         is_required=True, duration_minutes=duration_minutes,
     )
@@ -116,13 +116,13 @@ class CourseCompletionDeltaTests(TestCase):
 
     def test_negative_fail_weight_gives_negative_delta(self):
         from hub.competency import course_completion_delta
-        from hub.models import Lesson, Module
+        from hub.models import Activity, Module
         config = LearnerActivityConfig.get()
         config.quiz_affects_competency = True
         config.quiz_weight_fail = -1.0
         config.save()
         course, lesson = _make_course_with_lesson('ccd3')
-        quiz = Lesson.objects.create(
+        quiz = Activity.objects.create(
             module=Module.objects.get(course=course), title='Q', lesson_type='quiz',
             order=2, is_required=True,
         )

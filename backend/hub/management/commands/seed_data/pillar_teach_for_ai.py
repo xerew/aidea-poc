@@ -166,12 +166,12 @@ PILLAR =     {
                                 ),
                             },
                             {
-                                'title': 'Cross-Curricular Lesson Planner (PDF)',
+                                'title': 'Cross-Curricular Activity Planner (PDF)',
                                 'type': 'pdf', 'duration': 5, 'required': False,
                                 'content': shared.PDF,
                             },
                             {
-                                'title': 'Plan a Data Literacy Lesson',
+                                'title': 'Plan a Data Literacy Activity',
                                 'type': 'assignment', 'duration': 8, 'required': False,
                                 'content': (
                                     'Plan a 20-minute data literacy activity for your subject using the lesson '

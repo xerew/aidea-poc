@@ -142,12 +142,12 @@ PILLAR =     {
                         ],
                     },
                     {
-                        'title': 'Getting Started: Your First AI-Assisted Lesson',
+                        'title': 'Getting Started: Your First AI-Assisted Activity',
                         'description': 'A hands-on walkthrough of building a lesson with AI support from start to finish.',
                         'duration_minutes': 60,
                         'lessons': [
                             {
-                                'title': 'Walkthrough: AI-Assisted Lesson Planning',
+                                'title': 'Walkthrough: AI-Assisted Activity Planning',
                                 'type': 'video', 'duration': 20, 'required': True,
                                 'content': shared.VID,
                             },
@@ -161,7 +161,7 @@ PILLAR =     {
                                 ),
                             },
                             {
-                                'title': 'Build Your Own Lesson',
+                                'title': 'Build Your Own Activity',
                                 'type': 'assignment', 'duration': 15, 'required': True,
                                 'content': (
                                     'Use an AI assistant to plan a complete lesson for one of your upcoming classes. '
@@ -171,7 +171,7 @@ PILLAR =     {
                                 ),
                             },
                             {
-                                'title': 'Lesson Planning Knowledge Check',
+                                'title': 'Activity Planning Knowledge Check',
                                 'type': 'quiz', 'duration': 5, 'required': False,
                                 'quiz_data': shared.SAMPLE_QUIZ,
                             },
@@ -296,12 +296,12 @@ PILLAR =     {
                         ],
                     },
                     {
-                        'title': 'Prompting for Lesson Plans and Unit Outlines',
+                        'title': 'Prompting for Activity Plans and Unit Outlines',
                         'description': 'Step-by-step prompting workflows for planning entire units and individual lessons.',
                         'duration_minutes': 55,
                         'lessons': [
                             {
-                                'title': 'Lesson Plan Prompting Walkthrough',
+                                'title': 'Activity Plan Prompting Walkthrough',
                                 'type': 'video', 'duration': 18, 'required': True,
                                 'content': shared.VID,
                             },
@@ -325,7 +325,7 @@ PILLAR =     {
                                 ),
                             },
                             {
-                                'title': 'Lesson Planning Prompts Knowledge Check',
+                                'title': 'Activity Planning Prompts Knowledge Check',
                                 'type': 'quiz', 'duration': 5, 'required': False,
                                 'quiz_data': shared.SAMPLE_QUIZ,
                             },

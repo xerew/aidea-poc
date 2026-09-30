@@ -4,10 +4,10 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
     Subject,
@@ -97,7 +97,7 @@ class Command(BaseCommand):
                         if lesson['type'] in ('image', 'video', 'pdf') and content:
                             media_items = [{'type': lesson['type'], 'url': content, 'caption': ''}]
                             content = ''
-                        Lesson.objects.update_or_create(
+                        Activity.objects.update_or_create(
                             title=lesson['title'],
                             module=module,
                             defaults={
@@ -233,11 +233,11 @@ class Command(BaseCommand):
     def _enroll_at_stage(self, user, course, stage):
         """Create/update an enrollment and matching LessonProgress records."""
         required_lessons = list(
-            Lesson.objects.filter(module__course=course, is_required=True)
+            Activity.objects.filter(module__course=course, is_required=True)
             .order_by('module__order', 'order')
         )
         optional_lessons = list(
-            Lesson.objects.filter(module__course=course, is_required=False)
+            Activity.objects.filter(module__course=course, is_required=False)
             .order_by('module__order', 'order')
         )
         total = len(required_lessons)

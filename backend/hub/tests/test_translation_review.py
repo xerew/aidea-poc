@@ -3,7 +3,7 @@ from unittest.mock import patch
 from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
-from hub.models import Course, LearningPillar, Lesson, Module, UserProfile
+from hub.models import Activity, Course, LearningPillar, Module, UserProfile
 
 
 def make_user(username, role):
@@ -78,11 +78,11 @@ class TranslationResyncTests(APITestCase):
             course=self.course, title='M', description='MD', order=1,
             translations={'el': {'title': 'OLD', 'description': 'OLD'}},
         )
-        self.lesson1 = Lesson.objects.create(
+        self.lesson1 = Activity.objects.create(
             module=self.module, title='L1', description='D1', content='Content one',
             lesson_type='text', order=1, translations={'el': {'title': 'OLD1', 'content': 'OLD1'}},
         )
-        self.lesson2 = Lesson.objects.create(
+        self.lesson2 = Activity.objects.create(
             module=self.module, title='L2', description='D2', content='Content two',
             lesson_type='text', order=2, translations={'el': {'title': 'KEEP2', 'content': 'KEEP2'}},
         )
@@ -113,7 +113,7 @@ class TranslationResyncTests(APITestCase):
         url = f'/api/authoring/courses/{self.course.id}/modules/{self.module.id}/lessons/'
         res = self.client.post(url, {'title': 'L3', 'lesson_type': 'text', 'content': 'Third'}, format='json')
         self.assertEqual(res.status_code, 201)
-        lesson = Lesson.objects.get(pk=res.data['id'])
+        lesson = Activity.objects.get(pk=res.data['id'])
         self.assertEqual(lesson.translations['el']['content'], 'TR')
 
     def test_untranslated_course_is_not_touched(self, _mock):

@@ -3,11 +3,11 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 
 from hub.models import (
+    Activity,
     AssignmentSubmission,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     Module,
     UserProfile,
 )
@@ -20,7 +20,7 @@ def make_assignment_course(creator=None, slug='par1'):
         is_published=True, created_by=creator,
     )
     module = Module.objects.create(course=course, title='M', order=1)
-    assignment = Lesson.objects.create(
+    assignment = Activity.objects.create(
         module=module, title='A', lesson_type='assignment', order=1,
         is_required=True, content='Write an essay.',
     )
@@ -64,7 +64,7 @@ class CompleteEndpointAssignmentGateTests(APITestCase):
         self.assertIn('review', res.data['detail'].lower())
 
     def test_complete_still_works_for_text_lessons(self):
-        text = Lesson.objects.create(
+        text = Activity.objects.create(
             module=self.assignment.module, title='T', lesson_type='text',
             order=2, is_required=True,
         )
@@ -103,7 +103,7 @@ class AssignmentFlowTests(APITestCase):
     def test_submit_rejects_empty_and_non_assignment(self):
         res = self._submit(text='   ')
         self.assertEqual(res.status_code, 400)
-        text_lesson = Lesson.objects.create(
+        text_lesson = Activity.objects.create(
             module=self.module, title='T', lesson_type='text', order=2,
         )
         self.client.force_authenticate(self.learner)
@@ -147,7 +147,7 @@ class AssignmentFlowTests(APITestCase):
     def test_late_approval_does_not_regress_current_module(self):
         # Learner submits in module 1, then advances to module 2 before review
         module2 = Module.objects.create(course=self.course, title='M2', order=2)
-        later_lesson = Lesson.objects.create(
+        later_lesson = Activity.objects.create(
             module=module2, title='Later', lesson_type='text', order=1, is_required=True,
         )
         self._submit()

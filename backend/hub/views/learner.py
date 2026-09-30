@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, Enrollment, LearningPillar, Lesson, LessonProgress, LessonSession
+from hub.models import Activity, Course, Enrollment, LearningPillar, LessonProgress, LessonSession
 from hub.serializers import (
     ContinueLearningSerializer,
     CourseDetailSerializer,
@@ -119,7 +119,7 @@ class CourseLearnView(APIView):
         ).data
 
         all_lessons = list(
-            Lesson.objects.filter(module__course=course).order_by('module__order', 'order')
+            Activity.objects.filter(module__course=course).order_by('module__order', 'order')
         )
         first_incomplete_id = next(
             (lesson.id for lesson in all_lessons if lesson.id not in completed_ids),
@@ -150,16 +150,16 @@ class LessonDetailView(APIView):
             return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
 
         try:
-            lesson = Lesson.objects.select_related('module').get(
+            lesson = Activity.objects.select_related('module').get(
                 pk=lesson_pk, module__course=course,
             )
-        except Lesson.DoesNotExist:
+        except Activity.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         LessonSession.objects.create(user=request.user, lesson=lesson)
 
         all_ids = list(
-            Lesson.objects.filter(module__course=course)
+            Activity.objects.filter(module__course=course)
             .order_by('module__order', 'order')
             .values_list('id', flat=True)
         )
@@ -205,8 +205,8 @@ class QuizCheckView(APIView):
         if not Enrollment.objects.filter(user=request.user, course_id=pk).exists():
             return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
         try:
-            lesson = Lesson.objects.get(pk=lesson_pk, module__course_id=pk, lesson_type='quiz')
-        except Lesson.DoesNotExist:
+            lesson = Activity.objects.get(pk=lesson_pk, module__course_id=pk, lesson_type='quiz')
+        except Activity.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         q_index = request.data.get('question_index')
@@ -244,10 +244,10 @@ class LessonCompleteView(APIView):
         course = enrollment.course
 
         try:
-            lesson = Lesson.objects.select_related('module').get(
+            lesson = Activity.objects.select_related('module').get(
                 pk=lesson_pk, module__course=course,
             )
-        except Lesson.DoesNotExist:
+        except Activity.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         if lesson.lesson_type == 'assignment':

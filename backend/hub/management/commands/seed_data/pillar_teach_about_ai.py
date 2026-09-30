@@ -513,12 +513,12 @@ PILLAR =     {
                                 ),
                             },
                             {
-                                'title': 'English AI Lesson Plans (PDF)',
+                                'title': 'English AI Activity Plans (PDF)',
                                 'type': 'pdf', 'duration': 5, 'required': False,
                                 'content': shared.PDF,
                             },
                             {
-                                'title': 'Design an AI-Themed English Lesson',
+                                'title': 'Design an AI-Themed English Activity',
                                 'type': 'assignment', 'duration': 10, 'required': False,
                                 'content': (
                                     'Design a 30-minute English lesson that uses AI as a tool or topic. '
@@ -580,7 +580,7 @@ PILLAR =     {
                                 'content': shared.VID,
                             },
                             {
-                                'title': 'STEM AI Lesson Ideas',
+                                'title': 'STEM AI Activity Ideas',
                                 'type': 'text', 'duration': 27, 'required': True,
                                 'content': (
                                     'AI is accelerating scientific discovery in drug development, climate '
@@ -607,7 +607,7 @@ PILLAR =     {
                                 'content': shared.VID,
                             },
                             {
-                                'title': 'Humanities AI Lesson Ideas',
+                                'title': 'Humanities AI Activity Ideas',
                                 'type': 'text', 'duration': 28, 'required': True,
                                 'content': (
                                     'History: examine how data-driven decision-making echoes historical uses of '

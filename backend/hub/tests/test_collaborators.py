@@ -2,10 +2,10 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 
 from hub.models import (
+    Activity,
     AssignmentSubmission,
     CourseCollaborator,
     Enrollment,
-    Lesson,
     UserProfile,
 )
 
@@ -172,7 +172,7 @@ class TranslatorPermissionTests(CollaboratorBase):
 class CoEditorReviewScopeTests(CollaboratorBase):
     def setUp(self):
         super().setUp()
-        self.assignment = Lesson.objects.create(
+        self.assignment = Activity.objects.create(
             module=self.module1, title='Task', lesson_type='assignment', order=1,
         )
         self.learner = User.objects.create_user(username='learner1', password='testpass123')

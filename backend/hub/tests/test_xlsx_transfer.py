@@ -6,7 +6,7 @@ from openpyxl import load_workbook
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hub.models import Course, LearningPillar, Lesson, Module, UserProfile
+from hub.models import Activity, Course, LearningPillar, Module, UserProfile
 
 
 def make_course(creator, title='Exportable Course'):
@@ -21,11 +21,11 @@ def make_course(creator, title='Exportable Course'):
     )
     m1 = Module.objects.create(course=course, title='M1', description='first', order=1, duration_minutes=30)
     m2 = Module.objects.create(course=course, title='M2', order=2)
-    Lesson.objects.create(module=m1, title='Intro text', lesson_type='text',
+    Activity.objects.create(module=m1, title='Intro text', lesson_type='text',
                           content='Hello', order=1, is_required=True, duration_minutes=10)
-    Lesson.objects.create(module=m1, title='Watch this', lesson_type='video',
+    Activity.objects.create(module=m1, title='Watch this', lesson_type='video',
                           content='https://youtu.be/dQw4w9WgXcQ', order=2, is_required=False)
-    Lesson.objects.create(
+    Activity.objects.create(
         module=m2, title='Check', lesson_type='quiz', order=1, is_required=True,
         quiz_data=[{
             'question': 'Pick two',
@@ -223,7 +223,7 @@ class ImportXlsxTests(APITestCase):
         )
 
     def test_round_trip_preserves_media_items(self):
-        text_lesson = Lesson.objects.filter(
+        text_lesson = Activity.objects.filter(
             module__course=self.course, lesson_type='text',
         ).first()
         text_lesson.media_items = [
@@ -235,7 +235,7 @@ class ImportXlsxTests(APITestCase):
         res = self._post(self._export_bytes(self.course))
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         new = Course.objects.get(pk=res.data['id'])
-        new_lesson = Lesson.objects.get(module__course=new, title=text_lesson.title)
+        new_lesson = Activity.objects.get(module__course=new, title=text_lesson.title)
         self.assertEqual(len(new_lesson.media_items), 2)
         self.assertEqual(new_lesson.media_items[0], {
             'type': 'image', 'url': 'https://ex.com/a.png', 'caption': 'Diagram',

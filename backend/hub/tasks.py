@@ -510,7 +510,7 @@ def _translate_module(module, target):
 
 
 def _translate_lesson(lesson, target):
-    from hub.models import Lesson
+    from hub.models import Activity
     src = lesson.module.course.source_language
     blob = {
         'title': translate_text(lesson.title, src, target),
@@ -522,7 +522,7 @@ def _translate_lesson(lesson, target):
         blob['content'] = translate_text(lesson.content, src, target)
     elif lesson.lesson_type == 'quiz':
         blob['quiz_data'] = _tr_quiz(lesson.quiz_data, src, target)
-    _merge_json(Lesson, lesson.pk, 'translations', target, blob)
+    _merge_json(Activity, lesson.pk, 'translations', target, blob)
 
 
 def _finish(course, target, work):
@@ -583,9 +583,9 @@ def translate_module_meta(module_id: int, target: str) -> None:
 @shared_task
 def translate_lesson_meta(lesson_id: int, target: str) -> None:
     """Re-translate only one lesson's fields."""
-    from hub.models import Lesson
+    from hub.models import Activity
     try:
-        lesson = Lesson.objects.select_related('module__course').get(pk=lesson_id)
-    except Lesson.DoesNotExist:
+        lesson = Activity.objects.select_related('module__course').get(pk=lesson_id)
+    except Activity.DoesNotExist:
         return
     _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))

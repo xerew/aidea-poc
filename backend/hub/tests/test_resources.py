@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from hub.models import Course, LearningPillar, Lesson, Module, Resource
+from hub.models import Activity, Course, LearningPillar, Module, Resource
 
 
 class ResourceModelTest(TestCase):
@@ -8,8 +8,8 @@ class ResourceModelTest(TestCase):
         pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
         course = Course.objects.create(title='C', pillar=pillar)
         self.module = Module.objects.create(title='M', course=course, order=1)
-        # Lesson is the (pre-rename) Activity.
-        self.activity = Lesson.objects.create(module=self.module, title='A', order=1)
+        # Activity is the (pre-rename) Activity.
+        self.activity = Activity.objects.create(module=self.module, title='A', order=1)
 
     def test_create_resource(self):
         r = Resource.objects.create(

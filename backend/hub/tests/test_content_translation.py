@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from rest_framework.test import APITestCase
 
-from hub.models import Course, Enrollment, LearningPillar, Lesson, Module, UserProfile
+from hub.models import Activity, Course, Enrollment, LearningPillar, Module, UserProfile
 
 
 class TranslationFieldsTests(TestCase):
@@ -16,7 +16,7 @@ class TranslationFieldsTests(TestCase):
         self.assertEqual(c.translation_status, {})
         m = Module.objects.create(course=c, title='M', order=1)
         self.assertEqual(m.translations, {})
-        lesson = Lesson.objects.create(module=m, title='L', lesson_type='text', order=1)
+        lesson = Activity.objects.create(module=m, title='L', lesson_type='text', order=1)
         self.assertEqual(lesson.translations, {})
 
     def test_stores_translation_blob(self):
@@ -34,7 +34,7 @@ class TranslateCourseTaskTests(TestCase):
             level='beginner', duration_hours=1, source_language='en',
             learning_outcomes=['Outcome A'], is_published=True)
         self.module = Module.objects.create(course=self.course, title='Mod', description='md', order=1)
-        self.lesson = Lesson.objects.create(module=self.module, title='Les', description='ld',
+        self.lesson = Activity.objects.create(module=self.module, title='Les', description='ld',
             content='Body', lesson_type='quiz', order=1,
             quiz_data=[{'question': 'Q?', 'options': [
                 {'text': 'A', 'is_correct': True}, {'text': 'B', 'is_correct': False}]}])
@@ -141,9 +141,9 @@ class AuthoringTranslationTests(APITestCase):
         self.module = Module.objects.create(
             course=self.course, title='Module Title', description='Module Desc', order=1,
         )
-        self.lesson = Lesson.objects.create(
-            module=self.module, title='Lesson Title', description='Lesson Desc',
-            content='Lesson Body', lesson_type='quiz', order=1,
+        self.lesson = Activity.objects.create(
+            module=self.module, title='Activity Title', description='Activity Desc',
+            content='Activity Body', lesson_type='quiz', order=1,
             quiz_data=[{'question': 'Q?', 'options': [
                 {'text': 'A', 'is_correct': True}, {'text': 'B', 'is_correct': False}]}],
         )
@@ -260,9 +260,9 @@ class AuthoringTranslationTests(APITestCase):
         self.assertEqual(blob['description'], 'LesDescX')
         self.assertEqual(blob['content'], 'LesBodyX')
         self.assertEqual(blob['quiz_data'], new_quiz)
-        self.assertEqual(self.lesson.title, 'Lesson Title')
-        self.assertEqual(self.lesson.description, 'Lesson Desc')
-        self.assertEqual(self.lesson.content, 'Lesson Body')
+        self.assertEqual(self.lesson.title, 'Activity Title')
+        self.assertEqual(self.lesson.description, 'Activity Desc')
+        self.assertEqual(self.lesson.content, 'Activity Body')
         self.assertEqual(self.lesson.quiz_data[0]['question'], 'Q?')
 
     def test_patch_lesson_without_lang_edits_base_field(self):
@@ -332,9 +332,9 @@ class FinalReviewFixTests(APITestCase):
         course = Course.objects.create(title='C', pillar=self.pillar, level='beginner',
                                        duration_hours=1, source_language='en')
         module = Module.objects.create(course=course, title='M', order=1)
-        video = Lesson.objects.create(module=module, title='V', content='https://youtu.be/abc',
+        video = Activity.objects.create(module=module, title='V', content='https://youtu.be/abc',
                                       lesson_type='video', order=1)
-        text = Lesson.objects.create(module=module, title='T', content='Prose body',
+        text = Activity.objects.create(module=module, title='T', content='Prose body',
                                      lesson_type='text', order=2)
         with patch('hub.tasks.translate_text', side_effect=lambda t, s, d: f'[{d}] {t}'):
             translate_course(course.id, 'el')
@@ -347,7 +347,7 @@ class FinalReviewFixTests(APITestCase):
         course = Course.objects.create(title='C', pillar=self.pillar, level='beginner',
                                        duration_hours=1, source_language='en', created_by=self.creator)
         module = Module.objects.create(course=course, title='M', order=1)
-        quiz = Lesson.objects.create(module=module, title='Q', lesson_type='quiz', order=1,
+        quiz = Activity.objects.create(module=module, title='Q', lesson_type='quiz', order=1,
             quiz_data=[{'question': 'Q?', 'options': [
                 {'text': 'A', 'is_correct': True}, {'text': 'B', 'is_correct': False}]}])
         url = f'/api/authoring/courses/{course.id}/modules/{module.id}/lessons/{quiz.id}/?lang=el'

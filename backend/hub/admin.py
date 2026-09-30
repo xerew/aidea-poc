@@ -6,6 +6,7 @@ from django.utils.html import format_html, mark_safe
 
 from .models import (
     AccessRequest,
+    Activity,
     AssignmentSubmission,
     Course,
     CourseCollaborator,
@@ -16,7 +17,6 @@ from .models import (
     LearningPath,
     LearningPathCourse,
     LearningPillar,
-    Lesson,
     LessonProgress,
     LessonSession,
     Module,
@@ -237,7 +237,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 class LessonInline(admin.TabularInline):
-    model = Lesson
+    model = Activity
     extra = 1
     fields = ['title', 'lesson_type', 'order', 'is_required']
     ordering = ['order']
@@ -252,7 +252,7 @@ class ModuleAdmin(admin.ModelAdmin):
     inlines = [LessonInline]
 
 
-@admin.register(Lesson)
+@admin.register(Activity)
 class LessonAdmin(admin.ModelAdmin):
     list_display = ['title', 'module', 'lesson_type', 'order', 'is_required']
     list_filter  = ['lesson_type', 'module__course__pillar']
@@ -269,7 +269,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
     search_fields   = ['user__username', 'course__title']
     readonly_fields = ['enrolled_at', 'last_accessed_at', 'lesson_activity']
 
-    @admin.display(description='Lesson Activity')
+    @admin.display(description='Activity Activity')
     def lesson_activity(self, obj):
         records = (
             LessonProgress.objects
@@ -293,7 +293,7 @@ class EnrollmentAdmin(admin.ModelAdmin):
             '<table style="border-collapse:collapse;width:100%;font-size:13px">'
             '<thead><tr style="background:#f8f8f8;text-align:left">'
             '<th style="padding:6px 10px">Module</th>'
-            '<th style="padding:6px 10px">Lesson</th>'
+            '<th style="padding:6px 10px">Activity</th>'
             '<th style="padding:6px 10px">Type</th>'
             '<th style="padding:6px 10px">Required</th>'
             '<th style="padding:6px 10px">Completed At</th>'

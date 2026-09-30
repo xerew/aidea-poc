@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 
-from hub.models import Course, CourseEditHistory, Lesson, Module
+from hub.models import Activity, Course, CourseEditHistory, Module
 from hub.tests.test_authoring_courses import AuthoringTestCase
 
 # ── Module creation ───────────────────────────────────────────────────────────
@@ -141,11 +141,11 @@ class AuthoringModuleEditorTestCase(AuthoringTestCase):
     def setUp(self):
         super().setUp()
         self._login_as(self.creator)
-        self.lesson1 = Lesson.objects.create(
+        self.lesson1 = Activity.objects.create(
             module=self.module1, title='Intro Video', lesson_type='video',
             description='Watch this.', order=1, is_required=True,
         )
-        self.lesson2 = Lesson.objects.create(
+        self.lesson2 = Activity.objects.create(
             module=self.module1, title='Key Concepts', lesson_type='text',
             content='Some markdown.', order=2, is_required=False,
         )
@@ -182,7 +182,7 @@ class AuthoringModuleEditorTestCase(AuthoringTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-# ── Lesson creation ───────────────────────────────────────────────────────────
+# ── Activity creation ───────────────────────────────────────────────────────────
 
 class AuthoringLessonCreateTestCase(AuthoringTestCase):
 
@@ -192,7 +192,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         self.url = reverse('authoring-lesson-create', kwargs={
             'pk': self.course.pk, 'module_pk': self.module1.pk,
         })
-        self.valid_payload = {'title': 'New Lesson', 'lesson_type': 'text'}
+        self.valid_payload = {'title': 'New Activity', 'lesson_type': 'text'}
 
     def test_create_lesson_returns_201(self):
         response = self.client.post(self.url, self.valid_payload)
@@ -200,13 +200,13 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
 
     def test_create_lesson_persists_to_db(self):
         self.client.post(self.url, self.valid_payload)
-        self.assertTrue(Lesson.objects.filter(title='New Lesson', module=self.module1).exists())
+        self.assertTrue(Activity.objects.filter(title='New Activity', module=self.module1).exists())
 
     def test_create_lesson_auto_assigns_order(self):
-        Lesson.objects.create(module=self.module1, title='First', lesson_type='text', order=1)
+        Activity.objects.create(module=self.module1, title='First', lesson_type='text', order=1)
         response = self.client.post(self.url, self.valid_payload)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        lesson = Lesson.objects.get(pk=response.data['id'])
+        lesson = Activity.objects.get(pk=response.data['id'])
         self.assertEqual(lesson.order, 2)
 
     def test_first_lesson_gets_order_one(self):
@@ -217,7 +217,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         self.client.post(self.url, self.valid_payload)
         history = CourseEditHistory.objects.get(course=self.course)
         self.assertIn('lesson_added', history.changes)
-        self.assertEqual(history.changes['lesson_added']['lesson_title'], 'New Lesson')
+        self.assertEqual(history.changes['lesson_added']['lesson_title'], 'New Activity')
 
     def test_create_lesson_on_published_course_returns_403(self):
         self.course.is_published = True
@@ -241,7 +241,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         }
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        lesson = Lesson.objects.get(pk=response.data['id'])
+        lesson = Activity.objects.get(pk=response.data['id'])
         self.assertEqual(len(lesson.media_items), 2)
         self.assertEqual(lesson.media_items[0]['caption'], 'Fig 1')
         self.assertEqual(lesson.media_items[1]['caption'], '')  # defaulted
@@ -273,7 +273,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         }
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        lesson = Lesson.objects.get(pk=response.data['id'])
+        lesson = Activity.objects.get(pk=response.data['id'])
         self.assertEqual([b['type'] for b in lesson.media_items], ['text', 'image', 'text'])
         self.assertEqual(lesson.media_items[0]['html'], '<p>Before</p>')
 
@@ -292,7 +292,7 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
 
     def test_create_lesson_with_all_fields(self):
         payload = {
-            'title': 'Full Lesson',
+            'title': 'Full Activity',
             'lesson_type': 'video',
             'description': 'A video lesson.',
             'content': '',
@@ -301,19 +301,19 @@ class AuthoringLessonCreateTestCase(AuthoringTestCase):
         }
         response = self.client.post(self.url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        lesson = Lesson.objects.get(pk=response.data['id'])
+        lesson = Activity.objects.get(pk=response.data['id'])
         self.assertEqual(lesson.duration_minutes, 15)
         self.assertFalse(lesson.is_required)
 
 
-# ── Lesson edit / delete ──────────────────────────────────────────────────────
+# ── Activity edit / delete ──────────────────────────────────────────────────────
 
 class AuthoringLessonDetailTestCase(AuthoringTestCase):
 
     def setUp(self):
         super().setUp()
         self._login_as(self.creator)
-        self.lesson = Lesson.objects.create(
+        self.lesson = Activity.objects.create(
             module=self.module1, title='Intro Text', lesson_type='text',
             description='Original desc.', content='Original content.',
             duration_minutes=10, order=1, is_required=True,
@@ -353,7 +353,7 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
         self.assertFalse(self.lesson.is_required)
 
     def test_patch_creates_history(self):
-        self.client.patch(self.url, {'title': 'Renamed Lesson'})
+        self.client.patch(self.url, {'title': 'Renamed Activity'})
         history = CourseEditHistory.objects.get(course=self.course)
         self.assertIn('lesson_edited', history.changes)
         self.assertIn('title', history.changes['lesson_edited']['fields'])
@@ -384,7 +384,7 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_patch_lesson_belonging_to_other_module_returns_404(self):
-        other_lesson = Lesson.objects.create(
+        other_lesson = Activity.objects.create(
             module=self.module2, title='Other', lesson_type='text', order=1,
         )
         url = reverse('authoring-lesson-detail', kwargs={
@@ -396,7 +396,7 @@ class AuthoringLessonDetailTestCase(AuthoringTestCase):
     def test_delete_removes_lesson(self):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Lesson.objects.filter(pk=self.lesson.pk).exists())
+        self.assertFalse(Activity.objects.filter(pk=self.lesson.pk).exists())
 
     def test_delete_creates_history(self):
         self.client.delete(self.url)
@@ -460,7 +460,7 @@ class QuizDataTestCase(AuthoringTestCase):
         self.create_url = reverse('authoring-lesson-create', kwargs={
             'pk': self.course.pk, 'module_pk': self.module1.pk,
         })
-        self.quiz_lesson = Lesson.objects.create(
+        self.quiz_lesson = Activity.objects.create(
             module=self.module1, title='Knowledge Check', lesson_type='quiz',
             order=1, quiz_data=VALID_QUIZ,
         )
@@ -475,7 +475,7 @@ class QuizDataTestCase(AuthoringTestCase):
         payload = {'title': 'Quiz 1', 'lesson_type': 'quiz', 'quiz_data': VALID_QUIZ}
         response = self.client.post(self.create_url, payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        lesson = Lesson.objects.get(pk=response.data['id'])
+        lesson = Activity.objects.get(pk=response.data['id'])
         self.assertEqual(len(lesson.quiz_data), 2)
 
     def test_create_quiz_lesson_quiz_data_returned_in_response(self):
@@ -653,21 +653,21 @@ class AuthoringModuleReorderTestCase(AuthoringTestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-# ── Lesson reorder ────────────────────────────────────────────────────────────
+# ── Activity reorder ────────────────────────────────────────────────────────────
 
 class AuthoringLessonReorderTestCase(AuthoringTestCase):
 
     def setUp(self):
         super().setUp()
         self._login_as(self.creator)
-        self.lesson1 = Lesson.objects.create(
-            module=self.module1, title='Lesson 1', lesson_type='text', order=1,
+        self.lesson1 = Activity.objects.create(
+            module=self.module1, title='Activity 1', lesson_type='text', order=1,
         )
-        self.lesson2 = Lesson.objects.create(
-            module=self.module1, title='Lesson 2', lesson_type='video', order=2,
+        self.lesson2 = Activity.objects.create(
+            module=self.module1, title='Activity 2', lesson_type='video', order=2,
         )
-        self.lesson3 = Lesson.objects.create(
-            module=self.module1, title='Lesson 3', lesson_type='quiz', order=3,
+        self.lesson3 = Activity.objects.create(
+            module=self.module1, title='Activity 3', lesson_type='quiz', order=3,
         )
         self.url = reverse('authoring-lesson-reorder', kwargs={
             'pk': self.course.pk, 'module_pk': self.module1.pk,
@@ -710,7 +710,7 @@ class AuthoringLessonReorderTestCase(AuthoringTestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_reorder_lesson_from_other_module_returns_400(self):
-        other_lesson = Lesson.objects.create(
+        other_lesson = Activity.objects.create(
             module=self.module2, title='Other', lesson_type='text', order=1,
         )
         response = self.client.patch(

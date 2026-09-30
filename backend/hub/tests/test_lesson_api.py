@@ -3,10 +3,10 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     Module,
     UserProfile,
 )
@@ -19,8 +19,8 @@ class LessonDetailSerializerTest(TestCase):
         pillar = LearningPillar.objects.create(name='P_LD', slug='p-ld', description='')
         self.course = Course.objects.create(title='C_LD', pillar=pillar, is_published=True)
         module = Module.objects.create(title='M_LD', course=self.course, order=1)
-        self.lesson = Lesson.objects.create(
-            title='Quiz Lesson',
+        self.lesson = Activity.objects.create(
+            title='Quiz Activity',
             module=module,
             order=1,
             is_required=True,
@@ -55,8 +55,8 @@ class LessonDetailSerializerTest(TestCase):
         self.assertEqual(res.data['quiz_results'], [True])
 
     def test_quiz_results_null_for_non_quiz(self):
-        lesson2 = Lesson.objects.create(
-            title='Text Lesson', module=self.lesson.module, order=2,
+        lesson2 = Activity.objects.create(
+            title='Text Activity', module=self.lesson.module, order=2,
             is_required=True, lesson_type='text',
         )
         res = self.client.post(
@@ -75,7 +75,7 @@ class QuizCheckTests(TestCase):
             title='C', pillar=pillar, level='beginner', duration_hours=1, is_published=True,
         )
         module = Module.objects.create(course=self.course, title='M', order=1)
-        self.quiz = Lesson.objects.create(
+        self.quiz = Activity.objects.create(
             module=module, title='Q', lesson_type='quiz', order=1, is_required=True,
             quiz_data=[{
                 'question': '1+1?',

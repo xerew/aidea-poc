@@ -1,32 +1,34 @@
-import importlib
-
-from django.apps import apps as django_apps
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.utils import timezone
 
+from hub.content_migration_logic import (
+    build_resources_for_lesson,
+    migrate_progress_row,
+    repoint_submission,
+)
 from hub.models import (
+    Activity,
     AssignmentSubmission,
     Course,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
+    Resource,
     ResourceProgress,
 )
 
-# The migration modules aren't importable by dotted name (leading digits), so
-# load the forward functions via importlib.
-_content_mig = importlib.import_module('hub.migrations.0054_split_lessons_into_resources')
-_progress_mig = importlib.import_module('hub.migrations.0055_migrate_progress_and_submissions')
 
+class ContentMappingTest(TestCase):
+    """Exercises the shared mapping logic (build_resources_for_lesson) that the
+    0054 data migration runs — using current models."""
 
-class ContentMigrationTest(TestCase):
     def setUp(self):
         pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
         self.course = Course.objects.create(title='C', pillar=pillar)
         self.module = Module.objects.create(title='M', course=self.course, order=1)
 
-        self.text = Lesson.objects.create(
+        self.text = Activity.objects.create(
             module=self.module, title='Read', lesson_type='text', order=1,
             content='body text',
             media_items=[
@@ -35,24 +37,25 @@ class ContentMigrationTest(TestCase):
             ],
             translations={'el': {'content': 'κείμενο'}},
         )
-        self.video = Lesson.objects.create(
+        self.video = Activity.objects.create(
             module=self.module, title='Watch', lesson_type='video', order=2,
             content='', media_items=[{'type': 'video', 'url': 'w.mp4', 'caption': 'c'}],
         )
-        self.quiz = Lesson.objects.create(
+        self.quiz = Activity.objects.create(
             module=self.module, title='Quiz', lesson_type='quiz', order=3,
             content='intro', quiz_data=[{'question': 'Q', 'options': [{'text': 'a', 'is_correct': True}]}],
         )
-        self.assign = Lesson.objects.create(
+        self.assign = Activity.objects.create(
             module=self.module, title='Task', lesson_type='assignment', order=4,
             content='do this', is_required=True,
         )
 
-    def _run_content(self):
-        _content_mig.migrate_lessons_to_resources(django_apps, None)
+    def _run(self):
+        for a in Activity.objects.all():
+            build_resources_for_lesson(a, Resource)
 
     def test_text_lesson_becomes_text_plus_media(self):
-        self._run_content()
+        self._run()
         res = list(self.text.resources.order_by('order'))
         self.assertEqual([r.type for r in res], ['text', 'image', 'video'])
         self.assertEqual(res[0].content, 'body text')
@@ -61,57 +64,53 @@ class ContentMigrationTest(TestCase):
         self.assertEqual(res[1].caption, 'fig')
 
     def test_video_lesson_from_media(self):
-        self._run_content()
+        self._run()
         res = list(self.video.resources.all())
         self.assertEqual([r.type for r in res], ['video'])
         self.assertEqual(res[0].url, 'w.mp4')
 
     def test_quiz_lesson(self):
-        self._run_content()
+        self._run()
         res = list(self.quiz.resources.order_by('order'))
         self.assertEqual([r.type for r in res], ['text', 'quiz'])
         self.assertEqual(res[1].quiz_data[0]['question'], 'Q')
 
     def test_assignment_lesson(self):
-        self._run_content()
+        self._run()
         res = list(self.assign.resources.all())
         self.assertEqual([r.type for r in res], ['assignment'])
         self.assertEqual(res[0].instructions, 'do this')
 
     def test_malformed_media_items_are_skipped(self):
-        """Real prod data (lesson 310) has malformed media_items — a non-list,
-        non-dict items, or items missing a url must not crash the migration."""
-        bad_list = Lesson.objects.create(
+        bad_list = Activity.objects.create(
             module=self.module, title='BadList', lesson_type='text', order=5,
             content='c', media_items='not-a-list',
         )
-        bad_items = Lesson.objects.create(
+        bad_items = Activity.objects.create(
             module=self.module, title='BadItems', lesson_type='text', order=6,
             content='c', media_items=['x', {'type': 'video'}, {'type': 'video', 'url': 'ok.mp4'}],
         )
-        self._run_content()
+        self._run()
         self.assertEqual([r.type for r in bad_list.resources.all()], ['text'])
-        # only the well-formed video survives
         self.assertEqual([r.type for r in bad_items.resources.order_by('order')], ['text', 'video'])
 
 
-class ProgressMigrationTest(TestCase):
+class ProgressMappingTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='learner', password='x')
         pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
         self.course = Course.objects.create(title='C', pillar=pillar)
         self.module = Module.objects.create(title='M', course=self.course, order=1)
-        self.textlesson = Lesson.objects.create(
+        self.textlesson = Activity.objects.create(
             module=self.module, title='Read', lesson_type='text', order=1, content='b',
         )
-        self.quizlesson = Lesson.objects.create(
+        self.quizlesson = Activity.objects.create(
             module=self.module, title='Quiz', lesson_type='quiz', order=2,
             content='', quiz_data=[{'question': 'Q', 'options': []}],
         )
-        self.assignlesson = Lesson.objects.create(
+        self.assignlesson = Activity.objects.create(
             module=self.module, title='Task', lesson_type='assignment', order=3, content='x',
         )
-        from django.utils import timezone
         LessonProgress.objects.create(
             user=self.user, lesson=self.textlesson, completed_at=timezone.now(),
             time_spent_seconds=120,
@@ -124,21 +123,22 @@ class ProgressMigrationTest(TestCase):
         )
 
     def test_progress_and_submissions_migrate(self):
-        _content_mig.migrate_lessons_to_resources(django_apps, None)
-        _progress_mig.migrate_progress_and_submissions(django_apps, None)
+        for a in Activity.objects.all():
+            build_resources_for_lesson(a, Resource)
+        for lp in LessonProgress.objects.all():
+            migrate_progress_row(lp, Resource, ResourceProgress)
+        for sub in AssignmentSubmission.objects.filter(resource__isnull=True):
+            repoint_submission(sub, Resource)
 
-        # text lesson's single resource is completed for the learner
         text_res = self.textlesson.resources.get()
         rp = ResourceProgress.objects.get(user=self.user, resource=text_res)
         self.assertIsNotNone(rp.completed_at)
         self.assertEqual(rp.time_spent_seconds, 120)
 
-        # quiz score lands on the quiz resource
         quiz_res = self.quizlesson.resources.get(type='quiz')
         rp_quiz = ResourceProgress.objects.get(user=self.user, resource=quiz_res)
         self.assertEqual(rp_quiz.quiz_score, 0.8)
 
-        # submission repointed to the assignment resource
         assign_res = self.assignlesson.resources.get(type='assignment')
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.resource_id, assign_res.id)

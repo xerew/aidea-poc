@@ -1,8 +1,8 @@
-"""Lesson-completion side effects — shared by learner self-completion and
+"""Activity-completion side effects — shared by learner self-completion and
 assignment-review approval. Single source of truth for progress/competency."""
 from django.utils import timezone
 
-from hub.models import Lesson, LessonProgress, LessonSession
+from hub.models import Activity, LessonProgress, LessonSession
 
 
 def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None,
@@ -53,7 +53,7 @@ def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None,
 
         lp.save()
 
-    total = Lesson.objects.filter(module__course=course, is_required=True).count()
+    total = Activity.objects.filter(module__course=course, is_required=True).count()
     completed_count = LessonProgress.objects.filter(
         user=user,
         lesson__module__course=course,

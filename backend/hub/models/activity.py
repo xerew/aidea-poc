@@ -1,13 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .content import Lesson
+from .content import Activity
 
 
 class LessonSession(models.Model):
     """Records the moment a teacher opens a lesson — used to compute time_spent_seconds."""
     user       = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lesson_sessions')
-    lesson     = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='sessions')
+    lesson     = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name='sessions')
     started_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

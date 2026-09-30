@@ -4,10 +4,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from hub.models import (
+    Activity,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     LessonProgress,
     Module,
     UserProfile,
@@ -20,11 +20,11 @@ class LearnerProgressBase(APITestCase):
 
     Course structure:
         Module 1 (order=1)
-            Lesson 1  – text,  required, order=1, 10 min
-            Lesson 2  – video, required, order=2, 15 min
+            Activity 1  – text,  required, order=1, 10 min
+            Activity 2  – video, required, order=2, 15 min
         Module 2 (order=2)
-            Lesson 3  – quiz,  required, order=1
-            Lesson 4  – text,  optional, order=2
+            Activity 3  – quiz,  required, order=1
+            Activity 4  – text,  optional, order=2
     """
 
     def setUp(self):
@@ -47,15 +47,15 @@ class LearnerProgressBase(APITestCase):
         self.mod1 = Module.objects.create(title="Mod 1", course=self.course, order=1)
         self.mod2 = Module.objects.create(title="Mod 2", course=self.course, order=2)
 
-        self.lesson1 = Lesson.objects.create(
+        self.lesson1 = Activity.objects.create(
             title="L1", module=self.mod1, lesson_type="text",
             is_required=True, order=1, duration_minutes=10,
         )
-        self.lesson2 = Lesson.objects.create(
+        self.lesson2 = Activity.objects.create(
             title="L2", module=self.mod1, lesson_type="video",
             is_required=True, order=2, duration_minutes=15,
         )
-        self.lesson3 = Lesson.objects.create(
+        self.lesson3 = Activity.objects.create(
             title="L3", module=self.mod2, lesson_type="quiz",
             quiz_data=[{
                 "question": "What is AI?",
@@ -66,7 +66,7 @@ class LearnerProgressBase(APITestCase):
             }],
             is_required=True, order=1,
         )
-        self.lesson4 = Lesson.objects.create(
+        self.lesson4 = Activity.objects.create(
             title="L4", module=self.mod2, lesson_type="text",
             is_required=False, order=2,
         )
@@ -323,10 +323,10 @@ class CompletedModuleIdsTests(APITestCase):
         )
         self.m1 = Module.objects.create(course=self.course, title="M1", order=1)
         self.m2 = Module.objects.create(course=self.course, title="M2", order=2)
-        self.l1 = Lesson.objects.create(
+        self.l1 = Activity.objects.create(
             module=self.m1, title="L1", lesson_type="text", order=1, is_required=True,
         )
-        self.l2 = Lesson.objects.create(
+        self.l2 = Activity.objects.create(
             module=self.m2, title="L2", lesson_type="text", order=1, is_required=True,
         )
         Enrollment.objects.create(user=self.user, course=self.course)
@@ -343,7 +343,7 @@ class CompletedModuleIdsTests(APITestCase):
 
     def test_module_with_partial_required_lessons_not_completed(self):
         # Two required lessons in m1: completing only one must NOT mark the module done
-        l1b = Lesson.objects.create(
+        l1b = Activity.objects.create(
             module=self.m1, title="L1b", lesson_type="text", order=2, is_required=True,
         )
         LessonProgress.objects.create(user=self.user, lesson=self.l1)

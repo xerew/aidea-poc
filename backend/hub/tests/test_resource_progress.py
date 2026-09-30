@@ -3,9 +3,9 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 
 from hub.models import (
+    Activity,
     Course,
     LearningPillar,
-    Lesson,
     Module,
     Resource,
     ResourceProgress,
@@ -18,7 +18,7 @@ class ResourceProgressModelTest(TestCase):
         pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
         course = Course.objects.create(title='C', pillar=pillar)
         module = Module.objects.create(title='M', course=course, order=1)
-        activity = Lesson.objects.create(module=module, title='A', order=1)
+        activity = Activity.objects.create(module=module, title='A', order=1)
         self.resource = Resource.objects.create(activity=activity, type='text', order=1)
 
     def test_create_and_uniqueness(self):

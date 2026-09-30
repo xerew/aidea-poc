@@ -6,7 +6,7 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from hub.models import Course, LearningPillar, Lesson, Subject
+from hub.models import Activity, Course, LearningPillar, Subject
 from hub.translation import LANGUAGE_NAMES
 
 COURSE_HEADERS = ['title', 'description', 'pillar_slug', 'level',
@@ -109,7 +109,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     choices = wb.create_sheet('Choices')
     levels          = [c[0] for c in Course.Level.choices]
     content_formats = [c[0] for c in Course.ContentFormat.choices]
-    lesson_types    = [c[0] for c in Lesson.LessonType.choices]
+    lesson_types    = [c[0] for c in Activity.LessonType.choices]
     pillar_slugs    = list(LearningPillar.objects.values_list('slug', flat=True))
     subject_slugs   = list(Subject.objects.filter(is_active=True).values_list('slug', flat=True))
     yes_no          = ['yes', 'no']
@@ -191,7 +191,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
                         module.order, lesson.order, m_idx,
                         item.get('type', ''), item.get('url', ''), item.get('caption', ''),
                     ])
-            if lesson.lesson_type == Lesson.LessonType.QUIZ:
+            if lesson.lesson_type == Activity.LessonType.QUIZ:
                 for q_idx, question in enumerate(lesson.quiz_data or [], start=1):
                     options = question.get('options', [])[:len(OPTION_LETTERS)]
                     texts = [opt.get('text', '') for opt in options]
@@ -284,7 +284,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
 
     levels          = {c[0] for c in Course.Level.choices}
     content_formats = {c[0] for c in Course.ContentFormat.choices}
-    lesson_types    = {c[0] for c in Lesson.LessonType.choices}
+    lesson_types    = {c[0] for c in Activity.LessonType.choices}
     pillar_by_slug  = {p.slug: p for p in LearningPillar.objects.all()}
     subject_by_slug = {s.slug: s for s in Subject.objects.filter(is_active=True)}
 
@@ -440,7 +440,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             if lesson is None:
                 errors.append(f'{_cell("Quiz", 1, row_num)}: module_order/lesson_order do not match any lesson.')
                 continue
-            if lesson['lesson_type'] != Lesson.LessonType.QUIZ:
+            if lesson['lesson_type'] != Activity.LessonType.QUIZ:
                 errors.append(f'{_cell("Quiz", 2, row_num)}: lesson {m_order}/{l_order} is not a quiz.')
                 continue
             if not (question or '').strip():

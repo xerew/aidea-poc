@@ -5,11 +5,11 @@ from rest_framework.test import APITestCase
 
 from hub.emails import make_verify_token
 from hub.models import (
+    Activity,
     AssignmentSubmission,
     Course,
     Enrollment,
     LearningPillar,
-    Lesson,
     Module,
     UserProfile,
 )
@@ -125,7 +125,7 @@ class AssignmentReviewedEmailTests(APITestCase):
             title='C', pillar=pillar, level='beginner', duration_hours=1, created_by=self.reviewer,
         )
         module = Module.objects.create(course=self.course, title='M', order=1)
-        self.lesson = Lesson.objects.create(module=module, title='HW', lesson_type='assignment', order=1)
+        self.lesson = Activity.objects.create(module=module, title='HW', lesson_type='assignment', order=1)
         Enrollment.objects.create(user=self.teacher, course=self.course)
         self.submission = AssignmentSubmission.objects.create(
             user=self.teacher, lesson=self.lesson, text='my work',

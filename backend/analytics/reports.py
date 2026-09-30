@@ -7,7 +7,7 @@ engagement_data['quiz_selected'] (the option index the teacher picked).
 """
 import re
 
-from hub.models import Enrollment, Lesson, LessonProgress
+from hub.models import Activity, Enrollment, LessonProgress
 
 
 def _quiz_questions(lesson, lp):
@@ -36,7 +36,7 @@ def _quiz_questions(lesson, lp):
 def _teacher_rows(course):
     """Yield a per-teacher summary + quiz detail dict for each enrollment."""
     quiz_lessons = list(
-        Lesson.objects.filter(module__course=course, lesson_type='quiz')
+        Activity.objects.filter(module__course=course, lesson_type='quiz')
         .order_by('module__order', 'order')
     )
     enrollments = (
