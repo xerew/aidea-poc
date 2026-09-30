@@ -1,19 +1,66 @@
 from rest_framework import serializers
 
-from hub.models import Activity, Module
+from hub.models import Activity, Module, Resource
 
 from .localize import localized, viewer_language
 
 MEDIA_ITEM_TYPES = {'image', 'video', 'pdf'}
 
 
+class ResourceSerializer(serializers.ModelSerializer):
+    """Authoring view of one resource block within an activity."""
+    class Meta:
+        model = Resource
+        fields = [
+            'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
+            'caption', 'quiz_data', 'instructions', 'translations',
+        ]
+        read_only_fields = ['translations']
+
+
+class ResourceLearnSerializer(serializers.ModelSerializer):
+    """Learner view of a resource — localized, with quiz answers stripped."""
+    content = serializers.SerializerMethodField()
+    caption = serializers.SerializerMethodField()
+    instructions = serializers.SerializerMethodField()
+    quiz_data = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Resource
+        fields = [
+            'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
+            'caption', 'quiz_data', 'instructions',
+        ]
+
+    def get_content(self, obj):
+        return localized(obj, 'content', viewer_language(self.context))
+
+    def get_caption(self, obj):
+        return localized(obj, 'caption', viewer_language(self.context))
+
+    def get_instructions(self, obj):
+        return localized(obj, 'instructions', viewer_language(self.context))
+
+    def get_quiz_data(self, obj):
+        quiz_data = localized(obj, 'quiz_data', viewer_language(self.context))
+        return [
+            {
+                'question': q.get('question', ''),
+                'options': [{'text': opt.get('text', '')} for opt in q.get('options', [])],
+            }
+            for q in (quiz_data or [])
+        ]
+
+
 class LessonSerializer(serializers.ModelSerializer):
+    resources = ResourceSerializer(many=True, read_only=True)
+
     class Meta:
         model = Activity
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
-            'translations',
+            'translations', 'resources',
         ]
         read_only_fields = ['translations']
 
@@ -77,12 +124,14 @@ class LessonLearnDetailSerializer(serializers.ModelSerializer):
     description = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
     quiz_data = serializers.SerializerMethodField()
+    resources = ResourceLearnSerializer(many=True, read_only=True)
 
     class Meta:
         model = Activity
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
+            'resources',
         ]
 
     def get_title(self, obj):

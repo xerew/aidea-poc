@@ -13,6 +13,8 @@ from .content import (
     ModuleLearnSerializer,
     ModuleSerializer,
     ModuleWithLessonsSerializer,
+    ResourceLearnSerializer,
+    ResourceSerializer,
 )
 from .course import (
     ContinueLearningSerializer,
@@ -43,6 +45,8 @@ __all__ = [
     'LessonLearnDetailSerializer',
     'LessonLearnSerializer',
     'LessonSerializer',
+    'ResourceSerializer',
+    'ResourceLearnSerializer',
     'ModuleAuthoringSerializer',
     'ModuleLearnSerializer',
     'ModuleSerializer',
