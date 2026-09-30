@@ -78,6 +78,8 @@ from .learner import (
     LessonDetailView,
     MyLearningView,
     QuizCheckView,
+    ResourceCompleteView,
+    ResourceQuizCheckView,
 )
 from .maintenance import AdminMaintenanceView, MaintenanceView
 from .messaging import (
@@ -164,6 +166,8 @@ __all__ = [
     'LessonCompleteView',
     'LessonDetailView',
     'QuizCheckView',
+    'ResourceCompleteView',
+    'ResourceQuizCheckView',
     'IsContentCreator',
     'IsReviewer',
     'IsTeacher',

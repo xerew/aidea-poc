@@ -3,7 +3,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Activity, Course, Enrollment, LearningPillar, LessonProgress, LessonSession
+from hub.models import (
+    Activity,
+    Course,
+    Enrollment,
+    LearningPillar,
+    LessonProgress,
+    LessonSession,
+    Resource,
+)
 from hub.serializers import (
     ContinueLearningSerializer,
     CourseDetailSerializer,
@@ -268,6 +276,78 @@ class LessonCompleteView(APIView):
             'is_completed': True,
             'progress_pct': progress_pct,
             'quiz_results': lp.quiz_answers if lesson.lesson_type == 'quiz' else None,
+        })
+
+
+class ResourceQuizCheckView(APIView):
+    """POST .../lessons/<lesson_pk>/resources/<resource_pk>/quiz-check/ — grade one
+    answer for a quiz resource, no persistence."""
+
+    def post(self, request, pk, lesson_pk, resource_pk):
+        if not Enrollment.objects.filter(user=request.user, course_id=pk).exists():
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            resource = Resource.objects.get(
+                pk=resource_pk, activity_id=lesson_pk,
+                activity__module__course_id=pk, type='quiz',
+            )
+        except Resource.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        q_index = request.data.get('question_index')
+        selected = request.data.get('selected')
+        quiz_data = resource.quiz_data or []
+        if not isinstance(q_index, int) or not 0 <= q_index < len(quiz_data):
+            return Response({'detail': 'Invalid question_index.'}, status=status.HTTP_400_BAD_REQUEST)
+        options = quiz_data[q_index].get('options', [])
+        if not isinstance(selected, int) or not 0 <= selected < len(options):
+            return Response({'detail': 'Invalid selected.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        correct_index = next((i for i, opt in enumerate(options) if opt.get('is_correct')), -1)
+        return Response({
+            'correct': bool(options[selected].get('is_correct', False)),
+            'correct_index': correct_index,
+        })
+
+
+class ResourceCompleteView(APIView):
+    """POST .../lessons/<lesson_pk>/resources/<resource_pk>/complete/ — mark one
+    resource complete and recompute course progress."""
+
+    def post(self, request, pk, lesson_pk, resource_pk):
+        try:
+            enrollment = Enrollment.objects.select_related('course').get(
+                user=request.user, course_id=pk,
+            )
+        except Enrollment.DoesNotExist:
+            if not Course.objects.filter(pk=pk).exists():
+                return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            resource = Resource.objects.select_related('activity__module').get(
+                pk=resource_pk, activity_id=lesson_pk, activity__module__course_id=pk,
+            )
+        except Resource.DoesNotExist:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if resource.type == 'assignment':
+            return Response(
+                {'detail': 'Assignments are completed through review.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        from hub.completion import record_resource_completion
+        rp, progress_pct = record_resource_completion(
+            request.user, enrollment, resource,
+            quiz_answers_raw=request.data.get('quiz_answers', []),
+            engagement_data=request.data.get('engagement_data'),
+        )
+        return Response({
+            'resource_id': resource.id,
+            'is_completed': True,
+            'progress_pct': progress_pct,
+            'quiz_results': rp.quiz_answers if resource.type == 'quiz' else None,
         })
 
 
