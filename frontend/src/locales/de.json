@@ -392,7 +392,9 @@
     "courseModules": "Kursmodule",
     "enrollError": "Einschreibung fehlgeschlagen.",
     "unavailable": "Dieser Kurs ist derzeit nicht verfügbar — der Autor hat ihn zurückgezogen.",
-    "by": "Von"
+    "by": "Von",
+    "alsoRelevantTo": "Auch relevant für diese Säule der Akademie",
+    "coversOutcomes": "Lernziele:"
   },
   "myLearning": {
     "subtitle": "Verfolgen Sie Ihren Fortschritt und setzen Sie Ihre Kurse fort",
@@ -550,7 +552,21 @@
       "confirmDelete": "Diesen Kurs endgültig löschen? Alle Module, Aktivitäten und Einschreibungen gehen verloren. Dies kann nicht rückgängig gemacht werden.",
       "subjectsLabel": "Fächer",
       "subjectsHint": "Für welche Lehrkräfte ist dieser Kurs? Wähle alle zutreffenden aus.",
-      "translatorBanner": "Sie können nur Übersetzungen bearbeiten; der Originalinhalt ist schreibgeschützt."
+      "translatorBanner": "Sie können nur Übersetzungen bearbeiten; der Originalinhalt ist schreibgeschützt.",
+      "relatedOutcomes": "Zugehörige LZ:",
+      "relatedOutcomesNone": "Fügen Sie oben Lernziele hinzu, um sie Modulen zuzuordnen.",
+      "outcomeNumber": "Lernziel {{n}}",
+      "addExistingModule": "Vorhandenes Modul hinzufügen",
+      "moduleLibraryTitle": "Vorhandenes Modul wiederverwenden",
+      "moduleLibraryHint": "Eine Kopie des Moduls mit allen Aktivitäten und Ressourcen wird am Ende dieses Kurses eingefügt. Änderungen an der Kopie ändern das Original nicht.",
+      "moduleLibrarySearch": "Module oder Kurse suchen…",
+      "moduleLibraryEmpty": "Keine Module zur Wiederverwendung verfügbar.",
+      "moduleLibraryDraft": "Entwurf",
+      "moduleLibraryActivities": "Aktivitäten: {{count}}",
+      "moduleLibraryLoadFailed": "Module konnten nicht geladen werden.",
+      "importModule": "Kopie hinzufügen",
+      "importing": "Wird hinzugefügt…",
+      "importFailed": "Das Modul konnte nicht kopiert werden."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz-Editor",
@@ -646,6 +662,31 @@
         "co_editor": "Mitherausgeber",
         "translator": "Übersetzer"
       }
+    },
+    "proposal": {
+      "title": "Kursprofil",
+      "additionalPillars": "Weitere Säulen der Akademie",
+      "additionalPillarsHint": "Optional. Markieren Sie weitere Säulen, zu denen der Kurs beiträgt; die oben gewählte Säule bleibt die Hauptsäule.",
+      "crossAxis": "Achsenübergreifende Relevanz",
+      "crossAxisHint": "Geben Sie gegebenenfalls an, ob der Kurs auch wesentlich zu einer anderen Achse der Akademie beiträgt, und erläutern Sie kurz, wie.",
+      "targetAudience": "Zielgruppe",
+      "selectAll": "Alles Zutreffende auswählen.",
+      "audience": {
+        "teachers": "Lehrkräfte",
+        "school_leaders": "Schulleitungen"
+      },
+      "other": "Sonstiges:",
+      "otherPlaceholder": "Bitte angeben",
+      "educationalLevel": "Bildungsstufe / Kontext",
+      "educationalLevelHint": "Falls zutreffend. Alles Zutreffende auswählen.",
+      "level": {
+        "primary": "Primarstufe",
+        "lower_secondary": "Sekundarstufe I",
+        "upper_secondary": "Sekundarstufe II",
+        "cross_level": "Stufenübergreifend"
+      },
+      "priorKnowledge": "Empfohlene Vorkenntnisse / Erfahrung",
+      "priorKnowledgePlaceholder": "Nützliche Vorkenntnisse oder Erfahrungen angeben. Falls keine, „Keine“ angeben."
     }
   },
   "reviews": {

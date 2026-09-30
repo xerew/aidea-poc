@@ -392,7 +392,9 @@
     "courseModules": "Kurssin moduulit",
     "enrollError": "Ilmoittautuminen epäonnistui.",
     "unavailable": "Tämä kurssi ei ole tällä hetkellä saatavilla — tekijä on poistanut sen julkaisusta.",
-    "by": "Tekijä"
+    "by": "Tekijä",
+    "alsoRelevantTo": "Liittyy myös tähän Akatemian pilariin",
+    "coversOutcomes": "Oppimistavoitteet:"
   },
   "myLearning": {
     "subtitle": "Seuraa edistymistäsi ja jatka kurssejasi",
@@ -550,7 +552,21 @@
       "confirmDelete": "Poistetaanko tämä kurssi pysyvästi? Kaikki moduulit, aktiviteetit ja ilmoittautumiset menetetään. Tätä ei voi kumota.",
       "subjectsLabel": "Oppiaineet",
       "subjectsHint": "Keille opettajille tämä kurssi on tarkoitettu? Valitse kaikki sopivat.",
-      "translatorBanner": "Voit muokata vain käännöksiä; alkuperäinen sisältö on vain luettavissa."
+      "translatorBanner": "Voit muokata vain käännöksiä; alkuperäinen sisältö on vain luettavissa.",
+      "relatedOutcomes": "Liittyvät OT:",
+      "relatedOutcomesNone": "Lisää oppimistavoitteita yllä liittääksesi ne moduuleihin.",
+      "outcomeNumber": "Tavoite {{n}}",
+      "addExistingModule": "Lisää olemassa oleva moduuli",
+      "moduleLibraryTitle": "Käytä olemassa olevaa moduulia uudelleen",
+      "moduleLibraryHint": "Kopio moduulista kaikkine aktiviteetteineen ja resursseineen lisätään tämän kurssin loppuun. Kopion muokkaus ei muuta alkuperäistä.",
+      "moduleLibrarySearch": "Hae moduuleja tai kursseja…",
+      "moduleLibraryEmpty": "Ei uudelleenkäytettäviä moduuleja.",
+      "moduleLibraryDraft": "Luonnos",
+      "moduleLibraryActivities": "Aktiviteetit: {{count}}",
+      "moduleLibraryLoadFailed": "Moduulien lataaminen epäonnistui.",
+      "importModule": "Lisää kopio",
+      "importing": "Lisätään…",
+      "importFailed": "Moduulin kopiointi epäonnistui."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Tietovisan luonti",
@@ -646,6 +662,31 @@
         "co_editor": "Osatoimittaja",
         "translator": "Kääntäjä"
       }
+    },
+    "proposal": {
+      "title": "Kurssin profiili",
+      "additionalPillars": "Akatemian muut pilarit",
+      "additionalPillarsHint": "Valinnainen. Valitse muut pilarit, joita kurssi myös tukee; yllä valittu pilari pysyy pääpilarina.",
+      "crossAxis": "Yhteys muihin akseleihin",
+      "crossAxisHint": "Kerro tarvittaessa, tukeeko kurssi merkittävästi myös jotain toista Akatemian akselia, ja selitä lyhyesti miten.",
+      "targetAudience": "Kohderyhmä",
+      "selectAll": "Valitse kaikki sopivat.",
+      "audience": {
+        "teachers": "Opettajat",
+        "school_leaders": "Koulujen johto"
+      },
+      "other": "Muu:",
+      "otherPlaceholder": "Tarkenna",
+      "educationalLevel": "Koulutusaste / konteksti",
+      "educationalLevelHint": "Tarvittaessa. Valitse kaikki sopivat.",
+      "level": {
+        "primary": "Alakoulu",
+        "lower_secondary": "Yläkoulu",
+        "upper_secondary": "Toinen aste",
+        "cross_level": "Asteiden yli"
+      },
+      "priorKnowledge": "Suositellut esitiedot / kokemus",
+      "priorKnowledgePlaceholder": "Kuvaa hyödylliset esitiedot tai kokemus. Jos ei mitään, kirjoita ”Ei mitään”."
     }
   },
   "reviews": {

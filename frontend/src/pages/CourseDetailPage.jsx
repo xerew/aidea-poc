@@ -65,6 +65,18 @@ export default function CourseDetailPage() {
   if (!course) return <p className="page-loading">{t('common.loading')}</p>
 
   const pillarStyle = PILLAR_STYLES[course.pillar.slug] ?? { color: 'blue' }
+  const joinWithOther = (values, prefix, other) => [
+    ...(values ?? []).map((v) => t(`authoring.proposal.${prefix}.${v}`)),
+    ...(other ? [other] : []),
+  ].join(', ')
+  const audience = joinWithOther(course.target_audience, 'audience', course.target_audience_other)
+  const levels = joinWithOther(course.educational_levels, 'level', course.educational_level_other)
+  const profileRows = [
+    [t('authoring.proposal.targetAudience'), audience],
+    [t('authoring.proposal.educationalLevel'), levels],
+    [t('authoring.proposal.priorKnowledge'), course.prior_knowledge],
+    [t('authoring.proposal.crossAxis'), course.cross_axis_relevance],
+  ].filter(([, value]) => value)
 
   return (
     <div className="course-detail">
@@ -80,6 +92,15 @@ export default function CourseDetailPage() {
           <span className={`pillar-badge pillar-badge--${pillarStyle.color}`}>
             {course.pillar.name}
           </span>
+          {(course.additional_pillars ?? []).map((p) => (
+            <span
+              key={p.id}
+              className={`pillar-badge pillar-badge--outline pillar-badge--${(PILLAR_STYLES[p.slug] ?? { color: 'blue' }).color}`}
+              title={t('courseDetail.alsoRelevantTo')}
+            >
+              {p.name}
+            </span>
+          ))}
           <span className="level-label">{levelLabels[course.level] ?? course.level}</span>
         </div>
 
@@ -133,6 +154,21 @@ export default function CourseDetailPage() {
         </div>
       )}
 
+      {/* Course profile: audience, level, prior knowledge, cross-axis relevance */}
+      {profileRows.length > 0 && (
+        <div className="outcomes-card">
+          <h2>{t('authoring.proposal.title')}</h2>
+          <dl className="course-profile">
+            {profileRows.map(([label, value]) => (
+              <div key={label} className="course-profile-row">
+                <dt>{label}</dt>
+                <dd>{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
+
       {/* What You'll Learn */}
       {course.learning_outcomes?.length > 0 && (
         <div className="outcomes-card">
@@ -141,7 +177,7 @@ export default function CourseDetailPage() {
             {course.learning_outcomes.map((outcome, i) => (
               <div key={i} className="outcome-item">
                 <CheckCircle2 size={18} className="outcome-icon" />
-                <span>{outcome}</span>
+                <span><span className="outcome-num">{i + 1}.</span> {outcome}</span>
               </div>
             ))}
           </div>
@@ -164,6 +200,16 @@ export default function CourseDetailPage() {
                   <p className="module-meta">
                     {mod.duration_minutes > 0 && <span>{t('common.minutesLabel', { count: mod.duration_minutes })}</span>}
                   </p>
+                  {(mod.related_outcomes ?? []).some((i) => course.learning_outcomes?.[i]) && (
+                    <p className="module-outcome-links">
+                      {t('courseDetail.coversOutcomes')}{' '}
+                      {mod.related_outcomes.filter((i) => course.learning_outcomes?.[i]).map((i) => (
+                        <span key={i} className="module-outcome-ref" title={course.learning_outcomes[i]}>
+                          {i + 1}
+                        </span>
+                      ))}
+                    </p>
+                  )}
                 </div>
                 <div className="module-status">
                   {isCompleted

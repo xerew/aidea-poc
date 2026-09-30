@@ -392,7 +392,9 @@
     "courseModules": "Kursmoduler",
     "enrollError": "Registreringen misslyckades.",
     "unavailable": "Kursen är för närvarande otillgänglig — författaren har avpublicerat den.",
-    "by": "Av"
+    "by": "Av",
+    "alsoRelevantTo": "Rör även denna pelare i akademin",
+    "coversOutcomes": "Lärandemål:"
   },
   "myLearning": {
     "subtitle": "Följ dina framsteg och fortsätt dina kurser",
@@ -550,7 +552,21 @@
       "confirmDelete": "Radera den här kursen permanent? Alla moduler, aktiviteter och anmälningar går förlorade. Detta kan inte ångras.",
       "subjectsLabel": "Ämnen",
       "subjectsHint": "Vilka lärare är kursen för? Välj alla som gäller.",
-      "translatorBanner": "Du kan bara redigera översättningar; originalinnehållet är skrivskyddat."
+      "translatorBanner": "Du kan bara redigera översättningar; originalinnehållet är skrivskyddat.",
+      "relatedOutcomes": "Kopplade lärandemål:",
+      "relatedOutcomesNone": "Lägg till lärandemål ovan för att koppla dem till moduler.",
+      "outcomeNumber": "Mål {{n}}",
+      "addExistingModule": "Lägg till befintlig modul",
+      "moduleLibraryTitle": "Återanvänd en befintlig modul",
+      "moduleLibraryHint": "En kopia av modulen, med alla dess aktiviteter och resurser, läggs till sist i den här kursen. Att ändra kopian påverkar inte originalet.",
+      "moduleLibrarySearch": "Sök moduler eller kurser…",
+      "moduleLibraryEmpty": "Inga moduler att återanvända.",
+      "moduleLibraryDraft": "Utkast",
+      "moduleLibraryActivities": "Aktiviteter: {{count}}",
+      "moduleLibraryLoadFailed": "Det gick inte att läsa in modulerna.",
+      "importModule": "Lägg till kopia",
+      "importing": "Lägger till…",
+      "importFailed": "Det gick inte att kopiera modulen."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbyggare",
@@ -646,6 +662,31 @@
         "co_editor": "Medredaktör",
         "translator": "Översättare"
       }
+    },
+    "proposal": {
+      "title": "Kursprofil",
+      "additionalPillars": "Ytterligare pelare i akademin",
+      "additionalPillarsHint": "Valfritt. Markera andra pelare som kursen också bidrar till; pelaren som valts ovan förblir huvudpelaren.",
+      "crossAxis": "Relevans för andra axlar",
+      "crossAxisHint": "Ange vid behov om kursen även bidrar väsentligt till en annan axel i akademin och förklara kort hur.",
+      "targetAudience": "Målgrupp",
+      "selectAll": "Markera alla som gäller.",
+      "audience": {
+        "teachers": "Lärare",
+        "school_leaders": "Skolledare"
+      },
+      "other": "Annat:",
+      "otherPlaceholder": "Ange",
+      "educationalLevel": "Utbildningsnivå / sammanhang",
+      "educationalLevelHint": "Om tillämpligt. Markera alla som gäller.",
+      "level": {
+        "primary": "Lågstadiet/mellanstadiet",
+        "lower_secondary": "Högstadiet",
+        "upper_secondary": "Gymnasiet",
+        "cross_level": "Flera nivåer"
+      },
+      "priorKnowledge": "Rekommenderade förkunskaper / erfarenhet",
+      "priorKnowledgePlaceholder": "Ange användbara förkunskaper eller erfarenheter. Om inga, skriv ”Inga”."
     }
   },
   "reviews": {

@@ -291,3 +291,90 @@
   .editor-save-area { flex-wrap: wrap; }
   .detail-hero-meta { flex-wrap: wrap; }
 }
+
+/* ── Course profile (pillars, audience, level, prior knowledge) ─────────── */
+
+.proposal-card { display: flex; flex-direction: column; gap: 1.1rem; }
+.proposal-card h2 { margin-bottom: 0; }
+
+.proposal-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.proposal-label { font-size: 0.9rem; font-weight: 600; color: var(--color-text); }
+.proposal-hint { margin: 0; font-size: 0.8rem; color: var(--color-text-muted); line-height: 1.45; }
+.proposal-textarea { width: 100%; }
+
+.proposal-checks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+}
+.proposal-checks label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  color: var(--color-text);
+}
+.proposal-other { flex: 1 1 16rem; }
+.proposal-other input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+/* ── Module ↔ learning-outcome links ──────────────────────────────────────── */
+
+.module-outcomes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+.module-outcomes-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-right: 0.25rem;
+}
+.module-outcomes-empty { font-size: 0.78rem; color: var(--color-text-muted); }
+
+.module-outcome-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 16rem;
+  padding: 0.15rem 0.6rem 0.15rem 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.module-outcome-chip input { position: absolute; opacity: 0; pointer-events: none; }
+.module-outcome-chip:focus-within { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+.module-outcome-chip--on {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+}
+.module-outcome-num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 9999px;
+  background: var(--color-border);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.module-outcome-chip--on .module-outcome-num { background: var(--color-primary); color: #fff; }
+.module-outcome-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.module-add-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
