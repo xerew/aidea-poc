@@ -125,3 +125,21 @@ class ProfileBioTests(APITestCase):
         self.assertEqual(res.data['bio'], 'Physics teacher who loves AI.')
         self.user.profile.refresh_from_db()
         self.assertEqual(self.user.profile.bio, 'Physics teacher who loves AI.')
+
+
+class ProfileTeachingLevelTests(APITestCase):
+    def setUp(self):
+        self.user = make_teacher('level_teacher')
+        self.client.force_authenticate(self.user)
+        self.url = reverse('profile-info')
+
+    def test_teaching_level_can_be_changed(self):
+        res = self.client.patch(self.url, {'teaching_level': 'secondary'}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data['teaching_level'], 'secondary')
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.teaching_level, 'secondary')
+
+    def test_invalid_teaching_level_rejected(self):
+        res = self.client.patch(self.url, {'teaching_level': 'university'}, format='json')
+        self.assertEqual(res.status_code, 400)

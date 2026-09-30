@@ -50,6 +50,7 @@ export default function LoginPage() {
             <input
               id="username"
               type="text"
+              autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required

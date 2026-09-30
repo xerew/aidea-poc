@@ -115,3 +115,35 @@ class MeEndpointTests(APITestCase):
         self.client.force_authenticate(self.user)
         res = self.client.get(reverse('auth-me'))
         self.assertEqual(res.data['profile']['competency_score'], 3)
+
+
+class EmailLoginTests(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='forgetful', email='Maria@Example.com', password='testpass123',
+        )
+        UserProfile.objects.create(user=self.user, user_type=UserProfile.UserType.TEACHER)
+
+    def _login(self, identifier, password='testpass123'):
+        return self.client.post(reverse('auth-login'), {'username': identifier, 'password': password})
+
+    def test_login_with_email_case_insensitive(self):
+        res = self._login('maria@example.com')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['user']['username'], 'forgetful')
+
+    def test_login_with_email_wrong_password_fails(self):
+        self.assertEqual(self._login('maria@example.com', 'nope').status_code,
+                         status.HTTP_401_UNAUTHORIZED)
+
+    def test_username_login_still_works(self):
+        self.assertEqual(self._login('forgetful').status_code, status.HTTP_200_OK)
+
+    def test_shared_email_picks_the_account_whose_password_matches(self):
+        other = User.objects.create_user(
+            username='second', email='maria@example.com', password='OtherPass456',
+        )
+        UserProfile.objects.create(user=other, user_type=UserProfile.UserType.TEACHER)
+        res = self._login('maria@example.com', 'OtherPass456')
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data['user']['username'], 'second')

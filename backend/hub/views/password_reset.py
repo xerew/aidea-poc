@@ -7,6 +7,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
+from django.utils.html import escape
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -18,7 +19,7 @@ from hub.throttling import PasswordResetEmailThrottle, PasswordResetIPThrottle
 logger = logging.getLogger(__name__)
 
 
-def _reset_email_html(name, link):
+def _reset_email_html(name, username, link):
     base = settings.FRONTEND_BASE_URL
     logo = f'{base}/images/logos/aidea-logo.png'
     base_display = base.replace('https://', '').replace('http://', '')
@@ -45,6 +46,11 @@ def _reset_email_html(name, link):
           <h1 style="font-size:22px;color:#1e3a8a;margin:0 0 16px;">Reset your password</h1>
           <p style="font-size:15px;color:#374151;line-height:1.6;margin:0 0 24px;">
             We received a request to reset your AIDEA password. Click the button below to choose a new one.
+          </p>
+          <p style="font-size:15px;color:#374151;line-height:1.6;margin:0 0 24px;padding:12px 16px;
+                    background:#f1f5ff;border-radius:8px;">
+            Your username is <strong style="color:#111827;">{escape(username)}</strong>.
+            You can sign in with it or with this email address.
           </p>
           <p style="text-align:center;margin:0 0 24px;">
             <a href="{link}" style="display:inline-block;padding:13px 30px;background:#3b5bdb;color:#ffffff;
@@ -109,12 +115,14 @@ class PasswordResetRequestView(APIView):
             'We received a request to reset your AIDEA password. '
             'Open the link below to choose a new one:\n\n'
             f'{link}\n\n'
+            f'Your username is: {user.username}\n'
+            'You can sign in with your username or with this email address.\n\n'
             "If you didn't request this, you can safely ignore this email — "
             'your password will stay the same.\n\n'
             'ICCS Team — Information Management Unit\n'
             f'{settings.FRONTEND_BASE_URL}'
         )
-        html = _reset_email_html(name, link)
+        html = _reset_email_html(escape(name), user.username, link)
         try:
             send_mail(
                 subject='Reset your AIDEA password',

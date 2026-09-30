@@ -58,11 +58,11 @@
   "auth": {
     "login": {
       "subtitle": "Plataforma de Formación en IA para Docentes",
-      "usernameLabel": "Nombre de usuario",
+      "usernameLabel": "Nombre de usuario o correo electrónico",
       "passwordLabel": "Contraseña",
       "signIn": "Iniciar sesión",
       "signingIn": "Iniciando sesión…",
-      "invalidCredentials": "Nombre de usuario o contraseña incorrectos.",
+      "invalidCredentials": "Nombre de usuario/correo o contraseña incorrectos.",
       "noAccount": "¿No tienes una cuenta?",
       "createAccount": "Crea una",
       "forgotPassword": "¿Olvidaste tu contraseña?"
@@ -262,7 +262,9 @@
         "preferNotSay": "Prefiero no decirlo"
       },
       "bio": "Sobre ti",
-      "bioPlaceholder": "Algo sobre ti — tu docencia, tus intereses o lo que esperas obtener de AIDEA."
+      "bioPlaceholder": "Algo sobre ti — tu docencia, tus intereses o lo que esperas obtener de AIDEA.",
+      "teachingLevel": "Nivel educativo",
+      "selectTeachingLevel": "Selecciona un nivel"
     },
     "preferences": {
       "title": "Preferencias de Aprendizaje",

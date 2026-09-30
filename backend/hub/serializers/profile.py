@@ -42,6 +42,9 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
         choices=[('', '')] + list(UserProfile.Gender.choices),
         required=False, allow_blank=True,
     )
+    teaching_level = serializers.ChoiceField(
+        choices=list(UserProfile.TeachingLevel.choices), required=False, allow_blank=True,
+    )
     country  = serializers.CharField(max_length=2,   required=False, allow_blank=True)
     school   = serializers.CharField(max_length=200, required=False, allow_blank=True)
     phone    = serializers.CharField(max_length=30,  required=False, allow_blank=True)
@@ -58,6 +61,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'subject_name': instance.subject.name if instance.subject else '',
             'subject_slug': instance.subject.slug if instance.subject else '',
             'gender':       instance.gender,
+            'teaching_level': instance.teaching_level,
             'country':      instance.country,
             'school':       instance.school,
             'phone':        instance.phone,
@@ -74,12 +78,15 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
 
         instance.subject  = validated_data.get('subject',  instance.subject)
         instance.gender   = validated_data.get('gender',   instance.gender)
+        instance.teaching_level = validated_data.get('teaching_level', instance.teaching_level)
         instance.country  = validated_data.get('country',  instance.country)
         instance.school   = validated_data.get('school',   instance.school)
         instance.phone    = validated_data.get('phone',    instance.phone)
         instance.location = validated_data.get('location', instance.location)
         instance.bio      = validated_data.get('bio',      instance.bio)
-        instance.save(update_fields=['subject', 'gender', 'country', 'school', 'phone', 'location', 'bio'])
+        instance.save(update_fields=[
+            'subject', 'gender', 'teaching_level', 'country', 'school', 'phone', 'location', 'bio',
+        ])
         return instance
 
 
