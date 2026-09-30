@@ -621,7 +621,19 @@
       "addMediaOfType": "Add {{type}}",
       "mediaRequiredError": "Add at least one {{type}}.",
       "mediaUrlRequiredError": "Each media item needs a URL.",
-      "uploadTypeError": "That file type isn’t accepted. Use a PNG, JPG, GIF, WEBP or PDF file (max 20 MB)."
+      "uploadTypeError": "That file type isn’t accepted. Use a PNG, JPG, GIF, WEBP or PDF file (max 20 MB).",
+      "resource": {
+        "sectionTitle": "Resources",
+        "sectionHint": "Learners go through these in order. The activity is complete once every required resource is done.",
+        "saveActivityFirst": "Save the activity first, then add more resources to it.",
+        "addActivityHint": "Pick what the activity starts with. You can add more resources afterwards.",
+        "titlePlaceholder": "Resource title (optional)",
+        "required": "Required",
+        "save": "Save resource",
+        "delete": "Delete resource",
+        "lastResourceHint": "An activity needs at least one resource.",
+        "confirmDelete": "Delete this resource? Learner progress on it will be lost."
+      }
     },
     "translate": {
       "switchLanguage": "Language",

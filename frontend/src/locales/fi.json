@@ -621,7 +621,19 @@
       "addMediaOfType": "Lisää {{type}}",
       "mediaRequiredError": "Lisää vähintään yksi: {{type}}.",
       "mediaUrlRequiredError": "Jokainen mediakohde tarvitsee URL-osoitteen.",
-      "uploadTypeError": "Tätä tiedostotyyppiä ei hyväksytä. Käytä PNG-, JPG-, GIF-, WEBP- tai PDF-tiedostoa (enintään 20 Mt)."
+      "uploadTypeError": "Tätä tiedostotyyppiä ei hyväksytä. Käytä PNG-, JPG-, GIF-, WEBP- tai PDF-tiedostoa (enintään 20 Mt).",
+      "resource": {
+        "sectionTitle": "Resurssit",
+        "sectionHint": "Oppijat käyvät ne läpi järjestyksessä. Aktiviteetti on suoritettu, kun kaikki pakolliset resurssit on tehty.",
+        "saveActivityFirst": "Tallenna aktiviteetti ensin ja lisää sitten muita resursseja.",
+        "addActivityHint": "Valitse, millä aktiviteetti alkaa. Voit lisätä resursseja myöhemmin.",
+        "titlePlaceholder": "Resurssin otsikko (valinnainen)",
+        "required": "Pakollinen",
+        "save": "Tallenna resurssi",
+        "delete": "Poista resurssi",
+        "lastResourceHint": "Aktiviteetissa on oltava vähintään yksi resurssi.",
+        "confirmDelete": "Poistetaanko tämä resurssi? Oppijoiden edistyminen siinä menetetään."
+      }
     },
     "translate": {
       "switchLanguage": "Language",

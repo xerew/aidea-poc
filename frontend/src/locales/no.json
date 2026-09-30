@@ -621,7 +621,19 @@
       "addMediaOfType": "Legg til {{type}}",
       "mediaRequiredError": "Legg til minst én: {{type}}.",
       "mediaUrlRequiredError": "Hvert medieelement trenger en URL.",
-      "uploadTypeError": "Denne filtypen godtas ikke. Bruk en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (maks 20 MB)."
+      "uploadTypeError": "Denne filtypen godtas ikke. Bruk en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (maks 20 MB).",
+      "resource": {
+        "sectionTitle": "Ressurser",
+        "sectionHint": "Deltakerne går gjennom dem i rekkefølge. Aktiviteten er fullført når alle obligatoriske ressurser er gjort.",
+        "saveActivityFirst": "Lagre aktiviteten først, og legg deretter til flere ressurser.",
+        "addActivityHint": "Velg hva aktiviteten starter med. Du kan legge til flere ressurser etterpå.",
+        "titlePlaceholder": "Ressurstittel (valgfri)",
+        "required": "Obligatorisk",
+        "save": "Lagre ressurs",
+        "delete": "Slett ressurs",
+        "lastResourceHint": "En aktivitet trenger minst én ressurs.",
+        "confirmDelete": "Slette denne ressursen? Deltakernes fremgang i den går tapt."
+      }
     },
     "translate": {
       "switchLanguage": "Language",

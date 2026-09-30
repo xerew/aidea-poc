@@ -621,7 +621,19 @@
       "addMediaOfType": "Lägg till {{type}}",
       "mediaRequiredError": "Lägg till minst en: {{type}}.",
       "mediaUrlRequiredError": "Varje medieobjekt behöver en URL.",
-      "uploadTypeError": "Den filtypen accepteras inte. Använd en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (max 20 MB)."
+      "uploadTypeError": "Den filtypen accepteras inte. Använd en PNG-, JPG-, GIF-, WEBP- eller PDF-fil (max 20 MB).",
+      "resource": {
+        "sectionTitle": "Resurser",
+        "sectionHint": "Deltagarna går igenom dem i ordning. Aktiviteten är klar när alla obligatoriska resurser är gjorda.",
+        "saveActivityFirst": "Spara aktiviteten först och lägg sedan till fler resurser.",
+        "addActivityHint": "Välj vad aktiviteten börjar med. Du kan lägga till fler resurser efteråt.",
+        "titlePlaceholder": "Resursens titel (valfri)",
+        "required": "Obligatorisk",
+        "save": "Spara resurs",
+        "delete": "Ta bort resurs",
+        "lastResourceHint": "En aktivitet behöver minst en resurs.",
+        "confirmDelete": "Ta bort den här resursen? Deltagarnas framsteg i den går förlorade."
+      }
     },
     "translate": {
       "switchLanguage": "Language",

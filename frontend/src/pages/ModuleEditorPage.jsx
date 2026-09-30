@@ -1,22 +1,20 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
-  ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList,
-  Trash2, GripVertical, Save, Lock, Plus,
+  ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList, Layers,
+  Trash2, GripVertical, Save, Lock,
 } from 'lucide-react'
 import client from '../api/client'
-import RichTextEditor from '../components/lesson/RichTextEditor'
-import HtmlContent from '../components/lesson/HtmlContent'
-import MediaItem from '../components/lesson/MediaItem'
-import MediaItemsEditor from '../components/lesson/MediaItemsEditor'
 import TranslationBar from '../components/authoring/TranslationBar'
+import ResourceEditor from '../components/authoring/ResourceEditor'
+import { emptyQuestion, mergedQuizData } from '../components/authoring/quizUtils'
 import './ModuleEditorPage.css'
 
-// ── Lesson type config ────────────────────────────────────────────────────────
+// ── Resource type config ──────────────────────────────────────────────────────
 
-const LESSON_TYPES = [
+const RESOURCE_TYPES = [
   { type: 'text',       Icon: FileText,     color: 'blue'   },
   { type: 'video',      Icon: Video,        color: 'purple' },
   { type: 'image',      Icon: Image,        color: 'green'  },
@@ -25,209 +23,24 @@ const LESSON_TYPES = [
   { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
 ]
 
-// image/video/pdf lessons hold multiple media items, all of that one type.
-const MEDIA_TYPES = ['image', 'video', 'pdf']
-
-function lessonTypeConfig(type) {
-  return LESSON_TYPES.find((lt) => lt.type === type) ?? LESSON_TYPES[0]
+function typeConfig(type) {
+  return RESOURCE_TYPES.find((rt) => rt.type === type) ?? RESOURCE_TYPES[0]
 }
 
-// ── Lesson icon ───────────────────────────────────────────────────────────────
-
-function LessonTypeIcon({ type, size = 16 }) {
-  const { Icon, color } = lessonTypeConfig(type)
+// An activity's icon: its resource type when it holds one kind, else "layers".
+function ActivityIcon({ activity, size = 16 }) {
+  const types = activity.resources?.length
+    ? [...new Set(activity.resources.map((r) => r.type))]
+    : [activity.lesson_type]
+  if (types.length !== 1) return <Layers size={size} className="lesson-type-icon" />
+  const { Icon, color } = typeConfig(types[0])
   return <Icon size={size} className={`lesson-type-icon lesson-type-icon--${color}`} />
 }
 
-LessonTypeIcon.propTypes = { type: PropTypes.string.isRequired, size: PropTypes.number }
-
-// ── Lesson editor panel ───────────────────────────────────────────────────────
-
-// ── Quiz builder ──────────────────────────────────────────────────────────────
-
-function emptyQuestion() {
-  return {
-    question: '',
-    options: [
-      { text: '', is_correct: false },
-      { text: '', is_correct: false },
-      { text: '', is_correct: false },
-      { text: '', is_correct: false },
-    ],
-  }
+ActivityIcon.propTypes = {
+  activity: PropTypes.shape({ resources: PropTypes.array, lesson_type: PropTypes.string }).isRequired,
+  size: PropTypes.number,
 }
-
-// Merge a lesson's base quiz structure (is_correct + option/question order —
-// always authoritative) with its translated text for `lang`. Falls back to
-// blank text (not the source text) when nothing has been translated yet, so
-// translated-mode inputs never masquerade untranslated source text as a
-// translation.
-function mergedQuizData(lesson, lang) {
-  const base = lesson.quiz_data ?? []
-  if (lang === 'original') return base
-  const translated = lesson.translations?.[lang]?.quiz_data
-  if (Array.isArray(translated) && translated.length === base.length) {
-    return base.map((q, qi) => ({
-      question: translated[qi]?.question ?? '',
-      options: q.options.map((o, oi) => ({
-        text: translated[qi]?.options?.[oi]?.text ?? '',
-        is_correct: o.is_correct,
-      })),
-    }))
-  }
-  return base.map((q) => ({
-    question: '',
-    options: q.options.map((o) => ({ text: '', is_correct: o.is_correct })),
-  }))
-}
-
-function QuizBuilder({ quizData, textDisabled, structureLocked, onChange }) {
-  const { t } = useTranslation()
-  const questions = quizData ?? []
-
-  const updateQuestion = (qi, text) => {
-    const next = questions.map((q, i) => (i === qi ? { ...q, question: text } : q))
-    onChange(next)
-  }
-
-  const updateOptionText = (qi, oi, text) => {
-    const next = questions.map((q, i) =>
-      i === qi
-        ? { ...q, options: q.options.map((o, j) => (j === oi ? { ...o, text } : o)) }
-        : q,
-    )
-    onChange(next)
-  }
-
-  const toggleCorrect = (qi, oi) => {
-    const next = questions.map((q, i) =>
-      i === qi
-        ? { ...q, options: q.options.map((o, j) => (j === oi ? { ...o, is_correct: !o.is_correct } : o)) }
-        : q,
-    )
-    onChange(next)
-  }
-
-  const addOption = (qi) => {
-    const next = questions.map((q, i) =>
-      i === qi ? { ...q, options: [...q.options, { text: '', is_correct: false }] } : q,
-    )
-    onChange(next)
-  }
-
-  const removeOption = (qi, oi) => {
-    const next = questions.map((q, i) =>
-      i === qi ? { ...q, options: q.options.filter((_, j) => j !== oi) } : q,
-    )
-    onChange(next)
-  }
-
-  const addQuestion = () => onChange([...questions, emptyQuestion()])
-
-  const removeQuestion = (qi) => onChange(questions.filter((_, i) => i !== qi))
-
-  return (
-    <div className="quiz-builder">
-      <h3 className="quiz-builder-title">{t('authoring.moduleEditor.quizBuilderTitle')}</h3>
-
-      {questions.map((q, qi) => (
-        <div key={qi} className="quiz-question">
-          <div className="quiz-question-header">
-            <input
-              className="quiz-question-input"
-              value={q.question}
-              disabled={textDisabled}
-              onChange={(e) => updateQuestion(qi, e.target.value)}
-              placeholder={t('authoring.moduleEditor.questionPlaceholder', { number: qi + 1 })}
-            />
-            {!structureLocked && questions.length > 1 && (
-              <button
-                className="icon-btn icon-btn--danger"
-                onClick={() => removeQuestion(qi)}
-                title={t('authoring.moduleEditor.removeQuestion')}
-              >
-                <Trash2 size={14} />
-              </button>
-            )}
-          </div>
-
-          <div className="quiz-options">
-            {q.options.map((opt, oi) => (
-              <div key={oi} className="quiz-option">
-                <input
-                  type="checkbox"
-                  className="quiz-option-checkbox"
-                  checked={opt.is_correct}
-                  disabled={structureLocked}
-                  onChange={() => toggleCorrect(qi, oi)}
-                  title={t('authoring.moduleEditor.markCorrect')}
-                />
-                <input
-                  className="quiz-option-input"
-                  value={opt.text}
-                  disabled={textDisabled}
-                  onChange={(e) => updateOptionText(qi, oi, e.target.value)}
-                  placeholder={t('authoring.moduleEditor.optionPlaceholder', { letter: String.fromCharCode(65 + oi) })}
-                />
-                {!structureLocked && q.options.length > 2 && (
-                  <button
-                    className="icon-btn icon-btn--danger quiz-option-remove"
-                    onClick={() => removeOption(qi, oi)}
-                    title={t('authoring.moduleEditor.removeOption')}
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {!structureLocked && (
-            <button className="quiz-add-option-btn" onClick={() => addOption(qi)}>
-              <Plus size={13} /> {t('authoring.moduleEditor.addOption')}
-            </button>
-          )}
-        </div>
-      ))}
-
-      {!structureLocked && (
-        <button className="quiz-add-question-btn" onClick={addQuestion}>
-          <Plus size={14} /> {t('authoring.moduleEditor.addQuestion')}
-        </button>
-      )}
-    </div>
-  )
-}
-
-QuizBuilder.propTypes = {
-  quizData: PropTypes.arrayOf(PropTypes.shape({
-    question: PropTypes.string,
-    options: PropTypes.arrayOf(PropTypes.shape({
-      text: PropTypes.string,
-      is_correct: PropTypes.bool,
-    })),
-  })).isRequired,
-  textDisabled: PropTypes.bool.isRequired,
-  structureLocked: PropTypes.bool.isRequired,
-  onChange: PropTypes.func.isRequired,
-}
-
-// ── Lesson shape ──────────────────────────────────────────────────────────────
-
-const lessonShape = PropTypes.shape({
-  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  lesson_type: PropTypes.string.isRequired,
-  content: PropTypes.string,
-  media_items: PropTypes.array,
-  quiz_data: PropTypes.array,
-  duration_minutes: PropTypes.number,
-  is_required: PropTypes.bool,
-  isDirty: PropTypes.bool,
-  isNew: PropTypes.bool,
-  saving: PropTypes.bool,
-})
 
 function FieldError({ msg }) {
   if (!msg) return null
@@ -236,85 +49,88 @@ function FieldError({ msg }) {
 
 FieldError.propTypes = { msg: PropTypes.string }
 
-// ── Lesson preview ────────────────────────────────────────────────────────────
+// ── Translation view of a resource ────────────────────────────────────────────
 
-LessonPreview.propTypes = { lesson: lessonShape.isRequired }
-
-function LessonPreview({ lesson }) {
-  const { t } = useTranslation()
-  switch (lesson.lesson_type) {
-    case 'text':
-    case 'video':
-    case 'pdf':
-    case 'image': {
-      const blocks = lesson.media_items ?? []
-      // Back-compat: a legacy media lesson may still hold a single URL in content.
-      const legacy = !blocks.length && ['video', 'pdf', 'image'].includes(lesson.lesson_type) && lesson.content
-        ? [{ type: lesson.lesson_type, url: lesson.content, caption: '' }]
-        : []
-      const allBlocks = blocks.length ? blocks : legacy
-      const bodyHtml = lesson.lesson_type === 'text' ? lesson.content : ''
-      if (!bodyHtml && !allBlocks.length) {
-        return <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewTextEmpty')}</p>
-      }
-      return (
-        <div className="lesson-preview-content">
-          {bodyHtml && <HtmlContent content={bodyHtml} className="lesson-preview-text" />}
-          {allBlocks.map((block, i) => (block.type === 'text'
-            ? <HtmlContent key={i} content={block.html} className="lesson-preview-text" />
-            : <MediaItem key={i} item={block} />
-          ))}
-        </div>
-      )
-    }
-    case 'assignment':
-      return lesson.content
-        ? (
-          <div>
-            <h4 className="lesson-preview-subheading">{t('lesson.assignment.instructions')}</h4>
-            <p className="lesson-preview-text">{lesson.content}</p>
-          </div>
-        )
-        : <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewAssignmentEmpty')}</p>
-    case 'quiz': {
-      const first = (lesson.quiz_data ?? [])[0]
-      if (!first?.question) return <p className="lesson-preview-empty">{t('authoring.moduleEditor.previewQuizEmpty')}</p>
-      return (
-        <div>
-          <p className="lesson-preview-quiz-q">{first.question}</p>
-          <ul className="lesson-preview-quiz-opts">
-            {(first.options ?? []).filter(o => o.text).map((o, i) => <li key={i}>{o.text}</li>)}
-          </ul>
-        </div>
-      )
-    }
-    default:
-      return null
+function displayResource(resource, lang) {
+  if (lang === 'original') return resource
+  const tr = resource.translations?.[lang] ?? {}
+  return {
+    ...resource,
+    title: tr.title ?? '',
+    content: tr.content ?? '',
+    caption: tr.caption ?? '',
+    instructions: tr.instructions ?? '',
+    quiz_data: mergedQuizData(resource, lang),
   }
 }
 
-function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave, errors }) {
+function translationPayload(resource, lang) {
+  const tr = resource.translations?.[lang] ?? {}
+  const payload = { title: tr.title ?? '' }
+  if (resource.type === 'text') payload.content = tr.content ?? ''
+  if (['image', 'video', 'pdf'].includes(resource.type)) payload.caption = tr.caption ?? ''
+  if (resource.type === 'assignment') payload.instructions = tr.instructions ?? ''
+  if (resource.type === 'quiz') payload.quiz_data = mergedQuizData(resource, lang)
+  return payload
+}
+
+const withFlags = (r) => ({ ...r, isDirty: false, saving: false })
+
+// ── Validation ────────────────────────────────────────────────────────────────
+
+function validateActivity(activity, t) {
+  if (!activity.title.trim()) return { title: t('authoring.moduleEditor.titleRequiredError') }
+  return null
+}
+
+function validateResource(resource, t) {
+  if (['image', 'video', 'pdf'].includes(resource.type) && !(resource.url || '').trim()) {
+    return t('authoring.moduleEditor.mediaUrlRequiredError')
+  }
+  if (resource.type === 'quiz' && !(resource.quiz_data ?? []).length) {
+    return t('authoring.moduleEditor.quizRequiredError')
+  }
+  if (resource.type === 'assignment' && !(resource.instructions || '').trim()) {
+    return t('authoring.moduleEditor.assignmentRequiredError')
+  }
+  return null
+}
+
+// ── Activity editor panel ─────────────────────────────────────────────────────
+
+const activityShape = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string,
+  lesson_type: PropTypes.string,
+  duration_minutes: PropTypes.number,
+  resources: PropTypes.array,
+  isDirty: PropTypes.bool,
+  isNew: PropTypes.bool,
+  saving: PropTypes.bool,
+})
+
+function ActivityEditor({
+  activity, resources, locked, translating, errors, resourceErrors,
+  onChange, onDelete, onSave,
+  onAddResource, onResourceChange, onResourceSave, onResourceDelete, onResourceMove,
+}) {
   const { t } = useTranslation()
-  const cfg = lessonTypeConfig(lesson.lesson_type)
-  const typeLabel = t(`lesson.type.${lesson.lesson_type}`)
   const err = errors ?? {}
 
-  // A brand-new, not-yet-saved lesson has no `translations` bucket to write
-  // into — block translated-mode edits on it until it's saved in the
-  // original language.
-  const blockedNew = lesson.isNew && translating
+  // A brand-new, not-yet-saved activity has no `translations` bucket to write
+  // into — block translated-mode edits on it until it's saved in the original.
+  const blockedNew = activity.isNew && translating
   const fieldsDisabled = locked || blockedNew
-  const structureLocked = locked || translating
 
   return (
     <div className="lesson-editor-panel">
       <div className="lesson-editor-header">
         <div className="lesson-editor-header-left">
-          <div className={`lesson-editor-icon-wrap lesson-editor-icon-wrap--${cfg.color}`}>
-            <cfg.Icon size={20} />
+          <div className="lesson-editor-icon-wrap lesson-editor-icon-wrap--blue">
+            <ActivityIcon activity={activity} size={20} />
           </div>
           <div>
-            <span className="lesson-editor-editing-label">{t('authoring.moduleEditor.editingLabel', { label: typeLabel })}</span>
             <h2 className="lesson-editor-title">{t('authoring.moduleEditor.lessonEditorTitle')}</h2>
           </div>
         </div>
@@ -336,7 +152,7 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           <label className="lesson-field-label">{t('authoring.moduleEditor.lessonTitleLabel')}</label>
           <input
             className={`lesson-field-input${err.title ? ' lesson-field-input--error' : ''}`}
-            value={lesson.title}
+            value={activity.title}
             disabled={fieldsDisabled}
             onChange={(e) => onChange('title', e.target.value)}
             placeholder={t('authoring.moduleEditor.titlePlaceholderExample')}
@@ -348,7 +164,7 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           <label className="lesson-field-label">{t('authoring.moduleEditor.descriptionLabel')}</label>
           <textarea
             className="lesson-field-textarea"
-            value={lesson.description}
+            value={activity.description}
             disabled={fieldsDisabled}
             rows={3}
             onChange={(e) => onChange('description', e.target.value)}
@@ -356,63 +172,11 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           />
         </div>
 
-        {lesson.lesson_type === 'text' && (
-          <div className="lesson-field">
-            <label className="lesson-field-label">{t('authoring.moduleEditor.contentLabel')}</label>
-            <RichTextEditor
-              value={lesson.content}
-              disabled={fieldsDisabled}
-              onChange={(html) => onChange('content', html)}
-              placeholder={t('authoring.moduleEditor.contentPlaceholder')}
-            />
-          </div>
-        )}
-
-        {MEDIA_TYPES.includes(lesson.lesson_type) && (
-          <div className="lesson-field">
-            <MediaItemsEditor
-              items={lesson.media_items ?? []}
-              fixedType={lesson.lesson_type}
-              disabled={fieldsDisabled || translating}
-              onChange={(next) => onChange('media_items', next)}
-            />
-            <FieldError msg={err.media} />
-          </div>
-        )}
-
-        {lesson.lesson_type === 'assignment' && (
-          <div className="lesson-field">
-            <label className="lesson-field-label">{t('authoring.moduleEditor.assignmentInstructionsLabel')}</label>
-            <textarea
-              className={`lesson-field-textarea lesson-field-textarea--content${err.content ? ' lesson-field-textarea--error' : ''}`}
-              value={lesson.content}
-              disabled={fieldsDisabled}
-              rows={6}
-              onChange={(e) => onChange('content', e.target.value)}
-              placeholder={t('authoring.moduleEditor.assignmentPlaceholder')}
-            />
-            <FieldError msg={err.content} />
-            <p className="lesson-field-hint">{t('authoring.moduleEditor.markdownHint')}</p>
-          </div>
-        )}
-
-        {lesson.lesson_type === 'quiz' && (
-          <>
-            <FieldError msg={err.quiz_data} />
-            <QuizBuilder
-              quizData={lesson.quiz_data ?? []}
-              textDisabled={fieldsDisabled}
-              structureLocked={structureLocked}
-              onChange={(next) => onChange('quiz_data', next)}
-            />
-          </>
-        )}
-
         <div className="lesson-field">
           <label className="lesson-field-label">{t('authoring.moduleEditor.durationLabel')}</label>
           <input
             className="lesson-field-input lesson-field-input--short"
-            value={lesson.duration_minutes || ''}
+            value={activity.duration_minutes || ''}
             disabled={locked || translating}
             type="number"
             min={0}
@@ -421,80 +185,74 @@ function LessonEditor({ lesson, locked, translating, onChange, onDelete, onSave,
           />
         </div>
 
-        <div className="lesson-field">
-          <label className="lesson-required-label">
-            <input
-              type="checkbox"
-              checked={lesson.is_required}
-              disabled={locked || translating}
-              onChange={(e) => onChange('is_required', e.target.checked)}
-            />
-            <div>
-              <span className="lesson-required-title">{t('authoring.moduleEditor.requiredTitle')}</span>
-              <span className="lesson-required-sub">{t('authoring.moduleEditor.requiredSub')}</span>
-            </div>
-          </label>
-        </div>
-
         <FieldError msg={err.general} />
 
-        {!locked && !blockedNew && lesson.isDirty && (
-          <button
-            className="lesson-save-btn"
-            onClick={onSave}
-            disabled={lesson.saving}
-          >
+        {!locked && !blockedNew && activity.isDirty && (
+          <button className="lesson-save-btn" onClick={onSave} disabled={activity.saving}>
             <Save size={15} />
-            {lesson.saving ? t('authoring.moduleEditor.savingLesson') : t('authoring.moduleEditor.saveLesson')}
+            {activity.saving ? t('authoring.moduleEditor.savingLesson') : t('authoring.moduleEditor.saveLesson')}
           </button>
         )}
 
-        <div className="lesson-preview-card">
-          <h3 className="lesson-preview-title">{t('authoring.moduleEditor.previewTitle')}</h3>
-          <p className="lesson-preview-sub">{t('authoring.moduleEditor.previewSub')}</p>
-          <div className="lesson-preview-body">
-            <LessonPreview lesson={lesson} />
-          </div>
+        {/* ── Resources ── */}
+        <div className="lesson-field">
+          <label className="lesson-field-label">{t('authoring.moduleEditor.resource.sectionTitle')}</label>
+          <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.sectionHint')}</p>
+
+          {activity.isNew ? (
+            <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.saveActivityFirst')}</p>
+          ) : (
+            <>
+              <div className="resource-list">
+                {resources.map((resource, idx) => (
+                  <ResourceEditor
+                    key={resource.id}
+                    resource={resource}
+                    index={idx}
+                    count={resources.length}
+                    locked={locked}
+                    translating={translating}
+                    error={resourceErrors[resource.id]}
+                    onChange={(field, value) => onResourceChange(resource.id, field, value)}
+                    onSave={() => onResourceSave(resource.id)}
+                    onDelete={() => onResourceDelete(resource.id)}
+                    onMove={(dir) => onResourceMove(resource.id, dir)}
+                  />
+                ))}
+              </div>
+
+              {!locked && !translating && (
+                <div className="resource-add">
+                  {RESOURCE_TYPES.map(({ type, Icon }) => (
+                    <button key={type} type="button" className="resource-add-btn" onClick={() => onAddResource(type)}>
+                      <Icon size={14} /> {t('authoring.moduleEditor.addMediaOfType', { type: t(`lesson.type.${type}`) })}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
   )
 }
 
-LessonEditor.propTypes = {
-  lesson: lessonShape.isRequired,
+ActivityEditor.propTypes = {
+  activity: activityShape.isRequired,
+  resources: PropTypes.array.isRequired,
   locked: PropTypes.bool.isRequired,
   translating: PropTypes.bool.isRequired,
+  errors: PropTypes.object,
+  resourceErrors: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  onError: PropTypes.func.isRequired,
-  errors: PropTypes.object,
-}
-
-// ── Validation ────────────────────────────────────────────────────────────────
-
-function validateLesson(lesson, t) {
-  const errors = {}
-  if (!lesson.title.trim()) {
-    errors.title = t('authoring.moduleEditor.titleRequiredError')
-  }
-  if (['video', 'image', 'pdf'].includes(lesson.lesson_type)) {
-    const blocks = lesson.media_items ?? []
-    const mediaBlocks = blocks.filter((b) => b.type !== 'text')
-    if (mediaBlocks.length === 0) {
-      errors.media = t('authoring.moduleEditor.mediaRequiredError', { type: t(`lesson.type.${lesson.lesson_type}`) })
-    } else if (mediaBlocks.some((b) => !(b.url || '').trim())) {
-      errors.media = t('authoring.moduleEditor.mediaUrlRequiredError')
-    }
-  }
-  if (lesson.lesson_type === 'assignment' && !lesson.content.trim()) {
-    errors.content = t('authoring.moduleEditor.assignmentRequiredError')
-  }
-  if (lesson.lesson_type === 'quiz' && (!lesson.quiz_data || lesson.quiz_data.length === 0)) {
-    errors.quiz_data = t('authoring.moduleEditor.quizRequiredError')
-  }
-  return Object.keys(errors).length ? errors : null
+  onAddResource: PropTypes.func.isRequired,
+  onResourceChange: PropTypes.func.isRequired,
+  onResourceSave: PropTypes.func.isRequired,
+  onResourceDelete: PropTypes.func.isRequired,
+  onResourceMove: PropTypes.func.isRequired,
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
@@ -515,6 +273,7 @@ export default function ModuleEditorPage() {
   const [saveStatus, setSaveStatus] = useState('')
   const [error, setError] = useState('')
   const [lessonErrors, setLessonErrors] = useState({})
+  const [resourceErrors, setResourceErrors] = useState({})
 
   // drag-and-drop state
   const [dragId, setDragId] = useState(null)
@@ -526,6 +285,9 @@ export default function ModuleEditorPage() {
   const [translationStatus, setTranslationStatus] = useState({})
   const translating = activeLang !== 'original'
 
+  const lessonsUrl = `/authoring/courses/${courseId}/modules/${moduleId}/lessons/`
+  const resourcesUrl = (activityId) => `${lessonsUrl}${activityId}/resources/`
+
   useEffect(() => {
     Promise.all([
       client.get(`/authoring/courses/${courseId}/modules/${moduleId}/edit/`),
@@ -535,7 +297,9 @@ export default function ModuleEditorPage() {
         const m = modRes.data
         setModule(m)
         setModuleForm({ title: m.title, description: m.description })
-        setLessons(m.lessons.map((l) => ({ ...l, isDirty: false, isNew: false, saving: false })))
+        setLessons(m.lessons.map((l) => ({
+          ...withFlags(l), isNew: false, resources: (l.resources ?? []).map(withFlags),
+        })))
         setIsPublished(courseRes.data.is_published)
         setCaps({
           canEdit: !!courseRes.data.can_edit,
@@ -553,8 +317,6 @@ export default function ModuleEditorPage() {
         ...selectedLesson,
         title: selectedLesson.translations?.[activeLang]?.title ?? '',
         description: selectedLesson.translations?.[activeLang]?.description ?? '',
-        content: selectedLesson.translations?.[activeLang]?.content ?? '',
-        quiz_data: mergedQuizData(selectedLesson, activeLang),
       }
     : selectedLesson
 
@@ -599,70 +361,52 @@ export default function ModuleEditorPage() {
     }
   }
 
-  // ── Lesson helpers ────────────────────────────────────────────────────────
+  // ── Activity helpers ──────────────────────────────────────────────────────
 
-  const addLesson = async (lessonType) => {
+  // A new activity starts with one resource of the chosen type (the server
+  // creates it on first save).
+  const addLesson = (type) => {
     const tempId = `new-${Date.now()}`
-    const newLesson = {
+    setLessons((ls) => [...ls, {
       id: tempId,
-      title: t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${lessonType}`) }),
+      title: t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${type}`) }),
       description: '',
-      lesson_type: lessonType,
-      content: '',
-      quiz_data: lessonType === 'quiz' ? [emptyQuestion()] : [],
+      lesson_type: type,
       duration_minutes: 0,
-      order: lessons.length + 1,
-      is_required: true,
+      order: ls.length + 1,
+      resources: [],
       isDirty: true,
       isNew: true,
       saving: false,
-    }
-    setLessons((ls) => [...ls, newLesson])
+    }])
     setSelectedLessonId(tempId)
   }
 
-  const saveLessonRequest = useCallback(async (lesson) => {
+  const saveLessonRequest = async (lesson) => {
     if (activeLang === 'original') {
       const payload = {
         title: lesson.title,
         description: lesson.description,
-        lesson_type: lesson.lesson_type,
-        content: lesson.content,
-        media_items: lesson.media_items ?? [],
-        quiz_data: lesson.quiz_data ?? [],
         duration_minutes: lesson.duration_minutes,
-        is_required: lesson.is_required,
       }
       if (lesson.isNew) {
-        const res = await client.post(
-          `/authoring/courses/${courseId}/modules/${moduleId}/lessons/`, payload,
-        )
-        return { tempId: lesson.id, saved: res.data }
+        payload.lesson_type = lesson.lesson_type
+        if (lesson.lesson_type === 'quiz') payload.quiz_data = [emptyQuestion()]
+        return (await client.post(lessonsUrl, payload)).data
       }
-      const res = await client.patch(
-        `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/`, payload,
-      )
-      return { tempId: lesson.id, saved: res.data }
+      return (await client.patch(`${lessonsUrl}${lesson.id}/`, payload)).data
     }
-
     const payload = {
       title: lesson.translations?.[activeLang]?.title ?? '',
       description: lesson.translations?.[activeLang]?.description ?? '',
-      content: lesson.translations?.[activeLang]?.content ?? '',
     }
-    if (lesson.lesson_type === 'quiz') {
-      payload.quiz_data = mergedQuizData(lesson, activeLang)
-    }
-    const res = await client.patch(
-      `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/?lang=${activeLang}`, payload,
-    )
-    return { tempId: lesson.id, saved: res.data }
-  }, [courseId, moduleId, activeLang])
+    return (await client.patch(`${lessonsUrl}${lesson.id}/?lang=${activeLang}`, payload)).data
+  }
 
   const saveLesson = async (lesson) => {
     if (lesson.isNew && activeLang !== 'original') return
 
-    const errors = activeLang === 'original' ? validateLesson(lesson, t) : null
+    const errors = activeLang === 'original' ? validateActivity(lesson, t) : null
     if (errors) {
       setLessonErrors((prev) => ({ ...prev, [lesson.id]: errors }))
       return
@@ -670,12 +414,14 @@ export default function ModuleEditorPage() {
     setLessonErrors((prev) => { const next = { ...prev }; delete next[lesson.id]; return next })
     setLessons((ls) => ls.map((l) => (l.id === lesson.id ? { ...l, saving: true } : l)))
     try {
-      const { tempId, saved } = await saveLessonRequest(lesson)
-      setLessons((ls) =>
-        ls.map((l) => (l.id === tempId ? { ...saved, isDirty: false, isNew: false, saving: false } : l))
-      )
+      const saved = await saveLessonRequest(lesson)
+      setLessons((ls) => ls.map((l) => {
+        if (l.id !== lesson.id) return l
+        // Keep unsaved resource edits; a new activity takes the server's resources.
+        const resources = lesson.isNew ? (saved.resources ?? []).map(withFlags) : l.resources
+        return { ...withFlags(saved), isNew: false, resources }
+      }))
       setSelectedLessonId(saved.id)
-      setLessonErrors((prev) => { const next = { ...prev }; delete next[tempId]; return next })
     } catch (err) {
       const detail = err.response?.data?.detail
         ?? Object.values(err.response?.data ?? {})[0]
@@ -690,40 +436,21 @@ export default function ModuleEditorPage() {
 
   const updateLessonField = (field, value) => {
     if (!selectedLessonId) return
-    if (activeLang === 'original') {
-      setLessons((ls) =>
-        ls.map((l) => (l.id === selectedLessonId ? { ...l, [field]: value, isDirty: true } : l))
-      )
-    } else {
-      setLessons((ls) =>
-        ls.map((l) => (l.id === selectedLessonId
-          ? {
-              ...l,
-              translations: { ...l.translations, [activeLang]: { ...(l.translations?.[activeLang] ?? {}), [field]: value } },
-              isDirty: true,
-            }
-          : l))
-      )
-    }
-    // clear validation error for this field on change
+    setLessons((ls) => ls.map((l) => {
+      if (l.id !== selectedLessonId) return l
+      if (activeLang === 'original') return { ...l, [field]: value, isDirty: true }
+      return {
+        ...l,
+        translations: { ...l.translations, [activeLang]: { ...(l.translations?.[activeLang] ?? {}), [field]: value } },
+        isDirty: true,
+      }
+    }))
     setLessonErrors((prev) => {
       const errs = prev[selectedLessonId]
       if (!errs || !errs[field]) return prev
       const next = { ...errs }
       delete next[field]
       return { ...prev, [selectedLessonId]: next }
-    })
-  }
-
-  const setLessonGeneralError = (lessonId, message) => {
-    setLessonErrors((prev) => {
-      const current = prev[lessonId] ?? {}
-      if (!message) {
-        if (!('general' in current)) return prev
-        const { general: _general, ...rest } = current
-        return { ...prev, [lessonId]: rest }
-      }
-      return { ...prev, [lessonId]: { ...current, general: message } }
     })
   }
 
@@ -734,9 +461,7 @@ export default function ModuleEditorPage() {
       return
     }
     try {
-      await client.delete(
-        `/authoring/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}/`,
-      )
+      await client.delete(`${lessonsUrl}${lesson.id}/`)
       setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
       setSelectedLessonId(null)
     } catch (err) {
@@ -748,7 +473,106 @@ export default function ModuleEditorPage() {
     }
   }
 
-  // ── Drag-and-drop (lessons) ───────────────────────────────────────────────
+  // ── Resource helpers (all act on the selected activity) ──────────────────
+
+  const setResources = (update) => {
+    setLessons((ls) => ls.map((l) => (l.id === selectedLessonId ? { ...l, resources: update(l.resources ?? []) } : l)))
+  }
+  const patchResource = (resourceId, patch) =>
+    setResources((rs) => rs.map((r) => (r.id === resourceId ? { ...r, ...patch } : r)))
+  const setResourceError = (resourceId, message) => setResourceErrors((prev) => {
+    const next = { ...prev }
+    if (message) next[resourceId] = message
+    else delete next[resourceId]
+    return next
+  })
+  const errorDetail = (err, fallback) => {
+    const data = err.response?.data
+    const first = data?.detail ?? Object.values(data ?? {})[0]
+    return String(Array.isArray(first) ? first[0] : (first ?? fallback))
+  }
+
+  const addResource = async (type) => {
+    try {
+      const body = { type, quiz_data: type === 'quiz' ? [emptyQuestion()] : [] }
+      const res = await client.post(resourcesUrl(selectedLessonId), body)
+      setResources((rs) => [...rs, withFlags(res.data)])
+    } catch (err) {
+      setLessonErrors((prev) => ({
+        ...prev,
+        [selectedLessonId]: {
+          ...(prev[selectedLessonId] ?? {}),
+          general: errorDetail(err, t('authoring.moduleEditor.saveFailedGeneric')),
+        },
+      }))
+    }
+  }
+
+  const changeResource = (resourceId, field, value) => {
+    setResources((rs) => rs.map((r) => {
+      if (r.id !== resourceId) return r
+      if (activeLang === 'original') return { ...r, [field]: value, isDirty: true }
+      return {
+        ...r,
+        translations: { ...r.translations, [activeLang]: { ...(r.translations?.[activeLang] ?? {}), [field]: value } },
+        isDirty: true,
+      }
+    }))
+    setResourceError(resourceId, '')
+  }
+
+  const saveResource = async (resourceId) => {
+    const resource = selectedLesson?.resources?.find((r) => r.id === resourceId)
+    if (!resource) return
+    if (activeLang === 'original') {
+      const invalid = validateResource(resource, t)
+      if (invalid) { setResourceError(resourceId, invalid); return }
+    }
+    patchResource(resourceId, { saving: true })
+    try {
+      const url = `${resourcesUrl(selectedLessonId)}${resourceId}/`
+      let res
+      if (activeLang === 'original') {
+        const { title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired } = resource
+        res = await client.patch(url, {
+          title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired,
+        })
+      } else {
+        res = await client.patch(`${url}?lang=${activeLang}`, translationPayload(resource, activeLang))
+      }
+      patchResource(resourceId, withFlags(res.data))
+      setResourceError(resourceId, '')
+    } catch (err) {
+      patchResource(resourceId, { saving: false })
+      setResourceError(resourceId, errorDetail(err, t('authoring.moduleEditor.saveFailedGeneric')))
+    }
+  }
+
+  const deleteResource = async (resourceId) => {
+    if (!window.confirm(t('authoring.moduleEditor.resource.confirmDelete'))) return
+    try {
+      await client.delete(`${resourcesUrl(selectedLessonId)}${resourceId}/`)
+      setResources((rs) => rs.filter((r) => r.id !== resourceId))
+      setResourceError(resourceId, '')
+    } catch (err) {
+      setResourceError(resourceId, errorDetail(err, t('authoring.moduleEditor.deleteFailedGeneric')))
+    }
+  }
+
+  const moveResource = async (resourceId, dir) => {
+    const current = selectedLesson?.resources ?? []
+    const i = current.findIndex((r) => r.id === resourceId)
+    const j = i + dir
+    if (i < 0 || j < 0 || j >= current.length) return
+    const reordered = [...current]
+    ;[reordered[i], reordered[j]] = [reordered[j], reordered[i]]
+    setResources(() => reordered)
+    try {
+      await client.patch(`${resourcesUrl(selectedLessonId)}reorder/`, { order: reordered.map((r) => r.id) })
+    } catch { /* silent — visual order already updated */ }
+  }
+
+  // ── Drag-and-drop (activities) ────────────────────────────────────────────
 
   const handleDragStart = (e, id) => {
     setDragId(id)
@@ -774,14 +598,10 @@ export default function ModuleEditorPage() {
     setLessons(reordered)
     setDragId(null)
 
-    // only persist if all lessons are saved (no unsaved temp IDs)
-    const hasNew = reordered.some((l) => l.isNew)
-    if (!hasNew) {
+    // only persist if all activities are saved (no unsaved temp IDs)
+    if (!reordered.some((l) => l.isNew)) {
       try {
-        await client.patch(
-          `/authoring/courses/${courseId}/modules/${moduleId}/lessons/reorder/`,
-          { order: reordered.map((l) => l.id) },
-        )
+        await client.patch(`${lessonsUrl}reorder/`, { order: reordered.map((l) => l.id) })
       } catch { /* silent — visual order already updated */ }
     }
   }
@@ -802,7 +622,15 @@ export default function ModuleEditorPage() {
       setModule(m)
       setLessons((ls) => ls.map((l) => {
         const fresh = m.lessons.find((fl) => fl.id === l.id)
-        return fresh ? { ...l, translations: fresh.translations } : l
+        if (!fresh) return l
+        return {
+          ...l,
+          translations: fresh.translations,
+          resources: (l.resources ?? []).map((r) => {
+            const fr = fresh.resources?.find((x) => x.id === r.id)
+            return fr ? { ...r, translations: fr.translations } : r
+          }),
+        }
       }))
       setTranslationStatus(courseRes.data.translation_status ?? {})
     }).catch(() => {})
@@ -892,8 +720,9 @@ export default function ModuleEditorPage() {
           {!locked && !translating && (
             <div className="me-card">
               <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
+              <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.addActivityHint')}</p>
               <div className="me-lesson-type-grid">
-                {LESSON_TYPES.map(({ type, Icon, color }) => (
+                {RESOURCE_TYPES.map(({ type, Icon, color }) => (
                   <button
                     key={type}
                     className={`me-type-btn me-type-btn--${color}`}
@@ -929,7 +758,7 @@ export default function ModuleEditorPage() {
                     onDragEnd={handleDragEnd}
                   >
                     <GripVertical size={14} className="me-lesson-drag" />
-                    <LessonTypeIcon type={lesson.lesson_type} size={15} />
+                    <ActivityIcon activity={lesson} size={15} />
                     <span className="me-lesson-title">{lesson.title || t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${lesson.lesson_type}`) })}</span>
                     <span className="me-lesson-order">{idx + 1}</span>
                   </li>
@@ -946,15 +775,21 @@ export default function ModuleEditorPage() {
         {/* ── Right panel ── */}
         <main className="module-editor-main">
           {displayLesson ? (
-            <LessonEditor
-              lesson={displayLesson}
+            <ActivityEditor
+              activity={displayLesson}
+              resources={(selectedLesson.resources ?? []).map((r) => displayResource(r, activeLang))}
               locked={locked}
               translating={translating}
+              errors={lessonErrors[selectedLesson.id]}
+              resourceErrors={resourceErrors}
               onChange={updateLessonField}
               onDelete={() => deleteLesson(selectedLesson)}
               onSave={() => saveLesson(selectedLesson)}
-              onError={(message) => setLessonGeneralError(selectedLesson.id, message)}
-              errors={lessonErrors[selectedLesson.id]}
+              onAddResource={addResource}
+              onResourceChange={changeResource}
+              onResourceSave={saveResource}
+              onResourceDelete={deleteResource}
+              onResourceMove={moveResource}
             />
           ) : (
             <div className="me-empty-state">

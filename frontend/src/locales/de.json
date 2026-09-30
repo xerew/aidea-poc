@@ -621,7 +621,19 @@
       "addMediaOfType": "{{type}} hinzufügen",
       "mediaRequiredError": "Füge mindestens ein Element hinzu: {{type}}.",
       "mediaUrlRequiredError": "Jedes Medienelement benötigt eine URL.",
-      "uploadTypeError": "Dieser Dateityp wird nicht akzeptiert. Verwenden Sie eine PNG-, JPG-, GIF-, WEBP- oder PDF-Datei (max. 20 MB)."
+      "uploadTypeError": "Dieser Dateityp wird nicht akzeptiert. Verwenden Sie eine PNG-, JPG-, GIF-, WEBP- oder PDF-Datei (max. 20 MB).",
+      "resource": {
+        "sectionTitle": "Ressourcen",
+        "sectionHint": "Lernende bearbeiten sie der Reihe nach. Die Aktivität ist abgeschlossen, sobald alle Pflichtressourcen erledigt sind.",
+        "saveActivityFirst": "Speichern Sie zuerst die Aktivität und fügen Sie dann weitere Ressourcen hinzu.",
+        "addActivityHint": "Wählen Sie, womit die Aktivität beginnt. Weitere Ressourcen können Sie danach hinzufügen.",
+        "titlePlaceholder": "Titel der Ressource (optional)",
+        "required": "Pflicht",
+        "save": "Ressource speichern",
+        "delete": "Ressource löschen",
+        "lastResourceHint": "Eine Aktivität braucht mindestens eine Ressource.",
+        "confirmDelete": "Diese Ressource löschen? Der Fortschritt der Lernenden darin geht verloren."
+      }
     },
     "translate": {
       "switchLanguage": "Language",

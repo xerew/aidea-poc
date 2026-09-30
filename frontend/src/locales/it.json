@@ -621,7 +621,19 @@
       "addMediaOfType": "Aggiungi {{type}}",
       "mediaRequiredError": "Aggiungi almeno un elemento: {{type}}.",
       "mediaUrlRequiredError": "Ogni elemento multimediale necessita di un URL.",
-      "uploadTypeError": "Questo tipo di file non è accettato. Usa un file PNG, JPG, GIF, WEBP o PDF (max 20 MB)."
+      "uploadTypeError": "Questo tipo di file non è accettato. Usa un file PNG, JPG, GIF, WEBP o PDF (max 20 MB).",
+      "resource": {
+        "sectionTitle": "Risorse",
+        "sectionHint": "I partecipanti le seguono in ordine. L’attività è completata quando tutte le risorse obbligatorie sono state svolte.",
+        "saveActivityFirst": "Salva prima l’attività, poi aggiungi altre risorse.",
+        "addActivityHint": "Scegli con cosa inizia l’attività. Potrai aggiungere altre risorse in seguito.",
+        "titlePlaceholder": "Titolo della risorsa (facoltativo)",
+        "required": "Obbligatoria",
+        "save": "Salva risorsa",
+        "delete": "Elimina risorsa",
+        "lastResourceHint": "Un’attività deve contenere almeno una risorsa.",
+        "confirmDelete": "Eliminare questa risorsa? I progressi dei partecipanti su di essa andranno persi."
+      }
     },
     "translate": {
       "switchLanguage": "Language",
