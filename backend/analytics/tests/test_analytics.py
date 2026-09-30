@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -8,8 +9,9 @@ from hub.models import (
     Course,
     Enrollment,
     LearningPillar,
-    LessonProgress,
     Module,
+    Resource,
+    ResourceProgress,
     UserProfile,
 )
 
@@ -71,6 +73,10 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         self.lesson_quiz = Activity.objects.create(
             title='L2', module=self.module1, lesson_type='quiz', duration_minutes=20, order=2,
         )
+        self.quiz_resource = Resource.objects.create(
+            activity=self.lesson_quiz, type='quiz', order=1,
+            quiz_data=[{'question': 'Q', 'options': [{'text': 'a', 'is_correct': True}]}],
+        )
 
         teacher1 = make_teacher('t1')
         teacher2 = make_teacher('t2')
@@ -81,8 +87,10 @@ class AnalyticsOverviewDataTestCase(APITestCase):
         self.enroll3 = Enrollment.objects.create(user=teacher3, course=self.course1, progress_pct=0)
         self.enroll4 = Enrollment.objects.create(user=teacher1, course=self.course2, progress_pct=100)
 
-        LessonProgress.objects.create(user=teacher1, lesson=self.lesson_quiz)
-        LessonProgress.objects.create(user=teacher2, lesson=self.lesson_quiz)
+        ResourceProgress.objects.create(
+            user=teacher1, resource=self.quiz_resource, completed_at=timezone.now())
+        ResourceProgress.objects.create(
+            user=teacher2, resource=self.quiz_resource, completed_at=timezone.now())
 
         # Enrollment on other creator's course — must not appear
         Enrollment.objects.create(user=teacher1, course=self.other_course, progress_pct=100)

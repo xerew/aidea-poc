@@ -47,7 +47,19 @@ class Command(BaseCommand):
         self._seed_demo_partner()
         self._assign_creator_courses(creator)
         self._seed_teacher_cohort(creator)
+        self._generate_resources()
         self.stdout.write(self.style.SUCCESS('Seed data created successfully.'))
+
+    def _generate_resources(self):
+        """Build resources for seeded activities that don't have them yet, using
+        the same mapping as the lessons→resources data migration."""
+        from hub.content_migration_logic import build_resources_for_lesson
+        from hub.models import Activity, Resource
+        made = 0
+        for activity in Activity.objects.filter(resources__isnull=True).distinct():
+            build_resources_for_lesson(activity, Resource)
+            made += 1
+        self.stdout.write(f'  Generated resources for {made} activities')
 
     def _seed_pillars(self):
         for pillar_data in copy.deepcopy(PILLARS):

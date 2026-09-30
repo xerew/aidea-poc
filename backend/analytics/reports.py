@@ -7,15 +7,15 @@ engagement_data['quiz_selected'] (the option index the teacher picked).
 """
 import re
 
-from hub.models import Activity, Enrollment, LessonProgress
+from hub.models import Enrollment, Resource, ResourceProgress
 
 
-def _quiz_questions(lesson, lp):
-    """Reconstruct a teacher's answers for one quiz lesson."""
-    selected = (lp.engagement_data or {}).get('quiz_selected', [])
-    booleans = lp.quiz_answers or []
+def _quiz_questions(resource, rp):
+    """Reconstruct a teacher's answers for one quiz resource."""
+    selected = (rp.engagement_data or {}).get('quiz_selected', [])
+    booleans = rp.quiz_answers or []
     questions = []
-    for i, q in enumerate(lesson.quiz_data or []):
+    for i, q in enumerate(resource.quiz_data or []):
         options = q.get('options', [])
         sel_idx = selected[i] if i < len(selected) and isinstance(selected[i], int) else None
         selected_text = (
@@ -35,9 +35,10 @@ def _quiz_questions(lesson, lp):
 
 def _teacher_rows(course):
     """Yield a per-teacher summary + quiz detail dict for each enrollment."""
-    quiz_lessons = list(
-        Activity.objects.filter(module__course=course, lesson_type='quiz')
-        .order_by('module__order', 'order')
+    quiz_resources = list(
+        Resource.objects.filter(activity__module__course=course, type='quiz')
+        .select_related('activity')
+        .order_by('activity__module__order', 'activity__order', 'order')
     )
     enrollments = (
         Enrollment.objects.filter(course=course)
@@ -47,23 +48,25 @@ def _teacher_rows(course):
     for enrollment in enrollments:
         user = enrollment.user
         progresses = {
-            lp.lesson_id: lp
-            for lp in LessonProgress.objects.filter(user=user, lesson__module__course=course)
+            rp.resource_id: rp
+            for rp in ResourceProgress.objects.filter(
+                user=user, resource__activity__module__course=course,
+            )
         }
-        time_spent = sum((lp.time_spent_seconds or 0) for lp in progresses.values())
+        time_spent = sum((rp.time_spent_seconds or 0) for rp in progresses.values())
 
         quizzes, scores = [], []
-        for lesson in quiz_lessons:
-            lp = progresses.get(lesson.id)
-            if lp is None:
+        for resource in quiz_resources:
+            rp = progresses.get(resource.id)
+            if rp is None:
                 continue
-            if lp.quiz_score is not None:
-                scores.append(lp.quiz_score)
+            if rp.quiz_score is not None:
+                scores.append(rp.quiz_score)
             quizzes.append({
-                'lesson_id': lesson.id,
-                'lesson_title': lesson.title,
-                'score': lp.quiz_score,
-                'questions': _quiz_questions(lesson, lp),
+                'lesson_id': resource.id,
+                'lesson_title': resource.activity.title,
+                'score': rp.quiz_score,
+                'questions': _quiz_questions(resource, rp),
             })
 
         avg_quiz_score = round(sum(scores) / len(scores), 2) if scores else None

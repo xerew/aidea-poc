@@ -11,8 +11,9 @@ from hub.models import (
     Course,
     Enrollment,
     LearningPillar,
-    LessonProgress,
     Module,
+    Resource,
+    ResourceProgress,
     UserProfile,
 )
 
@@ -41,18 +42,21 @@ class TeacherDetailTests(APITestCase):
         self.module = Module.objects.create(title='M', course=self.course, order=1)
         self.quiz = Activity.objects.create(
             module=self.module, title='Quiz 1', lesson_type='quiz', order=1, is_required=True,
-            quiz_data=[{
-                'question': 'What is 2+2?',
-                'options': [
-                    {'text': '3', 'is_correct': False},
-                    {'text': '4', 'is_correct': True},
-                ],
-            }],
+        )
+        quiz_data = [{
+            'question': 'What is 2+2?',
+            'options': [
+                {'text': '3', 'is_correct': False},
+                {'text': '4', 'is_correct': True},
+            ],
+        }]
+        self.quiz_resource = Resource.objects.create(
+            activity=self.quiz, type='quiz', order=1, is_required=True, quiz_data=quiz_data,
         )
         self.teacher = make_teacher('det_t1', 'Ada', 'Byte')
         Enrollment.objects.create(user=self.teacher, course=self.course, progress_pct=100)
-        LessonProgress.objects.create(
-            user=self.teacher, lesson=self.quiz,
+        ResourceProgress.objects.create(
+            user=self.teacher, resource=self.quiz_resource,
             time_spent_seconds=120, quiz_score=1.0,
             quiz_answers=[True],
             engagement_data={'quiz_selected': [1]},

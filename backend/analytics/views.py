@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, CourseCollaborator, Enrollment, LessonProgress, UserProfile
+from hub.models import Course, CourseCollaborator, Enrollment, ResourceProgress, UserProfile
 from hub.views.permissions import IsContentCreator
 
 from .reports import build_analytics_workbook, build_course_teacher_report
@@ -54,9 +54,10 @@ class AnalyticsOverviewView(APIView):
         completion_rate = (
             round(completed_enrollments / total_enrollments * 100) if total_enrollments else 0
         )
-        quiz_attempts = LessonProgress.objects.filter(
-            lesson__lesson_type='quiz',
-            lesson__module__course__in=courses,
+        quiz_attempts = ResourceProgress.objects.filter(
+            resource__type='quiz',
+            resource__activity__module__course__in=courses,
+            completed_at__isnull=False,
         ).count()
 
         # "Courses Created" stays the count the viewer actually authored, even
