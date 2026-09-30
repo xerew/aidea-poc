@@ -30,6 +30,12 @@ class IsTeacher(BasePermission):
         )
 
 
+class HasProfile(BasePermission):
+    """Any signed-in user with a platform profile, whatever their role."""
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and hasattr(request.user, 'profile')
+
+
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return (

@@ -77,13 +77,31 @@ class PathwayGetTestCase(APITestCase):
         response = self.client.get(reverse('pathway'))
         self.assertEqual(response.data['competency_level'], 'advanced')
 
-    def test_content_creator_gets_403(self):
-        creator = User.objects.create_user(username='creator1', password='pass')
-        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
-        login = self.client.post(reverse('auth-login'), {'username': 'creator1', 'password': 'pass'})
+    def _login_as(self, user_type, username):
+        user = User.objects.create_user(username=username, password='pass')
+        UserProfile.objects.create(user=user, user_type=user_type, competency_score=6)
+        login = self.client.post(reverse('auth-login'), {'username': username, 'password': 'pass'})
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
-        response = self.client.get(reverse('pathway'))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        return user
+
+    def test_non_teacher_roles_get_a_pathway_on_first_visit(self):
+        make_path_with_courses([make_course(make_pillar())])
+        for i, user_type in enumerate([
+            UserProfile.UserType.CONTENT_CREATOR,
+            UserProfile.UserType.AIDEA_PARTNER,
+            UserProfile.UserType.ADMIN,
+        ]):
+            user = self._login_as(user_type, f'staff{i}')
+            response = self.client.get(reverse('pathway'))
+            self.assertEqual(response.status_code, status.HTTP_200_OK, user_type)
+            self.assertEqual(response.data['path_name'], 'Test Path')
+            self.assertTrue(UserLearningPath.objects.filter(user=user).exists())
+
+    def test_teacher_still_needs_onboarding(self):
+        make_path_with_courses([make_course(make_pillar())])
+        response = self.client.get(reverse('pathway'))  # teacher1, not onboarded
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertFalse(UserLearningPath.objects.filter(user=self.user).exists())
 
 
 class GeneratePathwayTests(TestCase):

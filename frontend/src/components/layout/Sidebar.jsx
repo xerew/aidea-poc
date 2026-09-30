@@ -24,11 +24,9 @@ const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: C
 
 // Content Analytics is a content-creation tool, so it's hidden from teachers.
 // Creators, AIDEA partners and admins share the content-creation nav (analytics
-// + reviews + authoring). Admins additionally get the Admin dashboard.
-const CREATOR_NAV = [
-  ...BASE_NAV.filter(item => item.to !== '/pathway'),
-  ANALYTICS_ITEM, REVIEWS_ITEM, AUTHORING_ITEM,
-]
+// + reviews + authoring) on top of the learner nav, pathway included. Admins
+// additionally get the Admin dashboard.
+const CREATOR_NAV = [...BASE_NAV, ANALYTICS_ITEM, REVIEWS_ITEM, AUTHORING_ITEM]
 
 export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
