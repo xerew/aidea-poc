@@ -64,3 +64,15 @@ def resync_lesson(lesson):
     from hub.tasks import translate_lesson_meta
     for lang in langs:
         translate_lesson_meta.delay(lesson.id, lang)
+
+
+def resync_resource(resource):
+    """One resource's content changed (or it was just added)."""
+    course = resource.activity.module.course
+    langs = _target_langs(course)
+    if not langs:
+        return
+    _mark_pending(course, langs)
+    from hub.tasks import translate_resource_meta
+    for lang in langs:
+        translate_resource_meta.delay(resource.id, lang)

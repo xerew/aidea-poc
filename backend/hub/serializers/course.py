@@ -112,14 +112,12 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         if not user.is_authenticated:
             return []
-        from hub.completion import completed_activity_ids
-        completed_lesson_ids = completed_activity_ids(user, obj)
+        from hub.completion import activity_completion
+        required_ids, _, completed_ids = activity_completion(user, obj)
         result = []
         for module in obj.modules.all():
-            required = [
-                lesson.id for lesson in module.lessons.all() if lesson.is_required
-            ]
-            if required and all(lid in completed_lesson_ids for lid in required):
+            required = [a.id for a in module.lessons.all() if a.id in required_ids]
+            if required and all(aid in completed_ids for aid in required):
                 result.append(module.id)
         return result
 

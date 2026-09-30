@@ -18,7 +18,7 @@ from hub.models import (
 # ── Reads ─────────────────────────────────────────────────────────────────────
 
 
-def _activity_completion(user, course):
+def activity_completion(user, course):
     """Return (required_ids, completed_required_ids, completed_ids) for a course.
 
     An activity is *required* when it has at least one required resource (the
@@ -61,7 +61,7 @@ def _activity_completion(user, course):
 
 def completed_activity_ids(user, course):
     """Ids of the course's activities the user has completed."""
-    return _activity_completion(user, course)[2]
+    return activity_completion(user, course)[2]
 
 
 def activity_time_seconds(resource_progress_rows):
@@ -83,7 +83,7 @@ def recompute_course_progress(user, enrollment):
     course = enrollment.course
     # Activity-weighted (not resource-weighted) so migrated enrollments keep the
     # exact percentage the legacy lesson-based calculation gave them.
-    required, completed_required, _ = _activity_completion(user, course)
+    required, completed_required, _ = activity_completion(user, course)
     total = len(required)
     progress_pct = round((len(completed_required) / total) * 100) if total > 0 else 0
 

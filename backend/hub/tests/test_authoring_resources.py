@@ -81,3 +81,51 @@ class AuthoringResourceTests(CollaboratorBase):
         r1.refresh_from_db()
         r2.refresh_from_db()
         self.assertEqual((r2.order, r1.order), (1, 2))
+
+    def test_translated_quiz_must_keep_shape(self):
+        quiz = self._mk(type='quiz', quiz_data=[{'question': 'Q', 'options': [
+            {'text': 'a', 'is_correct': True}, {'text': 'b', 'is_correct': False}]}])
+        self._login_as(self.creator)
+        bad = [{'question': 'Κ', 'options': [{'text': 'α'}, {'text': 'β'}, {'text': 'γ'}]}]
+        res = self.client.patch(f'{self._detail_url(quiz)}?lang=el', {'quiz_data': bad}, format='json')
+        self.assertEqual(res.status_code, 400)
+        good = [{'question': 'Κ', 'options': [{'text': 'α'}, {'text': 'β'}]}]
+        res = self.client.patch(f'{self._detail_url(quiz)}?lang=el', {'quiz_data': good}, format='json')
+        self.assertEqual(res.status_code, 200)
+
+    def test_new_and_edited_resources_are_resynced_to_translated_languages(self):
+        from unittest.mock import patch
+        self.course.translation_status = {'el': 'done'}
+        self.course.save(update_fields=['translation_status'])
+        self._login_as(self.creator)
+        with patch('hub.tasks.translate_resource_meta.delay') as delay:
+            res = self.client.post(self._create_url(), {'type': 'text', 'content': 'hi'}, format='json')
+            delay.assert_called_once_with(res.data['id'], 'el')
+            delay.reset_mock()
+            resource = Resource.objects.get(pk=res.data['id'])
+            self.client.patch(self._detail_url(resource), {'is_required': False}, format='json')
+            delay.assert_not_called()  # no translatable change
+            self.client.patch(self._detail_url(resource), {'content': 'changed'}, format='json')
+            delay.assert_called_once_with(resource.id, 'el')
+
+
+class ResourceMachineTranslationTests(CollaboratorBase):
+    def test_translate_course_translates_resources(self):
+        from unittest.mock import patch
+
+        from hub.tasks import translate_course
+        activity = Activity.objects.create(module=self.module1, title='A', order=1)
+        text = Resource.objects.create(activity=activity, type='text', order=1, content='Body')
+        video = Resource.objects.create(activity=activity, type='video', order=2,
+                                        url='https://v.example/x', caption='Cap')
+        quiz = Resource.objects.create(activity=activity, type='quiz', order=3, quiz_data=[
+            {'question': 'Q?', 'options': [{'text': 'A', 'is_correct': True},
+                                           {'text': 'B', 'is_correct': False}]}])
+        with patch('hub.tasks.translate_text', side_effect=lambda t, s, d: f'[{d}] {t}'):
+            translate_course(self.course.id, 'el')
+        for r in (text, video, quiz):
+            r.refresh_from_db()
+        self.assertEqual(text.translations['el']['content'], '[el] Body')
+        self.assertEqual(video.translations['el'], {'caption': '[el] Cap'})  # URL untouched
+        self.assertEqual(quiz.translations['el']['quiz_data'][0]['options'][0],
+                         {'text': '[el] A', 'is_correct': True})

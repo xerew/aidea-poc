@@ -512,20 +512,66 @@ def _translate_module(module, target):
     _merge_json(Module, module.pk, 'translations', target, blob)
 
 
+def _memo(fn):
+    """Per-job cache for translate_text: migrated activities still carry their
+    legacy content, which duplicates their resources' text — translate it once."""
+    cache = {}
+
+    def wrapped(text, src, target):
+        key = (text, src, target)
+        if key not in cache:
+            cache[key] = fn(text, src, target)
+        return cache[key]
+    return wrapped
+
+
+def _translate_resource(resource, target, tr=None):
+    from hub.models import Resource
+    tr = tr or translate_text
+    src = resource.activity.module.course.source_language
+    blob = {}
+    if resource.title:
+        blob['title'] = tr(resource.title, src, target)
+    # Media resources hold a URL; only their caption is prose.
+    if resource.type == 'text' and resource.content:
+        blob['content'] = tr(resource.content, src, target)
+    if resource.caption:
+        blob['caption'] = tr(resource.caption, src, target)
+    if resource.type == 'assignment' and resource.instructions:
+        blob['instructions'] = tr(resource.instructions, src, target)
+    if resource.type == 'quiz':
+        blob['quiz_data'] = [
+            {
+                'question': tr(q.get('question', ''), src, target),
+                'options': [
+                    {'text': tr(o.get('text', ''), src, target), 'is_correct': bool(o.get('is_correct'))}
+                    for o in q.get('options', [])
+                ],
+            }
+            for q in resource.quiz_data or []
+        ]
+    if blob:
+        _merge_json(Resource, resource.pk, 'translations', target, blob)
+
+
 def _translate_lesson(lesson, target):
     from hub.models import Activity
+    tr = _memo(translate_text)
     src = lesson.module.course.source_language
     blob = {
-        'title': translate_text(lesson.title, src, target),
-        'description': translate_text(lesson.description, src, target),
+        'title': tr(lesson.title, src, target),
+        'description': tr(lesson.description, src, target),
     }
-    # `content` is prose only for text/assignment; for video/image/pdf it's a URL
-    # — translating it would mangle the link, so leave it to fall back.
+    # Legacy fields, kept translated for the rollback window. `content` is prose
+    # only for text/assignment; for video/image/pdf it's a URL — translating it
+    # would mangle the link, so leave it to fall back.
     if lesson.lesson_type in ('text', 'assignment'):
-        blob['content'] = translate_text(lesson.content, src, target)
+        blob['content'] = tr(lesson.content, src, target)
     elif lesson.lesson_type == 'quiz':
         blob['quiz_data'] = _tr_quiz(lesson.quiz_data, src, target)
     _merge_json(Activity, lesson.pk, 'translations', target, blob)
+    for resource in lesson.resources.all():
+        _translate_resource(resource, target, tr)
 
 
 def _finish(course, target, work):
@@ -547,7 +593,7 @@ def translate_course(course_id: int, target: str) -> None:
     from hub.models import Course
 
     try:
-        course = Course.objects.prefetch_related('modules__lessons').get(pk=course_id)
+        course = Course.objects.prefetch_related('modules__lessons__resources').get(pk=course_id)
     except Course.DoesNotExist:
         return
 
@@ -592,3 +638,14 @@ def translate_lesson_meta(lesson_id: int, target: str) -> None:
     except Activity.DoesNotExist:
         return
     _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))
+
+
+@shared_task
+def translate_resource_meta(resource_id: int, target: str) -> None:
+    """Re-translate only one resource's fields."""
+    from hub.models import Resource
+    try:
+        resource = Resource.objects.select_related('activity__module__course').get(pk=resource_id)
+    except Resource.DoesNotExist:
+        return
+    _finish(resource.activity.module.course, target, lambda: _translate_resource(resource, target))

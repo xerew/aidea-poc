@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from hub.models import Activity, CourseEditHistory, Resource
 from hub.serializers import ResourceSerializer
 from hub.translation import LANGUAGE_NAMES
+from hub.translation_sync import resync_resource
 
 from .permissions import IsContentCreator, can_edit_course, can_translate_course
 
@@ -41,6 +42,7 @@ class AuthoringResourceView(APIView):
             course=activity.module.course, editor=request.user,
             changes={'resource_added': {'activity': activity.title, 'type': resource.type}},
         )
+        resync_resource(resource)
         return Response(ResourceSerializer(resource).data, status=status.HTTP_201_CREATED)
 
 
@@ -82,6 +84,22 @@ class AuthoringResourceDetailView(APIView):
                 except Exception as exc:  # noqa: BLE001 - surface DRF validation detail
                     return Response({'quiz_data': getattr(exc, 'detail', str(exc))},
                                     status=status.HTTP_400_BAD_REQUEST)
+                # Learners are graded positionally against the base quiz, so a
+                # translation must keep its question and option counts.
+                base = resource.quiz_data or []
+                same_shape = (
+                    isinstance(translated, list)
+                    and len(translated) == len(base)
+                    and all(
+                        len(translated[i].get('options', [])) == len(base[i].get('options', []))
+                        for i in range(len(base))
+                    )
+                )
+                if not same_shape:
+                    return Response(
+                        {'quiz_data': 'Translated quiz must match the original question and option counts.'},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
             blob = dict(resource.translations.get(lang, {}))
             for field in TRANSLATABLE_RESOURCE_FIELDS:
                 if field in request.data:
@@ -92,7 +110,13 @@ class AuthoringResourceDetailView(APIView):
 
         serializer = ResourceSerializer(resource, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
+        changed = any(
+            f in serializer.validated_data and serializer.validated_data[f] != getattr(resource, f)
+            for f in TRANSLATABLE_RESOURCE_FIELDS
+        )
         serializer.save()
+        if changed:
+            resync_resource(resource)
         return Response(ResourceSerializer(resource).data)
 
     def delete(self, request, pk, module_pk, lesson_pk, resource_pk):

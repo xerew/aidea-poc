@@ -100,3 +100,29 @@ class LegacyCompletionDualWriteTest(TestCase):
             ResourceProgress.objects.filter(user=self.user, completed_at__isnull=False).count(), 2,
         )
         self.assertTrue(LessonProgress.objects.filter(user=self.user, lesson=self.activity).exists())
+
+
+class ModuleCompletionTest(TestCase):
+    """A module is complete when its resource-required activities are done —
+    regardless of the legacy activity-level is_required flag."""
+
+    def test_module_completion_follows_required_resources(self):
+        from rest_framework.test import APIRequestFactory
+
+        from hub.serializers.course import CourseDetailSerializer
+        user = User.objects.create_user(username='mod', password='x')
+        pillar = LearningPillar.objects.create(name='P', slug='p', order=1)
+        course = Course.objects.create(title='C', pillar=pillar, is_published=True)
+        module = Module.objects.create(title='M', course=course, order=1)
+        # Flagged optional at activity level, but holds a required resource.
+        act = Activity.objects.create(module=module, title='A', order=1, is_required=False)
+        res = Resource.objects.create(activity=act, type='text', order=1, is_required=True)
+        Enrollment.objects.create(user=user, course=course)
+
+        request = APIRequestFactory().get('/')
+        request.user = user
+        ser = CourseDetailSerializer(course, context={'request': request})
+        self.assertEqual(ser.data['completed_module_ids'], [])
+        ResourceProgress.objects.create(user=user, resource=res, completed_at='2026-01-01T00:00:00Z')
+        ser = CourseDetailSerializer(course, context={'request': request})
+        self.assertEqual(ser.data['completed_module_ids'], [module.id])
