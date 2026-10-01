@@ -39,11 +39,16 @@ class PathwayGetTestCase(APITestCase):
         login = self.client.post(reverse('auth-login'), {'username': 'teacher1', 'password': 'pass'})
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
 
+    def _onboarded(self):
+        self.user.profile.onboarding_completed = True
+        self.user.profile.save()
+
     def test_404_before_onboarding(self):
         response = self.client.get(reverse('pathway'))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_returns_path_with_courses(self):
+        self._onboarded()
         pillar  = make_pillar()
         course1 = make_course(pillar, 'Course A')
         course2 = make_course(pillar, 'Course B')
@@ -62,6 +67,7 @@ class PathwayGetTestCase(APITestCase):
         self.assertEqual(response.data['progress']['completed'], 0)
 
     def test_course_status_is_completed_when_enrolled_at_100(self):
+        self._onboarded()
         pillar  = make_pillar()
         course  = make_course(pillar)
         path    = make_path_with_courses([course])
@@ -72,6 +78,7 @@ class PathwayGetTestCase(APITestCase):
         self.assertEqual(response.data['courses'][0]['status'], 'completed')
 
     def test_competency_level_advanced_for_score_6(self):
+        self._onboarded()
         path = make_path_with_courses([])
         UserLearningPath.objects.create(user=self.user, path=path, course_ids=[])
         response = self.client.get(reverse('pathway'))
@@ -84,18 +91,37 @@ class PathwayGetTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
         return user
 
-    def test_non_teacher_roles_get_a_pathway_on_first_visit(self):
+    def test_every_role_needs_onboarding_for_a_pathway(self):
+        from unittest.mock import patch
+
+        from hub.models import Subject
         make_path_with_courses([make_course(make_pillar())])
+        LearningPath.objects.create(name='Beginner', slug='beginner-foundations',
+                                    competency_min=0, competency_max=4)
+        subject = Subject.objects.get(slug='mathematics')
         for i, user_type in enumerate([
             UserProfile.UserType.CONTENT_CREATOR,
             UserProfile.UserType.AIDEA_PARTNER,
             UserProfile.UserType.ADMIN,
         ]):
-            user = self._login_as(user_type, f'staff{i}')
-            response = self.client.get(reverse('pathway'))
-            self.assertEqual(response.status_code, status.HTTP_200_OK, user_type)
-            self.assertEqual(response.data['path_name'], 'Test Path')
-            self.assertTrue(UserLearningPath.objects.filter(user=user).exists())
+            self._login_as(user_type, f'staff{i}')
+            self.assertEqual(self.client.get(reverse('pathway')).status_code,
+                             status.HTTP_404_NOT_FOUND, user_type)
+            with patch('hub.tasks.compute_user_recommendations.delay'):
+                res = self.client.post(reverse('onboarding'), {
+                    'subject': subject.id, 'teaching_level': 'secondary',
+                    'school_role': 'school_leader', 'goals': [],
+                }, format='json')
+            self.assertEqual(res.status_code, status.HTTP_200_OK, user_type)
+            self.assertEqual(self.client.get(reverse('pathway')).status_code,
+                             status.HTTP_200_OK, user_type)
+
+    def test_pathway_without_onboarding_is_not_served(self):
+        # e.g. created for a staff account before onboarding applied to every role
+        creator = self._login_as(UserProfile.UserType.CONTENT_CREATOR, 'early_creator')
+        path = make_path_with_courses([make_course(make_pillar())])
+        UserLearningPath.objects.create(user=creator, path=path, course_ids=[])
+        self.assertEqual(self.client.get(reverse('pathway')).status_code, status.HTTP_404_NOT_FOUND)
 
     def test_teacher_still_needs_onboarding(self):
         make_path_with_courses([make_course(make_pillar())])

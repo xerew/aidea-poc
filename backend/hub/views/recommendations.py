@@ -1,4 +1,3 @@
-from django.core.cache import cache
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,9 +9,6 @@ from hub.models.recommendations import (
 )
 from hub.serializers.pathway import RecommendationSerializer
 from hub.views.permissions import HasProfile
-
-# Queue at most one first computation per staff user per hour.
-_FIRST_COMPUTE_TTL = 60 * 60
 
 
 def records_recommendation_events(user):
@@ -28,8 +24,9 @@ class RecommendationsView(APIView):
 
     def get(self, request):
         from hub.study_logic import active_group
-        # The fixed (control) group gets no personalised recommendations.
-        if active_group(request.user) == 'fixed':
+        # Recommendations come from onboarding, for every role; the fixed
+        # (control) study group gets no personalised recommendations.
+        if not request.user.profile.onboarding_completed or active_group(request.user) == 'fixed':
             return Response([])
         recs = (
             CourseRecommendation.objects
@@ -37,12 +34,6 @@ class RecommendationsView(APIView):
             .select_related('course__pillar')
             .order_by('-score')
         )
-        # Teachers get recommendations at onboarding; other roles never onboard,
-        # so compute theirs in the background the first time they look.
-        if not recs.exists() and not records_recommendation_events(request.user):
-            if cache.add(f'recs_first_compute:{request.user.id}', True, _FIRST_COMPUTE_TTL):
-                from hub.tasks import compute_user_recommendations
-                compute_user_recommendations.delay(request.user.id)
         return Response(RecommendationSerializer(recs, many=True, context={'request': request}).data)
 
 

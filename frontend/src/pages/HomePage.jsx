@@ -7,9 +7,6 @@ import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import { useAuth } from '../context/AuthContext'
 import './HomePage.css'
 
-// How long to wait before re-checking freshly queued recommendations.
-const RECS_RETRY_MS = 20000
-
 PillarCard.propTypes = {
   pillar: PropTypes.shape({
     name: PropTypes.string,
@@ -135,27 +132,19 @@ export default function HomePage() {
     }).catch(() => {})
   }, [])
 
-  // Teachers get recommendations once onboarded; creators, partners and admins
-  // never onboard, so theirs are computed in the background on first visit.
-  const isTeacher = user?.profile?.user_type === 'teacher'
-  const canSeeRecs = Boolean(user?.profile && (!isTeacher || user.profile.onboarding_completed))
+  // Recommendations come from onboarding, for every role.
+  const canSeeRecs = Boolean(user?.profile?.onboarding_completed)
 
   useEffect(() => {
     if (!canSeeRecs) return
     let cancelled = false
-    let retry = null
 
-    const fetchRecs = async (isRetry = false) => {
-      if (!isRetry) setRecsLoading(true)
+    const fetchRecs = async () => {
+      setRecsLoading(true)
       try {
         const res = await client.get('/recommendations/')
         if (cancelled) return
         const all = res.data
-        // First visit for a non-teacher: the server just queued the
-        // computation, so look once more shortly after.
-        if (!all.length && !isTeacher && !isRetry) {
-          retry = setTimeout(() => fetchRecs(true), RECS_RETRY_MS)
-        }
         const personal = all.filter((r) => r.source === 'personal')
         const cf       = all.filter((r) => r.source === 'cf')
         setPersonal(personal)
@@ -170,11 +159,8 @@ export default function HomePage() {
     }
 
     fetchRecs()
-    return () => {
-      cancelled = true
-      clearTimeout(retry)
-    }
-  }, [canSeeRecs, isTeacher, fireEvent])
+    return () => { cancelled = true }
+  }, [canSeeRecs, fireEvent])
 
   if (error) return <p className="page-error">{error}</p>
   if (!data)  return <p className="page-loading">{t('common.loading')}</p>
