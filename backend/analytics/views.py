@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseCollaborator, Enrollment, ResourceProgress, UserProfile
 from hub.views.permissions import IsContentCreator
 
+from .learning import CourseData, content_tree, learner_rows, learner_timeline
 from .reports import build_analytics_workbook, build_course_teacher_report
 from .serializers import CourseAnalyticsSerializer
 
@@ -112,3 +113,51 @@ class AnalyticsExportView(APIView):
         name = f'{slugify(request.user.username) or "analytics"}-analytics.xlsx'
         response['Content-Disposition'] = f'attachment; filename="{name}"'
         return response
+
+
+class _CourseAnalyticsView(APIView):
+    """Base for one course's analytics: 404 outside the viewer's scope."""
+
+    permission_classes = [IsContentCreator]
+
+    def course_or_none(self, request, pk):
+        return scoped_courses(request.user).filter(pk=pk).first()
+
+
+def _not_found():
+    return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CourseContentView(_CourseAnalyticsView):
+    """GET — module → activity → resource tree with reached / done / typical
+    time / dropped-here and notes per resource type."""
+
+    def get(self, request, pk):
+        course = self.course_or_none(request, pk)
+        if course is None:
+            return _not_found()
+        return Response(content_tree(CourseData(course)))
+
+
+class CourseLearnersView(_CourseAnalyticsView):
+    """GET — one row per enrolled learner with time, position and status."""
+
+    def get(self, request, pk):
+        course = self.course_or_none(request, pk)
+        if course is None:
+            return _not_found()
+        return Response({
+            'course': {'id': course.id, 'title': course.title},
+            'learners': learner_rows(CourseData(course)),
+        })
+
+
+class CourseLearnerTimelineView(_CourseAnalyticsView):
+    """GET — one learner's timeline through the course."""
+
+    def get(self, request, pk, user_id):
+        course = self.course_or_none(request, pk)
+        timeline = learner_timeline(CourseData(course), user_id) if course else None
+        if timeline is None:
+            return _not_found()
+        return Response(timeline)
