@@ -639,7 +639,11 @@
       "statusReviewed": "Vérifié",
       "markReviewed": "Marquer comme vérifié par un humain",
       "unmarkReviewed": "Retirer la marque de vérification",
-      "reviewedNote": "Vérifié par un humain — cette traduction est valide."
+      "reviewedNote": "Vérifié par un humain — cette traduction est valide.",
+      "serviceOffline": "Le serveur de traduction est hors ligne : les traductions ne peuvent pas être lancées pour le moment.",
+      "serviceOfflineDetails": "Hors ligne depuis {{since}} · dernière vérification {{checked}}. Nouvelle vérification toutes les 15 minutes.",
+      "checkAgain": "Vérifier à nouveau",
+      "checking": "Vérification…"
     },
     "collab": {
       "title": "Collaborateurs",

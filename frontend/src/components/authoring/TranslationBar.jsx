@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { Languages, Check } from 'lucide-react'
+import { Languages, Check, CloudOff, RefreshCw } from 'lucide-react'
 import client from '../../api/client'
 import { LANGUAGES } from '../../i18n'
 import './TranslationBar.css'
@@ -22,7 +22,26 @@ export default function TranslationBar({
 }) {
   const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
+  // Last known status of the NTUA translation server: {online, error, since, checked_at}.
+  const [service, setService] = useState(null)
+  const [checking, setChecking] = useState(false)
   const pollRef = useRef(null)
+
+  useEffect(() => {
+    client.get('/authoring/translation-service/')
+      .then((res) => setService(res.data))
+      .catch(() => {})
+  }, [])
+
+  const recheckService = async () => {
+    setChecking(true)
+    try {
+      const res = await client.get('/authoring/translation-service/', { params: { refresh: 1 } })
+      setService(res.data)
+    } catch { /* keep the last known status */ } finally {
+      setChecking(false)
+    }
+  }
 
   const stopPolling = () => {
     if (pollRef.current) {
@@ -68,9 +87,12 @@ export default function TranslationBar({
     setBusy(true)
     try {
       const res = await client.post(`/authoring/courses/${courseId}/translate/`, { language: lang })
+      setService((s) => (s ? { ...s, online: true } : s))
       onStatusUpdate(res.data.translation_status ?? { ...translationStatus, [lang]: 'pending' })
       startPolling(lang)
-    } catch {
+    } catch (err) {
+      // 503: the server checked the translation service and it is down.
+      if (err.response?.status === 503 && err.response.data?.service) setService(err.response.data.service)
       setBusy(false)
     }
   }
@@ -92,8 +114,26 @@ export default function TranslationBar({
   const activeLabel = LANGUAGES.find((l) => l.code === activeLang)?.label ?? activeLang
   const activeStatus = activeLang !== 'original' ? translationStatus?.[activeLang] : null
 
+  const formatTime = (iso) => (iso ? new Date(iso).toLocaleString() : '')
+
   return (
     <div className="translation-bar">
+      {service && !service.online && (
+        <div className="translation-service-offline" role="status">
+          <CloudOff size={16} />
+          <div>
+            <strong>{t('authoring.translate.serviceOffline')}</strong>
+            <span>
+              {t('authoring.translate.serviceOfflineDetails', {
+                since: formatTime(service.since), checked: formatTime(service.checked_at),
+              })}
+            </span>
+          </div>
+          <button type="button" className="add-dashed-btn" onClick={recheckService} disabled={checking}>
+            <RefreshCw size={13} /> {checking ? t('authoring.translate.checking') : t('authoring.translate.checkAgain')}
+          </button>
+        </div>
+      )}
       <div className="translation-bar-tabs" role="tablist" aria-label={t('authoring.translate.switchLanguage')}>
         <Languages size={15} className="translation-bar-icon" />
         <button

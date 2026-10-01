@@ -639,7 +639,11 @@
       "statusReviewed": "Reviewed",
       "markReviewed": "Mark as human-reviewed",
       "unmarkReviewed": "Remove reviewed mark",
-      "reviewedNote": "Reviewed by a human — this translation is valid."
+      "reviewedNote": "Reviewed by a human — this translation is valid.",
+      "serviceOffline": "The translation server is offline, so translations can’t run right now.",
+      "serviceOfflineDetails": "Offline since {{since}} · last checked {{checked}}. It’s checked again every 15 minutes.",
+      "checkAgain": "Check again",
+      "checking": "Checking…"
     },
     "collab": {
       "title": "Collaborators",

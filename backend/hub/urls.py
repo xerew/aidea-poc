@@ -90,6 +90,7 @@ from .views import (
     UnreadMessageCountView,
     VerifyEmailView,
 )
+from .views.authoring_course import TranslationServiceStatusView
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
@@ -185,5 +186,6 @@ urlpatterns = [
     path('authoring/courses/<int:pk>/publish/', AuthoringCoursePublishView.as_view(), name='authoring-course-publish'),
     path('authoring/courses/<int:pk>/unpublish/', AuthoringCourseUnpublishView.as_view(), name='authoring-course-unpublish'),
     path('authoring/courses/<int:pk>/translate/', AuthoringCourseTranslateView.as_view(), name='authoring-course-translate'),
+    path('authoring/translation-service/', TranslationServiceStatusView.as_view(), name='translation-service-status'),
     path('authoring/courses/<int:pk>/translation-review/', AuthoringTranslationReviewView.as_view(), name='authoring-translation-review'),
 ]

@@ -639,7 +639,11 @@
       "statusReviewed": "Revisado",
       "markReviewed": "Marcar como revisado por humano",
       "unmarkReviewed": "Quitar marca de revisión",
-      "reviewedNote": "Revisado por un humano: esta traducción es válida."
+      "reviewedNote": "Revisado por un humano: esta traducción es válida.",
+      "serviceOffline": "El servidor de traducción está fuera de línea, por lo que ahora no se pueden hacer traducciones.",
+      "serviceOfflineDetails": "Fuera de línea desde {{since}} · última comprobación {{checked}}. Se vuelve a comprobar cada 15 minutos.",
+      "checkAgain": "Comprobar de nuevo",
+      "checking": "Comprobando…"
     },
     "collab": {
       "title": "Colaboradores",

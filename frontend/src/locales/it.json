@@ -639,7 +639,11 @@
       "statusReviewed": "Verificato",
       "markReviewed": "Segna come verificato da umano",
       "unmarkReviewed": "Rimuovi contrassegno di verifica",
-      "reviewedNote": "Verificato da un umano — questa traduzione è valida."
+      "reviewedNote": "Verificato da un umano — questa traduzione è valida.",
+      "serviceOffline": "Il server di traduzione è offline, quindi al momento non è possibile tradurre.",
+      "serviceOfflineDetails": "Offline da {{since}} · ultimo controllo {{checked}}. Viene ricontrollato ogni 15 minuti.",
+      "checkAgain": "Controlla di nuovo",
+      "checking": "Controllo…"
     },
     "collab": {
       "title": "Collaboratori",

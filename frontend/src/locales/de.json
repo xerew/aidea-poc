@@ -639,7 +639,11 @@
       "statusReviewed": "Geprüft",
       "markReviewed": "Als von Mensch geprüft markieren",
       "unmarkReviewed": "Prüfmarkierung entfernen",
-      "reviewedNote": "Von einem Menschen geprüft — diese Übersetzung ist gültig."
+      "reviewedNote": "Von einem Menschen geprüft — diese Übersetzung ist gültig.",
+      "serviceOffline": "Der Übersetzungsserver ist offline, daher können derzeit keine Übersetzungen ausgeführt werden.",
+      "serviceOfflineDetails": "Offline seit {{since}} · zuletzt geprüft {{checked}}. Wird alle 15 Minuten erneut geprüft.",
+      "checkAgain": "Erneut prüfen",
+      "checking": "Wird geprüft…"
     },
     "collab": {
       "title": "Mitwirkende",

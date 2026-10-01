@@ -639,7 +639,11 @@
       "statusReviewed": "Vurdert",
       "markReviewed": "Merk som vurdert av menneske",
       "unmarkReviewed": "Fjern vurderingsmerke",
-      "reviewedNote": "Vurdert av et menneske — denne oversettelsen er gyldig."
+      "reviewedNote": "Vurdert av et menneske — denne oversettelsen er gyldig.",
+      "serviceOffline": "Oversettelsesserveren er frakoblet, så oversettelser kan ikke kjøres akkurat nå.",
+      "serviceOfflineDetails": "Frakoblet siden {{since}} · sist sjekket {{checked}}. Sjekkes på nytt hvert 15. minutt.",
+      "checkAgain": "Sjekk igjen",
+      "checking": "Sjekker…"
     },
     "collab": {
       "title": "Samarbeidspartnere",

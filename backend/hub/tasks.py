@@ -589,3 +589,10 @@ def translate_lesson_meta(lesson_id: int, target: str) -> None:
     except Lesson.DoesNotExist:
         return
     _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))
+
+
+@shared_task
+def check_translation_service() -> None:
+    """Every 15 minutes (Celery beat): is the NTUA translation server up?"""
+    from hub.translation_health import check_now
+    check_now()

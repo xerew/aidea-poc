@@ -254,3 +254,37 @@ def send_feedback_email(feedback):
             cta_link=link,
         )
 
+
+def send_translation_service_email(status):
+    """Tell every admin the translation server went offline or came back."""
+    from django.contrib.auth.models import User
+
+    online = status['online']
+    admins = User.objects.filter(profile__user_type='admin', is_active=True).exclude(email='')
+    if online:
+        subject = 'AIDEA translation server is back online'
+        heading = 'Translation server is back online'
+        paragraphs = [
+            'The NTUA translation server is reachable again, so course translations can run.',
+            'Translations that failed while it was down are not retried automatically. '
+            'Authors can press Translate again for those languages.',
+        ]
+    else:
+        subject = 'AIDEA translation server is offline'
+        heading = 'Translation server is offline'
+        paragraphs = [
+            'The platform cannot reach the NTUA translation server (Ollama, through the '
+            'ollama-tunnel container), so course translations cannot run.',
+            f'<strong>Details:</strong> {_html_text(status["error"])}',
+            'Authors see a notice in the translation bar and the Translate button explains the '
+            'outage instead of queuing a job. The platform checks again every 15 minutes and will '
+            'email you when it is back.',
+            'If the NTUA machine is up, check the tunnel on the VM: '
+            '<code>docker compose -f docker-compose.prod.yml logs --tail 50 ollama-tunnel</code>.',
+        ]
+    for admin in admins:
+        _send(
+            to=admin.email, subject=subject,
+            name=admin.get_full_name() or admin.username,
+            tag='Translation server', heading=heading, paragraphs=paragraphs,
+        )

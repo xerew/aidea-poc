@@ -639,7 +639,11 @@
       "statusReviewed": "Granskad",
       "markReviewed": "Markera som granskad av människa",
       "unmarkReviewed": "Ta bort granskningsmärke",
-      "reviewedNote": "Granskad av en människa — denna översättning är giltig."
+      "reviewedNote": "Granskad av en människa — denna översättning är giltig.",
+      "serviceOffline": "Översättningsservern är offline, så översättningar kan inte köras just nu.",
+      "serviceOfflineDetails": "Offline sedan {{since}} · senast kontrollerad {{checked}}. Kontrolleras igen var 15:e minut.",
+      "checkAgain": "Kontrollera igen",
+      "checking": "Kontrollerar…"
     },
     "collab": {
       "title": "Medarbetare",
