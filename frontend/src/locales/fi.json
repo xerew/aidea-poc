@@ -169,6 +169,14 @@
           "adultEd": "Aikuiskoulutus"
         }
       },
+      "schoolRole": {
+        "question": "Mikä on roolisi koulussa?",
+        "options": {
+          "teacher": "Opettaja",
+          "schoolLeader": "Koulun johto",
+          "both": "Molemmat"
+        }
+      },
       "q3": {
         "question": "Pyydät tekoälyä tiivistämään oppilaan esseen. Se antaa itsevarman mutta asiasisällöltään virheellisen tiivistelmän. Mitä teet?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Valitse opetusaste",
       "website": "Henkilökohtainen verkkosivusto",
       "websitePlaceholder": "esim. koulu.fi/~maria",
-      "websiteInvalid": "Anna kelvollinen verkko-osoite, esim. https://example.org"
+      "websiteInvalid": "Anna kelvollinen verkko-osoite, esim. https://example.org",
+      "schoolRole": "Rooli koulussa",
+      "selectSchoolRole": "Valitse roolisi"
     },
     "preferences": {
       "title": "Oppimismieltymykset",

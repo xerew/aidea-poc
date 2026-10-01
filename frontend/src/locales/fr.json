@@ -169,6 +169,14 @@
           "adultEd": "Éducation des adultes"
         }
       },
+      "schoolRole": {
+        "question": "Quel est votre rôle dans l’établissement ?",
+        "options": {
+          "teacher": "Enseignant(e)",
+          "schoolLeader": "Chef d’établissement",
+          "both": "Les deux"
+        }
+      },
       "q3": {
         "question": "Vous demandez à une IA de résumer la rédaction d'un élève. Elle produit un résumé assuré mais factuellement erroné. Que faites-vous ?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Choisissez un niveau",
       "website": "Site web personnel",
       "websitePlaceholder": "ex. monecole.fr/~marie",
-      "websiteInvalid": "Saisissez une adresse web valide, ex. https://example.org"
+      "websiteInvalid": "Saisissez une adresse web valide, ex. https://example.org",
+      "schoolRole": "Rôle dans l’établissement",
+      "selectSchoolRole": "Choisissez votre rôle"
     },
     "preferences": {
       "title": "Préférences d'apprentissage",

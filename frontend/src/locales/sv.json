@@ -169,6 +169,14 @@
           "adultEd": "Vuxenutbildning"
         }
       },
+      "schoolRole": {
+        "question": "Vilken är din roll på skolan?",
+        "options": {
+          "teacher": "Lärare",
+          "schoolLeader": "Skolledare",
+          "both": "Båda"
+        }
+      },
       "q3": {
         "question": "Du ber en AI sammanfatta en elevs uppsats. Den ger en säker men sakligt felaktig sammanfattning. Vad gör du?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Välj nivå",
       "website": "Personlig webbplats",
       "websitePlaceholder": "t.ex. minskola.se/~maria",
-      "websiteInvalid": "Ange en giltig webbadress, t.ex. https://example.org"
+      "websiteInvalid": "Ange en giltig webbadress, t.ex. https://example.org",
+      "schoolRole": "Roll på skolan",
+      "selectSchoolRole": "Välj din roll"
     },
     "preferences": {
       "title": "Läropreferenser",

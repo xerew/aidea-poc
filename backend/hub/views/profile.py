@@ -56,9 +56,15 @@ class ProfilePersonalInfoView(APIView):
             request.user.profile, data=request.data, partial=True,
         )
         serializer.is_valid(raise_exception=True)
-        serializer.update(request.user.profile, serializer.validated_data)
-        # Subject feeds the pathway ranking, so a change re-personalises it.
+        profile = request.user.profile
+        personalising = ('subject', 'teaching_level', 'school_role')
+        before = {f: getattr(profile, f) for f in personalising}
+        serializer.update(profile, serializer.validated_data)
+        # Subject, teaching level and school role feed both personalisation
+        # engines, so a change re-personalises the pathway and recommendations.
         _regenerate_pathway(request.user)
+        if any(getattr(profile, f) != before[f] for f in personalising):
+            compute_user_recommendations.delay(request.user.id)
         return Response(ProfilePersonalInfoSerializer(request.user.profile).data)
 
 

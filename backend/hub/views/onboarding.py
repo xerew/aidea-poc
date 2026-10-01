@@ -162,6 +162,7 @@ class OnboardingView(APIView):
         profile = request.user.profile
         profile.subject              = data['subject']
         profile.teaching_level       = data['teaching_level']
+        profile.school_role          = data.get('school_role', profile.school_role)
         profile.goals                = data['goals']
         profile.onboarding_completed = True
         profile.save()

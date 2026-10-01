@@ -31,6 +31,17 @@ const STEP_DEFS = [
     ],
   },
   {
+    // Matched against each course's target audience.
+    key: 'school_role',
+    i18nKey: 'schoolRole',
+    type: 'radio',
+    options: [
+      { value: 'teacher',       i18nKey: 'teacher' },
+      { value: 'school_leader', i18nKey: 'schoolLeader' },
+      { value: 'both',          i18nKey: 'both' },
+    ],
+  },
+  {
     key: 'goals',
     i18nKey: 'goals',
     type: 'multiselect',
@@ -69,11 +80,7 @@ export default function OnboardingPage() {
 
   // Quick profile setup only — the AI self-efficacy assessment is a separate,
   // skippable step the teacher can start (or resume) afterwards.
-  const STEPS = [
-    resolveStatic(STEP_DEFS[0]),  // subject
-    resolveStatic(STEP_DEFS[1]),  // teaching level
-    resolveStatic(STEP_DEFS[2]),  // goals
-  ]
+  const STEPS = STEP_DEFS.map(resolveStatic)  // subject, teaching level, school role, goals
 
   const current = STEPS[step]
   const isLast  = step === STEPS.length - 1
@@ -102,6 +109,7 @@ export default function OnboardingPage() {
       const { data } = await client.post('/onboarding/', {
         subject:        answers.subject,
         teaching_level: answers.teaching_level,
+        school_role:    answers.school_role,
         goals:          answers.goals || [],
       })
       // Sync the freshly-computed competency into the cached user so the

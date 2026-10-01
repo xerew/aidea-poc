@@ -17,6 +17,11 @@ class UserProfile(models.Model):
         VOCATIONAL = 'vocational', 'Vocational'
         ADULT_ED   = 'adult_ed',   'Adult Education'
 
+    class SchoolRole(models.TextChoices):
+        TEACHER       = 'teacher',       'Teacher'
+        SCHOOL_LEADER = 'school_leader', 'School leader'
+        BOTH          = 'both',          'Teacher and school leader'
+
     class LearningStyle(models.TextChoices):
         VIDEO       = 'video',       'Video'
         TEXT        = 'text',        'Text'
@@ -54,6 +59,8 @@ class UserProfile(models.Model):
         'hub.Subject', on_delete=models.SET_NULL, null=True, blank=True, related_name='teachers',
     )
     teaching_level       = models.CharField(max_length=20, choices=TeachingLevel.choices, blank=True)
+    # Matched against a course's target audience (teachers / school leaders).
+    school_role          = models.CharField(max_length=20, choices=SchoolRole.choices, blank=True)
     goals                = models.JSONField(default=list, blank=True)
     onboarding_completed = models.BooleanField(default=False)
     # AI self-efficacy assessment: saved incrementally so it can be paused and
