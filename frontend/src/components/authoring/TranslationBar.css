@@ -105,3 +105,21 @@
   cursor: pointer;
 }
 .translation-review-btn:disabled { opacity: 0.55; cursor: default; }
+
+/* Translation server (NTUA) unreachable */
+.translation-service-offline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 0.75rem;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.85rem;
+}
+.translation-service-offline > div { display: flex; flex-direction: column; gap: 0.1rem; flex: 1 1 16rem; }
+.translation-service-offline span { color: #a16207; font-size: 0.8rem; }
+.translation-service-offline .add-dashed-btn { margin-top: 0; }

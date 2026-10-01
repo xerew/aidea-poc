@@ -76,8 +76,9 @@ class TranslateEndpointTests(APITestCase):
             duration_hours=1, source_language='en', created_by=self.creator)
         self.url = f'/api/authoring/courses/{self.course.id}/translate/'
 
+    @patch('hub.translation_health.probe', return_value=(True, ''))
     @patch('hub.tasks.translate_course.delay')
-    def test_enqueues_and_sets_pending(self, mock_delay):
+    def test_enqueues_and_sets_pending(self, mock_delay, _probe):
         self.client.force_authenticate(self.creator)
         res = self.client.post(self.url, {'language': 'el'}, format='json')
         self.assertEqual(res.status_code, 202)

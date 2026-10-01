@@ -238,6 +238,16 @@ class AuthoringCourseTranslateView(APIView):
         valid = set(LANGUAGE_NAMES) - {course.source_language}
         if language not in valid:
             return Response({'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Check the NTUA translation server first, so an outage is reported
+        # now instead of as a 'failed' translation a few minutes later.
+        from hub.translation_health import check_now
+        service = check_now()
+        if not service['online']:
+            return Response(
+                {'detail': 'The translation server is offline. Please try again later.',
+                 'service': service},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
         course.translation_status[language] = 'pending'
         course.save(update_fields=['translation_status'])
         from hub.tasks import translate_course
@@ -280,3 +290,16 @@ class AuthoringTranslationReviewView(APIView):
 
         course.save(update_fields=['translation_status'])
         return Response({'translation_status': course.translation_status})
+
+
+class TranslationServiceStatusView(APIView):
+    """GET /authoring/translation-service/ — last known status of the translation
+    server (?refresh=1 checks it live now)."""
+    permission_classes = [IsContentCreator]
+
+    def get(self, request):
+        from hub.translation_health import check_now, get_status
+        current = get_status()
+        if current is None or request.query_params.get('refresh') == '1':
+            current = check_now()
+        return Response(current)

@@ -652,3 +652,10 @@ def translate_resource_meta(resource_id: int, target: str) -> None:
     except Resource.DoesNotExist:
         return
     _finish(resource.activity.module.course, target, lambda: _translate_resource(resource, target))
+
+
+@shared_task
+def check_translation_service() -> None:
+    """Every 15 minutes (Celery beat): is the NTUA translation server up?"""
+    from hub.translation_health import check_now
+    check_now()
