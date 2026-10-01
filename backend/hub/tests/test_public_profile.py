@@ -71,3 +71,11 @@ class PublicProfileTests(APITestCase):
         u = make_user('puba', UserProfile.UserType.ADMIN, profile_public=True)
         res = self.client.get(self._url(u))
         self.assertNotIn('authored_courses', res.data)
+
+    def test_website_shown_only_on_public_profile(self):
+        pub = make_user('webpub', UserProfile.UserType.TEACHER, profile_public=True,
+                        website='https://example.org')
+        priv = make_user('webpriv', UserProfile.UserType.TEACHER, profile_public=False,
+                         website='https://secret.example.org')
+        self.assertEqual(self.client.get(self._url(pub)).data['website'], 'https://example.org')
+        self.assertNotIn('website', self.client.get(self._url(priv)).data)

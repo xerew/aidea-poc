@@ -264,7 +264,10 @@
       "bio": "Tietoa sinusta",
       "bioPlaceholder": "Muutama sana itsestäsi — opetuksestasi, kiinnostuksen kohteistasi tai mitä toivot saavasi AIDEAsta.",
       "teachingLevel": "Opetusaste",
-      "selectTeachingLevel": "Valitse opetusaste"
+      "selectTeachingLevel": "Valitse opetusaste",
+      "website": "Henkilökohtainen verkkosivusto",
+      "websitePlaceholder": "esim. koulu.fi/~maria",
+      "websiteInvalid": "Anna kelvollinen verkko-osoite, esim. https://example.org"
     },
     "preferences": {
       "title": "Oppimismieltymykset",

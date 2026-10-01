@@ -264,7 +264,10 @@
       "bio": "Über dich",
       "bioPlaceholder": "Ein paar Worte über dich — deinen Unterricht, deine Interessen oder was du dir von AIDEA erhoffst.",
       "teachingLevel": "Unterrichtsstufe",
-      "selectTeachingLevel": "Stufe auswählen"
+      "selectTeachingLevel": "Stufe auswählen",
+      "website": "Persönliche Website",
+      "websitePlaceholder": "z. B. meineschule.de/~maria",
+      "websiteInvalid": "Geben Sie eine gültige Webadresse ein, z. B. https://example.org"
     },
     "preferences": {
       "title": "Lernpräferenzen",

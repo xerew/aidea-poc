@@ -264,7 +264,10 @@
       "bio": "Σχετικά με εσάς",
       "bioPlaceholder": "Λίγα λόγια για εσάς — τη διδασκαλία σας, τα ενδιαφέροντά σας ή τι ελπίζετε να αποκομίσετε από το AIDEA.",
       "teachingLevel": "Βαθμίδα διδασκαλίας",
-      "selectTeachingLevel": "Επιλέξτε βαθμίδα"
+      "selectTeachingLevel": "Επιλέξτε βαθμίδα",
+      "website": "Προσωπική ιστοσελίδα",
+      "websitePlaceholder": "π.χ. myschool.gr/~maria",
+      "websiteInvalid": "Εισαγάγετε μια έγκυρη διεύθυνση ιστοσελίδας, π.χ. https://example.org"
     },
     "preferences": {
       "title": "Προτιμήσεις Εκμάθησης",

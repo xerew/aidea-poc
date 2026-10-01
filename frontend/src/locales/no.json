@@ -264,7 +264,10 @@
       "bio": "Om deg",
       "bioPlaceholder": "Noen ord om deg — undervisningen din, interessene dine eller hva du håper å få ut av AIDEA.",
       "teachingLevel": "Undervisningsnivå",
-      "selectTeachingLevel": "Velg nivå"
+      "selectTeachingLevel": "Velg nivå",
+      "website": "Personlig nettside",
+      "websitePlaceholder": "f.eks. minskole.no/~maria",
+      "websiteInvalid": "Skriv inn en gyldig nettadresse, f.eks. https://example.org"
     },
     "preferences": {
       "title": "Læringspreferanser",

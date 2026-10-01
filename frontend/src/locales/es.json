@@ -264,7 +264,10 @@
       "bio": "Sobre ti",
       "bioPlaceholder": "Algo sobre ti — tu docencia, tus intereses o lo que esperas obtener de AIDEA.",
       "teachingLevel": "Nivel educativo",
-      "selectTeachingLevel": "Selecciona un nivel"
+      "selectTeachingLevel": "Selecciona un nivel",
+      "website": "Sitio web personal",
+      "websitePlaceholder": "p. ej. miescuela.es/~maria",
+      "websiteInvalid": "Introduce una dirección web válida, p. ej. https://example.org"
     },
     "preferences": {
       "title": "Preferencias de Aprendizaje",

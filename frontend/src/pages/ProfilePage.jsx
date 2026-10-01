@@ -32,17 +32,21 @@ function useSectionSave(endpoint, method = 'patch') {
   const [saved,  setSaved]  = useState(false)
   const [error,  setError]  = useState('')
 
-  const save = useCallback(async (data) => {
+  // fieldMessages: {field: message} shown when the API rejects that field.
+  // Resolves to the saved data (truthy) or false.
+  const save = useCallback(async (data, fieldMessages = {}) => {
     setSaving(true)
     setError('')
     setSaved(false)
     try {
-      await client[method](endpoint, data)
+      const res = await client[method](endpoint, data)
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
-      return true
+      return res.data ?? true
     } catch (err) {
-      setError(err?.response?.data?.error || t('common.saveFailed'))
+      const body = err?.response?.data ?? {}
+      const field = Object.keys(fieldMessages).find((f) => f in body)
+      setError(field ? fieldMessages[field] : (body.error || t('common.saveFailed')))
       return false
     } finally {
       setSaving(false)
@@ -80,6 +84,7 @@ function PersonalInfoSection() {
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
     subject: '', teaching_level: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
+    website: '',
   })
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -105,7 +110,12 @@ function PersonalInfoSection() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     // The API expects a subject id or null — never an empty string.
-    const ok = await save({ ...form, subject: form.subject === '' ? null : form.subject })
+    const ok = await save(
+      { ...form, subject: form.subject === '' ? null : form.subject },
+      { website: t('profile.personalInfo.websiteInvalid') },
+    )
+    // Show the address as stored (e.g. with https:// added).
+    if (ok?.website !== undefined) setForm(prev => ({ ...prev, website: ok.website }))
     // Keep the header avatar in sync when the gender-based avatar changes.
     if (ok && user) updateUser({ profile: { ...user.profile, gender: form.gender } })
   }
@@ -172,6 +182,18 @@ function PersonalInfoSection() {
           <div className="profile-field">
             <label>{t('profile.personalInfo.location')}</label>
             <input value={form.location} onChange={set('location')} placeholder={t('profile.personalInfo.locationPlaceholder')} />
+          </div>
+          <div className="profile-field">
+            <label htmlFor="profile-website">{t('profile.personalInfo.website')}</label>
+            <input
+              id="profile-website"
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              value={form.website ?? ''}
+              onChange={set('website')}
+              placeholder={t('profile.personalInfo.websitePlaceholder')}
+            />
           </div>
         </div>
         <div className="profile-field">

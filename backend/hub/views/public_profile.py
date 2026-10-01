@@ -50,6 +50,7 @@ class PublicProfileView(APIView):
             'subject_slug': profile.subject.slug if profile.subject else '',
             'teaching_level': profile.get_teaching_level_display() if profile.teaching_level else '',
             'school': profile.school,
+            'website': profile.website,
             'country': profile.country,
             'member_since': user.date_joined,
         })
