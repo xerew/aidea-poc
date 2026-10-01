@@ -11,8 +11,8 @@ from hub.models import Course, CourseCollaborator, Enrollment, ResourceProgress,
 from hub.views.permissions import IsContentCreator
 
 from .learning import CourseData, content_tree, learner_rows, learner_timeline
-from .reports import build_analytics_workbook, build_course_teacher_report
 from .serializers import CourseAnalyticsSerializer
+from .workbook import build_learning_workbook
 
 XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
@@ -80,39 +80,28 @@ class AnalyticsOverviewView(APIView):
         return Response({'summary': summary, 'courses': courses_data})
 
 
-class AnalyticsCourseTeachersView(APIView):
-    """GET — #27: per-teacher detail (progress, time spent, quiz answers) for
-    a course the requesting creator authored."""
-
-    permission_classes = [IsContentCreator]
-
-    def get(self, request, pk):
-        try:
-            course = scoped_courses(request.user).get(pk=pk)
-        except Course.DoesNotExist:
-            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
-        return Response(build_course_teacher_report(course))
+def _xlsx_response(workbook, name):
+    buffer = BytesIO()
+    workbook.save(buffer)
+    response = HttpResponse(buffer.getvalue(), content_type=XLSX_MIME)
+    response['Content-Disposition'] = f'attachment; filename="{name}"'
+    return response
 
 
 class AnalyticsExportView(APIView):
-    """GET — #26: xlsx workbook, one sheet per authored course, one row per
-    enrolled teacher."""
+    """GET — the learning analytics workbook for every course in scope (or ?ids=)."""
 
     permission_classes = [IsContentCreator]
 
     def get(self, request):
-        courses = scoped_courses(request.user).prefetch_related('modules__lessons').order_by('title')
+        courses = scoped_courses(request.user).order_by('title')
         # Optional subset selected in the export dialog: ?ids=1,2,3
         ids_param = request.query_params.get('ids')
         if ids_param:
             wanted = {int(x) for x in ids_param.split(',') if x.strip().isdigit()}
             courses = courses.filter(id__in=wanted)
-        buffer = BytesIO()
-        build_analytics_workbook(courses).save(buffer)
-        response = HttpResponse(buffer.getvalue(), content_type=XLSX_MIME)
         name = f'{slugify(request.user.username) or "analytics"}-analytics.xlsx'
-        response['Content-Disposition'] = f'attachment; filename="{name}"'
-        return response
+        return _xlsx_response(build_learning_workbook(courses), name)
 
 
 class _CourseAnalyticsView(APIView):
@@ -161,3 +150,14 @@ class CourseLearnerTimelineView(_CourseAnalyticsView):
         if timeline is None:
             return _not_found()
         return Response(timeline)
+
+
+class CourseExportView(_CourseAnalyticsView):
+    """GET — the learning analytics workbook for one course."""
+
+    def get(self, request, pk):
+        course = self.course_or_none(request, pk)
+        if course is None:
+            return _not_found()
+        name = f'{slugify(course.title) or "course"}-analytics.xlsx'
+        return _xlsx_response(build_learning_workbook([course]), name)
