@@ -14,6 +14,7 @@ from .models import (
     Enrollment,
     Feedback,
     LearnerActivityConfig,
+    LearningEvent,
     LearningPath,
     LearningPathCourse,
     LearningPillar,
@@ -22,6 +23,7 @@ from .models import (
     Module,
     PreferenceOption,
     PreferenceQuestion,
+    ResourceVisit,
     StudyAssessmentOption,
     StudyAssessmentQuestion,
     StudyConfig,
@@ -440,6 +442,13 @@ class LearnerActivityConfigAdmin(admin.ModelAdmin):
         }),
         ('Decay', {'fields': ['decay_enabled', 'slow_ratio_threshold', 'slow_penalty',
                               'idle_decay_days', 'idle_decay_points']}),
+        ('Learning analytics', {
+            'fields': ['tracking_enabled'],
+            'description': (
+                'When off, activity pages stop sending time and interaction data. '
+                'Data already collected is kept.'
+            ),
+        }),
     ]
 
     def has_add_permission(self, request):
@@ -447,6 +456,30 @@ class LearnerActivityConfigAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+class _ReadOnlyAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(ResourceVisit)
+class ResourceVisitAdmin(_ReadOnlyAdmin):
+    list_display = ['user', 'course', 'resource', 'started_at', 'active_seconds', 'visible_seconds', 'device']
+    list_filter = ['device', 'completed_during']
+    search_fields = ['user__username', 'course__title']
+    raw_id_fields = ['user', 'resource', 'activity', 'module', 'course']
+
+
+@admin.register(LearningEvent)
+class LearningEventAdmin(_ReadOnlyAdmin):
+    list_display = ['user', 'course', 'resource', 'event_type', 'occurred_at']
+    list_filter = ['event_type']
+    search_fields = ['user__username', 'course__title']
+    raw_id_fields = ['user', 'resource', 'visit', 'course']
 
 
 # ── Recommendations ───────────────────────────────────────────────────────────

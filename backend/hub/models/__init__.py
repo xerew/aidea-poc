@@ -26,6 +26,7 @@ from .study import (
     StudyPreregistration,
 )
 from .subject import Subject
+from .tracking import LearningEvent, ResourceVisit
 from .user import UserProfile
 
 __all__ = [
@@ -46,9 +47,11 @@ __all__ = [
     'MaintenanceNotice',
     'LearningPathCourse',
     'LearningPillar',
+    'LearningEvent',
     'Activity',
     'LessonProgress',
     'ResourceProgress',
+    'ResourceVisit',
     'LessonSession',
     'Module',
     'Resource',

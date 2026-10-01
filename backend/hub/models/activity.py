@@ -31,6 +31,10 @@ class LearnerActivityConfig(models.Model):
     idle_decay_days      = models.PositiveSmallIntegerField(default=30)
     idle_decay_points    = models.PositiveSmallIntegerField(default=1)
 
+    # Learning analytics: when off, the activity page stops sending time and
+    # interaction data (see hub/tracking.py). Existing data is kept.
+    tracking_enabled = models.BooleanField(default=True)
+
     def save(self, *args, **kwargs):
         self.pk = 1
         super().save(*args, **kwargs)
