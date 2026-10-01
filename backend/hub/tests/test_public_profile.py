@@ -67,10 +67,11 @@ class PublicProfileTests(APITestCase):
         titles = [c['title'] for c in res.data['authored_courses']]
         self.assertEqual(titles, ['Live'])
 
-    def test_admin_has_no_authored_courses_block(self):
+    def test_admin_lists_authored_courses_like_a_partner(self):
         u = make_user('puba', UserProfile.UserType.ADMIN, profile_public=True)
+        Course.objects.create(title='Admin course', pillar=self.pillar, is_published=True, created_by=u)
         res = self.client.get(self._url(u))
-        self.assertNotIn('authored_courses', res.data)
+        self.assertEqual([c['title'] for c in res.data['authored_courses']], ['Admin course'])
 
     def test_website_shown_only_on_public_profile(self):
         pub = make_user('webpub', UserProfile.UserType.TEACHER, profile_public=True,

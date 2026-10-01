@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 from hub.models import Course, Enrollment
 from hub.views.onboarding import get_competency_level
 
-CREATOR_ROLES = ('content_creator', 'aidea_partner')
+# Roles whose public profile lists the courses they authored.
+CREATOR_ROLES = ('content_creator', 'aidea_partner', 'admin')
 
 
 class PublicProfileView(APIView):

@@ -44,7 +44,8 @@ function MyFeedbackList() {
 export default function FeedbackWidget() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const isPartner = user?.profile?.user_type === 'aidea_partner'
+  // Partners and admins (admins count as partners) see their own feedback history.
+  const isPartner = ['aidea_partner', 'admin'].includes(user?.profile?.user_type)
 
   const [category, setCategory] = useState('bug')
   const [message, setMessage] = useState('')
