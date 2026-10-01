@@ -148,3 +148,27 @@ class FeedbackStreamFollowsRoleTests(APITestCase):
         stale.refresh_from_db()
         self.assertEqual(stuck.stream, 'partner')
         self.assertEqual(stale.stream, 'user')
+
+
+class AdminFeedbackIsPartnerFeedbackTests(APITestCase):
+    def test_admin_feedback_goes_to_partner_stream(self):
+        admin = make_user('fb_admin2', UserProfile.UserType.ADMIN)
+        self.client.force_authenticate(admin)
+        res = self.client.post('/api/feedback/', {'category': 'bug', 'message': 'Admin note'}, format='json')
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertEqual(Feedback.objects.get(user=admin).stream, 'partner')
+
+    def test_existing_admin_feedback_moves_to_partner_stream(self):
+        import importlib
+
+        from django.apps import apps
+        migration = importlib.import_module('hub.migrations.0055_admin_feedback_to_partner_stream')
+        admin = make_user('fb_admin3', UserProfile.UserType.ADMIN)
+        teacher = make_user('fb_teacher3', UserProfile.UserType.TEACHER)
+        old = Feedback.objects.create(user=admin, category='bug', message='old', stream='user')
+        mine = Feedback.objects.create(user=teacher, category='bug', message='t', stream='user')
+        migration.sync_streams(apps, None)
+        old.refresh_from_db()
+        mine.refresh_from_db()
+        self.assertEqual(old.stream, 'partner')
+        self.assertEqual(mine.stream, 'user')
