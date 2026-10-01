@@ -73,6 +73,11 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/home/` — dashboard: in-progress enrollment + pillar summaries
 - `GET /api/my-learning/` — user's enrollments split into `continue_learning`, `in_progress`, `completed`
 - `GET /api/analytics/overview/` — content creator analytics: summary stats + per-course breakdown (content_creator only)
+- `POST /api/tracking/` — activity page time/interaction data (running totals per visit; 204 = tracking switched off)
+- `GET /api/analytics/courses/<id>/content/` — content tree: reached / done / typical active time / dropped-here per module, activity, resource
+- `GET /api/analytics/courses/<id>/learners/` — learners with time, position and status (completed / on track / stuck / inactive)
+- `GET /api/analytics/courses/<id>/learners/<user_id>/` — one learner's timeline
+- `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — 9-sheet learning analytics workbook
 
 **Auth:** JWT via `djangorestframework-simplejwt`. 60-min access tokens, 7-day refresh with rotation. Token blacklisting enabled for logout.
 

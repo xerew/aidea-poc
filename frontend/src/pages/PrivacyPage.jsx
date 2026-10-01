@@ -22,7 +22,7 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Account information:</strong> your name, username, and email address.</li>
         <li><strong>Profile information:</strong> optional details such as gender, country, school, subject, language and biography.</li>
-        <li><strong>Learning activity:</strong> enrolments, progress, quiz results, assignment submissions and engagement data.</li>
+        <li><strong>Learning activity:</strong> enrolments, progress, quiz results, assignment submissions, engagement data and how you use each course resource (see section 11).</li>
         <li><strong>Technical data:</strong> information needed to keep you signed in and to operate the service securely.</li>
       </ul>
 
@@ -91,7 +91,26 @@ export default function PrivacyPage() {
         improving an educational platform.
       </p>
 
-      <h2>11. Changes and complaints</h2>
+      <h2>11. Learning activity records</h2>
+      <p>
+        When you study an activity, the platform records how you use each of its resources, so that
+        we can improve courses, support learners who get stuck, and carry out the AIDEA research. We record:
+      </p>
+      <ul>
+        <li>the time spent on each resource — both the time you were actively using the page and the time it was on screen;</li>
+        <li>video playback (play, pause, skipping and how much was watched), your quiz answers and the time taken per question, and when a PDF or image is opened or downloaded;</li>
+        <li>the interface language, the type of device (desktop, tablet or mobile) and your local time of day.</li>
+      </ul>
+      <p>
+        We do not record your IP address, your precise location or what you type for this purpose. These
+        records are visible, with your name, to the authors and co-editors of the course, to AIDEA
+        partners and to administrators, and may be exported by them for analysis. They are kept like the
+        rest of your account data and deleted with your account. The legal basis is our legitimate
+        interest in running and improving an educational platform; for study participants, the study
+        consent also applies.
+      </p>
+
+      <h2>12. Changes and complaints</h2>
       <p>
         We may update this Policy; material changes will be notified through the platform. If you
         believe your data has been handled improperly, you may lodge a complaint with your national
