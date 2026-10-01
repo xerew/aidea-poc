@@ -395,7 +395,9 @@
     "courseModules": "Course Modules",
     "enrollError": "Enrollment failed.",
     "unavailable": "This course is currently unavailable — its author has unpublished it.",
-    "by": "By"
+    "by": "By",
+    "alsoRelevantTo": "Also relevant to this Academy Pillar",
+    "coversOutcomes": "Learning outcomes:"
   },
   "myLearning": {
     "subtitle": "Track your progress and continue your courses",
@@ -546,7 +548,21 @@
       "confirmDelete": "Delete this course permanently? All modules, lessons and enrollments will be lost. This cannot be undone.",
       "subjectsLabel": "Subjects",
       "subjectsHint": "Which teachers is this course for? Select all that apply.",
-      "translatorBanner": "You can edit translations only; the original content is read-only."
+      "translatorBanner": "You can edit translations only; the original content is read-only.",
+      "relatedOutcomes": "Related LO(s):",
+      "relatedOutcomesNone": "Add learning outcomes above to link them to modules.",
+      "outcomeNumber": "Outcome {{n}}",
+      "addExistingModule": "Add existing module",
+      "moduleLibraryTitle": "Reuse an existing module",
+      "moduleLibraryHint": "A copy of the module, with all its activities and resources, is added at the end of this course. Editing the copy does not change the original.",
+      "moduleLibrarySearch": "Search modules or courses…",
+      "moduleLibraryEmpty": "No modules available to reuse.",
+      "moduleLibraryDraft": "Draft",
+      "moduleLibraryActivities": "Activities: {{count}}",
+      "moduleLibraryLoadFailed": "Could not load modules.",
+      "importModule": "Add a copy",
+      "importing": "Adding…",
+      "importFailed": "Could not copy the module."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quiz Builder",
@@ -656,6 +672,31 @@
         "co_editor": "Co-editor",
         "translator": "Translator"
       }
+    },
+    "proposal": {
+      "title": "Course profile",
+      "additionalPillars": "Additional Academy Pillars",
+      "additionalPillarsHint": "Optional. Tick any other pillar this course also contributes to; the pillar chosen above stays the main one.",
+      "crossAxis": "Cross-Axis Relevance",
+      "crossAxisHint": "If relevant, indicate whether the course also contributes significantly to another Academy Axis and briefly explain how.",
+      "targetAudience": "Target Audience",
+      "selectAll": "Select all that apply.",
+      "audience": {
+        "teachers": "Teachers",
+        "school_leaders": "School Leaders"
+      },
+      "other": "Other:",
+      "otherPlaceholder": "Please specify",
+      "educationalLevel": "Educational Level / Context",
+      "educationalLevelHint": "If applicable. Select all that apply.",
+      "level": {
+        "primary": "Primary",
+        "lower_secondary": "Lower Secondary",
+        "upper_secondary": "Upper Secondary",
+        "cross_level": "Cross-level"
+      },
+      "priorKnowledge": "Recommended Prior Knowledge / Experience",
+      "priorKnowledgePlaceholder": "Specify useful prior knowledge or experience. If none, state None."
     }
   },
   "reviews": {

@@ -10,8 +10,11 @@ from hub.models import Course, LearningPillar, Lesson, Subject
 from hub.translation import LANGUAGE_NAMES
 
 COURSE_HEADERS = ['title', 'description', 'pillar_slug', 'level',
-                  'duration_hours', 'content_format', 'learning_outcomes', 'subjects']
-MODULE_HEADERS = ['order', 'title', 'description', 'duration_minutes']
+                  'duration_hours', 'content_format', 'learning_outcomes', 'subjects',
+                  'additional_pillars', 'cross_axis_relevance', 'target_audience',
+                  'target_audience_other', 'educational_levels', 'educational_level_other',
+                  'prior_knowledge']
+MODULE_HEADERS = ['order', 'title', 'description', 'duration_minutes', 'related_outcomes']
 LESSON_HEADERS = ['module_order', 'order', 'title', 'description',
                   'lesson_type', 'content', 'duration_minutes', 'required']
 QUIZ_HEADERS   = ['module_order', 'lesson_order', 'question_order', 'question',
@@ -20,7 +23,11 @@ QUIZ_HEADERS   = ['module_order', 'lesson_order', 'question_order', 'question',
 MEDIA_HEADERS  = ['module_order', 'lesson_order', 'order', 'type', 'url', 'caption']
 TRANSLATION_HEADERS = ['type', 'module_order', 'lesson_order', 'language', 'field', 'value']
 MEDIA_TYPES    = {'image', 'video', 'pdf'}
-TRANSLATION_FIELDS = {'title', 'description', 'content', 'learning_outcomes', 'quiz_data', 'status'}
+TRANSLATION_FIELDS = {'title', 'description', 'content', 'learning_outcomes', 'quiz_data', 'status',
+                      'cross_axis_relevance', 'prior_knowledge', 'target_audience_other',
+                      'educational_level_other'}
+COURSE_TRANSLATION_FIELDS = ('title', 'description', 'learning_outcomes', 'cross_axis_relevance',
+                             'prior_knowledge', 'target_audience_other', 'educational_level_other')
 OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 DROPDOWN_ROWS  = 500
 
@@ -58,8 +65,14 @@ README_LINES = [
     '            offer dropdowns. learning_outcomes: one outcome per line in the cell',
     '            (Alt+Enter inside Excel). subjects: comma-separated subject slugs',
     '            (e.g. physics,astronomy) from the hidden Choices sheet; leave blank',
-    '            for none.',
+    '            for none. additional_pillars: comma-separated pillar slugs.',
+    '            target_audience: teachers and/or school_leaders, comma separated.',
+    '            educational_levels: any of primary, lower_secondary,',
+    '            upper_secondary, cross_level, comma separated. The *_other columns,',
+    '            cross_axis_relevance and prior_knowledge are free text.',
     '  Modules - one row per module. "order" must be a unique positive number.',
+    '            related_outcomes: numbers of the learning outcomes the module',
+    '            addresses, comma separated (1 = first outcome), e.g. 1,3.',
     '  Lessons - one row per lesson. module_order refers to the Modules sheet.',
     '            lesson_type and required offer dropdowns.',
     '  Quiz    - one row per question, only for lessons whose type is quiz.',
@@ -131,6 +144,13 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
             course.content_format,
             '\n'.join(course.learning_outcomes or []),
             ','.join(course.subjects.values_list('slug', flat=True)),
+            ','.join(course.additional_pillars.order_by('order').values_list('slug', flat=True)),
+            course.cross_axis_relevance,
+            ','.join(course.target_audience or []),
+            course.target_audience_other,
+            ','.join(course.educational_levels or []),
+            course.educational_level_other,
+            course.prior_knowledge,
         ])
         course_ws['G2'].alignment = course_ws['G2'].alignment.copy(wrap_text=True)
     _list_validation(wb, course_ws, 'D', max(len(pillar_slugs), 1), 'C', 2)
@@ -143,7 +163,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
         for lang, st in (course.translation_status or {}).items():
             translation_rows.append(['course', '', '', lang, 'status', st])
         for lang, blob in (course.translations or {}).items():
-            for field in ('title', 'description', 'learning_outcomes'):
+            for field in COURSE_TRANSLATION_FIELDS:
                 if field in blob:
                     translation_rows.append(['course', '', '', lang, field, _ser_translation(field, blob[field])])
 
@@ -152,7 +172,10 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     _write_headers(modules_ws, MODULE_HEADERS)
     modules = list(course.modules.order_by('order').prefetch_related('lessons')) if course else []
     for module in modules:
-        modules_ws.append([module.order, module.title, module.description, module.duration_minutes])
+        modules_ws.append([
+            module.order, module.title, module.description, module.duration_minutes,
+            ','.join(str(i + 1) for i in (module.related_outcomes or [])),
+        ])
         for lang, blob in (module.translations or {}).items():
             for field in ('title', 'description'):
                 if field in blob:
@@ -267,6 +290,12 @@ def _as_int(value, default=0):
     return number, True
 
 
+def _tokens(raw):
+    """Comma/semicolon/newline-separated cell -> lower-cased tokens."""
+    text = str(raw or '').replace(';', ',').replace('\n', ',')
+    return [t.strip().lower() for t in text.split(',') if t.strip()]
+
+
 def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
     from openpyxl import load_workbook
 
@@ -294,7 +323,8 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         return None, ['Course!A2: course row is missing.']
     row_num, values = course_rows[0]
     values = list(values) + [None] * (len(COURSE_HEADERS) - len(values))
-    title, description, pillar_slug, level, duration_hours, content_format, outcomes, subjects = values[:8]
+    (title, description, pillar_slug, level, duration_hours, content_format, outcomes, subjects,
+     extra_pillars, cross_axis, audience, audience_other, edu_levels, edu_other, prior) = values[:15]
 
     subject_objs = []
     for token in str(subjects or '').replace(';', ',').replace('\n', ',').split(','):
@@ -305,6 +335,20 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             errors.append(f'{_cell("Course", 8, row_num)}: unknown subject slug {slug!r}.')
         else:
             subject_objs.append(subject_by_slug[slug])
+
+    extra_pillar_objs = []
+    for slug in _tokens(extra_pillars):
+        if slug not in pillar_by_slug:
+            errors.append(f'{_cell("Course", 9, row_num)}: unknown pillar slug {slug!r}.')
+        elif slug != pillar_slug:  # the primary pillar is never also an additional one
+            extra_pillar_objs.append(pillar_by_slug[slug])
+
+    def _choice_list(raw, allowed, col, name):
+        picked = _tokens(raw)
+        bad = [v for v in picked if v not in allowed]
+        if bad:
+            errors.append(f'{_cell("Course", col, row_num)}: {name} must be from {allowed}, got {bad}.')
+        return [v for v in allowed if v in picked]
 
     if not (title or '').strip():
         errors.append(f'{_cell("Course", 1, row_num)}: title is required.')
@@ -331,6 +375,13 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
             line.strip() for line in str(outcomes or '').splitlines() if line.strip()
         ],
         'subjects': subject_objs,
+        'additional_pillars': extra_pillar_objs,
+        'cross_axis_relevance': str(cross_axis or ''),
+        'target_audience': _choice_list(audience, Course.AUDIENCE_CHOICES, 11, 'target_audience'),
+        'target_audience_other': str(audience_other or '')[:200],
+        'educational_levels': _choice_list(edu_levels, Course.EDUCATIONAL_LEVEL_CHOICES, 13, 'educational_levels'),
+        'educational_level_other': str(edu_other or '')[:200],
+        'prior_knowledge': str(prior or ''),
         'translations': {},
         'translation_status': {},
     }
@@ -339,7 +390,7 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
     modules: dict[int, dict] = {}
     for row_num, values in _rows(wb['Modules']):
         values = list(values) + [None] * (len(MODULE_HEADERS) - len(values))
-        order, m_title, m_desc, m_minutes = values[:4]
+        order, m_title, m_desc, m_minutes, m_outcomes = values[:5]
         order, ok = _as_int(order, default=-1)
         if not ok or order < 1:
             errors.append(f'{_cell("Modules", 1, row_num)}: order must be a positive number.')
@@ -353,9 +404,20 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         m_minutes, ok = _as_int(m_minutes)
         if not ok:
             errors.append(f'{_cell("Modules", 4, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
+        related = set()
+        for token in _tokens(m_outcomes):
+            number, ok = _as_int(token, default=-1)
+            if not ok or not 1 <= number <= len(course_payload['learning_outcomes']):
+                errors.append(
+                    f'{_cell("Modules", 5, row_num)}: related_outcomes must be outcome numbers '
+                    f'between 1 and {len(course_payload["learning_outcomes"])}, got {token!r}.'
+                )
+                continue
+            related.add(number - 1)
         modules[order] = {
             'order': order, 'title': m_title.strip(), 'description': m_desc or '',
-            'duration_minutes': m_minutes, 'lessons': {}, 'translations': {},
+            'duration_minutes': m_minutes, 'related_outcomes': sorted(related),
+            'lessons': {}, 'translations': {},
         }
     if not modules:
         errors.append('Modules!A2: at least one module is required.')

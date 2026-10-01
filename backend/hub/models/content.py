@@ -49,6 +49,23 @@ class Course(models.Model):
     # translation_status: {lang_code: "pending"|"in_progress"|"done"|"failed"}
     translation_status  = models.JSONField(default=dict, blank=True)
 
+    # Course-proposal fields. `pillar` stays the primary Academy Pillar (ordering,
+    # colour, home-page grouping); `additional_pillars` are the other axes the
+    # course also serves, explained in `cross_axis_relevance`.
+    additional_pillars   = models.ManyToManyField(
+        LearningPillar, blank=True, related_name='secondary_courses',
+    )
+    cross_axis_relevance = models.TextField(blank=True)
+    # Lists of AUDIENCE_CHOICES / EDUCATIONAL_LEVEL_CHOICES values, plus free text.
+    target_audience          = models.JSONField(default=list, blank=True)
+    target_audience_other    = models.CharField(max_length=200, blank=True)
+    educational_levels       = models.JSONField(default=list, blank=True)
+    educational_level_other  = models.CharField(max_length=200, blank=True)
+    prior_knowledge          = models.TextField(blank=True)
+
+    AUDIENCE_CHOICES = ['teachers', 'school_leaders']
+    EDUCATIONAL_LEVEL_CHOICES = ['primary', 'lower_secondary', 'upper_secondary', 'cross_level']
+
     class Meta:
         ordering = ['pillar', 'title']
 
@@ -90,6 +107,8 @@ class Module(models.Model):
     llm_review_enabled = models.BooleanField(default=False)
     # translations: {lang_code: {"title": str, "description": str}}
     translations     = models.JSONField(default=dict, blank=True)
+    # Indices into course.learning_outcomes this module addresses.
+    related_outcomes = models.JSONField(default=list, blank=True)
 
     class Meta:
         ordering = ['order']

@@ -395,7 +395,9 @@
     "courseModules": "Kursmoduler",
     "enrollError": "Påmelding mislyktes.",
     "unavailable": "Dette kurset er for øyeblikket utilgjengelig — forfatteren har avpublisert det.",
-    "by": "Av"
+    "by": "Av",
+    "alsoRelevantTo": "Gjelder også denne pilaren i akademiet",
+    "coversOutcomes": "Læringsmål:"
   },
   "myLearning": {
     "subtitle": "Følg fremgangen din og fortsett kursene dine",
@@ -546,7 +548,21 @@
       "confirmDelete": "Slette dette kurset permanent? Alle moduler, leksjoner og påmeldinger går tapt. Dette kan ikke angres.",
       "subjectsLabel": "Fag",
       "subjectsHint": "Hvilke lærere er dette kurset for? Velg alle som passer.",
-      "translatorBanner": "Du kan bare redigere oversettelser; originalinnholdet er skrivebeskyttet."
+      "translatorBanner": "Du kan bare redigere oversettelser; originalinnholdet er skrivebeskyttet.",
+      "relatedOutcomes": "Tilknyttede læringsmål:",
+      "relatedOutcomesNone": "Legg til læringsmål ovenfor for å knytte dem til moduler.",
+      "outcomeNumber": "Mål {{n}}",
+      "addExistingModule": "Legg til eksisterende modul",
+      "moduleLibraryTitle": "Gjenbruk en eksisterende modul",
+      "moduleLibraryHint": "En kopi av modulen, med alle aktiviteter og ressurser, legges til sist i dette kurset. Endringer i kopien påvirker ikke originalen.",
+      "moduleLibrarySearch": "Søk etter moduler eller kurs…",
+      "moduleLibraryEmpty": "Ingen moduler tilgjengelige for gjenbruk.",
+      "moduleLibraryDraft": "Utkast",
+      "moduleLibraryActivities": "Aktiviteter: {{count}}",
+      "moduleLibraryLoadFailed": "Kunne ikke laste modulene.",
+      "importModule": "Legg til kopi",
+      "importing": "Legger til…",
+      "importFailed": "Kunne ikke kopiere modulen."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Quizbygger",
@@ -656,6 +672,31 @@
         "co_editor": "Medredaktør",
         "translator": "Oversetter"
       }
+    },
+    "proposal": {
+      "title": "Kursprofil",
+      "additionalPillars": "Flere pilarer i akademiet",
+      "additionalPillarsHint": "Valgfritt. Kryss av for andre pilarer kurset også bidrar til; pilaren valgt ovenfor forblir hovedpilaren.",
+      "crossAxis": "Relevans for andre akser",
+      "crossAxisHint": "Oppgi om relevant om kurset også bidrar vesentlig til en annen akse i akademiet, og forklar kort hvordan.",
+      "targetAudience": "Målgruppe",
+      "selectAll": "Kryss av for alle som gjelder.",
+      "audience": {
+        "teachers": "Lærere",
+        "school_leaders": "Skoleledere"
+      },
+      "other": "Annet:",
+      "otherPlaceholder": "Spesifiser",
+      "educationalLevel": "Utdanningsnivå / kontekst",
+      "educationalLevelHint": "Hvis relevant. Kryss av for alle som gjelder.",
+      "level": {
+        "primary": "Barneskole",
+        "lower_secondary": "Ungdomsskole",
+        "upper_secondary": "Videregående skole",
+        "cross_level": "På tvers av nivåer"
+      },
+      "priorKnowledge": "Anbefalte forkunnskaper / erfaring",
+      "priorKnowledgePlaceholder": "Oppgi nyttige forkunnskaper eller erfaring. Hvis ingen, skriv «Ingen»."
     }
   },
   "reviews": {

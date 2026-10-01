@@ -7,7 +7,11 @@ import { LANGUAGES } from '../i18n'
 import TranslationBar from '../components/authoring/TranslationBar'
 import SubjectPicker from '../components/authoring/SubjectPicker'
 import CollaboratorsPanel from '../components/authoring/CollaboratorsPanel'
+import CourseProposalFields from '../components/authoring/CourseProposalFields'
 import './CourseEditorPage.css'
+
+// Course-profile texts that are translated alongside title/description.
+const PROPOSAL_TEXT_FIELDS = ['cross_axis_relevance', 'prior_knowledge', 'target_audience_other', 'educational_level_other']
 
 const PILLAR_COLOR = {
   'teach-with-ai':  'blue',
@@ -62,6 +66,13 @@ export default function CourseEditorPage() {
           learning_outcomes: c.learning_outcomes ?? [],
           source_language: c.source_language ?? 'en',
           subject_ids: (c.subjects ?? []).map((s) => s.id),
+          additional_pillar_ids: (c.additional_pillars ?? []).map((p) => p.id),
+          cross_axis_relevance: c.cross_axis_relevance ?? '',
+          target_audience: c.target_audience ?? [],
+          target_audience_other: c.target_audience_other ?? '',
+          educational_levels: c.educational_levels ?? [],
+          educational_level_other: c.educational_level_other ?? '',
+          prior_knowledge: c.prior_knowledge ?? '',
         })
         setTranslationsData(c.translations ?? {})
         setTranslationStatus(c.translation_status ?? {})
@@ -94,7 +105,12 @@ export default function CourseEditorPage() {
 
   const saveModuleRequest = async (mod) => {
     if (activeLang === 'original') {
-      const payload = { title: mod.title, description: mod.description, duration_minutes: mod.duration_minutes }
+      const payload = {
+        title: mod.title,
+        description: mod.description,
+        duration_minutes: mod.duration_minutes,
+        related_outcomes: mod.related_outcomes ?? [],
+      }
       if (mod.isNew) {
         const res = await client.post(`/authoring/courses/${id}/modules/`, payload)
         return { tempId: mod.id, saved: res.data }
@@ -123,6 +139,7 @@ export default function CourseEditorPage() {
           title: courseFieldValue('title'),
           description: courseFieldValue('description'),
           learning_outcomes: outcomesForEdit,
+          ...Object.fromEntries(PROPOSAL_TEXT_FIELDS.map((f) => [f, courseFieldValue(f)])),
         }
         const res = await client.patch(`/authoring/courses/${id}/?lang=${activeLang}`, payload)
         setTranslationsData(res.data.translations ?? {})
@@ -231,8 +248,17 @@ export default function CourseEditorPage() {
     }
   }
 
-  const removeOutcome = (i) =>
+  const removeOutcome = (i) => {
     setForm((f) => ({ ...f, learning_outcomes: f.learning_outcomes.filter((_, idx) => idx !== i) }))
+    // Module links are outcome indices: drop links to the removed outcome and
+    // shift the ones after it, so every module still points at the same text.
+    setModules((ms) => ms.map((m) => {
+      const current = m.related_outcomes ?? []
+      if (!current.some((n) => n >= i)) return m
+      const next = current.filter((n) => n !== i).map((n) => (n > i ? n - 1 : n))
+      return { ...m, related_outcomes: next, isDirty: true }
+    }))
+  }
 
   const addOutcome = () =>
     setForm((f) => ({ ...f, learning_outcomes: [...f.learning_outcomes, ''] }))
@@ -264,7 +290,7 @@ export default function CourseEditorPage() {
     const tempId = `new-${Date.now()}`
     setModules((ms) => [
       ...ms,
-      { id: tempId, title: '', description: '', duration_minutes: 0, order: ms.length + 1, isDirty: true, isNew: true, saving: false },
+      { id: tempId, title: '', description: '', duration_minutes: 0, related_outcomes: [], order: ms.length + 1, isDirty: true, isNew: true, saving: false },
     ])
   }
 
@@ -401,7 +427,15 @@ export default function CourseEditorPage() {
             className={`pillar-select pillar-badge pillar-badge--${pillarColor}`}
             value={form.pillar_id}
             disabled={locked || translating}
-            onChange={(e) => setForm((f) => ({ ...f, pillar_id: Number(e.target.value) }))}
+            onChange={(e) => {
+              const pillarId = Number(e.target.value)
+              // The primary pillar is never also an additional one.
+              setForm((f) => ({
+                ...f,
+                pillar_id: pillarId,
+                additional_pillar_ids: f.additional_pillar_ids.filter((pid) => pid !== pillarId),
+              }))
+            }}
           >
             {pillars.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -524,6 +558,17 @@ export default function CourseEditorPage() {
         )}
       </div>
 
+      {/* Pillars, audience, level, prior knowledge */}
+      <CourseProposalFields
+        pillars={pillars}
+        form={form}
+        textValue={courseFieldValue}
+        onField={(field, value) => setForm((f) => ({ ...f, [field]: value }))}
+        onText={setCourseField}
+        locked={locked}
+        translating={translating}
+      />
+
       {/* Subjects (source language only — subjects aren't translated) */}
       {!translating && (
         <div className="outcomes-card">
@@ -586,6 +631,37 @@ export default function CourseEditorPage() {
                     onChange={(e) => updateModuleField(mod.id, 'duration_minutes', Number(e.target.value))}
                   />
                   <span>{t('authoring.editor.min')}</span>
+                </div>
+                <div className="module-outcomes">
+                  <span className="module-outcomes-label">{t('authoring.editor.relatedOutcomes')}</span>
+                  {form.learning_outcomes.length === 0 ? (
+                    <span className="module-outcomes-empty">{t('authoring.editor.relatedOutcomesNone')}</span>
+                  ) : outcomesForEdit.map((outcome, i) => {
+                    const linked = (mod.related_outcomes ?? []).includes(i)
+                    const label = form.learning_outcomes[i] || t('authoring.editor.outcomeNumber', { n: i + 1 })
+                    return (
+                      <label
+                        key={i}
+                        className={`module-outcome-chip${linked ? ' module-outcome-chip--on' : ''}`}
+                        title={outcome || label}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={linked}
+                          disabled={locked || translating}
+                          onChange={() => updateModuleField(
+                            mod.id,
+                            'related_outcomes',
+                            linked
+                              ? mod.related_outcomes.filter((n) => n !== i)
+                              : [...(mod.related_outcomes ?? []), i].sort((a, b) => a - b),
+                          )}
+                        />
+                        <span className="module-outcome-num">{i + 1}</span>
+                        <span className="module-outcome-text">{outcome || label}</span>
+                      </label>
+                    )
+                  })}
                 </div>
               </div>
               <div className="module-editor-actions">

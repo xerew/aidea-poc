@@ -395,7 +395,9 @@
     "courseModules": "Módulos del Curso",
     "enrollError": "No se pudo completar la inscripción.",
     "unavailable": "Este curso no está disponible actualmente — su autor lo ha retirado.",
-    "by": "Por"
+    "by": "Por",
+    "alsoRelevantTo": "También relacionado con este pilar de la Academia",
+    "coversOutcomes": "Resultados de aprendizaje:"
   },
   "myLearning": {
     "subtitle": "Sigue tu progreso y continúa tus cursos",
@@ -546,7 +548,21 @@
       "confirmDelete": "¿Eliminar este curso de forma permanente? Se perderán todos los módulos, lecciones e inscripciones. No se puede deshacer.",
       "subjectsLabel": "Asignaturas",
       "subjectsHint": "¿Para qué docentes es este curso? Selecciona todas las que correspondan.",
-      "translatorBanner": "Solo puede editar traducciones; el contenido original es de solo lectura."
+      "translatorBanner": "Solo puede editar traducciones; el contenido original es de solo lectura.",
+      "relatedOutcomes": "RA relacionados:",
+      "relatedOutcomesNone": "Añade resultados de aprendizaje arriba para vincularlos a los módulos.",
+      "outcomeNumber": "Resultado {{n}}",
+      "addExistingModule": "Añadir módulo existente",
+      "moduleLibraryTitle": "Reutilizar un módulo existente",
+      "moduleLibraryHint": "Se añade al final de este curso una copia del módulo con todas sus actividades y recursos. Editar la copia no cambia el original.",
+      "moduleLibrarySearch": "Buscar módulos o cursos…",
+      "moduleLibraryEmpty": "No hay módulos disponibles para reutilizar.",
+      "moduleLibraryDraft": "Borrador",
+      "moduleLibraryActivities": "Actividades: {{count}}",
+      "moduleLibraryLoadFailed": "No se pudieron cargar los módulos.",
+      "importModule": "Añadir copia",
+      "importing": "Añadiendo…",
+      "importFailed": "No se pudo copiar el módulo."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Creador de Cuestionarios",
@@ -656,6 +672,31 @@
         "co_editor": "Coeditor",
         "translator": "Traductor"
       }
+    },
+    "proposal": {
+      "title": "Perfil del curso",
+      "additionalPillars": "Pilares adicionales de la Academia",
+      "additionalPillarsHint": "Opcional. Marca cualquier otro pilar al que también contribuya el curso; el pilar elegido arriba sigue siendo el principal.",
+      "crossAxis": "Relevancia transversal",
+      "crossAxisHint": "Si procede, indica si el curso también contribuye de forma significativa a otro eje de la Academia y explica brevemente cómo.",
+      "targetAudience": "Público destinatario",
+      "selectAll": "Marca todas las opciones que correspondan.",
+      "audience": {
+        "teachers": "Docentes",
+        "school_leaders": "Equipos directivos"
+      },
+      "other": "Otro:",
+      "otherPlaceholder": "Especifica",
+      "educationalLevel": "Nivel / contexto educativo",
+      "educationalLevelHint": "Si procede. Marca todas las opciones que correspondan.",
+      "level": {
+        "primary": "Primaria",
+        "lower_secondary": "Secundaria inferior",
+        "upper_secondary": "Secundaria superior",
+        "cross_level": "Multinivel"
+      },
+      "priorKnowledge": "Conocimientos / experiencia previa recomendados",
+      "priorKnowledgePlaceholder": "Indica conocimientos o experiencia previa útiles. Si no hay, escribe «Ninguno»."
     }
   },
   "reviews": {

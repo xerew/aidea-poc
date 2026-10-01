@@ -316,3 +316,43 @@ class ImportXlsxTests(APITestCase):
         res = self._post(B(b'\x00\x01garbage not a zip'), name='course.xlsx')
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('not a valid xlsx workbook', res.data['errors'][0])
+
+    def test_round_trip_preserves_course_profile_and_module_outcomes(self):
+        extra = LearningPillar.objects.create(slug='teach-for-ai', name='Teach for AI', description='d', order=2)
+        self.course.additional_pillars.add(extra)
+        self.course.cross_axis_relevance = 'Also builds AI literacy.'
+        self.course.target_audience = ['teachers', 'school_leaders']
+        self.course.target_audience_other = 'Trainers'
+        self.course.educational_levels = ['upper_secondary']
+        self.course.prior_knowledge = 'None'
+        self.course.translations = {'el': {'prior_knowledge': 'Καμία'}}
+        self.course.save()
+        m1 = self.course.modules.get(order=1)
+        m1.related_outcomes = [1]
+        m1.save()
+        self.client.force_authenticate(self.creator)
+        res = self._post(self._export_bytes(self.course))
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED, getattr(res, 'data', None))
+        new = Course.objects.get(pk=res.data['id'])
+        self.assertEqual(list(new.additional_pillars.values_list('slug', flat=True)), ['teach-for-ai'])
+        self.assertEqual(new.cross_axis_relevance, 'Also builds AI literacy.')
+        self.assertEqual(new.target_audience, ['teachers', 'school_leaders'])
+        self.assertEqual(new.target_audience_other, 'Trainers')
+        self.assertEqual(new.educational_levels, ['upper_secondary'])
+        self.assertEqual(new.prior_knowledge, 'None')
+        self.assertEqual(new.translations['el']['prior_knowledge'], 'Καμία')
+        self.assertEqual(new.modules.get(order=1).related_outcomes, [1])
+
+    def test_out_of_range_related_outcome_rejected(self):
+        from io import BytesIO as B
+
+        from openpyxl import load_workbook
+        wb = load_workbook(self._export_bytes(self.course))
+        wb['Modules']['E2'] = '3'  # only two outcomes
+        bad = B()
+        wb.save(bad)
+        bad.seek(0)
+        self.client.force_authenticate(self.creator)
+        res = self._post(bad)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertTrue(any('Modules!E2' in e for e in res.data['errors']))

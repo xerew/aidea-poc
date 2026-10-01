@@ -395,7 +395,9 @@
     "courseModules": "Modules du cours",
     "enrollError": "Échec de l'inscription.",
     "unavailable": "Ce cours est actuellement indisponible — son auteur l'a dépublié.",
-    "by": "Par"
+    "by": "Par",
+    "alsoRelevantTo": "Concerne aussi ce pilier de l’Académie",
+    "coversOutcomes": "Acquis d’apprentissage :"
   },
   "myLearning": {
     "subtitle": "Suivez votre progression et poursuivez vos cours",
@@ -546,7 +548,21 @@
       "confirmDelete": "Supprimer définitivement ce cours ? Tous les modules, leçons et inscriptions seront perdus. Cette action est irréversible.",
       "subjectsLabel": "Matières",
       "subjectsHint": "À quels enseignants ce cours s'adresse-t-il ? Sélectionnez tout ce qui s'applique.",
-      "translatorBanner": "Vous ne pouvez modifier que les traductions ; le contenu original est en lecture seule."
+      "translatorBanner": "Vous ne pouvez modifier que les traductions ; le contenu original est en lecture seule.",
+      "relatedOutcomes": "AA associés :",
+      "relatedOutcomesNone": "Ajoutez des acquis d’apprentissage ci-dessus pour les relier aux modules.",
+      "outcomeNumber": "Acquis {{n}}",
+      "addExistingModule": "Ajouter un module existant",
+      "moduleLibraryTitle": "Réutiliser un module existant",
+      "moduleLibraryHint": "Une copie du module, avec toutes ses activités et ressources, est ajoutée à la fin de ce cours. Modifier la copie ne change pas l’original.",
+      "moduleLibrarySearch": "Rechercher des modules ou des cours…",
+      "moduleLibraryEmpty": "Aucun module disponible à réutiliser.",
+      "moduleLibraryDraft": "Brouillon",
+      "moduleLibraryActivities": "Activités : {{count}}",
+      "moduleLibraryLoadFailed": "Impossible de charger les modules.",
+      "importModule": "Ajouter une copie",
+      "importing": "Ajout…",
+      "importFailed": "Impossible de copier le module."
     },
     "moduleEditor": {
       "quizBuilderTitle": "Créateur de quiz",
@@ -656,6 +672,31 @@
         "co_editor": "Co-éditeur",
         "translator": "Traducteur"
       }
+    },
+    "proposal": {
+      "title": "Profil du cours",
+      "additionalPillars": "Piliers supplémentaires de l’Académie",
+      "additionalPillarsHint": "Facultatif. Cochez tout autre pilier auquel ce cours contribue aussi ; le pilier choisi ci-dessus reste le principal.",
+      "crossAxis": "Pertinence transversale",
+      "crossAxisHint": "Le cas échéant, indiquez si le cours contribue aussi de manière significative à un autre axe de l’Académie et expliquez brièvement comment.",
+      "targetAudience": "Public cible",
+      "selectAll": "Cochez toutes les réponses applicables.",
+      "audience": {
+        "teachers": "Enseignants",
+        "school_leaders": "Chefs d’établissement"
+      },
+      "other": "Autre :",
+      "otherPlaceholder": "Veuillez préciser",
+      "educationalLevel": "Niveau / contexte éducatif",
+      "educationalLevelHint": "Le cas échéant. Cochez toutes les réponses applicables.",
+      "level": {
+        "primary": "Primaire",
+        "lower_secondary": "Premier cycle du secondaire",
+        "upper_secondary": "Second cycle du secondaire",
+        "cross_level": "Multi-niveaux"
+      },
+      "priorKnowledge": "Connaissances / expérience préalables recommandées",
+      "priorKnowledgePlaceholder": "Précisez les connaissances ou l’expérience utiles. Si aucune, indiquez « Aucune »."
     }
   },
   "reviews": {

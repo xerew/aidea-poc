@@ -5,6 +5,7 @@ import { ArrowLeft, Clock, CheckCircle2, Plus, Trash2 } from 'lucide-react'
 import client from '../api/client'
 import { LANGUAGES } from '../i18n'
 import SubjectPicker from '../components/authoring/SubjectPicker'
+import CourseProposalFields from '../components/authoring/CourseProposalFields'
 // Reuse editor and detail styles — same class names apply
 import './CourseDetailPage.css'
 import './CourseEditorPage.css'
@@ -24,6 +25,13 @@ const EMPTY_FORM = {
   learning_outcomes: [],
   source_language: 'en',
   subject_ids: [],
+  additional_pillar_ids: [],
+  cross_axis_relevance: '',
+  target_audience: [],
+  target_audience_other: '',
+  educational_levels: [],
+  educational_level_other: '',
+  prior_knowledge: '',
 }
 
 export default function CourseCreatePage() {
@@ -91,7 +99,15 @@ export default function CourseCreatePage() {
           <select
             className={`pillar-select pillar-badge pillar-badge--${pillarColor}`}
             value={form.pillar_id ?? ''}
-            onChange={(e) => setForm((f) => ({ ...f, pillar_id: Number(e.target.value) }))}
+            onChange={(e) => {
+              const pillarId = Number(e.target.value)
+              // The primary pillar is never also an additional one.
+              setForm((f) => ({
+                ...f,
+                pillar_id: pillarId,
+                additional_pillar_ids: f.additional_pillar_ids.filter((pid) => pid !== pillarId),
+              }))
+            }}
           >
             {pillars.map((p) => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -184,6 +200,15 @@ export default function CourseCreatePage() {
           <Plus size={14} /> {t('authoring.editor.addOutcome')}
         </button>
       </div>
+
+      {/* Pillars, audience, level, prior knowledge */}
+      <CourseProposalFields
+        pillars={pillars}
+        form={form}
+        textValue={(field) => form[field]}
+        onField={(field, value) => setForm((f) => ({ ...f, [field]: value }))}
+        onText={(field, value) => setForm((f) => ({ ...f, [field]: value }))}
+      />
 
       {/* Subjects */}
       <div className="outcomes-card">

@@ -21,6 +21,7 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 class CourseListSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
+    additional_pillars = PillarSerializer(many=True, read_only=True)
     subjects = SubjectSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     progress_pct = serializers.SerializerMethodField()
@@ -31,7 +32,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'pillar', 'subjects',
+            'id', 'title', 'description', 'pillar', 'additional_pillars', 'subjects',
             'level', 'duration_hours', 'module_count',
             'progress_pct', 'is_enrolled',
         ]
@@ -62,6 +63,11 @@ class CourseListSerializer(serializers.ModelSerializer):
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     pillar = PillarSerializer(read_only=True)
+    additional_pillars = PillarSerializer(many=True, read_only=True)
+    cross_axis_relevance = serializers.SerializerMethodField()
+    target_audience_other = serializers.SerializerMethodField()
+    educational_level_other = serializers.SerializerMethodField()
+    prior_knowledge = serializers.SerializerMethodField()
     subjects = SubjectSerializer(many=True, read_only=True)
     modules = ModuleLocalizedSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
@@ -79,10 +85,24 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'pillar', 'subjects', 'level', 'duration_hours',
             'learning_outcomes', 'module_count', 'modules',
             'is_enrolled', 'progress_pct', 'current_module_id', 'completed_module_ids',
+            'additional_pillars', 'cross_axis_relevance', 'target_audience', 'target_audience_other',
+            'educational_levels', 'educational_level_other', 'prior_knowledge',
         ]
 
     def get_title(self, obj):
         return localized(obj, 'title', viewer_language(self.context))
+
+    def get_cross_axis_relevance(self, obj):
+        return localized(obj, 'cross_axis_relevance', viewer_language(self.context))
+
+    def get_target_audience_other(self, obj):
+        return localized(obj, 'target_audience_other', viewer_language(self.context))
+
+    def get_educational_level_other(self, obj):
+        return localized(obj, 'educational_level_other', viewer_language(self.context))
+
+    def get_prior_knowledge(self, obj):
+        return localized(obj, 'prior_knowledge', viewer_language(self.context))
 
     def get_description(self, obj):
         return localized(obj, 'description', viewer_language(self.context))
@@ -193,6 +213,11 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
         queryset=Subject.objects.filter(is_active=True), source='subjects',
         many=True, write_only=True, required=False,
     )
+    additional_pillars = PillarSerializer(many=True, read_only=True)
+    additional_pillar_ids = serializers.PrimaryKeyRelatedField(
+        queryset=LearningPillar.objects.all(), source='additional_pillars',
+        many=True, write_only=True, required=False,
+    )
     modules = ModuleAuthoringSerializer(many=True, read_only=True)
     module_count = serializers.IntegerField(source='modules.count', read_only=True)
     created_by_id = serializers.IntegerField(source='created_by.id', read_only=True, default=None)
@@ -211,8 +236,30 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
             'subjects', 'subject_ids', 'created_by_id', 'created_by_name',
             'source_language', 'translations', 'translation_status',
             'collaborators', 'my_role', 'can_edit', 'can_translate', 'can_manage',
+            'additional_pillar_ids', 'additional_pillars', 'cross_axis_relevance', 'target_audience', 'target_audience_other',
+            'educational_levels', 'educational_level_other', 'prior_knowledge',
         ]
         read_only_fields = ['is_published', 'translations', 'translation_status']
+
+    @staticmethod
+    def _checked_list(value, allowed, name):
+        if not isinstance(value, list) or any(v not in allowed for v in value):
+            raise serializers.ValidationError(f'{name} must be a list drawn from {allowed}.')
+        return [v for v in allowed if v in value]  # canonical order, no duplicates
+
+    def validate_target_audience(self, value):
+        return self._checked_list(value, Course.AUDIENCE_CHOICES, 'target_audience')
+
+    def validate_educational_levels(self, value):
+        return self._checked_list(value, Course.EDUCATIONAL_LEVEL_CHOICES, 'educational_levels')
+
+    def validate(self, attrs):
+        # The primary pillar is never also listed as an additional one.
+        extra = attrs.get('additional_pillars')
+        if extra is not None:
+            primary = attrs.get('pillar') or getattr(self.instance, 'pillar', None)
+            attrs['additional_pillars'] = [p for p in extra if not primary or p.pk != primary.pk]
+        return attrs
 
     def get_created_by_name(self, obj):
         if not obj.created_by:

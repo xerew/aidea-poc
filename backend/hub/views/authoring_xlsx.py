@@ -22,7 +22,7 @@ class AuthoringCourseExportView(APIView):
     def get(self, request, pk):
         try:
             course = Course.objects.select_related('pillar').prefetch_related(
-                'modules__lessons',
+                'modules__lessons', 'subjects', 'additional_pillars',
             ).get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -80,6 +80,12 @@ class AuthoringCourseImportView(APIView):
                 duration_hours=payload['duration_hours'],
                 content_format=payload['content_format'],
                 learning_outcomes=payload['learning_outcomes'],
+                cross_axis_relevance=payload['cross_axis_relevance'],
+                target_audience=payload['target_audience'],
+                target_audience_other=payload['target_audience_other'],
+                educational_levels=payload['educational_levels'],
+                educational_level_other=payload['educational_level_other'],
+                prior_knowledge=payload['prior_knowledge'],
                 translations=payload.get('translations', {}),
                 translation_status=payload.get('translation_status', {}),
                 is_published=False,
@@ -87,6 +93,8 @@ class AuthoringCourseImportView(APIView):
             )
             if payload.get('subjects'):
                 course.subjects.set(payload['subjects'])
+            if payload.get('additional_pillars'):
+                course.additional_pillars.set(payload['additional_pillars'])
             for module_data in payload['modules']:
                 module = Module.objects.create(
                     course=course,
@@ -94,6 +102,7 @@ class AuthoringCourseImportView(APIView):
                     description=module_data['description'],
                     order=module_data['order'],
                     duration_minutes=module_data['duration_minutes'],
+                    related_outcomes=module_data['related_outcomes'],
                     translations=module_data.get('translations', {}),
                 )
                 for lesson_data in sorted(module_data['lessons'].values(), key=lambda lesson: lesson['order']):
