@@ -685,7 +685,14 @@
       "serviceOffline": "Oversettelsesserveren er frakoblet, så oversettelser kan ikke kjøres akkurat nå.",
       "serviceOfflineDetails": "Frakoblet siden {{since}} · sist sjekket {{checked}}. Sjekkes på nytt hvert 15. minutt.",
       "checkAgain": "Sjekk igjen",
-      "checking": "Sjekker…"
+      "checking": "Sjekker…",
+      "originalLabel": "Original ({{language}})",
+      "copyOriginal": "Kopier",
+      "copyOriginalTitle": "Kopier originalteksten til dette feltet",
+      "showOriginal": "Vis original ({{language}})",
+      "hideOriginal": "Skjul original",
+      "showMore": "Vis mer",
+      "showLess": "Vis mindre"
     },
     "collab": {
       "title": "Samarbeidspartnere",

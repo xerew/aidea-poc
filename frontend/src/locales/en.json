@@ -685,7 +685,14 @@
       "serviceOffline": "The translation server is offline, so translations can’t run right now.",
       "serviceOfflineDetails": "Offline since {{since}} · last checked {{checked}}. It’s checked again every 15 minutes.",
       "checkAgain": "Check again",
-      "checking": "Checking…"
+      "checking": "Checking…",
+      "originalLabel": "Original ({{language}})",
+      "copyOriginal": "Copy",
+      "copyOriginalTitle": "Copy the original text into this field",
+      "showOriginal": "Show original ({{language}})",
+      "hideOriginal": "Hide original",
+      "showMore": "Show more",
+      "showLess": "Show less"
     },
     "collab": {
       "title": "Collaborators",

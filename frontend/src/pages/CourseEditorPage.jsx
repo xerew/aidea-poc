@@ -9,6 +9,7 @@ import SubjectPicker from '../components/authoring/SubjectPicker'
 import CollaboratorsPanel from '../components/authoring/CollaboratorsPanel'
 import CourseProposalFields from '../components/authoring/CourseProposalFields'
 import ModuleLibraryModal from '../components/authoring/ModuleLibraryModal'
+import OriginalHint from '../components/authoring/OriginalHint'
 import './CourseEditorPage.css'
 
 // Course-profile texts that are translated alongside title/description.
@@ -376,6 +377,12 @@ export default function CourseEditorPage() {
   // a translator edits only translations.
   const locked = translating ? !canTranslate : !canEdit
 
+  // While translating, each field shows its source-language original below it.
+  const sourceLangLabel = LANGUAGES.find((l) => l.code === form.source_language)?.label ?? form.source_language
+  const original = (text, onCopy, html = false) => (translating && !locked
+    ? <OriginalHint text={text} onCopy={onCopy} language={sourceLangLabel} html={html} />
+    : null)
+
   return (
     <div className="course-editor">
 
@@ -500,6 +507,7 @@ export default function CourseEditorPage() {
         onChange={(e) => setCourseField('title', e.target.value)}
         placeholder={t('authoring.editor.courseTitlePlaceholder')}
       />
+      {original(form.title, (v) => setCourseField('title', v))}
 
       {/* Author */}
       {author.name && <p className="course-editor-author">{t('authoring.editor.authorLabel', { name: author.name })}</p>}
@@ -513,6 +521,7 @@ export default function CourseEditorPage() {
         rows={2}
         placeholder={t('authoring.editor.courseDescPlaceholder')}
       />
+      {original(form.description, (v) => setCourseField('description', v))}
 
       {/* Stats */}
       <div className="detail-stats">
@@ -538,13 +547,16 @@ export default function CourseEditorPage() {
           {outcomesForEdit.map((outcome, i) => (
             <div key={i} className="outcome-item outcome-item--edit">
               <CheckCircle2 size={18} className="outcome-icon" />
-              <input
-                className="editor-outcome-input"
-                value={outcome}
-                disabled={locked}
-                onChange={(e) => updateOutcome(i, e.target.value)}
-                placeholder={t('authoring.editor.outcomePlaceholder')}
-              />
+              <div className="outcome-edit-col">
+                <input
+                  className="editor-outcome-input"
+                  value={outcome}
+                  disabled={locked}
+                  onChange={(e) => updateOutcome(i, e.target.value)}
+                  placeholder={t('authoring.editor.outcomePlaceholder')}
+                />
+                {original(form.learning_outcomes[i], (v) => updateOutcome(i, v))}
+              </div>
               {!locked && !translating && (
                 <button className="icon-btn icon-btn--danger" onClick={() => removeOutcome(i)} title={t('authoring.editor.removeOutcome')}>
                   <Trash2 size={14} />
@@ -569,6 +581,7 @@ export default function CourseEditorPage() {
         onText={setCourseField}
         locked={locked}
         translating={translating}
+        sourceLanguageLabel={sourceLangLabel}
       />
 
       {/* Subjects (source language only — subjects aren't translated) */}
@@ -615,6 +628,7 @@ export default function CourseEditorPage() {
                   onChange={(e) => updateModuleField(mod.id, 'title', e.target.value)}
                   placeholder={t('authoring.editor.modulePlaceholder')}
                 />
+                {original(mod.title, (v) => updateModuleField(mod.id, 'title', v))}
                 <textarea
                   className="editor-module-desc"
                   value={moduleFieldValue(mod, 'description')}
@@ -623,6 +637,7 @@ export default function CourseEditorPage() {
                   rows={1}
                   placeholder={t('authoring.editor.moduleDescPlaceholder')}
                 />
+                {original(mod.description, (v) => updateModuleField(mod.id, 'description', v))}
                 <div className="module-meta editor-module-meta">
                   <input
                     type="number"

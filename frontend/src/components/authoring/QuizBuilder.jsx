@@ -2,8 +2,11 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import { Trash2, Plus } from 'lucide-react'
 import { emptyQuestion } from './quizUtils'
+import OriginalHint from './OriginalHint'
 
-export default function QuizBuilder({ quizData, textDisabled, structureLocked, onChange }) {
+export default function QuizBuilder({
+  quizData, textDisabled, structureLocked, onChange, original = null, sourceLanguageLabel = '',
+}) {
   const { t } = useTranslation()
   const questions = quizData ?? []
 
@@ -44,6 +47,17 @@ export default function QuizBuilder({ quizData, textDisabled, structureLocked, o
     onChange(next)
   }
 
+  // Translating: Copy fills in the question and all its options from the original.
+  const copyOriginalQuestion = (qi) => {
+    const src = original?.[qi]
+    if (!src) return
+    onChange(questions.map((q, i) => (i !== qi ? q : {
+      ...q,
+      question: src.question ?? '',
+      options: q.options.map((o, j) => ({ ...o, text: src.options?.[j]?.text ?? o.text })),
+    })))
+  }
+
   const addQuestion = () => onChange([...questions, emptyQuestion()])
 
   const removeQuestion = (qi) => onChange(questions.filter((_, i) => i !== qi))
@@ -72,6 +86,13 @@ export default function QuizBuilder({ quizData, textDisabled, structureLocked, o
               </button>
             )}
           </div>
+          {original?.[qi] && (
+            <OriginalHint
+              text={original[qi].question}
+              onCopy={() => copyOriginalQuestion(qi)}
+              language={sourceLanguageLabel}
+            />
+          )}
 
           <div className="quiz-options">
             {q.options.map((opt, oi) => (
@@ -89,7 +110,11 @@ export default function QuizBuilder({ quizData, textDisabled, structureLocked, o
                   value={opt.text}
                   disabled={textDisabled}
                   onChange={(e) => updateOptionText(qi, oi, e.target.value)}
-                  placeholder={t('authoring.moduleEditor.optionPlaceholder', { letter: String.fromCharCode(65 + oi) })}
+                  placeholder={
+                    // Translating: the original option text shows until it's translated.
+                    original?.[qi]?.options?.[oi]?.text
+                    || t('authoring.moduleEditor.optionPlaceholder', { letter: String.fromCharCode(65 + oi) })
+                  }
                 />
                 {!structureLocked && q.options.length > 2 && (
                   <button
@@ -132,4 +157,6 @@ QuizBuilder.propTypes = {
   textDisabled: PropTypes.bool.isRequired,
   structureLocked: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
+  original: PropTypes.array,
+  sourceLanguageLabel: PropTypes.string,
 }

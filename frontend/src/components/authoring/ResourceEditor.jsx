@@ -6,6 +6,7 @@ import client from '../../api/client'
 import RichTextEditor from '../lesson/RichTextEditor'
 import TypeIcon from '../learner/TypeIcon'
 import QuizBuilder from './QuizBuilder'
+import OriginalHint from './OriginalHint'
 import './ResourceEditor.css'
 
 const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
@@ -17,7 +18,7 @@ const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
  */
 export default function ResourceEditor({
   resource, index, count, locked, translating, error,
-  onChange, onSave, onDelete, onMove,
+  onChange, onSave, onDelete, onMove, original = null, sourceLanguageLabel = '',
 }) {
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
@@ -25,6 +26,10 @@ export default function ResourceEditor({
   const structureLocked = locked || translating
   const isMedia = ['image', 'video', 'pdf'].includes(resource.type)
   const typeLabel = t(`lesson.type.${resource.type}`)
+  // While translating: the source text under each field, with Copy.
+  const hint = (field, html = false) => (translating && !locked && original
+    ? <OriginalHint text={original[field]} onCopy={(v) => onChange(field, v)} language={sourceLanguageLabel} html={html} />
+    : null)
 
   const upload = async (file) => {
     if (!file) return
@@ -78,6 +83,7 @@ export default function ResourceEditor({
           placeholder={t('authoring.moduleEditor.resource.titlePlaceholder')}
           onChange={(e) => onChange('title', e.target.value)}
         />
+        {hint('title')}
 
         {resource.type === 'text' && (
           <RichTextEditor
@@ -87,6 +93,7 @@ export default function ResourceEditor({
             placeholder={t('authoring.moduleEditor.contentPlaceholder')}
           />
         )}
+        {resource.type === 'text' && hint('content', true)}
 
         {isMedia && (
           <>
@@ -121,6 +128,7 @@ export default function ResourceEditor({
               placeholder={t('authoring.moduleEditor.captionPlaceholder')}
               onChange={(e) => onChange('caption', e.target.value)}
             />
+            {hint('caption')}
           </>
         )}
 
@@ -129,6 +137,8 @@ export default function ResourceEditor({
             quizData={resource.quiz_data ?? []}
             textDisabled={locked}
             structureLocked={structureLocked}
+            original={translating && !locked ? original?.quiz_data : null}
+            sourceLanguageLabel={sourceLanguageLabel}
             onChange={(next) => onChange('quiz_data', next)}
           />
         )}
@@ -142,6 +152,7 @@ export default function ResourceEditor({
               onChange={(html) => onChange('instructions', html)}
               placeholder={t('authoring.moduleEditor.assignmentPlaceholder')}
             />
+            {hint('instructions', true)}
           </>
         )}
 
@@ -191,4 +202,6 @@ ResourceEditor.propTypes = {
   onSave: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onMove: PropTypes.func.isRequired,
+  original: PropTypes.object,
+  sourceLanguageLabel: PropTypes.string,
 }

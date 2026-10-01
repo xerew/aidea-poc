@@ -685,7 +685,14 @@
       "serviceOffline": "Översättningsservern är offline, så översättningar kan inte köras just nu.",
       "serviceOfflineDetails": "Offline sedan {{since}} · senast kontrollerad {{checked}}. Kontrolleras igen var 15:e minut.",
       "checkAgain": "Kontrollera igen",
-      "checking": "Kontrollerar…"
+      "checking": "Kontrollerar…",
+      "originalLabel": "Original ({{language}})",
+      "copyOriginal": "Kopiera",
+      "copyOriginalTitle": "Kopiera originaltexten till det här fältet",
+      "showOriginal": "Visa original ({{language}})",
+      "hideOriginal": "Dölj original",
+      "showMore": "Visa mer",
+      "showLess": "Visa mindre"
     },
     "collab": {
       "title": "Medarbetare",

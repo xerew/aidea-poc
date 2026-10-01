@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import client from '../api/client'
 import TranslationBar from '../components/authoring/TranslationBar'
+import OriginalHint from '../components/authoring/OriginalHint'
+import { LANGUAGES } from '../i18n'
 import ResourceEditor from '../components/authoring/ResourceEditor'
 import { emptyQuestion, mergedQuizData } from '../components/authoring/quizUtils'
 import './ModuleEditorPage.css'
@@ -125,7 +127,7 @@ const activityShape = PropTypes.shape({
 })
 
 function ActivityEditor({
-  activity, resources, locked, translating, errors, resourceErrors,
+  activity, original, sourceLanguageLabel, resources, locked, translating, errors, resourceErrors,
   onChange, onDelete, onSave,
   onAddResource, onResourceChange, onResourceSave, onResourceDelete, onResourceMove,
 }) {
@@ -171,6 +173,9 @@ function ActivityEditor({
             onChange={(e) => onChange('title', e.target.value)}
             placeholder={t('authoring.moduleEditor.titlePlaceholderExample')}
           />
+          {translating && !locked && (
+            <OriginalHint text={original.title} onCopy={(v) => onChange('title', v)} language={sourceLanguageLabel} />
+          )}
           <FieldError msg={err.title} />
         </div>
 
@@ -184,6 +189,9 @@ function ActivityEditor({
             onChange={(e) => onChange('description', e.target.value)}
             placeholder={t('authoring.moduleEditor.descPlaceholder')}
           />
+          {translating && !locked && (
+            <OriginalHint text={original.description} onCopy={(v) => onChange('description', v)} language={sourceLanguageLabel} />
+          )}
         </div>
 
         <div className="lesson-field">
@@ -222,6 +230,8 @@ function ActivityEditor({
                 <ResourceEditor
                   key={resource.id}
                   resource={resource}
+                  original={original.resources?.find((r) => r.id === resource.id)}
+                  sourceLanguageLabel={sourceLanguageLabel}
                   index={idx}
                   count={resources.length}
                   locked={locked}
@@ -263,6 +273,8 @@ function ActivityEditor({
 
 ActivityEditor.propTypes = {
   activity: activityShape.isRequired,
+  original: activityShape.isRequired,
+  sourceLanguageLabel: PropTypes.string.isRequired,
   resources: PropTypes.array.isRequired,
   locked: PropTypes.bool.isRequired,
   translating: PropTypes.bool.isRequired,
@@ -704,6 +716,7 @@ export default function ModuleEditorPage() {
   // need translate rights (co-editors edit everything; translators only
   // translations).
   const locked = translating ? !caps.canTranslate : !caps.canEdit
+  const sourceLangLabel = LANGUAGES.find((l) => l.code === sourceLanguage)?.label ?? sourceLanguage
   const canAddActivity = !locked && !translating
 
   return (
@@ -768,6 +781,9 @@ export default function ModuleEditorPage() {
               onChange={(e) => handleModuleFieldChange('title', e.target.value)}
               placeholder={t('authoring.editor.modulePlaceholder')}
             />
+            {translating && !locked && (
+              <OriginalHint text={moduleForm.title} onCopy={(v) => handleModuleFieldChange('title', v)} language={sourceLangLabel} />
+            )}
             <label className="me-label" style={{ marginTop: '1rem' }}>{t('authoring.moduleEditor.descriptionLabel')}</label>
             <textarea
               className="me-textarea"
@@ -777,6 +793,9 @@ export default function ModuleEditorPage() {
               onChange={(e) => handleModuleFieldChange('description', e.target.value)}
               placeholder={t('authoring.moduleEditor.moduleOverviewPlaceholder')}
             />
+            {translating && !locked && (
+              <OriginalHint text={moduleForm.description} onCopy={(v) => handleModuleFieldChange('description', v)} language={sourceLangLabel} />
+            )}
           </div>
 
           <div className="me-card">
@@ -842,6 +861,8 @@ export default function ModuleEditorPage() {
           {displayLesson ? (
             <ActivityEditor
               activity={displayLesson}
+              original={selectedLesson}
+              sourceLanguageLabel={sourceLangLabel}
               resources={(selectedLesson.resources ?? []).map((r) => displayResource(r, activeLang))}
               locked={locked}
               translating={translating}

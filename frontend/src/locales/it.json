@@ -685,7 +685,14 @@
       "serviceOffline": "Il server di traduzione è offline, quindi al momento non è possibile tradurre.",
       "serviceOfflineDetails": "Offline da {{since}} · ultimo controllo {{checked}}. Viene ricontrollato ogni 15 minuti.",
       "checkAgain": "Controlla di nuovo",
-      "checking": "Controllo…"
+      "checking": "Controllo…",
+      "originalLabel": "Originale ({{language}})",
+      "copyOriginal": "Copia",
+      "copyOriginalTitle": "Copia il testo originale in questo campo",
+      "showOriginal": "Mostra originale ({{language}})",
+      "hideOriginal": "Nascondi originale",
+      "showMore": "Mostra di più",
+      "showLess": "Mostra meno"
     },
     "collab": {
       "title": "Collaboratori",

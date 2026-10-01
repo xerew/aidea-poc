@@ -685,7 +685,14 @@
       "serviceOffline": "Käännöspalvelin ei ole tavoitettavissa, joten käännöksiä ei voi nyt tehdä.",
       "serviceOfflineDetails": "Poissa käytöstä {{since}} alkaen · viimeksi tarkistettu {{checked}}. Tarkistetaan 15 minuutin välein.",
       "checkAgain": "Tarkista uudelleen",
-      "checking": "Tarkistetaan…"
+      "checking": "Tarkistetaan…",
+      "originalLabel": "Alkuperäinen ({{language}})",
+      "copyOriginal": "Kopioi",
+      "copyOriginalTitle": "Kopioi alkuperäinen teksti tähän kenttään",
+      "showOriginal": "Näytä alkuperäinen ({{language}})",
+      "hideOriginal": "Piilota alkuperäinen",
+      "showMore": "Näytä lisää",
+      "showLess": "Näytä vähemmän"
     },
     "collab": {
       "title": "Yhteistyökumppanit",

@@ -378,3 +378,7 @@
 .module-outcome-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .module-add-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+/* Outcome input with its translation reference underneath */
+.outcome-edit-col { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.proposal-checks .original-hint { flex-basis: 100%; }

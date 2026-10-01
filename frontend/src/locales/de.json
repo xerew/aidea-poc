@@ -685,7 +685,14 @@
       "serviceOffline": "Der Übersetzungsserver ist offline, daher können derzeit keine Übersetzungen ausgeführt werden.",
       "serviceOfflineDetails": "Offline seit {{since}} · zuletzt geprüft {{checked}}. Wird alle 15 Minuten erneut geprüft.",
       "checkAgain": "Erneut prüfen",
-      "checking": "Wird geprüft…"
+      "checking": "Wird geprüft…",
+      "originalLabel": "Original ({{language}})",
+      "copyOriginal": "Kopieren",
+      "copyOriginalTitle": "Originaltext in dieses Feld kopieren",
+      "showOriginal": "Original anzeigen ({{language}})",
+      "hideOriginal": "Original ausblenden",
+      "showMore": "Mehr anzeigen",
+      "showLess": "Weniger anzeigen"
     },
     "collab": {
       "title": "Mitwirkende",

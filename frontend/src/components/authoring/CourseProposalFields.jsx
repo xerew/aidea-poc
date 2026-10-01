@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
+import OriginalHint from './OriginalHint'
 
 const AUDIENCES = ['teachers', 'school_leaders']
 const LEVELS = ['primary', 'lower_secondary', 'upper_secondary', 'cross_level']
@@ -19,8 +20,13 @@ function toggle(list, value) {
  */
 export default function CourseProposalFields({
   pillars, form, textValue, onField, onText, locked = false, translating = false,
+  sourceLanguageLabel = '',
 }) {
   const { t } = useTranslation()
+  // While translating, show the source text under each translatable field.
+  const original = (field) => (translating && !locked
+    ? <OriginalHint text={form[field]} onCopy={(v) => onText(field, v)} language={sourceLanguageLabel} />
+    : null)
   const structureLocked = locked || translating
   const otherPillars = pillars.filter((p) => p.id !== form.pillar_id)
   const extra = form.additional_pillar_ids ?? []
@@ -60,6 +66,7 @@ export default function CourseProposalFields({
           disabled={locked}
           onChange={(e) => onText('cross_axis_relevance', e.target.value)}
         />
+        {original('cross_axis_relevance')}
       </div>
 
       <div className="proposal-field">
@@ -86,6 +93,7 @@ export default function CourseProposalFields({
               onChange={(e) => onText('target_audience_other', e.target.value)}
             />
           </label>
+          {original('target_audience_other')}
         </div>
       </div>
 
@@ -113,6 +121,7 @@ export default function CourseProposalFields({
               onChange={(e) => onText('educational_level_other', e.target.value)}
             />
           </label>
+          {original('educational_level_other')}
         </div>
       </div>
 
@@ -127,6 +136,7 @@ export default function CourseProposalFields({
           placeholder={t('authoring.proposal.priorKnowledgePlaceholder')}
           onChange={(e) => onText('prior_knowledge', e.target.value)}
         />
+        {original('prior_knowledge')}
       </div>
     </div>
   )
@@ -145,4 +155,5 @@ CourseProposalFields.propTypes = {
   onText: PropTypes.func.isRequired,
   locked: PropTypes.bool,
   translating: PropTypes.bool,
+  sourceLanguageLabel: PropTypes.string,
 }
