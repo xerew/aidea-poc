@@ -11,7 +11,13 @@
     "reviews": "Revisioni",
     "openMenu": "Apri menu",
     "documentation": "Documentazione",
-    "messages": "Messaggi"
+    "messages": "Messaggi",
+    "sections": {
+      "learn": "Impara",
+      "create": "Crea",
+      "manage": "Gestisci"
+    },
+    "pendingCount": "{{count}} in attesa"
   },
   "common": {
     "search": "Cerca corsi...",

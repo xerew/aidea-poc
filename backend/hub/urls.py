@@ -90,6 +90,7 @@ from .views import (
     UnreadMessageCountView,
     VerifyEmailView,
 )
+from .views.assignments import ReviewQueueCountView
 from .views.authoring_course import TranslationServiceStatusView
 
 urlpatterns = [
@@ -112,6 +113,7 @@ urlpatterns = [
     path('courses/<int:pk>/lessons/<int:lesson_pk>/submit-assignment/', AssignmentSubmitView.as_view(), name='assignment-submit'),
     path('courses/<int:pk>/lessons/<int:lesson_pk>/submission-upload/', SubmissionUploadView.as_view(), name='submission-upload'),
     path('reviews/', ReviewQueueView.as_view(), name='review-queue'),
+    path('reviews/count/', ReviewQueueCountView.as_view(), name='review-queue-count'),
     path('reviews/<int:pk>/', ReviewActionView.as_view(), name='review-action'),
     path('home/', HomeView.as_view(), name='home'),
     path('my-learning/', MyLearningView.as_view(), name='my-learning'),

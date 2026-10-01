@@ -11,7 +11,13 @@
     "reviews": "Vurderinger",
     "openMenu": "Åpne meny",
     "documentation": "Dokumentasjon",
-    "messages": "Meldinger"
+    "messages": "Meldinger",
+    "sections": {
+      "learn": "Lær",
+      "create": "Lag",
+      "manage": "Administrer"
+    },
+    "pendingCount": "{{count}} venter"
   },
   "common": {
     "search": "Søk etter kurs...",
