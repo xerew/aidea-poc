@@ -264,7 +264,10 @@
       "bio": "Om dig",
       "bioPlaceholder": "Några ord om dig — din undervisning, dina intressen eller vad du hoppas få ut av AIDEA.",
       "teachingLevel": "Undervisningsnivå",
-      "selectTeachingLevel": "Välj nivå"
+      "selectTeachingLevel": "Välj nivå",
+      "website": "Personlig webbplats",
+      "websitePlaceholder": "t.ex. minskola.se/~maria",
+      "websiteInvalid": "Ange en giltig webbadress, t.ex. https://example.org"
     },
     "preferences": {
       "title": "Läropreferenser",

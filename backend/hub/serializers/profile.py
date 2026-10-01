@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import URLValidator
 from rest_framework import serializers
 
 from hub.models import Subject, UserProfile
@@ -50,6 +52,22 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
     phone    = serializers.CharField(max_length=30,  required=False, allow_blank=True)
     location = serializers.CharField(max_length=200, required=False, allow_blank=True)
     bio      = serializers.CharField(required=False, allow_blank=True)
+    website  = serializers.CharField(max_length=200, required=False, allow_blank=True)
+
+    def validate_website(self, value):
+        """Accept "school.gr" as well as a full URL; only http(s) links."""
+        value = value.strip()
+        if not value:
+            return ''
+        if '://' not in value:
+            value = f'https://{value}'
+        try:
+            URLValidator(schemes=['http', 'https'])(value)
+        except DjangoValidationError:
+            raise serializers.ValidationError('Enter a valid website address.') from None
+        if len(value) > 200:
+            raise serializers.ValidationError('Website address is too long.')
+        return value
 
     def to_representation(self, instance):
         user = instance.user
@@ -67,6 +85,7 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
             'phone':        instance.phone,
             'location':     instance.location,
             'bio':          instance.bio,
+            'website':      instance.website,
         }
 
     def update(self, instance, validated_data):
@@ -84,8 +103,10 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
         instance.phone    = validated_data.get('phone',    instance.phone)
         instance.location = validated_data.get('location', instance.location)
         instance.bio      = validated_data.get('bio',      instance.bio)
+        instance.website  = validated_data.get('website',  instance.website)
         instance.save(update_fields=[
             'subject', 'gender', 'teaching_level', 'country', 'school', 'phone', 'location', 'bio',
+            'website',
         ])
         return instance
 

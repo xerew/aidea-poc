@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.validators import URLValidator
 from django.db import models
 
 
@@ -72,6 +73,9 @@ class UserProfile(models.Model):
     phone                = models.CharField(max_length=30, blank=True)
     location             = models.CharField(max_length=200, blank=True)
     bio                  = models.TextField(blank=True)
+    website              = models.URLField(
+        max_length=200, blank=True, validators=[URLValidator(schemes=['http', 'https'])],
+    )
     weekly_learning_goal = models.CharField(max_length=10, choices=WeeklyGoal.choices, blank=True)
     email_notifications  = models.BooleanField(default=True)
     progress_reminders   = models.BooleanField(default=True)

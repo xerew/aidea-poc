@@ -198,3 +198,6 @@
   .pp-name { font-size: 1.2rem; }
   .pp-course-pillar { display: none; }
 }
+
+.pp-link { color: var(--color-primary); overflow-wrap: anywhere; }
+.pp-link:hover { text-decoration: underline; }

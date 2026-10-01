@@ -143,3 +143,27 @@ class ProfileTeachingLevelTests(APITestCase):
     def test_invalid_teaching_level_rejected(self):
         res = self.client.patch(self.url, {'teaching_level': 'university'}, format='json')
         self.assertEqual(res.status_code, 400)
+
+
+class ProfileWebsiteTests(APITestCase):
+    def setUp(self):
+        self.user = make_teacher('web_teacher')
+        self.client.force_authenticate(self.user)
+        self.url = reverse('profile-info')
+
+    def test_website_saved_and_scheme_added(self):
+        res = self.client.patch(self.url, {'website': '  myschool.gr/~maria '}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.data['website'], 'https://myschool.gr/~maria')
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.website, 'https://myschool.gr/~maria')
+
+    def test_website_can_be_cleared(self):
+        self.client.patch(self.url, {'website': 'https://example.org'}, format='json')
+        res = self.client.patch(self.url, {'website': ''}, format='json')
+        self.assertEqual(res.data['website'], '')
+
+    def test_non_http_or_invalid_website_rejected(self):
+        for bad in ('javascript:alert(1)', 'ftp://files.example.org', 'not a url'):
+            res = self.client.patch(self.url, {'website': bad}, format='json')
+            self.assertEqual(res.status_code, 400, bad)

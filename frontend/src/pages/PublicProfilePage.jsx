@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  ArrowLeft, Lock, GraduationCap, MapPin, School, BookOpen, CalendarDays, MessageCircle,
+  ArrowLeft, Lock, GraduationCap, MapPin, School, BookOpen, CalendarDays, MessageCircle, Globe,
 } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -117,6 +117,15 @@ export default function PublicProfilePage() {
     )
   }
   if (profile.school) details.push(<DetailRow key="school" icon={School}>{profile.school}</DetailRow>)
+  if (profile.website) {
+    details.push(
+      <DetailRow key="website" icon={Globe}>
+        <a href={profile.website} target="_blank" rel="noopener noreferrer nofollow ugc" className="pp-link">
+          {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+        </a>
+      </DetailRow>,
+    )
+  }
   if (profile.country) {
     details.push(
       <DetailRow key="country" icon={MapPin}>
