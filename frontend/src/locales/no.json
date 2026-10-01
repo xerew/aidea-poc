@@ -169,6 +169,14 @@
           "adultEd": "Voksenopplæring"
         }
       },
+      "schoolRole": {
+        "question": "Hva er rollen din på skolen?",
+        "options": {
+          "teacher": "Lærer",
+          "schoolLeader": "Skoleleder",
+          "both": "Begge"
+        }
+      },
       "q3": {
         "question": "Du ber en AI oppsummere en elevs stil. Den gir et selvsikkert, men faktisk feil sammendrag. Hva gjør du?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Velg nivå",
       "website": "Personlig nettside",
       "websitePlaceholder": "f.eks. minskole.no/~maria",
-      "websiteInvalid": "Skriv inn en gyldig nettadresse, f.eks. https://example.org"
+      "websiteInvalid": "Skriv inn en gyldig nettadresse, f.eks. https://example.org",
+      "schoolRole": "Rolle på skolen",
+      "selectSchoolRole": "Velg rollen din"
     },
     "preferences": {
       "title": "Læringspreferanser",

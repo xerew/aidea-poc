@@ -18,6 +18,13 @@ import { subjectLabel } from '../lib/subjects'
 import './ProfilePage.css'
 
 // Same options as the onboarding "What level do you teach?" step.
+// Same options as the onboarding "What is your role at school?" step.
+const SCHOOL_ROLES = [
+  { value: 'teacher',       key: 'teacher' },
+  { value: 'school_leader', key: 'schoolLeader' },
+  { value: 'both',          key: 'both' },
+]
+
 const TEACHING_LEVELS = [
   { value: 'primary',    key: 'primary' },
   { value: 'secondary',  key: 'secondary' },
@@ -83,7 +90,7 @@ function PersonalInfoSection() {
   const { user, updateUser } = useAuth()
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '',
-    subject: '', teaching_level: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
+    subject: '', teaching_level: '', school_role: '', gender: '', country: '', school: '', phone: '', location: '', bio: '',
     website: '',
   })
   const [subjects, setSubjects] = useState([])
@@ -155,6 +162,15 @@ function PersonalInfoSection() {
               <option value="">{t('profile.personalInfo.selectTeachingLevel')}</option>
               {TEACHING_LEVELS.map(({ value, key }) => (
                 <option key={value} value={value}>{t(`onboarding.questions.teachingLevel.options.${key}`)}</option>
+              ))}
+            </select>
+          </div>
+          <div className="profile-field">
+            <label htmlFor="profile-school-role">{t('profile.personalInfo.schoolRole')}</label>
+            <select id="profile-school-role" value={form.school_role ?? ''} onChange={set('school_role')}>
+              <option value="">{t('profile.personalInfo.selectSchoolRole')}</option>
+              {SCHOOL_ROLES.map(({ value, key }) => (
+                <option key={value} value={value}>{t(`onboarding.questions.schoolRole.options.${key}`)}</option>
               ))}
             </select>
           </div>

@@ -169,6 +169,14 @@
           "adultEd": "Erwachsenenbildung"
         }
       },
+      "schoolRole": {
+        "question": "Welche Rolle haben Sie an der Schule?",
+        "options": {
+          "teacher": "Lehrkraft",
+          "schoolLeader": "Schulleitung",
+          "both": "Beides"
+        }
+      },
       "q3": {
         "question": "Sie bitten eine KI, den Aufsatz einer Schülerin oder eines Schülers zusammenzufassen. Sie liefert eine selbstsicher klingende, aber inhaltlich falsche Zusammenfassung. Was tun Sie?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Stufe auswählen",
       "website": "Persönliche Website",
       "websitePlaceholder": "z. B. meineschule.de/~maria",
-      "websiteInvalid": "Geben Sie eine gültige Webadresse ein, z. B. https://example.org"
+      "websiteInvalid": "Geben Sie eine gültige Webadresse ein, z. B. https://example.org",
+      "schoolRole": "Rolle an der Schule",
+      "selectSchoolRole": "Rolle auswählen"
     },
     "preferences": {
       "title": "Lernpräferenzen",

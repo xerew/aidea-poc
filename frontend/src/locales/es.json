@@ -169,6 +169,14 @@
           "adultEd": "Educación para Adultos"
         }
       },
+      "schoolRole": {
+        "question": "¿Cuál es tu función en el centro?",
+        "options": {
+          "teacher": "Docente",
+          "schoolLeader": "Equipo directivo",
+          "both": "Ambas"
+        }
+      },
       "q3": {
         "question": "Le pides a una IA que resuma el ensayo de un estudiante. Te da un resumen convincente pero incorrecto. ¿Qué haces?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Selecciona un nivel",
       "website": "Sitio web personal",
       "websitePlaceholder": "p. ej. miescuela.es/~maria",
-      "websiteInvalid": "Introduce una dirección web válida, p. ej. https://example.org"
+      "websiteInvalid": "Introduce una dirección web válida, p. ej. https://example.org",
+      "schoolRole": "Función en el centro",
+      "selectSchoolRole": "Selecciona tu función"
     },
     "preferences": {
       "title": "Preferencias de Aprendizaje",

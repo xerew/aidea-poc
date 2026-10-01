@@ -83,6 +83,12 @@ class OnboardingPostTestCase(APITestCase):
         self.assertEqual(self.user.profile.subject_id, self.subject.id)
 
     @patch('hub.tasks.compute_user_recommendations.delay')
+    def test_school_role_saved_when_given(self, _task):
+        self.client.post(reverse('onboarding'), {**self.payload, 'school_role': 'both'}, format='json')
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.school_role, 'both')
+
+    @patch('hub.tasks.compute_user_recommendations.delay')
     def test_user_learning_path_created(self, mock_task):
         self.client.post(reverse('onboarding'), self.payload, format='json')
         self.assertTrue(UserLearningPath.objects.filter(user=self.user).exists())

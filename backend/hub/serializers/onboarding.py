@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hub.models import OnboardingQuestion, Subject
+from hub.models import OnboardingQuestion, Subject, UserProfile
 from hub.self_efficacy import LIKERT_MAX, LIKERT_MIN
 
 _TEACHING_LEVELS = ['primary', 'secondary', 'higher_ed', 'vocational', 'adult_ed']
@@ -50,6 +50,9 @@ class OnboardingSubmitSerializer(serializers.Serializer):
         queryset=Subject.objects.filter(is_active=True),
     )
     teaching_level = serializers.ChoiceField(choices=_TEACHING_LEVELS)
+    school_role    = serializers.ChoiceField(
+        choices=UserProfile.SchoolRole.choices, required=False, allow_blank=True,
+    )
     goals          = serializers.ListField(
         child=serializers.ChoiceField(choices=_GOALS),
         allow_empty=True,

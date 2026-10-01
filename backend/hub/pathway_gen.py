@@ -2,9 +2,11 @@
 
 Deterministic and embedding-free (works on any database, unlike the pgvector
 recommendation engine), so a teacher's pathway responds to their competency,
-preferred pillars, subject and goals — and can be recomputed synchronously
-whenever the profile changes.
+preferred pillars (any of a course's pillars count), subject, goals, teaching
+level (vs the course's educational levels) and school role (vs its target
+audience) — and can be recomputed synchronously whenever the profile changes.
 """
+from hub.personalization import course_pillar_slugs, pathway_bonus
 
 PATHWAY_SIZE = 6
 
@@ -55,7 +57,7 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
             continue  # too far above the teacher's competency
 
         score = 3.0 - abs(clevel - band)  # closeness to the teacher's band
-        pillars = {course.pillar.slug, *(p.slug for p in course.additional_pillars.all())}
+        pillars = course_pillar_slugs(course)
         if pillars & preferred:
             score += W_PILLAR
         if pillars & goal_pillars:
@@ -65,6 +67,9 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
             subject_ids = {s.id for s in course.subjects.all()}
             if subject_id in subject_ids or 'general' in subject_slugs:
                 score += W_SUBJECT
+
+        # Educational level and target audience (teaching level / school role).
+        score += pathway_bonus(profile, course)
 
         # Tie-break deterministically on pillar order then id.
         scored.append((-score, course.pillar.order, course.id))

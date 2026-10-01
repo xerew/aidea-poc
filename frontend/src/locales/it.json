@@ -169,6 +169,14 @@
           "adultEd": "Educazione degli adulti"
         }
       },
+      "schoolRole": {
+        "question": "Qual è il tuo ruolo a scuola?",
+        "options": {
+          "teacher": "Docente",
+          "schoolLeader": "Dirigente scolastico",
+          "both": "Entrambi"
+        }
+      },
       "q3": {
         "question": "Chiedi a un'AI di riassumere il tema di uno studente. Fornisce un riassunto sicuro di sé ma sbagliato nei fatti. Cosa fai?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Seleziona un livello",
       "website": "Sito web personale",
       "websitePlaceholder": "es. miascuola.it/~maria",
-      "websiteInvalid": "Inserisci un indirizzo web valido, es. https://example.org"
+      "websiteInvalid": "Inserisci un indirizzo web valido, es. https://example.org",
+      "schoolRole": "Ruolo a scuola",
+      "selectSchoolRole": "Seleziona il tuo ruolo"
     },
     "preferences": {
       "title": "Preferenze di apprendimento",

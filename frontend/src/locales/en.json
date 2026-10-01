@@ -169,6 +169,14 @@
           "adultEd": "Adult Education"
         }
       },
+      "schoolRole": {
+        "question": "What is your role at school?",
+        "options": {
+          "teacher": "Teacher",
+          "schoolLeader": "School leader",
+          "both": "Both"
+        }
+      },
       "q3": {
         "question": "You ask an AI to summarise a student's essay. It gives a confident but factually wrong summary. What do you do?",
         "options": {
@@ -267,7 +275,9 @@
       "selectTeachingLevel": "Select teaching level",
       "website": "Personal website",
       "websitePlaceholder": "e.g. myschool.gr/~maria",
-      "websiteInvalid": "Enter a valid website address, e.g. https://example.org"
+      "websiteInvalid": "Enter a valid website address, e.g. https://example.org",
+      "schoolRole": "Role at school",
+      "selectSchoolRole": "Select your role"
     },
     "preferences": {
       "title": "Learning Preferences",

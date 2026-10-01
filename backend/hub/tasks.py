@@ -60,10 +60,10 @@ def compute_course_embeddings(course_id: int) -> None:
     from hub.models.recommendations import CourseEmbedding
 
     course = Course.objects.get(pk=course_id)
+    from hub.personalization import course_embedding_text
+
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    subjects = ' '.join(course.subjects.values_list('name', flat=True))
-    text = f"{course.title} {course.description} {subjects}".strip()
-    embedding = model.encode(text).tolist()
+    embedding = model.encode(course_embedding_text(course)).tolist()
     CourseEmbedding.objects.update_or_create(
         course=course,
         defaults={'embedding': embedding},
@@ -79,7 +79,7 @@ def compute_user_recommendations(user_id: int) -> None:
 
     import numpy as np
     from django.contrib.auth.models import User
-    from django.db.models import Count
+    from django.db.models import Count, Q
     from django.utils import timezone
     from pgvector.django import CosineDistance
     from sentence_transformers import SentenceTransformer
@@ -116,15 +116,10 @@ def compute_user_recommendations(user_id: int) -> None:
     else:
         alpha, beta, gamma = config.alpha, config.beta, config.gamma
 
+    from hub.personalization import course_pillar_slugs, profile_text, recommendation_factor
+
     # ── Signal ①: Profile vector ──────────────────────────────────────────
-    goals_str = ', '.join(profile.goals) if profile.goals else 'general'
-    subject   = profile.subject.name if profile.subject else 'general'
-    level_str = profile.get_teaching_level_display() if profile.teaching_level else 'unknown'
-    profile_text = (
-        f"{subject} teacher, {level_str}, "
-        f"competency {profile.competency_score}/6, goals: {goals_str}"
-    )
-    profile_vec = model.encode(profile_text)
+    profile_vec = model.encode(profile_text(profile))
 
     # ── Signal ②: Pillar bias vector ──────────────────────────────────────
     pillar_vec = None
@@ -132,9 +127,11 @@ def compute_user_recommendations(user_id: int) -> None:
         raw_embeddings = list(
             CourseEmbedding.objects
             .filter(
-                course__pillar__slug__in=profile.preferred_pillars,
+                Q(course__pillar__slug__in=profile.preferred_pillars)
+                | Q(course__additional_pillars__slug__in=profile.preferred_pillars),
                 course__is_published=True,
             )
+            .distinct()
             .values_list('embedding', flat=True)
         )
         if raw_embeddings:
@@ -235,7 +232,7 @@ def compute_user_recommendations(user_id: int) -> None:
     candidates = (
         CourseEmbedding.objects
         .select_related('course__pillar')
-        .prefetch_related('course__subjects')
+        .prefetch_related('course__subjects', 'course__additional_pillars')
         .exclude(course_id__in=enrolled_ids)
         .filter(course__is_published=True)
         .annotate(distance=CosineDistance('embedding', user_vec_list))
@@ -259,11 +256,14 @@ def compute_user_recommendations(user_id: int) -> None:
             course_subject_slugs = {s.slug for s in emb.course.subjects.all()}
             if teacher_subject_slug in course_subject_slugs or 'general' in course_subject_slugs:
                 similarity *= SUBJECT_MATCH_BOOST
-        if emb.course.pillar.slug in preferred_pillars:
+        if course_pillar_slugs(emb.course) & preferred_pillars:
             similarity *= PILLAR_MATCH_BOOST
+        # Educational level vs teaching level; target audience vs school role.
+        similarity *= recommendation_factor(profile, emb.course)
         filtered.append((emb.course, similarity))
-        if len(filtered) >= 5:
-            break
+
+    # Rank by the boosted score (not raw distance) so the boosts decide the top 5.
+    filtered = sorted(filtered, key=lambda pair: pair[1], reverse=True)[:5]
 
     # ── Write personal recommendations ───────────────────────────────────
     subject_display = profile.subject.name if profile.subject else 'general'
