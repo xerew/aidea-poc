@@ -113,8 +113,9 @@
 }
 
 .login-eu-logo {
-  height: 36px;
+  height: 44px;
   width: auto;
+  max-width: 100%;
 }
 
 .login-eu-text {
