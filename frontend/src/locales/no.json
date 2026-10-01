@@ -442,7 +442,17 @@
     "loadError": "Kunne ikke laste læringsveien din.",
     "loading": "Laster læringsveien din…",
     "completed": "{{done}} av {{total}} kurs fullført",
-    "durationHoursShort": "{{count}} t"
+    "durationHoursShort": "{{count}} t",
+    "empty": {
+      "title": "Læringsstien din har ingen kurs ennå",
+      "no_published_courses": "Det finnes ingen publiserte kurs på plattformen ennå. Læringsstien din fylles automatisk så snart kurs publiseres.",
+      "above_level": "Alle publiserte kurs ligger nå over kompetansenivået ditt, så ingen ble lagt til. Egenvurderingen av KI-kompetanse kan plassere deg på et høyere nivå; læringsstien oppdateres også når nye kurs for ditt nivå publiseres.",
+      "study_curriculum_empty": "Du følger studiens faste program, og ingen av kursene er publisert ennå. Sjekk igjen senere."
+    },
+    "notOnboarded": "Læringsstien din opprettes når du fullfører den korte introduksjonen (fag, undervisningsnivå, rolle og mål).",
+    "startOnboarding": "Fullfør introduksjonen",
+    "takeAssessment": "Ta egenvurderingen av KI-kompetanse",
+    "browseCourses": "Se alle kurs"
   },
   "lesson": {
     "type": {

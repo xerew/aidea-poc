@@ -39,7 +39,11 @@ def apply_competency_delta(user, delta: int, recompute: bool = True) -> int:
             competency_min__lte=new, competency_max__gte=new,
         ).first()
         if path:
-            UserLearningPath.objects.update_or_create(user=user, defaults={'path': path})
+            # New level: new path and a course list rebuilt for that level.
+            from hub.pathway_gen import generate_pathway
+            UserLearningPath.objects.update_or_create(
+                user=user, defaults={'path': path, 'course_ids': generate_pathway(user)},
+            )
 
     if recompute:
         from hub.tasks import compute_user_recommendations

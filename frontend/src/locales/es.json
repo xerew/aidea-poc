@@ -442,7 +442,17 @@
     "loadError": "No se pudo cargar tu itinerario.",
     "loading": "Cargando tu itinerario…",
     "completed": "{{done}} de {{total}} cursos completados",
-    "durationHoursShort": "{{count}}h"
+    "durationHoursShort": "{{count}}h",
+    "empty": {
+      "title": "Tu itinerario aún no tiene cursos",
+      "no_published_courses": "Todavía no hay cursos publicados en la plataforma. Tu itinerario se completará automáticamente en cuanto se publiquen cursos.",
+      "above_level": "Todos los cursos publicados están ahora por encima de tu nivel de competencia, así que no se añadió ninguno. La autoevaluación de competencias en IA puede situarte en un nivel superior; tu itinerario también se actualiza cuando se publican nuevos cursos de tu nivel.",
+      "study_curriculum_empty": "Sigues el programa fijo del estudio y ninguno de sus cursos está publicado todavía. Vuelve más tarde."
+    },
+    "notOnboarded": "Tu itinerario se crea cuando completas la breve configuración inicial (materia, nivel educativo, función y objetivos).",
+    "startOnboarding": "Completar la configuración inicial",
+    "takeAssessment": "Hacer la autoevaluación de competencias en IA",
+    "browseCourses": "Ver todos los cursos"
   },
   "lesson": {
     "type": {

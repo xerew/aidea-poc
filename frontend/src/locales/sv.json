@@ -442,7 +442,17 @@
     "loadError": "Kunde inte läsa in din lärväg.",
     "loading": "Läser in din lärväg…",
     "completed": "{{done}} av {{total}} kurser slutförda",
-    "durationHoursShort": "{{count}} tim"
+    "durationHoursShort": "{{count}} tim",
+    "empty": {
+      "title": "Din lärväg har inga kurser ännu",
+      "no_published_courses": "Det finns inga publicerade kurser på plattformen ännu. Din lärväg fylls automatiskt så snart kurser publiceras.",
+      "above_level": "Alla publicerade kurser ligger just nu över din kompetensnivå, så ingen lades till. Självskattningen av AI-kompetens kan placera dig på en högre nivå; din lärväg uppdateras också när nya kurser för din nivå publiceras.",
+      "study_curriculum_empty": "Du följer studiens fasta program, och ingen av dess kurser är publicerad ännu. Titta in igen senare."
+    },
+    "notOnboarded": "Din lärväg skapas när du slutför den korta introduktionen (ämne, undervisningsnivå, roll och mål).",
+    "startOnboarding": "Slutför introduktionen",
+    "takeAssessment": "Gör självskattningen av AI-kompetens",
+    "browseCourses": "Visa alla kurser"
   },
   "lesson": {
     "type": {

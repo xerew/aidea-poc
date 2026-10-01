@@ -442,7 +442,17 @@
     "loadError": "Oppimispolkuasi ei voitu ladata.",
     "loading": "Ladataan oppimispolkuasi…",
     "completed": "{{done}}/{{total}} kurssia suoritettu",
-    "durationHoursShort": "{{count}} t"
+    "durationHoursShort": "{{count}} t",
+    "empty": {
+      "title": "Polullasi ei ole vielä kursseja",
+      "no_published_courses": "Alustalla ei ole vielä julkaistuja kursseja. Polkusi täyttyy automaattisesti heti, kun kursseja julkaistaan.",
+      "above_level": "Kaikki julkaistut kurssit ovat tällä hetkellä osaamistasosi yläpuolella, joten yhtään ei lisätty. Tekoälyosaamisen itsearviointi voi sijoittaa sinut korkeammalle tasolle; polkusi päivittyy myös, kun tasollesi sopivia kursseja julkaistaan.",
+      "study_curriculum_empty": "Seuraat tutkimuksen kiinteää ohjelmaa, eikä sen kursseja ole vielä julkaistu. Tarkista myöhemmin uudelleen."
+    },
+    "notOnboarded": "Polkusi luodaan, kun teet lyhyen aloituksen (aine, opetusaste, rooli ja tavoitteet).",
+    "startOnboarding": "Tee aloitus",
+    "takeAssessment": "Tee tekoälyosaamisen itsearviointi",
+    "browseCourses": "Selaa kaikkia kursseja"
   },
   "lesson": {
     "type": {

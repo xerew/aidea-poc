@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, PlayCircle, Circle } from 'lucide-react'
+import { CheckCircle, PlayCircle, Circle, Info } from 'lucide-react'
 import client from '../api/client'
 import './PathwayPage.css'
 
@@ -17,11 +18,34 @@ const STATUS_ICON = {
   not_started: Circle,
 }
 
+// Explains why there is nothing to show, with what the user can do next.
+function EmptyNotice({ title, text, children }) {
+  return (
+    <Card className="pathway-empty">
+      <CardContent className="pathway-empty-content">
+        <Info size={22} className="pathway-empty-icon" />
+        <div>
+          <h2 className="pathway-empty-title">{title}</h2>
+          <p className="pathway-empty-text">{text}</p>
+          <div className="pathway-empty-actions">{children}</div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+EmptyNotice.propTypes = {
+  title: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  children: PropTypes.node,
+}
+
 export default function PathwayPage() {
   const { t } = useTranslation()
   const [data, setData]       = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState('')
+  const [needsOnboarding, setNeedsOnboarding] = useState(false)
 
   const levelLabels = {
     beginner: t('common.level.beginner'),
@@ -32,12 +56,25 @@ export default function PathwayPage() {
   useEffect(() => {
     client.get('/pathway/')
       .then(res => setData(res.data))
-      .catch(() => setError(t('pathway.loadError')))
+      .catch((err) => {
+        // 404: no pathway yet — it is created by completing onboarding.
+        if (err.response?.status === 404) setNeedsOnboarding(true)
+        else setError(t('pathway.loadError'))
+      })
       .finally(() => setLoading(false))
   }, [t])
 
   if (loading) return <div className="pathway-loading">{t('pathway.loading')}</div>
   if (error)   return <div className="pathway-error">{error}</div>
+  if (needsOnboarding) {
+    return (
+      <div className="pathway-page">
+        <EmptyNotice title={t('pathway.empty.title')} text={t('pathway.notOnboarded')}>
+          <Button asChild size="sm"><Link to="/onboarding">{t('pathway.startOnboarding')}</Link></Button>
+        </EmptyNotice>
+      </div>
+    )
+  }
 
   const nextCourse  = data.courses.find(c => c.status !== 'completed')
   const progressPct = data.progress.total > 0
@@ -61,6 +98,15 @@ export default function PathwayPage() {
           </span>
         </div>
       </div>
+
+      {data.courses.length === 0 && (
+        <EmptyNotice title={t('pathway.empty.title')} text={t(`pathway.empty.${data.empty_reason ?? 'no_published_courses'}`)}>
+          {data.empty_reason === 'above_level' && (
+            <Button asChild size="sm"><Link to="/ai-competency">{t('pathway.takeAssessment')}</Link></Button>
+          )}
+          <Button asChild size="sm" variant="outline"><Link to="/courses">{t('pathway.browseCourses')}</Link></Button>
+        </EmptyNotice>
+      )}
 
       <div className="pathway-courses">
         {data.courses.map((course, idx) => {

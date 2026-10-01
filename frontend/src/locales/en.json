@@ -442,7 +442,17 @@
     "loadError": "Could not load your pathway.",
     "loading": "Loading your pathway…",
     "completed": "{{done}} of {{total}} courses completed",
-    "durationHoursShort": "{{count}}h"
+    "durationHoursShort": "{{count}}h",
+    "empty": {
+      "title": "Your pathway has no courses yet",
+      "no_published_courses": "There are no published courses on the platform yet. Your pathway fills in automatically as soon as courses are published.",
+      "above_level": "All published courses are currently above your competency level, so none were added. Taking the AI competency self-assessment can place you at a higher level; your pathway also updates as new courses for your level are published.",
+      "study_curriculum_empty": "You follow the study’s fixed curriculum, and none of its courses is published yet. Please check back later."
+    },
+    "notOnboarded": "Your pathway is created when you complete the short onboarding (subject, teaching level, role and goals).",
+    "startOnboarding": "Complete onboarding",
+    "takeAssessment": "Take the AI competency self-assessment",
+    "browseCourses": "Browse all courses"
   },
   "lesson": {
     "type": {
