@@ -632,7 +632,6 @@
       "moduleStructure": "Modulstruktur",
       "moduleTitleLabel": "Modultittel",
       "moduleOverviewPlaceholder": "Modulomtale…",
-      "addLessonActivity": "Legg til aktivitet",
       "lessonsCount": "Aktiviteter ({{count}})",
       "noLessons": "Ingen aktiviteter ennå. Legg til en over.",
       "newLessonTitle": "Ny {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Ressurser",
         "sectionHint": "Deltakerne går gjennom dem i rekkefølge. Aktiviteten er fullført når alle obligatoriske ressurser er gjort.",
-        "saveActivityFirst": "Lagre aktiviteten først, og legg deretter til flere ressurser.",
-        "addActivityHint": "Velg hva aktiviteten starter med. Du kan legge til flere ressurser etterpå.",
         "titlePlaceholder": "Ressurstittel (valgfri)",
         "required": "Obligatorisk",
         "save": "Lagre ressurs",
         "delete": "Slett ressurs",
         "lastResourceHint": "En aktivitet trenger minst én ressurs.",
-        "confirmDelete": "Slette denne ressursen? Deltakernes fremgang i den går tapt."
-      }
+        "confirmDelete": "Slette denne ressursen? Deltakernes fremgang i den går tapt.",
+        "firstResourceHint": "Velg hva aktiviteten starter med. Når du velger en ressurs, lagres aktiviteten; du kan legge til flere ressurser etterpå.",
+        "addLabel": "Legg til en ressurs:"
+      },
+      "addActivity": "Legg til aktivitet",
+      "newActivityTitle": "Ny aktivitet",
+      "draftBadge": "Utkast",
+      "discardDraft": "Forkaste denne ulagrede aktiviteten?"
     },
     "translate": {
       "switchLanguage": "Language",

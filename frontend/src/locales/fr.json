@@ -632,7 +632,6 @@
       "moduleStructure": "Structure du module",
       "moduleTitleLabel": "Titre du module",
       "moduleOverviewPlaceholder": "Aperçu du module…",
-      "addLessonActivity": "Ajouter une activité",
       "lessonsCount": "Activités ({{count}})",
       "noLessons": "Pas encore d’activités. Ajoutez-en une ci-dessus.",
       "newLessonTitle": "Nouveau {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Ressources",
         "sectionHint": "Les apprenants les parcourent dans l’ordre. L’activité est terminée lorsque toutes les ressources obligatoires sont faites.",
-        "saveActivityFirst": "Enregistrez d’abord l’activité, puis ajoutez-y d’autres ressources.",
-        "addActivityHint": "Choisissez le contenu de départ de l’activité. Vous pourrez ajouter d’autres ressources ensuite.",
         "titlePlaceholder": "Titre de la ressource (facultatif)",
         "required": "Obligatoire",
         "save": "Enregistrer la ressource",
         "delete": "Supprimer la ressource",
         "lastResourceHint": "Une activité doit contenir au moins une ressource.",
-        "confirmDelete": "Supprimer cette ressource ? La progression des apprenants sur celle-ci sera perdue."
-      }
+        "confirmDelete": "Supprimer cette ressource ? La progression des apprenants sur celle-ci sera perdue.",
+        "firstResourceHint": "Choisissez le contenu de départ de l’activité. Choisir une ressource enregistre l’activité ; vous pourrez en ajouter d’autres ensuite.",
+        "addLabel": "Ajouter une ressource :"
+      },
+      "addActivity": "Ajouter une activité",
+      "newActivityTitle": "Nouvelle activité",
+      "draftBadge": "Brouillon",
+      "discardDraft": "Abandonner cette activité non enregistrée ?"
     },
     "translate": {
       "switchLanguage": "Language",

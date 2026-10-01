@@ -169,3 +169,19 @@
 }
 .resource-add-btn:hover:not(:disabled) { border-color: #64748b; background: #f8fafc; }
 .resource-add-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Resource picker at the bottom of an activity */
+.resource-add-panel {
+  margin-top: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.resource-add-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+}

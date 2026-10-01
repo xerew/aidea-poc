@@ -632,7 +632,6 @@
       "moduleStructure": "Modulstruktur",
       "moduleTitleLabel": "Modultitel",
       "moduleOverviewPlaceholder": "Modulübersicht…",
-      "addLessonActivity": "Aktivität hinzufügen",
       "lessonsCount": "Aktivitäten ({{count}})",
       "noLessons": "Noch keine Aktivitäten vorhanden. Fügen Sie oben eine hinzu.",
       "newLessonTitle": "Neu: {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Ressourcen",
         "sectionHint": "Lernende bearbeiten sie der Reihe nach. Die Aktivität ist abgeschlossen, sobald alle Pflichtressourcen erledigt sind.",
-        "saveActivityFirst": "Speichern Sie zuerst die Aktivität und fügen Sie dann weitere Ressourcen hinzu.",
-        "addActivityHint": "Wählen Sie, womit die Aktivität beginnt. Weitere Ressourcen können Sie danach hinzufügen.",
         "titlePlaceholder": "Titel der Ressource (optional)",
         "required": "Pflicht",
         "save": "Ressource speichern",
         "delete": "Ressource löschen",
         "lastResourceHint": "Eine Aktivität braucht mindestens eine Ressource.",
-        "confirmDelete": "Diese Ressource löschen? Der Fortschritt der Lernenden darin geht verloren."
-      }
+        "confirmDelete": "Diese Ressource löschen? Der Fortschritt der Lernenden darin geht verloren.",
+        "firstResourceHint": "Wählen Sie, womit die Aktivität beginnt. Mit der Auswahl einer Ressource wird die Aktivität gespeichert; weitere Ressourcen können Sie danach hinzufügen.",
+        "addLabel": "Ressource hinzufügen:"
+      },
+      "addActivity": "Aktivität hinzufügen",
+      "newActivityTitle": "Neue Aktivität",
+      "draftBadge": "Entwurf",
+      "discardDraft": "Diese nicht gespeicherte Aktivität verwerfen?"
     },
     "translate": {
       "switchLanguage": "Language",

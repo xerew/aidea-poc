@@ -632,7 +632,6 @@
       "moduleStructure": "Moduulin rakenne",
       "moduleTitleLabel": "Moduulin nimi",
       "moduleOverviewPlaceholder": "Moduulin yleiskuvaus…",
-      "addLessonActivity": "Lisää aktiviteetti",
       "lessonsCount": "Aktiviteetit ({{count}})",
       "noLessons": "Ei vielä aktiviteetteja. Lisää yksi yllä.",
       "newLessonTitle": "Uusi {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Resurssit",
         "sectionHint": "Oppijat käyvät ne läpi järjestyksessä. Aktiviteetti on suoritettu, kun kaikki pakolliset resurssit on tehty.",
-        "saveActivityFirst": "Tallenna aktiviteetti ensin ja lisää sitten muita resursseja.",
-        "addActivityHint": "Valitse, millä aktiviteetti alkaa. Voit lisätä resursseja myöhemmin.",
         "titlePlaceholder": "Resurssin otsikko (valinnainen)",
         "required": "Pakollinen",
         "save": "Tallenna resurssi",
         "delete": "Poista resurssi",
         "lastResourceHint": "Aktiviteetissa on oltava vähintään yksi resurssi.",
-        "confirmDelete": "Poistetaanko tämä resurssi? Oppijoiden edistyminen siinä menetetään."
-      }
+        "confirmDelete": "Poistetaanko tämä resurssi? Oppijoiden edistyminen siinä menetetään.",
+        "firstResourceHint": "Valitse, millä aktiviteetti alkaa. Resurssin valinta tallentaa aktiviteetin; voit lisätä muita resursseja myöhemmin.",
+        "addLabel": "Lisää resurssi:"
+      },
+      "addActivity": "Lisää aktiviteetti",
+      "newActivityTitle": "Uusi aktiviteetti",
+      "draftBadge": "Luonnos",
+      "discardDraft": "Hylätäänkö tämä tallentamaton aktiviteetti?"
     },
     "translate": {
       "switchLanguage": "Language",

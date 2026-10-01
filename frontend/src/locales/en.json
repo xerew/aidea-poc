@@ -632,7 +632,6 @@
       "moduleStructure": "Module Structure",
       "moduleTitleLabel": "Module Title",
       "moduleOverviewPlaceholder": "Module overview…",
-      "addLessonActivity": "Add Activity",
       "lessonsCount": "Activities ({{count}})",
       "noLessons": "No activities yet. Add one above.",
       "newLessonTitle": "New {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Resources",
         "sectionHint": "Learners go through these in order. The activity is complete once every required resource is done.",
-        "saveActivityFirst": "Save the activity first, then add more resources to it.",
-        "addActivityHint": "Pick what the activity starts with. You can add more resources afterwards.",
         "titlePlaceholder": "Resource title (optional)",
         "required": "Required",
         "save": "Save resource",
         "delete": "Delete resource",
         "lastResourceHint": "An activity needs at least one resource.",
-        "confirmDelete": "Delete this resource? Learner progress on it will be lost."
-      }
+        "confirmDelete": "Delete this resource? Learner progress on it will be lost.",
+        "firstResourceHint": "Choose what this activity starts with. Picking a resource saves the activity; you can add more resources afterwards.",
+        "addLabel": "Add a resource:"
+      },
+      "addActivity": "Add activity",
+      "newActivityTitle": "New activity",
+      "draftBadge": "Draft",
+      "discardDraft": "Discard this unsaved activity?"
     },
     "translate": {
       "switchLanguage": "Language",

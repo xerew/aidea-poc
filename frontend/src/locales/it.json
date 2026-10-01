@@ -632,7 +632,6 @@
       "moduleStructure": "Struttura del modulo",
       "moduleTitleLabel": "Titolo del modulo",
       "moduleOverviewPlaceholder": "Panoramica del modulo…",
-      "addLessonActivity": "Aggiungi attività",
       "lessonsCount": "Attività ({{count}})",
       "noLessons": "Nessuna attività ancora presente. Aggiungine una qui sopra.",
       "newLessonTitle": "Nuovo/a {{type}}",
@@ -649,15 +648,19 @@
       "resource": {
         "sectionTitle": "Risorse",
         "sectionHint": "I partecipanti le seguono in ordine. L’attività è completata quando tutte le risorse obbligatorie sono state svolte.",
-        "saveActivityFirst": "Salva prima l’attività, poi aggiungi altre risorse.",
-        "addActivityHint": "Scegli con cosa inizia l’attività. Potrai aggiungere altre risorse in seguito.",
         "titlePlaceholder": "Titolo della risorsa (facoltativo)",
         "required": "Obbligatoria",
         "save": "Salva risorsa",
         "delete": "Elimina risorsa",
         "lastResourceHint": "Un’attività deve contenere almeno una risorsa.",
-        "confirmDelete": "Eliminare questa risorsa? I progressi dei partecipanti su di essa andranno persi."
-      }
+        "confirmDelete": "Eliminare questa risorsa? I progressi dei partecipanti su di essa andranno persi.",
+        "firstResourceHint": "Scegli con cosa inizia questa attività. Scegliendo una risorsa l’attività viene salvata; poi puoi aggiungere altre risorse.",
+        "addLabel": "Aggiungi una risorsa:"
+      },
+      "addActivity": "Aggiungi attività",
+      "newActivityTitle": "Nuova attività",
+      "draftBadge": "Bozza",
+      "discardDraft": "Eliminare questa attività non salvata?"
     },
     "translate": {
       "switchLanguage": "Language",

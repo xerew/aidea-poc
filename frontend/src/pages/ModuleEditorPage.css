@@ -716,3 +716,18 @@
 @media (max-width: 900px) {
   .module-editor-layout { grid-template-columns: 1fr; }
 }
+
+/* Activities list header with [+], draft badge, bottom "Add activity" */
+.me-card-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.me-card-head .me-card-title { margin-bottom: 0; }
+.me-add-activity-icon { color: var(--color-primary); }
+.me-add-activity { width: 100%; justify-content: center; margin-top: 0.75rem; }
+.me-lesson-draft {
+  margin-left: auto;
+  padding: 0.05rem 0.5rem;
+  border-radius: 9999px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.7rem;
+  font-weight: 600;
+}

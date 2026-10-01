@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList, Layers,
-  Trash2, GripVertical, Save, Lock,
+  Trash2, GripVertical, Save, Lock, Plus,
 } from 'lucide-react'
 import client from '../api/client'
 import TranslationBar from '../components/authoring/TranslationBar'
@@ -75,6 +75,20 @@ function translationPayload(resource, lang) {
 }
 
 const withFlags = (r) => ({ ...r, isDirty: false, saving: false })
+
+// An unsaved activity: saved (with its first resource) once a resource is picked.
+const makeDraft = () => ({
+  id: `new-${Date.now()}`,
+  title: '',
+  description: '',
+  lesson_type: 'text',
+  duration_minutes: 0,
+  resources: [],
+  translations: {},
+  isDirty: false,
+  isNew: true,
+  saving: false,
+})
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
@@ -187,7 +201,8 @@ function ActivityEditor({
 
         <FieldError msg={err.general} />
 
-        {!locked && !blockedNew && activity.isDirty && (
+        {/* A draft is saved by choosing its first resource (below). */}
+        {!locked && !activity.isNew && activity.isDirty && (
           <button className="lesson-save-btn" onClick={onSave} disabled={activity.saving}>
             <Save size={15} />
             {activity.saving ? t('authoring.moduleEditor.savingLesson') : t('authoring.moduleEditor.saveLesson')}
@@ -200,37 +215,45 @@ function ActivityEditor({
           <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.sectionHint')}</p>
 
           {activity.isNew ? (
-            <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.saveActivityFirst')}</p>
+            !translating && <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.firstResourceHint')}</p>
           ) : (
-            <>
-              <div className="resource-list">
-                {resources.map((resource, idx) => (
-                  <ResourceEditor
-                    key={resource.id}
-                    resource={resource}
-                    index={idx}
-                    count={resources.length}
-                    locked={locked}
-                    translating={translating}
-                    error={resourceErrors[resource.id]}
-                    onChange={(field, value) => onResourceChange(resource.id, field, value)}
-                    onSave={() => onResourceSave(resource.id)}
-                    onDelete={() => onResourceDelete(resource.id)}
-                    onMove={(dir) => onResourceMove(resource.id, dir)}
-                  />
+            <div className="resource-list">
+              {resources.map((resource, idx) => (
+                <ResourceEditor
+                  key={resource.id}
+                  resource={resource}
+                  index={idx}
+                  count={resources.length}
+                  locked={locked}
+                  translating={translating}
+                  error={resourceErrors[resource.id]}
+                  onChange={(field, value) => onResourceChange(resource.id, field, value)}
+                  onSave={() => onResourceSave(resource.id)}
+                  onDelete={() => onResourceDelete(resource.id)}
+                  onMove={(dir) => onResourceMove(resource.id, dir)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Resource picker — always at the bottom of the activity. */}
+          {!locked && !translating && (
+            <div className="resource-add-panel">
+              <span className="resource-add-label">{t('authoring.moduleEditor.resource.addLabel')}</span>
+              <div className="resource-add">
+                {RESOURCE_TYPES.map(({ type, Icon }) => (
+                  <button
+                    key={type}
+                    type="button"
+                    className="resource-add-btn"
+                    disabled={activity.saving}
+                    onClick={() => onAddResource(type)}
+                  >
+                    <Icon size={14} /> {t(`lesson.type.${type}`)}
+                  </button>
                 ))}
               </div>
-
-              {!locked && !translating && (
-                <div className="resource-add">
-                  {RESOURCE_TYPES.map(({ type, Icon }) => (
-                    <button key={type} type="button" className="resource-add-btn" onClick={() => onAddResource(type)}>
-                      <Icon size={14} /> {t('authoring.moduleEditor.addMediaOfType', { type: t(`lesson.type.${type}`) })}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -297,9 +320,19 @@ export default function ModuleEditorPage() {
         const m = modRes.data
         setModule(m)
         setModuleForm({ title: m.title, description: m.description })
-        setLessons(m.lessons.map((l) => ({
+        const loaded = m.lessons.map((l) => ({
           ...withFlags(l), isNew: false, resources: (l.resources ?? []).map(withFlags),
-        })))
+        }))
+        // The editor always shows an activity: the first one, or a new draft
+        // when the module is still empty and the user may edit it.
+        if (!loaded.length && courseRes.data.can_edit) {
+          const draft = makeDraft()
+          setLessons([draft])
+          setSelectedLessonId(draft.id)
+        } else {
+          setLessons(loaded)
+          setSelectedLessonId(loaded[0]?.id ?? null)
+        }
         setIsPublished(courseRes.data.is_published)
         setCaps({
           canEdit: !!courseRes.data.can_edit,
@@ -363,23 +396,30 @@ export default function ModuleEditorPage() {
 
   // ── Activity helpers ──────────────────────────────────────────────────────
 
-  // A new activity starts with one resource of the chosen type (the server
-  // creates it on first save).
-  const addLesson = (type) => {
-    const tempId = `new-${Date.now()}`
-    setLessons((ls) => [...ls, {
-      id: tempId,
-      title: t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${type}`) }),
-      description: '',
-      lesson_type: type,
-      duration_minutes: 0,
-      order: ls.length + 1,
-      resources: [],
-      isDirty: true,
-      isNew: true,
-      saving: false,
-    }])
-    setSelectedLessonId(tempId)
+  // Leaving a draft drops it (nothing is saved yet); ask first if the user
+  // already typed something. Returns false if they chose to stay.
+  const leaveDraft = () => {
+    const current = lessons.find((l) => l.id === selectedLessonId)
+    if (!current?.isNew) return true
+    const typed = (current.title || '').trim() || (current.description || '').trim()
+    if (typed && !window.confirm(t('authoring.moduleEditor.discardDraft'))) return false
+    setLessons((ls) => ls.filter((l) => l.id !== current.id))
+    return true
+  }
+
+  const selectLesson = (id) => {
+    if (id === selectedLessonId || !leaveDraft()) return
+    setSelectedLessonId(id)
+  }
+
+  // [+] / "Add activity": a new draft at the bottom of the list. It is saved
+  // when the author picks its first resource.
+  const addLesson = () => {
+    const existing = lessons.find((l) => l.isNew)
+    if (existing) { setSelectedLessonId(existing.id); return }
+    const draft = makeDraft()
+    setLessons((ls) => [...ls, draft])
+    setSelectedLessonId(draft.id)
   }
 
   const saveLessonRequest = async (lesson) => {
@@ -454,16 +494,27 @@ export default function ModuleEditorPage() {
     })
   }
 
+  // After removing an activity, open the first remaining one (or a new draft).
+  const showAfterRemoval = (removedId) => {
+    const rest = lessons.filter((l) => l.id !== removedId)
+    if (rest.length) {
+      setLessons(rest)
+      setSelectedLessonId(rest[0].id)
+    } else {
+      const draft = makeDraft()
+      setLessons([draft])
+      setSelectedLessonId(draft.id)
+    }
+  }
+
   const deleteLesson = async (lesson) => {
     if (lesson.isNew) {
-      setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
-      setSelectedLessonId(null)
+      showAfterRemoval(lesson.id)
       return
     }
     try {
       await client.delete(`${lessonsUrl}${lesson.id}/`)
-      setLessons((ls) => ls.filter((l) => l.id !== lesson.id))
-      setSelectedLessonId(null)
+      showAfterRemoval(lesson.id)
     } catch (err) {
       const detail = err.response?.data?.detail ?? t('authoring.moduleEditor.deleteFailedGeneric')
       setLessonErrors((prev) => ({
@@ -493,6 +544,16 @@ export default function ModuleEditorPage() {
   }
 
   const addResource = async (type) => {
+    if (selectedLesson?.isNew) {
+      // The server creates the activity with a first resource of this type.
+      await saveLesson({
+        ...selectedLesson,
+        lesson_type: type,
+        title: (selectedLesson.title || '').trim()
+          || t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${type}`) }),
+      })
+      return
+    }
     try {
       const body = { type, quiz_data: type === 'quiz' ? [emptyQuestion()] : [] }
       const res = await client.post(resourcesUrl(selectedLessonId), body)
@@ -643,6 +704,7 @@ export default function ModuleEditorPage() {
   // need translate rights (co-editors edit everything; translators only
   // translations).
   const locked = translating ? !caps.canTranslate : !caps.canEdit
+  const canAddActivity = !locked && !translating
 
   return (
     <div className="module-editor-page">
@@ -717,27 +779,23 @@ export default function ModuleEditorPage() {
             />
           </div>
 
-          {!locked && !translating && (
-            <div className="me-card">
-              <h2 className="me-card-title">{t('authoring.moduleEditor.addLessonActivity')}</h2>
-              <p className="lesson-field-hint">{t('authoring.moduleEditor.resource.addActivityHint')}</p>
-              <div className="me-lesson-type-grid">
-                {RESOURCE_TYPES.map(({ type, Icon, color }) => (
-                  <button
-                    key={type}
-                    className={`me-type-btn me-type-btn--${color}`}
-                    onClick={() => addLesson(type)}
-                  >
-                    <Icon size={22} />
-                    <span>{t(`lesson.type.${type}`)}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="me-card">
-            <h2 className="me-card-title">{t('authoring.moduleEditor.lessonsCount', { count: lessons.length })}</h2>
+            <div className="me-card-head">
+              <h2 className="me-card-title">
+                {t('authoring.moduleEditor.lessonsCount', { count: lessons.filter((l) => !l.isNew).length })}
+              </h2>
+              {canAddActivity && (
+                <button
+                  type="button"
+                  className="icon-btn me-add-activity-icon"
+                  onClick={addLesson}
+                  title={t('authoring.moduleEditor.addActivity')}
+                  aria-label={t('authoring.moduleEditor.addActivity')}
+                >
+                  <Plus size={16} />
+                </button>
+              )}
+            </div>
             <ul className="me-lesson-list">
               {lessons.map((lesson, idx) => {
                 const isDragOver = dragOverId === lesson.id && dragId !== lesson.id
@@ -750,8 +808,8 @@ export default function ModuleEditorPage() {
                       dragId === lesson.id ? 'me-lesson-item--dragging' : '',
                       isDragOver ? 'me-lesson-item--drag-over' : '',
                     ].filter(Boolean).join(' ')}
-                    onClick={() => setSelectedLessonId(lesson.id)}
-                    draggable={!locked && !translating}
+                    onClick={() => selectLesson(lesson.id)}
+                    draggable={!locked && !translating && !lesson.isNew}
                     onDragStart={(e) => handleDragStart(e, lesson.id)}
                     onDragOver={(e) => handleDragOver(e, lesson.id)}
                     onDrop={(e) => handleDrop(e, lesson.id)}
@@ -759,8 +817,10 @@ export default function ModuleEditorPage() {
                   >
                     <GripVertical size={14} className="me-lesson-drag" />
                     <ActivityIcon activity={lesson} size={15} />
-                    <span className="me-lesson-title">{lesson.title || t('authoring.moduleEditor.newLessonTitle', { type: t(`lesson.type.${lesson.lesson_type}`) })}</span>
-                    <span className="me-lesson-order">{idx + 1}</span>
+                    <span className="me-lesson-title">{lesson.title || t('authoring.moduleEditor.newActivityTitle')}</span>
+                    {lesson.isNew
+                      ? <span className="me-lesson-draft">{t('authoring.moduleEditor.draftBadge')}</span>
+                      : <span className="me-lesson-order">{idx + 1}</span>}
                   </li>
                 )
               })}
@@ -768,6 +828,11 @@ export default function ModuleEditorPage() {
                 <li className="me-lesson-empty">{t('authoring.moduleEditor.noLessons')}</li>
               )}
             </ul>
+            {canAddActivity && (
+              <button type="button" className="add-dashed-btn me-add-activity" onClick={addLesson}>
+                <Plus size={14} /> {t('authoring.moduleEditor.addActivity')}
+              </button>
+            )}
           </div>
 
         </aside>
