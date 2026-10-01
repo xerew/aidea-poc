@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import { useAuth } from '../context/AuthContext'
+import { subjectLabel } from '../lib/subjects'
 import './HomePage.css'
 
 PillarCard.propTypes = {
@@ -38,12 +39,37 @@ function PillarCard({ pillar }) {
   )
 }
 
+// The reason, worded in the viewer's language from the facts the server sends
+// (falls back to the server's English text).
+function recReason(rec, t) {
+  const p = rec.reason_params
+  if (!p) return rec.reason
+  const subject = p.subject_slug ? subjectLabel({ slug: p.subject_slug, name: p.subject_name }, t) : ''
+  if (rec.source === 'cf') {
+    return subject
+      ? t('home.reason.peers', { pct: p.pct, subject })
+      : t('home.reason.peersNoSubject', { pct: p.pct })
+  }
+  const level = t(`common.level.${p.level}`)
+  return subject
+    ? t('home.reason.personal', { level, subject })
+    : t('home.reason.personalNoSubject', { level })
+}
+
+const reasonParamsShape = PropTypes.shape({
+  level: PropTypes.string,
+  subject_slug: PropTypes.string,
+  subject_name: PropTypes.string,
+  pct: PropTypes.number,
+})
+
 RecCard.propTypes = {
   rec: PropTypes.shape({
     course_id: PropTypes.number,
     title: PropTypes.string,
     pillar_name: PropTypes.string,
     reason: PropTypes.string,
+    reason_params: reasonParamsShape,
     source: PropTypes.string,
   }),
   rank: PropTypes.number,
@@ -66,7 +92,7 @@ function RecCard({ rec, rank, onFireEvent }) {
     <div className="rec-card">
       <span className="rec-pillar">{rec.pillar_name}</span>
       <h3 className="rec-title">{rec.title}</h3>
-      <p className="rec-reason">{rec.reason}</p>
+      <p className="rec-reason">{recReason(rec, t)}</p>
       <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
         {t('home.startCourse')}
       </a>
@@ -79,6 +105,7 @@ CfRecCard.propTypes = {
     course_id: PropTypes.number,
     title: PropTypes.string,
     reason: PropTypes.string,
+    reason_params: reasonParamsShape,
     source: PropTypes.string,
   }),
   rank: PropTypes.number,
@@ -100,7 +127,7 @@ function CfRecCard({ rec, rank, onFireEvent }) {
   return (
     <div className="rec-card cf-card">
       <h3 className="rec-title">{rec.title}</h3>
-      <p className="rec-reason cf-reason">{rec.reason}</p>
+      <p className="rec-reason cf-reason">{recReason(rec, t)}</p>
       <a href={`/courses/${rec.course_id}`} className="rec-link" onClick={handleClick}>
         {t('home.viewCourseArrow')}
       </a>

@@ -4,6 +4,21 @@ Changes to how the pathway and recommendations rank courses. The study's
 adaptive group sees these rankings, so each change is dated for the analysis.
 The current version is `ALGORITHM_VERSION` in `backend/hub/personalization.py`.
 
+## 2026-10-01.2
+
+**Recommendations** (`hub/tasks.py`, `hub/completion.py`):
+- Candidate pool widened from the 20 to the 50 nearest courses before the
+  boosts and level filter re-rank them (a strongly matching course just
+  outside the nearest 20 can now reach the top 5).
+- "Completed" recommendation events are now recorded: when a course enrolled
+  in from a recommendation reaches 100 %, an event with the enrolment's
+  source, rank and weight snapshot is logged. The weight tuning's strongest
+  reward (1.0) was previously never earned. Teachers only, as for the other
+  events.
+
+**Display only** (no ranking effect): recommendation reasons are worded in the
+viewer's language; the peer list is titled "Educators like you also took".
+
 ## 2026-10-01
 
 **Pathway** (`hub/pathway_gen.py`) — additive score terms:

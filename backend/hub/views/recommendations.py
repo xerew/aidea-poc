@@ -31,7 +31,7 @@ class RecommendationsView(APIView):
         recs = (
             CourseRecommendation.objects
             .filter(user=request.user, course__is_published=True)
-            .select_related('course__pillar')
+            .select_related('course__pillar', 'user__profile__subject')
             .order_by('-score')
         )
         return Response(RecommendationSerializer(recs, many=True, context={'request': request}).data)

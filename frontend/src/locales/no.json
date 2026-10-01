@@ -385,10 +385,16 @@
     "viewCourses": "Se kurs →",
     "recommendedTitle": "Anbefalt for deg",
     "startCourse": "Start kurs →",
-    "cfTitle": "Lærere som deg tok også",
+    "cfTitle": "Lærere som deg har også tatt",
     "viewCourseArrow": "Se kurs →",
     "courseCount_one": "{{count}} kurs",
-    "courseCount_other": "{{count}} kurs"
+    "courseCount_other": "{{count}} kurs",
+    "reason": {
+      "personal": "Passer ditt nivå ({{level}}) og faget ditt ({{subject}})",
+      "personalNoSubject": "Passer ditt nivå ({{level}})",
+      "peers": "{{pct}} % av lærere som deg ({{subject}}) har meldt seg på",
+      "peersNoSubject": "{{pct}} % av lærere som deg har meldt seg på"
+    }
   },
   "courses": {
     "title": "Kurs",

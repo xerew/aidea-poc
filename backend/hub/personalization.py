@@ -7,7 +7,7 @@ sees; record them in docs/personalization-changelog.md.
 """
 
 # Bump when the ranking rules change (see docs/personalization-changelog.md).
-ALGORITHM_VERSION = '2026-10-01'
+ALGORITHM_VERSION = '2026-10-01.2'
 
 # A teacher's level (onboarding/profile) → course educational levels it fits.
 # Higher-ed, vocational and adult-ed teachers have no counterpart in the course

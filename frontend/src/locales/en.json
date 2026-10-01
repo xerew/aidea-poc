@@ -385,10 +385,16 @@
     "viewCourses": "View courses →",
     "recommendedTitle": "Recommended for you",
     "startCourse": "Start course →",
-    "cfTitle": "Teachers like you also took",
+    "cfTitle": "Educators like you also took",
     "viewCourseArrow": "View course →",
     "courseCount_one": "{{count}} course",
-    "courseCount_other": "{{count}} courses"
+    "courseCount_other": "{{count}} courses",
+    "reason": {
+      "personal": "Matches your {{level}} level and {{subject}} focus",
+      "personalNoSubject": "Matches your {{level}} level",
+      "peers": "{{pct}}% of {{subject}} educators like you enrolled",
+      "peersNoSubject": "{{pct}}% of educators like you enrolled"
+    }
   },
   "courses": {
     "title": "Courses",

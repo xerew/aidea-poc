@@ -385,10 +385,16 @@
     "viewCourses": "Ver cursos →",
     "recommendedTitle": "Recomendado para ti",
     "startCourse": "Empezar curso →",
-    "cfTitle": "Docentes como tú también tomaron",
+    "cfTitle": "Docentes como tú también cursaron",
     "viewCourseArrow": "Ver curso →",
     "courseCount_one": "{{count}} curso",
-    "courseCount_other": "{{count}} cursos"
+    "courseCount_other": "{{count}} cursos",
+    "reason": {
+      "personal": "Se ajusta a tu nivel ({{level}}) y a tu materia ({{subject}})",
+      "personalNoSubject": "Se ajusta a tu nivel ({{level}})",
+      "peers": "El {{pct}} % de los docentes como tú ({{subject}}) se inscribió",
+      "peersNoSubject": "El {{pct}} % de los docentes como tú se inscribió"
+    }
   },
   "courses": {
     "title": "Cursos",

@@ -385,10 +385,16 @@
     "viewCourses": "Näytä kurssit →",
     "recommendedTitle": "Suositukset sinulle",
     "startCourse": "Aloita kurssi →",
-    "cfTitle": "Kaltaisesi opettajat valitsivat myös",
+    "cfTitle": "Kaltaisesi opettajat osallistuivat myös",
     "viewCourseArrow": "Näytä kurssi →",
     "courseCount_one": "{{count}} kurssi",
-    "courseCount_other": "{{count}} kurssia"
+    "courseCount_other": "{{count}} kurssia",
+    "reason": {
+      "personal": "Sopii tasollesi ({{level}}) ja aineeseesi ({{subject}})",
+      "personalNoSubject": "Sopii tasollesi ({{level}})",
+      "peers": "{{pct}} % kaltaisistasi opettajista ({{subject}}) ilmoittautui",
+      "peersNoSubject": "{{pct}} % kaltaisistasi opettajista ilmoittautui"
+    }
   },
   "courses": {
     "title": "Kurssit",

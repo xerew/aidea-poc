@@ -42,6 +42,10 @@ def _merge_json(model_cls, pk, field, key, value):
 # recommendations rework (#24) may move signal tuning into RecommendationConfig.
 SUBJECT_MATCH_BOOST = 1.2
 
+# Nearest courses (by raw similarity) considered before boosts and filters
+# re-rank them; the top 5 of these are kept.
+CANDIDATE_POOL = 50
+
 # Nudge for courses in a pillar the teacher marked as preferred, so changing
 # the preferred pillar visibly reshuffles recommendations.
 PILLAR_MATCH_BOOST = 1.25
@@ -236,7 +240,7 @@ def compute_user_recommendations(user_id: int) -> None:
         .exclude(course_id__in=enrolled_ids)
         .filter(course__is_published=True)
         .annotate(distance=CosineDistance('embedding', user_vec_list))
-        .order_by('distance')[:20]
+        .order_by('distance')[:CANDIDATE_POOL]
     )
 
     # A course tagged with the teacher's subject (or the catch-all General/All)

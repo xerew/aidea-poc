@@ -185,3 +185,66 @@ class RecomputeAllTest(APITestCase):
         with patch('hub.tasks.compute_user_recommendations.delay') as compute:
             recompute_all_recommendations()
         self.assertEqual({c.args[0] for c in compute.call_args_list}, {teacher.id, partner.id})
+
+
+class RecommendedCompletionEventTests(APITestCase):
+    """Completing a course enrolled in from a recommendation records the
+    'completed' reward, credited to the weights of the original enrolment."""
+
+    def setUp(self):
+        from hub.models import Enrollment, Module, Resource
+        from hub.models.content import Activity
+        pillar = LearningPillar.objects.create(name='RC', slug='rc', description='')
+        self.course = Course.objects.create(title='Rec course', pillar=pillar, is_published=True)
+        module = Module.objects.create(course=self.course, title='M', order=1)
+        activity = Activity.objects.create(module=module, title='A', order=1)
+        self.resource = Resource.objects.create(activity=activity, type='text', order=1)
+        self.teacher = make_teacher('rc_t')
+        self.enrollment = Enrollment.objects.create(user=self.teacher, course=self.course)
+
+    def _complete(self, user, enrollment):
+        from hub.completion import record_resource_completion
+        record_resource_completion(user, enrollment, self.resource)
+
+    def test_completion_logged_with_enrolment_weights(self):
+        snapshot = {'alpha': 0.4, 'beta': 0.4, 'gamma': 0.2, 'bandit_active': True}
+        RecommendationEvent.objects.create(
+            user=self.teacher, course=self.course, event_type='enrolled',
+            rank=2, source='cf', weights_snapshot=snapshot,
+        )
+        self._complete(self.teacher, self.enrollment)
+        done = RecommendationEvent.objects.get(user=self.teacher, event_type='completed')
+        self.assertEqual((done.source, done.rank, done.weights_snapshot), ('cf', 2, snapshot))
+
+    def test_no_event_when_course_was_not_recommended(self):
+        self._complete(self.teacher, self.enrollment)
+        self.assertFalse(RecommendationEvent.objects.filter(event_type='completed').exists())
+
+    def test_staff_completion_not_logged(self):
+        from hub.models import Enrollment
+        creator = User.objects.create_user(username='rc_cc', password='pass')
+        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        RecommendationEvent.objects.create(
+            user=creator, course=self.course, event_type='enrolled', rank=1, source='personal',
+        )
+        self._complete(creator, Enrollment.objects.create(user=creator, course=self.course))
+        self.assertFalse(RecommendationEvent.objects.filter(event_type='completed').exists())
+
+
+class RecommendationReasonParamsTests(APITestCase):
+    def test_reason_params_for_personal_and_peer_cards(self):
+        from hub.models import Subject
+        user = make_teacher('rp_t')
+        user.profile.subject = Subject.objects.get(slug='mathematics')
+        user.profile.competency_score = 3
+        user.profile.save()
+        pillar = LearningPillar.objects.create(name='RP', slug='rp', description='')
+        c1 = Course.objects.create(title='One', pillar=pillar, is_published=True)
+        c2 = Course.objects.create(title='Two', pillar=pillar, is_published=True)
+        CourseRecommendation.objects.create(user=user, course=c1, score=0.9, reason='r', source='personal')
+        CourseRecommendation.objects.create(user=user, course=c2, score=0.4, reason='r', source='cf')
+        self.client.force_authenticate(user)
+        by_source = {r['source']: r['reason_params'] for r in self.client.get(reverse('recommendations')).data}
+        self.assertEqual(by_source['personal'],
+                         {'level': 'intermediate', 'subject_slug': 'mathematics', 'subject_name': 'Mathematics'})
+        self.assertEqual(by_source['cf']['pct'], 40)

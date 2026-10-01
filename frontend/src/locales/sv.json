@@ -385,10 +385,16 @@
     "viewCourses": "Visa kurser →",
     "recommendedTitle": "Rekommenderat för dig",
     "startCourse": "Starta kurs →",
-    "cfTitle": "Lärare som du tog också",
+    "cfTitle": "Lärare som du har också gått",
     "viewCourseArrow": "Visa kurs →",
     "courseCount_one": "{{count}} kurs",
-    "courseCount_other": "{{count}} kurser"
+    "courseCount_other": "{{count}} kurser",
+    "reason": {
+      "personal": "Passar din nivå ({{level}}) och ditt ämne ({{subject}})",
+      "personalNoSubject": "Passar din nivå ({{level}})",
+      "peers": "{{pct}} % av lärare som du ({{subject}}) har anmält sig",
+      "peersNoSubject": "{{pct}} % av lärare som du har anmält sig"
+    }
   },
   "courses": {
     "title": "Kurser",

@@ -388,7 +388,13 @@
     "cfTitle": "Εκπαιδευτικοί σαν εσάς παρακολούθησαν επίσης",
     "viewCourseArrow": "Προβολή μαθήματος →",
     "courseCount_one": "{{count}} μάθημα",
-    "courseCount_other": "{{count}} μαθήματα"
+    "courseCount_other": "{{count}} μαθήματα",
+    "reason": {
+      "personal": "Ταιριάζει στο επίπεδό σας ({{level}}) και στο αντικείμενό σας ({{subject}})",
+      "personalNoSubject": "Ταιριάζει στο επίπεδό σας ({{level}})",
+      "peers": "Το {{pct}}% των εκπαιδευτικών σαν εσάς ({{subject}}) εγγράφηκε",
+      "peersNoSubject": "Το {{pct}}% των εκπαιδευτικών σαν εσάς εγγράφηκε"
+    }
   },
   "courses": {
     "title": "Μαθήματα",

@@ -385,10 +385,16 @@
     "viewCourses": "Kurse ansehen →",
     "recommendedTitle": "Für Sie empfohlen",
     "startCourse": "Kurs starten →",
-    "cfTitle": "Lehrkräfte wie Sie haben ebenfalls belegt",
+    "cfTitle": "Lehrkräfte wie Sie haben auch belegt",
     "viewCourseArrow": "Kurs ansehen →",
     "courseCount_one": "{{count}} Kurs",
-    "courseCount_other": "{{count}} Kurse"
+    "courseCount_other": "{{count}} Kurse",
+    "reason": {
+      "personal": "Passt zu Ihrem Niveau ({{level}}) und Ihrem Fach ({{subject}})",
+      "personalNoSubject": "Passt zu Ihrem Niveau ({{level}})",
+      "peers": "{{pct}} % der Lehrkräfte wie Sie ({{subject}}) haben sich eingeschrieben",
+      "peersNoSubject": "{{pct}} % der Lehrkräfte wie Sie haben sich eingeschrieben"
+    }
   },
   "courses": {
     "title": "Kurse",

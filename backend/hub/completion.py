@@ -96,8 +96,38 @@ def recompute_course_progress(user, enrollment):
     if just_completed and hasattr(user, 'profile'):
         from hub.competency import apply_competency_delta, course_completion_delta
         apply_competency_delta(user, course_completion_delta(user, course))
+    if just_completed:
+        _record_recommended_completion(user, course)
 
     return progress_pct
+
+
+def _record_recommended_completion(user, course):
+    """If the course was enrolled in from a recommendation, log a "completed"
+    event — the strongest reward for the weight tuning. It reuses the enrol
+    event's source, rank and weights so the completion is credited to the
+    weight mix that produced the recommendation (the recommendation row itself
+    is gone by now: enrolled courses are dropped from the list)."""
+    from hub.models.recommendations import RecommendationEvent
+    from hub.views.recommendations import records_recommendation_events
+    if not records_recommendation_events(user):
+        return
+    enrolled = (
+        RecommendationEvent.objects
+        .filter(user=user, course=course, event_type=RecommendationEvent.EventType.ENROLLED)
+        .order_by('-created_at')
+        .first()
+    )
+    if enrolled is None:
+        return
+    RecommendationEvent.objects.get_or_create(
+        user=user, course=course, event_type=RecommendationEvent.EventType.COMPLETED,
+        defaults={
+            'rank': enrolled.rank,
+            'source': enrolled.source,
+            'weights_snapshot': enrolled.weights_snapshot,
+        },
+    )
 
 
 # ── Writes ────────────────────────────────────────────────────────────────────

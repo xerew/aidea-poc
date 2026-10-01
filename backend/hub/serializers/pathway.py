@@ -83,9 +83,28 @@ class RecommendationSerializer(serializers.ModelSerializer):
     level          = serializers.CharField(source='course.level')
     duration_hours = serializers.IntegerField(source='course.duration_hours')
 
+    reason_params  = serializers.SerializerMethodField()
+
     class Meta:
         model  = CourseRecommendation
-        fields = ['course_id', 'title', 'pillar_name', 'level', 'duration_hours', 'score', 'reason', 'source']
+        fields = [
+            'course_id', 'title', 'pillar_name', 'level', 'duration_hours', 'score',
+            'reason', 'reason_params', 'source',
+        ]
 
     def get_title(self, obj):
         return localized(obj.course, 'title', viewer_language(self.context))
+
+    def get_reason_params(self, obj):
+        """Facts behind the reason, for the page to word in the viewer's
+        language (`reason` stays as an English fallback)."""
+        profile = obj.user.profile
+        score = profile.competency_score
+        params = {
+            'level': 'beginner' if score <= 2 else ('intermediate' if score <= 4 else 'advanced'),
+            'subject_slug': profile.subject.slug if profile.subject else '',
+            'subject_name': profile.subject.name if profile.subject else '',
+        }
+        if obj.source == 'cf':
+            params['pct'] = round(obj.score * 100)  # cf score = share of peers who enrolled
+        return params
