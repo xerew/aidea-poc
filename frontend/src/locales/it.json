@@ -689,9 +689,9 @@
     },
     "collab": {
       "title": "Collaboratori",
-      "description": "Aggiungi creatori di contenuti o partner AIDEA per aiutare a gestire o tradurre questo corso.",
+      "description": "Aggiungi creatori di contenuti, partner AIDEA o amministratori per aiutare a gestire o tradurre questo corso.",
       "none": "Nessun collaboratore ancora.",
-      "searchPlaceholder": "Cerca creatori o partner...",
+      "searchPlaceholder": "Cerca creatori, partner o amministratori...",
       "add": "Aggiungi",
       "remove": "Rimuovi",
       "role": {

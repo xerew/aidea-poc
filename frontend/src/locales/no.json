@@ -689,9 +689,9 @@
     },
     "collab": {
       "title": "Samarbeidspartnere",
-      "description": "Legg til innholdsskapere eller AIDEA-partnere for å hjelpe med å administrere eller oversette dette kurset.",
+      "description": "Legg til innholdsskapere, AIDEA-partnere eller administratorer som kan hjelpe med å administrere eller oversette dette kurset.",
       "none": "Ingen samarbeidspartnere ennå.",
-      "searchPlaceholder": "Søk etter skapere eller partnere...",
+      "searchPlaceholder": "Søk etter skapere, partnere eller administratorer...",
       "add": "Legg til",
       "remove": "Fjern",
       "role": {

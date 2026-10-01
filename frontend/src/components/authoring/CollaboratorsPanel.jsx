@@ -108,7 +108,7 @@ export default function CollaboratorsPanel({ courseId }) {
         <select className="collab-role" value={role} onChange={(e) => setRole(e.target.value)}>
           {ROLES.map((r) => <option key={r} value={r}>{t(`authoring.collab.role.${r}`)}</option>)}
         </select>
-        <button className="enroll-btn" onClick={add} disabled={!selected || busy}>
+        <button type="button" className="collab-add-btn" onClick={add} disabled={!selected || busy}>
           <Plus size={15} /> {t('authoring.collab.add')}
         </button>
       </div>

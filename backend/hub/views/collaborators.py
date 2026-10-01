@@ -14,7 +14,12 @@ from .permissions import (
 )
 
 # Roles eligible to be added as collaborators (admins already edit everything).
-_CANDIDATE_ROLES = [UserProfile.UserType.CONTENT_CREATOR, UserProfile.UserType.AIDEA_PARTNER]
+# Admins count as AIDEA partners, so they can be added too.
+_CANDIDATE_ROLES = [
+    UserProfile.UserType.CONTENT_CREATOR,
+    UserProfile.UserType.AIDEA_PARTNER,
+    UserProfile.UserType.ADMIN,
+]
 
 
 def _serialize(collab):
@@ -66,7 +71,7 @@ class AuthoringCourseCollaboratorsView(APIView):
         profile = getattr(user, 'profile', None)
         if profile is None or profile.user_type not in CONTENT_CREATOR_ROLES:
             return Response(
-                {'detail': 'Collaborators must be content creators or AIDEA partners.'},
+                {'detail': 'Collaborators must be content creators, AIDEA partners or admins.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -78,8 +83,8 @@ class AuthoringCourseCollaboratorsView(APIView):
 
 
 class AuthoringCollaboratorCandidatesView(APIView):
-    """GET ?q= → content creators / AIDEA partners who can be added as
-    collaborators (for the add-collaborator picker)."""
+    """GET ?q= → content creators, AIDEA partners and admins who can be added
+    as collaborators (for the add-collaborator picker)."""
     permission_classes = [IsContentCreator]
 
     def get(self, request):

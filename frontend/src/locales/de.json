@@ -689,9 +689,9 @@
     },
     "collab": {
       "title": "Mitwirkende",
-      "description": "Fügen Sie Content-Ersteller oder AIDEA-Partner hinzu, um bei der Verwaltung oder Übersetzung dieses Kurses zu helfen.",
+      "description": "Fügen Sie Inhaltsersteller, AIDEA-Partner oder Administratoren hinzu, die bei der Verwaltung oder Übersetzung dieses Kurses helfen.",
       "none": "Noch keine Mitwirkenden.",
-      "searchPlaceholder": "Ersteller oder Partner suchen...",
+      "searchPlaceholder": "Ersteller, Partner oder Administratoren suchen...",
       "add": "Hinzufügen",
       "remove": "Entfernen",
       "role": {

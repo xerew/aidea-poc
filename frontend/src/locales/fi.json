@@ -689,9 +689,9 @@
     },
     "collab": {
       "title": "Yhteistyökumppanit",
-      "description": "Lisää sisällöntuottajia tai AIDEA-kumppaneita auttamaan tämän kurssin hallinnassa tai kääntämisessä.",
+      "description": "Lisää sisällöntuottajia, AIDEA-kumppaneita tai ylläpitäjiä auttamaan tämän kurssin hallinnassa tai kääntämisessä.",
       "none": "Ei vielä yhteistyökumppaneita.",
-      "searchPlaceholder": "Hae tekijöitä tai kumppaneita...",
+      "searchPlaceholder": "Hae tuottajia, kumppaneita tai ylläpitäjiä...",
       "add": "Lisää",
       "remove": "Poista",
       "role": {

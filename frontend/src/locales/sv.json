@@ -689,9 +689,9 @@
     },
     "collab": {
       "title": "Medarbetare",
-      "description": "Lägg till innehållsskapare eller AIDEA-partner för att hjälpa till att hantera eller översätta kursen.",
+      "description": "Lägg till innehållsskapare, AIDEA-partner eller administratörer som hjälper till att hantera eller översätta kursen.",
       "none": "Inga medarbetare ännu.",
-      "searchPlaceholder": "Sök skapare eller partner...",
+      "searchPlaceholder": "Sök skapare, partner eller administratörer...",
       "add": "Lägg till",
       "remove": "Ta bort",
       "role": {

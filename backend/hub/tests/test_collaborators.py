@@ -109,14 +109,21 @@ class CollaboratorManagementTests(CollaboratorBase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['role'], 'co_editor')
 
-    def test_candidates_lists_creators_and_partners_not_teachers(self):
+    def test_candidates_lists_creators_partners_and_admins_not_teachers(self):
         self._login_as(self.creator)
         res = self.client.get(reverse('authoring-collaborator-candidates'))
         self.assertEqual(res.status_code, 200)
         ids = {row['id'] for row in res.data}
         self.assertIn(self.other_creator.id, ids)
         self.assertIn(self.partner.id, ids)
+        self.assertIn(self.admin.id, ids)
         self.assertNotIn(self.teacher.id, ids)
+
+    def test_admin_can_be_added_as_collaborator(self):
+        self._login_as(self.creator)
+        res = self.client.post(self._collaborators_url(),
+                               {'user_id': self.admin.id, 'role': 'translator'}, format='json')
+        self.assertEqual(res.status_code, 201)
 
 
 class CoEditorPermissionTests(CollaboratorBase):
