@@ -932,14 +932,6 @@
     "restricted": "Content Analytics is only available to content creators.",
     "loadError": "Failed to load analytics.",
     "downloadExcel": "Download Excel",
-    "viewTeachers": "View teachers",
-    "hideTeachers": "Hide teachers",
-    "noTeachers": "No teachers enrolled yet.",
-    "minutes": "{{count}} min",
-    "avgScore": "avg {{pct}}%",
-    "chose": "chose “{{answer}}”",
-    "correctAnswer": "correct: {{answer}}",
-    "notAnswered": "not answered",
     "searchPlaceholder": "Search name, description or author…",
     "allPillars": "All pillars",
     "noMatch": "No courses match your filters.",
@@ -951,6 +943,79 @@
       "selectAll": "Select all",
       "exportSelected": "Export {{count}}",
       "search": "Search courses…"
+    },
+    "open": "Open",
+    "excel": "Excel",
+    "course": {
+      "back": "All courses",
+      "notFound": "This course was not found, or you cannot see its analytics.",
+      "learnersCount": "{{count}} learners enrolled",
+      "help": "Active time counts only while the learner is using the page (input in the last minute, or a video playing). Typical = median; hover for the average.",
+      "tabs": {
+        "content": "Content",
+        "learners": "Learners"
+      },
+      "col": {
+        "item": "Module / activity / resource",
+        "reached": "Reached",
+        "done": "Done",
+        "typical": "Typical active time",
+        "dropped": "Dropped here",
+        "learner": "Learner",
+        "progress": "Progress",
+        "active": "Active",
+        "onScreen": "On screen",
+        "visits": "Visits",
+        "lastActive": "Last active",
+        "position": "Current position",
+        "status": "Status",
+        "resource": "Resource",
+        "firstOpened": "First opened",
+        "completed": "Completed",
+        "details": "Details"
+      },
+      "average": "Average: {{value}}",
+      "notTracked": "not tracked",
+      "noContent": "This course has no modules yet.",
+      "empty": "No learners are enrolled in this course yet.",
+      "status": {
+        "all": "All statuses",
+        "completed": "Completed",
+        "on_track": "On track",
+        "stuck": "Stuck",
+        "inactive": "Inactive"
+      },
+      "notes": {
+        "scroll": "avg. scrolled {{pct}}%",
+        "watched": "avg. watched {{pct}}%",
+        "stop": "often stops at {{time}}",
+        "score": "avg. score {{pct}}%",
+        "hardest": "hardest: Q{{n}} ({{pct}}% right)",
+        "perQuestion": "{{s}} s per question",
+        "opened": "opened by {{count}}",
+        "downloaded": "downloaded by {{count}}",
+        "assignment": "{{submitted}} submitted · {{approved}} approved · {{waiting}} waiting"
+      },
+      "detail": {
+        "score": "Score {{pct}}%",
+        "watched": "Watched {{pct}}%",
+        "scrolled": "Scrolled {{pct}}%",
+        "opened": "Opened",
+        "downloaded": "Downloaded",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "Waiting for review",
+          "approved": "Approved",
+          "changes_requested": "Changes requested"
+        }
+      },
+      "backToLearners": "Back to learners",
+      "totals": "Active {{active}} · on screen {{onScreen}} · {{visits}} visits",
+      "dur": {
+        "hm": "{{h}} h {{m}} min",
+        "ms": "{{m}} min {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {

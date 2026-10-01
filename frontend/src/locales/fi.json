@@ -932,14 +932,6 @@
     "restricted": "Sisältöanalytiikka on käytettävissä vain sisällöntuottajille.",
     "loadError": "Analytiikan lataaminen epäonnistui.",
     "downloadExcel": "Lataa Excel",
-    "viewTeachers": "Näytä opettajat",
-    "hideTeachers": "Piilota opettajat",
-    "noTeachers": "Ei vielä ilmoittautuneita opettajia.",
-    "minutes": "{{count}} min",
-    "avgScore": "ka {{pct}}%",
-    "chose": "valitsi “{{answer}}”",
-    "correctAnswer": "oikein: {{answer}}",
-    "notAnswered": "ei vastausta",
     "searchPlaceholder": "Hae nimi, kuvaus tai tekijä…",
     "allPillars": "Kaikki pilarit",
     "noMatch": "Yksikään kurssi ei täsmää.",
@@ -951,6 +943,79 @@
       "selectAll": "Valitse kaikki",
       "exportSelected": "Vie {{count}}",
       "search": "Hae kursseja…"
+    },
+    "open": "Avaa",
+    "excel": "Excel",
+    "course": {
+      "back": "Kaikki kurssit",
+      "notFound": "Kurssia ei löytynyt tai et voi nähdä sen analytiikkaa.",
+      "learnersCount": "{{count}} ilmoittautunutta osallistujaa",
+      "help": "Aktiivinen aika lasketaan vain, kun osallistuja käyttää sivua (toiminto viimeisen minuutin aikana tai video toistumassa). Tyypillinen = mediaani; vie osoitin päälle nähdäksesi keskiarvon.",
+      "tabs": {
+        "content": "Sisältö",
+        "learners": "Osallistujat"
+      },
+      "col": {
+        "item": "Moduuli / tehtävä / materiaali",
+        "reached": "Avattu",
+        "done": "Valmis",
+        "typical": "Tyypillinen aktiivinen aika",
+        "dropped": "Jäi tähän",
+        "learner": "Osallistuja",
+        "progress": "Edistyminen",
+        "active": "Aktiivinen",
+        "onScreen": "Näytöllä",
+        "visits": "Käynnit",
+        "lastActive": "Viimeksi aktiivinen",
+        "position": "Nykyinen kohta",
+        "status": "Tila",
+        "resource": "Materiaali",
+        "firstOpened": "Avattu ensimmäisen kerran",
+        "completed": "Suoritettu",
+        "details": "Tiedot"
+      },
+      "average": "Keskiarvo: {{value}}",
+      "notTracked": "ei mitattu",
+      "noContent": "Kurssilla ei ole vielä moduuleja.",
+      "empty": "Kurssille ei ole vielä ilmoittautunut osallistujia.",
+      "status": {
+        "all": "Kaikki tilat",
+        "completed": "Suoritettu",
+        "on_track": "Etenee",
+        "stuck": "Jumissa",
+        "inactive": "Passiivinen"
+      },
+      "notes": {
+        "scroll": "vieritetty keskim. {{pct}} %",
+        "watched": "katsottu keskim. {{pct}} %",
+        "stop": "pysähtyy usein kohdassa {{time}}",
+        "score": "keskipisteet {{pct}} %",
+        "hardest": "vaikein: K{{n}} ({{pct}} % oikein)",
+        "perQuestion": "{{s}} s / kysymys",
+        "opened": "avannut {{count}}",
+        "downloaded": "ladannut {{count}}",
+        "assignment": "{{submitted}} palautettu · {{approved}} hyväksytty · {{waiting}} odottaa"
+      },
+      "detail": {
+        "score": "Pisteet {{pct}} %",
+        "watched": "Katsottu {{pct}} %",
+        "scrolled": "Vieritetty {{pct}} %",
+        "opened": "Avattu",
+        "downloaded": "Ladattu",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "Odottaa arviointia",
+          "approved": "Hyväksytty",
+          "changes_requested": "Muutoksia pyydetty"
+        }
+      },
+      "backToLearners": "Takaisin osallistujiin",
+      "totals": "Aktiivinen {{active}} · näytöllä {{onScreen}} · {{visits}} käyntiä",
+      "dur": {
+        "hm": "{{h}} h {{m}} min",
+        "ms": "{{m}} min {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {

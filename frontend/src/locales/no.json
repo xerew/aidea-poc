@@ -932,14 +932,6 @@
     "restricted": "Innholdsanalyse er kun tilgjengelig for innholdsskapere.",
     "loadError": "Kunne ikke laste analysedata.",
     "downloadExcel": "Last ned Excel",
-    "viewTeachers": "Vis lærere",
-    "hideTeachers": "Skjul lærere",
-    "noTeachers": "Ingen lærere påmeldt ennå.",
-    "minutes": "{{count}} min",
-    "avgScore": "snitt {{pct}}%",
-    "chose": "valgte “{{answer}}”",
-    "correctAnswer": "riktig: {{answer}}",
-    "notAnswered": "ikke besvart",
     "searchPlaceholder": "Søk navn, beskrivelse eller forfatter…",
     "allPillars": "Alle pilarer",
     "noMatch": "Ingen kurs samsvarer.",
@@ -951,6 +943,79 @@
       "selectAll": "Velg alle",
       "exportSelected": "Eksporter {{count}}",
       "search": "Søk kurs…"
+    },
+    "open": "Åpne",
+    "excel": "Excel",
+    "course": {
+      "back": "Alle kurs",
+      "notFound": "Kurset ble ikke funnet, eller du har ikke tilgang til statistikken.",
+      "learnersCount": "{{count}} påmeldte deltakere",
+      "help": "Aktiv tid telles bare mens deltakeren bruker siden (aktivitet siste minutt eller en video som spilles). Typisk = median; hold pekeren over for gjennomsnittet.",
+      "tabs": {
+        "content": "Innhold",
+        "learners": "Deltakere"
+      },
+      "col": {
+        "item": "Modul / aktivitet / ressurs",
+        "reached": "Åpnet",
+        "done": "Fullført",
+        "typical": "Typisk aktiv tid",
+        "dropped": "Stoppet her",
+        "learner": "Deltaker",
+        "progress": "Fremdrift",
+        "active": "Aktiv",
+        "onScreen": "På skjermen",
+        "visits": "Besøk",
+        "lastActive": "Sist aktiv",
+        "position": "Nåværende posisjon",
+        "status": "Status",
+        "resource": "Ressurs",
+        "firstOpened": "Først åpnet",
+        "completed": "Fullført",
+        "details": "Detaljer"
+      },
+      "average": "Gjennomsnitt: {{value}}",
+      "notTracked": "ikke målt",
+      "noContent": "Kurset har ingen moduler ennå.",
+      "empty": "Ingen deltakere er påmeldt kurset ennå.",
+      "status": {
+        "all": "Alle statuser",
+        "completed": "Fullført",
+        "on_track": "I rute",
+        "stuck": "Står fast",
+        "inactive": "Inaktiv"
+      },
+      "notes": {
+        "scroll": "scrollet i snitt {{pct}} %",
+        "watched": "sett i snitt {{pct}} %",
+        "stop": "stopper ofte ved {{time}}",
+        "score": "snittresultat {{pct}} %",
+        "hardest": "vanskeligst: S{{n}} ({{pct}} % riktig)",
+        "perQuestion": "{{s}} s per spørsmål",
+        "opened": "åpnet av {{count}}",
+        "downloaded": "lastet ned av {{count}}",
+        "assignment": "{{submitted}} levert · {{approved}} godkjent · {{waiting}} venter"
+      },
+      "detail": {
+        "score": "Resultat {{pct}} %",
+        "watched": "Sett {{pct}} %",
+        "scrolled": "Scrollet {{pct}} %",
+        "opened": "Åpnet",
+        "downloaded": "Lastet ned",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "Venter på vurdering",
+          "approved": "Godkjent",
+          "changes_requested": "Endringer etterspurt"
+        }
+      },
+      "backToLearners": "Tilbake til deltakerne",
+      "totals": "Aktiv {{active}} · på skjermen {{onScreen}} · {{visits}} besøk",
+      "dur": {
+        "hm": "{{h}} t {{m}} min",
+        "ms": "{{m}} min {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {

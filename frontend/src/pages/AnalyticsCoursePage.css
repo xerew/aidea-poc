@@ -1,0 +1,61 @@
+.acp-page { display: flex; flex-direction: column; gap: 1.25rem; }
+.acp-back {
+  display: inline-flex; align-items: center; gap: 0.3rem; align-self: flex-start;
+  background: none; border: none; padding: 0; color: var(--color-primary);
+  font-size: 0.85rem; cursor: pointer; text-decoration: none;
+}
+.acp-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.acp-title { margin: 0; font-size: 1.4rem; }
+.acp-subtitle, .acp-help { margin: 0; color: var(--color-text-muted); font-size: 0.88rem; }
+.acp-help { display: flex; gap: 0.4rem; align-items: flex-start; }
+.acp-tabs { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--color-border); }
+.acp-tab {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  padding: 0.55rem 1rem; font-size: 0.92rem; cursor: pointer; color: var(--color-text-muted);
+}
+.acp-tab--active { color: var(--color-primary); border-bottom-color: var(--color-primary); font-weight: 600; }
+.acp-table-wrap {
+  overflow-x: auto; background: var(--color-surface);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+}
+.acp-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+.acp-table th, .acp-table td { padding: 0.55rem 0.75rem; text-align: left; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+.acp-table th { font-weight: 600; white-space: nowrap; }
+.acp-table--compact th, .acp-table--compact td { padding: 0.4rem 0.6rem; }
+.acp-table .acp-num { text-align: right; white-space: nowrap; }
+.acp-pct { color: var(--color-text-muted); font-size: 0.78rem; }
+.acp-row--module { cursor: pointer; font-weight: 600; background: rgba(0, 0, 0, 0.02); }
+.acp-row--activity { cursor: pointer; }
+.acp-row--activity td:first-child { padding-left: 1.75rem; }
+.acp-row--resource td:first-child { padding-left: 3.25rem; }
+.acp-row--learner { cursor: pointer; }
+.acp-row--learner:hover, .acp-row--activity:hover, .acp-row--module:hover { background: rgba(37, 99, 235, 0.05); }
+.acp-resource-title { display: inline-flex; align-items: center; gap: 0.35rem; }
+.acp-notes { margin: 0.2rem 0 0; color: var(--color-text-muted); font-size: 0.78rem; }
+.acp-sortable { cursor: pointer; user-select: none; }
+.acp-sortable svg { margin-left: 0.25rem; vertical-align: middle; }
+.acp-learner-name { display: block; font-weight: 500; }
+.acp-learner-email { display: block; color: var(--color-text-muted); font-size: 0.78rem; }
+.acp-position { max-width: 16rem; }
+.acp-status-filter { align-self: flex-start; padding: 0.4rem 0.6rem; border: 1px solid var(--color-border); border-radius: var(--radius); }
+.acp-status { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+.acp-status--completed { background: #dcfce7; color: #166534; }
+.acp-status--on_track { background: #dbeafe; color: #1e40af; }
+.acp-status--stuck { background: #fef3c7; color: #92400e; }
+.acp-status--inactive { background: #f3f4f6; color: #4b5563; }
+.acp-empty { color: var(--color-text-muted); }
+.acp-timeline { display: flex; flex-direction: column; gap: 1.25rem; }
+.acp-timeline-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem 1rem; }
+.acp-timeline-head h2 { margin: 0; font-size: 1.2rem; }
+.acp-tl-module h3 { display: flex; gap: 0.75rem; align-items: baseline; font-size: 1rem; margin: 0 0 0.5rem; }
+.acp-tl-activity { margin: 0 0 0.9rem 0.75rem; }
+.acp-tl-activity h4 { display: flex; align-items: center; gap: 0.4rem; font-size: 0.92rem; margin: 0 0 0.4rem; }
+.acp-tl-meta { color: var(--color-text-muted); font-size: 0.8rem; font-weight: 400; }
+.acp-answers { margin: 0.35rem 0 0; padding-left: 1.1rem; font-size: 0.8rem; }
+.acp-answers li { display: flex; gap: 0.35rem; align-items: baseline; flex-wrap: wrap; }
+.acp-answer-q { color: var(--color-text-muted); }
+.acp-answer-a { font-weight: 500; }
+.acp-answer-t { color: var(--color-text-muted); }
+.acp-right { color: #16a34a; flex-shrink: 0; }
+.acp-wrong { color: #dc2626; flex-shrink: 0; }
+.acp-muted { color: var(--color-text-muted); }

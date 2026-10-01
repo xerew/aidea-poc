@@ -19,6 +19,7 @@ import ActivityPage, { LearnRedirect } from './pages/ActivityPage'
 import MyLearningPage from './pages/MyLearningPage'
 import PathwayPage from './pages/PathwayPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import AnalyticsCoursePage from './pages/AnalyticsCoursePage'
 import PlaceholderPage from './pages/PlaceholderPage'
 import ProfilePage from './pages/ProfilePage'
 import AuthoringPage from './pages/AuthoringPage'
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/learning"             element={<MyLearningPage />} />
             <Route path="/pathway"              element={<PathwayPage />} />
             <Route path="/analytics"            element={<AnalyticsPage />} />
+            <Route path="/analytics/courses/:id" element={<AnalyticsCoursePage />} />
             <Route path="/profile"              element={<ProfilePage />} />
             <Route path="/ai-competency"        element={<AICompetencyPage />} />
             <Route path="/users/:id"            element={<PublicProfilePage />} />

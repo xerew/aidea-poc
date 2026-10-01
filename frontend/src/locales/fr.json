@@ -932,14 +932,6 @@
     "restricted": "Les analyses de contenu sont réservées aux créateurs de contenu.",
     "loadError": "Échec du chargement des analyses.",
     "downloadExcel": "Télécharger Excel",
-    "viewTeachers": "Voir les enseignants",
-    "hideTeachers": "Masquer les enseignants",
-    "noTeachers": "Aucun enseignant inscrit pour l'instant.",
-    "minutes": "{{count}} min",
-    "avgScore": "moy. {{pct}}%",
-    "chose": "a choisi “{{answer}}”",
-    "correctAnswer": "correct : {{answer}}",
-    "notAnswered": "sans réponse",
     "searchPlaceholder": "Rechercher nom, description ou auteur…",
     "allPillars": "Tous les piliers",
     "noMatch": "Aucun cours ne correspond.",
@@ -951,6 +943,79 @@
       "selectAll": "Tout sélectionner",
       "exportSelected": "Exporter {{count}}",
       "search": "Rechercher des cours…"
+    },
+    "open": "Ouvrir",
+    "excel": "Excel",
+    "course": {
+      "back": "Tous les cours",
+      "notFound": "Ce cours est introuvable ou vous ne pouvez pas voir ses statistiques.",
+      "learnersCount": "{{count}} apprenants inscrits",
+      "help": "Le temps actif ne compte que lorsque l'apprenant utilise la page (action dans la dernière minute ou vidéo en lecture). Typique = médiane ; survolez pour la moyenne.",
+      "tabs": {
+        "content": "Contenu",
+        "learners": "Apprenants"
+      },
+      "col": {
+        "item": "Module / activité / ressource",
+        "reached": "Ouvert",
+        "done": "Terminé",
+        "typical": "Temps actif typique",
+        "dropped": "Abandon ici",
+        "learner": "Apprenant",
+        "progress": "Progression",
+        "active": "Actif",
+        "onScreen": "À l'écran",
+        "visits": "Visites",
+        "lastActive": "Dernière activité",
+        "position": "Position actuelle",
+        "status": "Statut",
+        "resource": "Ressource",
+        "firstOpened": "Première ouverture",
+        "completed": "Terminé",
+        "details": "Détails"
+      },
+      "average": "Moyenne : {{value}}",
+      "notTracked": "non mesuré",
+      "noContent": "Ce cours n'a pas encore de modules.",
+      "empty": "Aucun apprenant n'est encore inscrit à ce cours.",
+      "status": {
+        "all": "Tous les statuts",
+        "completed": "Terminé",
+        "on_track": "En bonne voie",
+        "stuck": "En difficulté",
+        "inactive": "Inactif"
+      },
+      "notes": {
+        "scroll": "défilement moyen {{pct}} %",
+        "watched": "visionnage moyen {{pct}} %",
+        "stop": "arrêt fréquent à {{time}}",
+        "score": "score moyen {{pct}} %",
+        "hardest": "la plus difficile : Q{{n}} ({{pct}} % de réussite)",
+        "perQuestion": "{{s}} s par question",
+        "opened": "ouvert par {{count}}",
+        "downloaded": "téléchargé par {{count}}",
+        "assignment": "{{submitted}} rendus · {{approved}} validés · {{waiting}} en attente"
+      },
+      "detail": {
+        "score": "Score {{pct}} %",
+        "watched": "Visionné {{pct}} %",
+        "scrolled": "Défilé {{pct}} %",
+        "opened": "Ouvert",
+        "downloaded": "Téléchargé",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "En attente de relecture",
+          "approved": "Validé",
+          "changes_requested": "Modifications demandées"
+        }
+      },
+      "backToLearners": "Retour aux apprenants",
+      "totals": "Actif {{active}} · à l’écran {{onScreen}} · {{visits}} visites",
+      "dur": {
+        "hm": "{{h}} h {{m}} min",
+        "ms": "{{m}} min {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {

@@ -2,25 +2,15 @@ import { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Users, CheckCircle, Target, Award, Download, ChevronDown, ChevronRight, Clock, Search, X } from 'lucide-react'
+import { Users, CheckCircle, Target, Award, Download, Search, X } from 'lucide-react'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { downloadXlsx } from '../components/analytics/download'
 import './AnalyticsPage.css'
 
 const PER_PAGE = 10
 
-async function downloadExport(ids) {
-  const params = ids && ids.length ? { ids: ids.join(',') } : {}
-  const res = await client.get('/analytics/export/', { params, responseType: 'blob' })
-  const url = URL.createObjectURL(res.data)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'analytics.xlsx'
-  document.body.appendChild(a)
-  a.click()
-  a.remove()
-  URL.revokeObjectURL(url)
-}
+const downloadExport = (ids) => downloadXlsx('/analytics/export/', ids && ids.length ? { ids: ids.join(',') } : {}, 'analytics.xlsx')
 
 const STAT_CARDS = [
   { key: 'total_enrollments', labelKey: 'analytics.stats.totalEnrollments', Icon: Users,       color: 'blue'   },
@@ -56,63 +46,6 @@ function StatCard({ stat, value }) {
   )
 }
 
-// ── Per-teacher drill-down (#27) ──────────────────────────────────────────────
-
-TeacherDetail.propTypes = { teacher: PropTypes.object.isRequired }
-
-function TeacherDetail({ teacher }) {
-  const { t } = useTranslation()
-  const [open, setOpen] = useState(false)
-  const minutes = Math.round((teacher.time_spent_seconds || 0) / 60)
-  const hasQuizzes = teacher.quizzes.length > 0
-
-  return (
-    <div className="an-teacher">
-      <div className="an-teacher-head">
-        <button
-          className="an-teacher-toggle"
-          onClick={() => hasQuizzes && setOpen(o => !o)}
-          disabled={!hasQuizzes}
-        >
-          {hasQuizzes ? (open ? <ChevronDown size={14} /> : <ChevronRight size={14} />) : <span className="an-teacher-spacer" />}
-        </button>
-        <Link className="an-teacher-name" to={`/users/${teacher.user_id}`}>{teacher.name}</Link>
-        <span className="an-teacher-meta">
-          {t('analytics.pctCompleted', { pct: teacher.progress_pct })}
-          <span className="an-teacher-dot">·</span>
-          <Clock size={12} /> {t('analytics.minutes', { count: minutes })}
-          {teacher.avg_quiz_score != null && (
-            <>
-              <span className="an-teacher-dot">·</span>
-              {t('analytics.avgScore', { pct: Math.round(teacher.avg_quiz_score * 100) })}
-            </>
-          )}
-        </span>
-      </div>
-
-      {open && teacher.quizzes.map(quiz => (
-        <div key={quiz.lesson_id} className="an-quiz">
-          <p className="an-quiz-title">
-            {quiz.lesson_title}
-            {quiz.score != null && ` — ${Math.round(quiz.score * 100)}%`}
-          </p>
-          {quiz.questions.map((q, i) => (
-            <div key={i} className={`an-answer ${q.is_correct ? 'an-answer--ok' : 'an-answer--bad'}`}>
-              <span className="an-answer-q">{q.question}</span>
-              <span className="an-answer-a">
-                {q.selected_text
-                  ? t('analytics.chose', { answer: q.selected_text })
-                  : t('analytics.notAnswered')}
-                {!q.is_correct && q.correct_text && ` · ${t('analytics.correctAnswer', { answer: q.correct_text })}`}
-              </span>
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  )
-}
-
 CourseRow.propTypes = {
   course: PropTypes.shape({
     id: PropTypes.number,
@@ -128,22 +61,6 @@ CourseRow.propTypes = {
 
 function CourseRow({ course }) {
   const { t } = useTranslation()
-  const [expanded, setExpanded] = useState(false)
-  const [teachers, setTeachers] = useState(null)
-  const [loadingTeachers, setLoadingTeachers] = useState(false)
-
-  const toggle = () => {
-    const next = !expanded
-    setExpanded(next)
-    if (next && teachers === null && !loadingTeachers) {
-      setLoadingTeachers(true)
-      client.get(`/analytics/courses/${course.id}/teachers/`)
-        .then(res => setTeachers(res.data.teachers))
-        .catch(() => setTeachers([]))
-        .finally(() => setLoadingTeachers(false))
-    }
-  }
-
   return (
     <div className="an-course-row">
       <div className="an-course-header">
@@ -173,19 +90,15 @@ function CourseRow({ course }) {
       </div>
 
       {course.can_view_teachers && (
-        <>
-          <button className="an-teachers-toggle" onClick={toggle}>
-            {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-            {expanded ? t('analytics.hideTeachers') : t('analytics.viewTeachers')}
+        <div className="an-course-actions">
+          <Link className="an-course-open" to={`/analytics/courses/${course.id}`}>{t('analytics.open')}</Link>
+          <button
+            className="an-course-excel"
+            onClick={() => downloadXlsx(`/analytics/courses/${course.id}/export/`, {}, `course-${course.id}-analytics.xlsx`).catch(() => {})}
+          >
+            <Download size={14} /> {t('analytics.excel')}
           </button>
-          {expanded && (
-            <div className="an-teachers">
-              {loadingTeachers && <p className="an-teachers-loading">{t('common.loading')}</p>}
-              {teachers && teachers.length === 0 && <p className="an-teachers-loading">{t('analytics.noTeachers')}</p>}
-              {teachers && teachers.map(tt => <TeacherDetail key={tt.user_id} teacher={tt} />)}
-            </div>
-          )}
-        </>
+        </div>
       )}
     </div>
   )

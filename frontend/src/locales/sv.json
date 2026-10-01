@@ -932,14 +932,6 @@
     "restricted": "Innehållsanalys är endast tillgänglig för innehållsskapare.",
     "loadError": "Det gick inte att läsa in analysen.",
     "downloadExcel": "Ladda ner Excel",
-    "viewTeachers": "Visa lärare",
-    "hideTeachers": "Dölj lärare",
-    "noTeachers": "Inga lärare anmälda än.",
-    "minutes": "{{count}} min",
-    "avgScore": "snitt {{pct}}%",
-    "chose": "valde “{{answer}}”",
-    "correctAnswer": "rätt: {{answer}}",
-    "notAnswered": "ej besvarad",
     "searchPlaceholder": "Sök namn, beskrivning eller författare…",
     "allPillars": "Alla pelare",
     "noMatch": "Inga kurser matchar.",
@@ -951,6 +943,79 @@
       "selectAll": "Markera alla",
       "exportSelected": "Exportera {{count}}",
       "search": "Sök kurser…"
+    },
+    "open": "Öppna",
+    "excel": "Excel",
+    "course": {
+      "back": "Alla kurser",
+      "notFound": "Kursen hittades inte, eller så kan du inte se dess statistik.",
+      "learnersCount": "{{count}} registrerade deltagare",
+      "help": "Aktiv tid räknas bara medan deltagaren använder sidan (aktivitet senaste minuten eller en video som spelas). Typisk = median; håll muspekaren över för medelvärdet.",
+      "tabs": {
+        "content": "Innehåll",
+        "learners": "Deltagare"
+      },
+      "col": {
+        "item": "Modul / aktivitet / resurs",
+        "reached": "Öppnad",
+        "done": "Klar",
+        "typical": "Typisk aktiv tid",
+        "dropped": "Slutade här",
+        "learner": "Deltagare",
+        "progress": "Framsteg",
+        "active": "Aktiv",
+        "onScreen": "På skärmen",
+        "visits": "Besök",
+        "lastActive": "Senast aktiv",
+        "position": "Nuvarande position",
+        "status": "Status",
+        "resource": "Resurs",
+        "firstOpened": "Först öppnad",
+        "completed": "Klar",
+        "details": "Detaljer"
+      },
+      "average": "Medelvärde: {{value}}",
+      "notTracked": "ej mätt",
+      "noContent": "Kursen har inga moduler än.",
+      "empty": "Inga deltagare är registrerade på kursen än.",
+      "status": {
+        "all": "Alla statusar",
+        "completed": "Klar",
+        "on_track": "På rätt spår",
+        "stuck": "Fastnat",
+        "inactive": "Inaktiv"
+      },
+      "notes": {
+        "scroll": "scrollat i snitt {{pct}} %",
+        "watched": "sett i snitt {{pct}} %",
+        "stop": "slutar ofta vid {{time}}",
+        "score": "snittresultat {{pct}} %",
+        "hardest": "svårast: F{{n}} ({{pct}} % rätt)",
+        "perQuestion": "{{s}} s per fråga",
+        "opened": "öppnad av {{count}}",
+        "downloaded": "nedladdad av {{count}}",
+        "assignment": "{{submitted}} inlämnade · {{approved}} godkända · {{waiting}} väntar"
+      },
+      "detail": {
+        "score": "Resultat {{pct}} %",
+        "watched": "Sett {{pct}} %",
+        "scrolled": "Scrollat {{pct}} %",
+        "opened": "Öppnad",
+        "downloaded": "Nedladdad",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "Väntar på granskning",
+          "approved": "Godkänd",
+          "changes_requested": "Ändringar begärda"
+        }
+      },
+      "backToLearners": "Tillbaka till deltagarna",
+      "totals": "Aktiv {{active}} · på skärmen {{onScreen}} · {{visits}} besök",
+      "dur": {
+        "hm": "{{h}} h {{m}} min",
+        "ms": "{{m}} min {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {

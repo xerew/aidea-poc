@@ -932,14 +932,6 @@
     "restricted": "Die Inhaltsanalyse steht nur Kurserstellenden zur Verfügung.",
     "loadError": "Analysedaten konnten nicht geladen werden.",
     "downloadExcel": "Excel herunterladen",
-    "viewTeachers": "Lehrkräfte anzeigen",
-    "hideTeachers": "Lehrkräfte ausblenden",
-    "noTeachers": "Noch keine Lehrkräfte eingeschrieben.",
-    "minutes": "{{count}} Min.",
-    "avgScore": "Durchschn. {{pct}}%",
-    "chose": "wählte „{{answer}}“",
-    "correctAnswer": "richtig: {{answer}}",
-    "notAnswered": "nicht beantwortet",
     "searchPlaceholder": "Name, Beschreibung oder Autor suchen…",
     "allPillars": "Alle Säulen",
     "noMatch": "Keine Kurse entsprechen den Filtern.",
@@ -951,6 +943,79 @@
       "selectAll": "Alle auswählen",
       "exportSelected": "{{count}} exportieren",
       "search": "Kurse suchen…"
+    },
+    "open": "Öffnen",
+    "excel": "Excel",
+    "course": {
+      "back": "Alle Kurse",
+      "notFound": "Dieser Kurs wurde nicht gefunden oder Sie können seine Auswertung nicht sehen.",
+      "learnersCount": "{{count}} eingeschriebene Teilnehmende",
+      "help": "Aktive Zeit zählt nur, während die Seite genutzt wird (Eingabe in der letzten Minute oder ein laufendes Video). Typisch = Median; für den Durchschnitt mit der Maus darüberfahren.",
+      "tabs": {
+        "content": "Inhalt",
+        "learners": "Teilnehmende"
+      },
+      "col": {
+        "item": "Modul / Aktivität / Ressource",
+        "reached": "Geöffnet",
+        "done": "Abgeschlossen",
+        "typical": "Typische aktive Zeit",
+        "dropped": "Hier aufgehört",
+        "learner": "Teilnehmende(r)",
+        "progress": "Fortschritt",
+        "active": "Aktiv",
+        "onScreen": "Auf dem Bildschirm",
+        "visits": "Besuche",
+        "lastActive": "Zuletzt aktiv",
+        "position": "Aktuelle Position",
+        "status": "Status",
+        "resource": "Ressource",
+        "firstOpened": "Erstmals geöffnet",
+        "completed": "Abgeschlossen",
+        "details": "Details"
+      },
+      "average": "Durchschnitt: {{value}}",
+      "notTracked": "nicht gemessen",
+      "noContent": "Dieser Kurs hat noch keine Module.",
+      "empty": "In diesem Kurs sind noch keine Teilnehmenden eingeschrieben.",
+      "status": {
+        "all": "Alle Status",
+        "completed": "Abgeschlossen",
+        "on_track": "Im Plan",
+        "stuck": "Kommt nicht weiter",
+        "inactive": "Inaktiv"
+      },
+      "notes": {
+        "scroll": "Ø gescrollt {{pct}} %",
+        "watched": "Ø angesehen {{pct}} %",
+        "stop": "oft Abbruch bei {{time}}",
+        "score": "Ø Ergebnis {{pct}} %",
+        "hardest": "am schwersten: F{{n}} ({{pct}} % richtig)",
+        "perQuestion": "{{s}} s pro Frage",
+        "opened": "von {{count}} geöffnet",
+        "downloaded": "von {{count}} heruntergeladen",
+        "assignment": "{{submitted}} eingereicht · {{approved}} angenommen · {{waiting}} wartend"
+      },
+      "detail": {
+        "score": "Ergebnis {{pct}} %",
+        "watched": "Angesehen {{pct}} %",
+        "scrolled": "Gescrollt {{pct}} %",
+        "opened": "Geöffnet",
+        "downloaded": "Heruntergeladen",
+        "answerTime": "{{s}} s",
+        "assignment": {
+          "pending": "Wartet auf Prüfung",
+          "approved": "Angenommen",
+          "changes_requested": "Änderungen angefordert"
+        }
+      },
+      "backToLearners": "Zurück zu den Teilnehmenden",
+      "totals": "Aktiv {{active}} · auf dem Bildschirm {{onScreen}} · {{visits}} Besuche",
+      "dur": {
+        "hm": "{{h}} Std. {{m}} Min.",
+        "ms": "{{m}} Min. {{s}} s",
+        "s": "{{s}} s"
+      }
     }
   },
   "media": {
