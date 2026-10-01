@@ -466,11 +466,13 @@ def apply_competency_decay() -> None:
 @shared_task
 def recompute_all_recommendations() -> None:
     from django.contrib.auth.models import User
+    from django.db.models import Q
 
+    # Onboarded teachers, plus creators/partners/admins (who never onboard).
     user_ids = list(
-        User.objects.filter(
-            profile__onboarding_completed=True,
-        ).values_list('id', flat=True)
+        User.objects.filter(is_active=True, profile__isnull=False)
+        .filter(Q(profile__onboarding_completed=True) | ~Q(profile__user_type='teacher'))
+        .values_list('id', flat=True)
     )
     for uid in user_ids:
         compute_user_recommendations.delay(uid)

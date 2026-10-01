@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,11 +9,22 @@ from hub.models.recommendations import (
     RecommendationEvent,
 )
 from hub.serializers.pathway import RecommendationSerializer
-from hub.views.permissions import IsTeacher
+from hub.views.permissions import HasProfile
+
+# Queue at most one first computation per staff user per hour.
+_FIRST_COMPUTE_TTL = 60 * 60
+
+
+def records_recommendation_events(user):
+    """Shown/click/enrol events tune the recommendation weights and are study
+    data, so only teachers' events are stored. Staff (creators, partners,
+    admins) see recommendations but don't shape them."""
+    profile = getattr(user, 'profile', None)
+    return profile is not None and profile.user_type == 'teacher'
 
 
 class RecommendationsView(APIView):
-    permission_classes = [IsTeacher]
+    permission_classes = [HasProfile]
 
     def get(self, request):
         from hub.study_logic import active_group
@@ -25,11 +37,17 @@ class RecommendationsView(APIView):
             .select_related('course__pillar')
             .order_by('-score')
         )
+        # Teachers get recommendations at onboarding; other roles never onboard,
+        # so compute theirs in the background the first time they look.
+        if not recs.exists() and not records_recommendation_events(request.user):
+            if cache.add(f'recs_first_compute:{request.user.id}', True, _FIRST_COMPUTE_TTL):
+                from hub.tasks import compute_user_recommendations
+                compute_user_recommendations.delay(request.user.id)
         return Response(RecommendationSerializer(recs, many=True, context={'request': request}).data)
 
 
 class RecommendationEventView(APIView):
-    permission_classes = [IsTeacher]
+    permission_classes = [HasProfile]
 
     def post(self, request):
         from hub.serializers.recommendations import RecommendationEventSerializer
@@ -37,6 +55,8 @@ class RecommendationEventView(APIView):
         serializer = RecommendationEventSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         d = serializer.validated_data
+        if not records_recommendation_events(request.user):
+            return Response({'status': 'ignored'}, status=status.HTTP_200_OK)
 
         config = RecommendationConfig.get()
         weights_snapshot = {
