@@ -23,7 +23,7 @@
     "cancel": "Annuler",
     "back": "Retour",
     "next": "Suivant",
-    "euFundedShort": "Financé par l'Union européenne. Les points de vue et opinions exprimés n'engagent toutefois que leur(s) auteur(s) et ne reflètent pas nécessairement ceux de l'Union européenne ou de l'EACEA.",
+    "euFundedShort": "Financé par l’Union européenne. Les points de vue et avis exprimés n’engagent toutefois que leur(s) auteur(s) et ne reflètent pas nécessairement ceux de l’Union européenne ou de l’Agence exécutive européenne pour l’éducation et la culture (EACEA). Ni l’Union européenne ni l’EACEA ne sauraient en être tenues pour responsables.",
     "euCofundedAlt": "Cofinancé par l'Union européenne",
     "saveFailed": "Échec de l'enregistrement.",
     "previous": "Précédent",
@@ -53,7 +53,7 @@
     "platform": "Plateforme de formation des enseignants à l'IA"
   },
   "footer": {
-    "funded": "Financé par l'Union européenne. Les points de vue et opinions exprimés n'engagent toutefois que leur(s) auteur(s) et ne reflètent pas nécessairement ceux de l'Union européenne ou de l'Agence exécutive européenne pour l'éducation et la culture (EACEA)."
+    "funded": "Financé par l’Union européenne. Les points de vue et avis exprimés n’engagent toutefois que leur(s) auteur(s) et ne reflètent pas nécessairement ceux de l’Union européenne ou de l’Agence exécutive européenne pour l’éducation et la culture (EACEA). Ni l’Union européenne ni l’EACEA ne sauraient en être tenues pour responsables."
   },
   "auth": {
     "login": {

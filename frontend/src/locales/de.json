@@ -23,7 +23,7 @@
     "cancel": "Abbrechen",
     "back": "Zurück",
     "next": "Weiter",
-    "euFundedShort": "Gefördert von der Europäischen Union. Die geäußerten Ansichten und Meinungen entsprechen jedoch ausschließlich denen der Autorin bzw. des Autors und spiegeln nicht zwangsläufig die der Europäischen Union oder der EACEA wider.",
+    "euFundedShort": "Von der Europäischen Union finanziert. Die geäußerten Ansichten und Meinungen entsprechen jedoch ausschließlich denen des Autors bzw. der Autoren und spiegeln nicht zwingend die der Europäischen Union oder der Europäischen Exekutivagentur für Bildung und Kultur (EACEA) wider. Weder die Europäische Union noch die EACEA können dafür verantwortlich gemacht werden.",
     "euCofundedAlt": "Kofinanziert von der Europäischen Union",
     "saveFailed": "Speichern fehlgeschlagen.",
     "previous": "Zurück",
@@ -53,7 +53,7 @@
     "platform": "Fortbildungsplattform für KI im Unterricht"
   },
   "footer": {
-    "funded": "Gefördert von der Europäischen Union. Die geäußerten Ansichten und Meinungen entsprechen jedoch ausschließlich denen der Autorin bzw. des Autors und spiegeln nicht zwangsläufig die der Europäischen Union oder der Europäischen Exekutivagentur für Bildung und Kultur (EACEA) wider."
+    "funded": "Von der Europäischen Union finanziert. Die geäußerten Ansichten und Meinungen entsprechen jedoch ausschließlich denen des Autors bzw. der Autoren und spiegeln nicht zwingend die der Europäischen Union oder der Europäischen Exekutivagentur für Bildung und Kultur (EACEA) wider. Weder die Europäische Union noch die EACEA können dafür verantwortlich gemacht werden."
   },
   "auth": {
     "login": {
