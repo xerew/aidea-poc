@@ -959,7 +959,8 @@
     "openVideo": "Ouvrir la vidéo ↗",
     "pdfDocument": "Document PDF",
     "pdfLessonTitle": "Document PDF",
-    "openInNewTab": "Ouvrir dans un nouvel onglet ↗ (si l’aperçu ne se charge pas)"
+    "openInNewTab": "Ouvrir dans un nouvel onglet ↗ (si l’aperçu ne se charge pas)",
+    "download": "Télécharger"
   },
   "layout": {
     "denialBanner": "Votre demande d’accès Créateur de contenu a été refusée : « {{reason}} »",

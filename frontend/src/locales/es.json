@@ -959,7 +959,8 @@
     "openVideo": "Abrir vídeo ↗",
     "pdfDocument": "Documento PDF",
     "pdfLessonTitle": "Documento PDF",
-    "openInNewTab": "Abrir en una pestaña nueva ↗ (si la vista previa no carga)"
+    "openInNewTab": "Abrir en una pestaña nueva ↗ (si la vista previa no carga)",
+    "download": "Descargar"
   },
   "layout": {
     "denialBanner": "Tu solicitud de acceso como Creador de contenido fue rechazada: «{{reason}}»",

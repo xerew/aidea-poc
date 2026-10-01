@@ -959,7 +959,8 @@
     "openVideo": "Avaa video ↗",
     "pdfDocument": "PDF-asiakirja",
     "pdfLessonTitle": "PDF-dokumentti",
-    "openInNewTab": "Avaa uudessa välilehdessä ↗ (jos esikatselu ei lataudu)"
+    "openInNewTab": "Avaa uudessa välilehdessä ↗ (jos esikatselu ei lataudu)",
+    "download": "Lataa"
   },
   "layout": {
     "denialBanner": "Sisällöntuottajan käyttöoikeuspyyntösi hylättiin: ”{{reason}}”",

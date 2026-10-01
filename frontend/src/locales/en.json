@@ -959,7 +959,8 @@
     "openVideo": "Open video ↗",
     "pdfDocument": "PDF Document",
     "pdfLessonTitle": "PDF document",
-    "openInNewTab": "Open in new tab ↗ (if the preview does not load)"
+    "openInNewTab": "Open in new tab ↗ (if the preview does not load)",
+    "download": "Download"
   },
   "layout": {
     "denialBanner": "Your Content Creator access request was denied: “{{reason}}”",

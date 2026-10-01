@@ -959,7 +959,8 @@
     "openVideo": "Video öffnen ↗",
     "pdfDocument": "PDF-Dokument",
     "pdfLessonTitle": "PDF-Dokument",
-    "openInNewTab": "In neuem Tab öffnen ↗ (falls die Vorschau nicht lädt)"
+    "openInNewTab": "In neuem Tab öffnen ↗ (falls die Vorschau nicht lädt)",
+    "download": "Herunterladen"
   },
   "layout": {
     "denialBanner": "Ihre Anfrage für den Zugang als Content Creator wurde abgelehnt: „{{reason}}“",

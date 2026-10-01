@@ -959,7 +959,8 @@
     "openVideo": "Öppna video ↗",
     "pdfDocument": "PDF-dokument",
     "pdfLessonTitle": "PDF-dokument",
-    "openInNewTab": "Öppna i ny flik ↗ (om förhandsvisningen inte laddas)"
+    "openInNewTab": "Öppna i ny flik ↗ (om förhandsvisningen inte laddas)",
+    "download": "Ladda ner"
   },
   "layout": {
     "denialBanner": "Din begäran om åtkomst som innehållsskapare avslogs: ”{{reason}}”",

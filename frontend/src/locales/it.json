@@ -959,7 +959,8 @@
     "openVideo": "Apri video ↗",
     "pdfDocument": "Documento PDF",
     "pdfLessonTitle": "Documento PDF",
-    "openInNewTab": "Apri in una nuova scheda ↗ (se l’anteprima non si carica)"
+    "openInNewTab": "Apri in una nuova scheda ↗ (se l’anteprima non si carica)",
+    "download": "Scarica"
   },
   "layout": {
     "denialBanner": "La tua richiesta di accesso come Creatore di contenuti è stata rifiutata: «{{reason}}»",

@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import ResourceView from '../components/learner/ResourceView'
 import TypeIcon from '../components/learner/TypeIcon'
+import { TrackingContext } from '../lib/tracking/TrackingContext'
+import { useActivityTracker } from '../lib/tracking/useActivityTracker'
 import './ActivityPage.css'
 
 // An activity with a single kind of resource shows that type's icon; a mixed
@@ -49,7 +51,7 @@ export function LearnRedirect() {
 // ─── Main ActivityPage ───────────────────────────────────────────────────────
 
 export default function ActivityPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { courseId, lessonId: activityId } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -61,12 +63,16 @@ export default function ActivityPage() {
   const [notes, setNotes] = useState({})
   const [error, setError] = useState('')
   const scrollPctRef = useRef(0)
+  const mainRef = useRef(null)
 
   const activity = loaded?.id === activityId ? loaded.data : null
   const note = notes[activityId] ?? ''
   const setActivity = useCallback((update) => {
     setLoaded(prev => (prev ? { ...prev, data: update(prev.data) } : prev))
   }, [])
+
+  // Time and interaction measurement for learning analytics.
+  const tracking = useActivityTracker(mainRef, activityId, activity?.resources?.length ?? 0, i18n.language)
 
   // Redirect if not logged in
   useEffect(() => {
@@ -108,6 +114,7 @@ export default function ActivityPage() {
     const res = await client.post(
       `/courses/${courseId}/lessons/${activityId}/resources/${resource.id}/complete/`, body,
     )
+    tracking.completed(resource.id)
     const { progress_pct: progressPct, activity_completed: activityDone } = res.data
     // A just-finished quiz keeps its in-session feedback; the stored review
     // (quiz_review) is used when the activity is opened again.
@@ -124,7 +131,7 @@ export default function ActivityPage() {
         lessons: mod.lessons.map(a => (a.id === Number(activityId) ? { ...a, is_completed: activityDone } : a)),
       })),
     }))
-  }, [courseId, activityId, setActivity])
+  }, [courseId, activityId, setActivity, tracking])
 
   const handleSubmissionChange = useCallback((resourceId, submission) => {
     setActivity(prev => prev && ({
@@ -204,7 +211,7 @@ export default function ActivityPage() {
         </aside>
 
         {/* ── Main ── */}
-        <main className="lp-main">
+        <main className="lp-main" ref={mainRef}>
           {!activity ? (
             <p className="page-loading">{t('lesson.loadingLesson')}</p>
           ) : (
@@ -231,16 +238,20 @@ export default function ActivityPage() {
               {/* Resources, in order */}
               {resources.length === 0 ? (
                 <div className="lp-content-card"><p className="lp-empty">{t('lesson.noContent')}</p></div>
-              ) : resources.map(resource => (
-                <ResourceView
-                  key={resource.id}
-                  resource={resource}
-                  courseId={courseId}
-                  activityId={activityId}
-                  onComplete={completeResource}
-                  onSubmissionChange={handleSubmissionChange}
-                />
-              ))}
+              ) : (
+                <TrackingContext.Provider value={tracking}>
+                  {resources.map(resource => (
+                    <ResourceView
+                      key={resource.id}
+                      resource={resource}
+                      courseId={courseId}
+                      activityId={activityId}
+                      onComplete={completeResource}
+                      onSubmissionChange={handleSubmissionChange}
+                    />
+                  ))}
+                </TrackingContext.Provider>
+              )}
 
               {/* Navigation */}
               <div className="lp-nav">

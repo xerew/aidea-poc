@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import { CheckCircle2, Circle, Video, Image, FileIcon, Paperclip, Link2, X } from 'lucide-react'
@@ -6,6 +6,7 @@ import client from '../../api/client'
 import HtmlContent from '../lesson/HtmlContent'
 import MediaItem from '../lesson/MediaItem'
 import TypeIcon from './TypeIcon'
+import { useResourceTracking } from '../../lib/tracking/TrackingContext'
 import { TYPE_ICONS, resourceShape } from './resourceMeta'
 
 const base = (courseId, activityId, resourceId) =>
@@ -27,9 +28,20 @@ function TextBody({ resource }) {
 MediaBody.propTypes = { resource: resourceShape.isRequired }
 function MediaBody({ resource }) {
   const { t } = useTranslation()
+  const track = useResourceTracking(resource.id)
+  const tracking = useMemo(() => ({
+    onPlayerEvent: track.video,
+    onPdfOpen: () => track.event('pdf_open'),
+    onPdfDownload: () => track.event('pdf_download'),
+    onImageOpen: () => track.event('image_open'),
+  }), [track])
   if (!resource.url) return <p className="lp-empty">{t('lesson.noContent')}</p>
-  return <MediaItem item={{ type: resource.type, url: resource.url, caption: resource.caption }} />
+  return <MediaItem item={{ type: resource.type, url: resource.url, caption: resource.caption }} tracking={tracking} />
 }
+
+// Clock reads live outside components (React compiler purity rule).
+const nowMs = () => Date.now()
+const secondsSince = (ms) => Math.round((nowMs() - ms) / 100) / 10
 
 // ─── Quiz ────────────────────────────────────────────────────────────────────
 
@@ -46,6 +58,10 @@ function QuizBody({ resource, endpoint, onComplete }) {
   const [currentIdx, setCurrentIdx] = useState(0)
   const [answers, setAnswers] = useState({})     // { [qIdx]: selectedOption }
   const [feedback, setFeedback] = useState({})   // { [qIdx]: {correct, correct_index} }
+  const track = useResourceTracking(resource.id)
+  // When the current question appeared, for the seconds-per-question figure.
+  const shownAtRef = useRef(0)
+  useEffect(() => { shownAtRef.current = nowMs() }, [currentIdx])
 
   if (questions.length === 0) {
     return <p className="lp-empty">{t('lesson.quiz.noQuestions')}</p>
@@ -58,6 +74,11 @@ function QuizBody({ resource, endpoint, onComplete }) {
   const handleSelect = async (optionIdx) => {
     if (answered) return
     setAnswers(prev => ({ ...prev, [currentIdx]: optionIdx }))
+    track.event('quiz_answer', {
+      question_index: currentIdx,
+      selected: optionIdx,
+      seconds_on_question: secondsSince(shownAtRef.current),
+    })
     try {
       const res = await client.post(`${endpoint}/quiz-check/`, {
         question_index: currentIdx, selected: optionIdx,
@@ -381,7 +402,7 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
   }
 
   return (
-    <section className={`lp-resource ${resource.is_completed ? 'lp-resource--done' : ''}`}>
+    <section data-resource-id={resource.id} className={`lp-resource ${resource.is_completed ? 'lp-resource--done' : ''}`}>
       <header className="lp-resource-header">
         <span className="lp-resource-type">
           <TypeIcon type={resource.type} size={15} />
