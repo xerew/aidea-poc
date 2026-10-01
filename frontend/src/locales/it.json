@@ -23,7 +23,7 @@
     "cancel": "Annulla",
     "back": "Indietro",
     "next": "Avanti",
-    "euFundedShort": "Finanziato dall'Unione europea. I punti di vista e le opinioni espressi sono tuttavia esclusivamente quelli dell'autore o degli autori e non riflettono necessariamente quelli dell'Unione europea o dell'EACEA.",
+    "euFundedShort": "Finanziato dall'Unione europea. Le opinioni espresse appartengono, tuttavia, al solo o ai soli autori e non riflettono necessariamente le opinioni dell'Unione europea o dell’Agenzia esecutiva europea per l’istruzione e la cultura (EACEA). Né l'Unione europea né l'EACEA possono esserne ritenute responsabili.",
     "euCofundedAlt": "Cofinanziato dall'Unione europea",
     "saveFailed": "Salvataggio non riuscito.",
     "previous": "Precedente",
@@ -53,7 +53,7 @@
     "platform": "Piattaforma di formazione AI per docenti"
   },
   "footer": {
-    "funded": "Finanziato dall'Unione europea. I punti di vista e le opinioni espressi sono tuttavia esclusivamente quelli dell'autore o degli autori e non riflettono necessariamente quelli dell'Unione europea o dell'Agenzia esecutiva europea per l'istruzione e la cultura (EACEA)."
+    "funded": "Finanziato dall'Unione europea. Le opinioni espresse appartengono, tuttavia, al solo o ai soli autori e non riflettono necessariamente le opinioni dell'Unione europea o dell’Agenzia esecutiva europea per l’istruzione e la cultura (EACEA). Né l'Unione europea né l'EACEA possono esserne ritenute responsabili."
   },
   "auth": {
     "login": {

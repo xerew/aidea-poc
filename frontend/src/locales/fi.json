@@ -23,7 +23,7 @@
     "cancel": "Peruuta",
     "back": "Takaisin",
     "next": "Seuraava",
-    "euFundedShort": "Euroopan unionin rahoittama. Ilmaistut näkemykset ja mielipiteet ovat kuitenkin yksinomaan tekijän/tekijöiden omia, eivätkä ne välttämättä vastaa Euroopan unionin tai EACEA:n näkemyksiä.",
+    "euFundedShort": "Euroopan unionin rahoittama. Esitetyt näkemykset ja mielipiteet ovat ainoastaan tämän tekstin laatijoiden näkemyksiä eivätkä välttämättä vastaa Euroopan unionin tai Euroopan koulutuksen ja kulttuurin toimeenpanovirasto (EACEA) kantaa. Euroopan unioni ja EACEA eivät ole vastuussa niistä.",
     "euCofundedAlt": "Euroopan unionin osarahoittama",
     "saveFailed": "Tallennus epäonnistui.",
     "previous": "Edellinen",
@@ -53,7 +53,7 @@
     "platform": "Opettajien tekoälykoulutusalusta"
   },
   "footer": {
-    "funded": "Euroopan unionin rahoittama. Ilmaistut näkemykset ja mielipiteet ovat kuitenkin yksinomaan tekijän/tekijöiden omia, eivätkä ne välttämättä vastaa Euroopan unionin tai Euroopan koulutuksen ja kulttuurin toimeenpanoviraston (EACEA) näkemyksiä."
+    "funded": "Euroopan unionin rahoittama. Esitetyt näkemykset ja mielipiteet ovat ainoastaan tämän tekstin laatijoiden näkemyksiä eivätkä välttämättä vastaa Euroopan unionin tai Euroopan koulutuksen ja kulttuurin toimeenpanovirasto (EACEA) kantaa. Euroopan unioni ja EACEA eivät ole vastuussa niistä."
   },
   "auth": {
     "login": {

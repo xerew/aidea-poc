@@ -23,7 +23,7 @@
     "cancel": "Avbryt",
     "back": "Tillbaka",
     "next": "Nästa",
-    "euFundedShort": "Finansierat av Europeiska unionen. De åsikter och synpunkter som framförs är dock endast författarens/författarnas egna och återspeglar inte nödvändigtvis Europeiska unionens eller EACEA:s åsikter.",
+    "euFundedShort": "Finansieras av Europeiska unionen. De synpunkter och åsikter som uttrycks är endast upphovsmannens [upphovsmännens] och utgör inte Europeiska unionens eller Europeiska genomförandeorganet för utbildning och kulturs (EACEA) officiella ståndpunkt. Varken Europeiska unionen eller EACEA tar något ansvar för dessa.",
     "euCofundedAlt": "Samfinansierat av Europeiska unionen",
     "saveFailed": "Det gick inte att spara.",
     "previous": "Föregående",
@@ -53,7 +53,7 @@
     "platform": "AI-utbildningsplattform för lärare"
   },
   "footer": {
-    "funded": "Finansierat av Europeiska unionen. De åsikter och synpunkter som framförs är dock endast författarens/författarnas egna och återspeglar inte nödvändigtvis Europeiska unionens eller Europeiska genomförandeorganets för utbildning och kultur (EACEA) åsikter."
+    "funded": "Finansieras av Europeiska unionen. De synpunkter och åsikter som uttrycks är endast upphovsmannens [upphovsmännens] och utgör inte Europeiska unionens eller Europeiska genomförandeorganet för utbildning och kulturs (EACEA) officiella ståndpunkt. Varken Europeiska unionen eller EACEA tar något ansvar för dessa."
   },
   "auth": {
     "login": {

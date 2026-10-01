@@ -23,7 +23,7 @@
     "cancel": "Cancelar",
     "back": "Atrás",
     "next": "Siguiente",
-    "euFundedShort": "Financiado por la Unión Europea. No obstante, los puntos de vista y las opiniones expresadas son exclusivamente responsabilidad de sus autores y no reflejan necesariamente los de la Unión Europea o la EACEA.",
+    "euFundedShort": "Financiado por la Unión Europea. Las opiniones y puntos de vista expresados solo comprometen a su(s) autor(es) y no reflejan necesariamente los de la Unión Europea o los de la Agencia Ejecutiva Europea de Educación y Cultura (EACEA). Ni la Unión Europea ni la EACEA pueden ser considerados responsables de ellos.",
     "euCofundedAlt": "Cofinanciado por la Unión Europea",
     "saveFailed": "No se pudo guardar.",
     "previous": "Anterior",
@@ -53,7 +53,7 @@
     "platform": "Plataforma de Formación en IA para Docentes"
   },
   "footer": {
-    "funded": "Financiado por la Unión Europea. No obstante, los puntos de vista y las opiniones expresadas son exclusivamente responsabilidad de sus autores y no reflejan necesariamente los de la Unión Europea o la Agencia Ejecutiva Europea de Educación y Cultura (EACEA)."
+    "funded": "Financiado por la Unión Europea. Las opiniones y puntos de vista expresados solo comprometen a su(s) autor(es) y no reflejan necesariamente los de la Unión Europea o los de la Agencia Ejecutiva Europea de Educación y Cultura (EACEA). Ni la Unión Europea ni la EACEA pueden ser considerados responsables de ellos."
   },
   "auth": {
     "login": {

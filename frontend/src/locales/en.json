@@ -23,7 +23,7 @@
     "cancel": "Cancel",
     "back": "Back",
     "next": "Next",
-    "euFundedShort": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the EACEA.",
+    "euFundedShort": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Education and Culture Executive Agency (EACEA). Neither the European Union nor EACEA can be held responsible for them.",
     "euCofundedAlt": "Co-funded by the European Union",
     "saveFailed": "Failed to save.",
     "previous": "Previous",
@@ -53,7 +53,7 @@
     "platform": "AI Teacher Training Platform"
   },
   "footer": {
-    "funded": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Education and Culture Executive Agency (EACEA)."
+    "funded": "Funded by the European Union. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Education and Culture Executive Agency (EACEA). Neither the European Union nor EACEA can be held responsible for them."
   },
   "auth": {
     "login": {
