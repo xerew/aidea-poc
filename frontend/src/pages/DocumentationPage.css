@@ -49,14 +49,6 @@
 .doc-pillar h3 { margin: 0.6rem 0 0.4rem; font-size: 1rem; }
 .doc-pillar p { margin: 0; font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.5; }
 
-.doc-funding {
-  margin: 1.25rem 0 0;
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-  text-align: center;
-}
-
 /* Guide */
 .doc-guide {
   margin-top: 2rem;

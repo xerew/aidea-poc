@@ -45,8 +45,6 @@ pedagogical transformation.
 - **Teaching For AI** — preparing students for an AI‑driven future through
   critical thinking.
 
-_Funded by the European Union through the Erasmus+ and Horizon Europe
-programmes._
 """,
     "el": """
 ![AIDEA](aidea-logo.png)
@@ -71,8 +69,6 @@ Horizon Europe, η AIDEA προσφέρει ένα αρθρωτό, ερευνη�
 - **Διδασκαλία εν όψει της ΤΝ** — προετοιμασία των μαθητών για ένα μέλλον με
   γνώμονα την ΤΝ μέσα από την κριτική σκέψη.
 
-_Χρηματοδοτείται από την Ευρωπαϊκή Ένωση μέσω των προγραμμάτων Erasmus+ και
-Horizon Europe._
 """,
     "fr": """
 ![AIDEA](aidea-logo.png)
@@ -97,8 +93,6 @@ seulement comme un outil, mais comme un catalyseur de transformation pédagogiqu
 - **Enseigner pour l'IA** — préparer les élèves à un avenir façonné par l'IA
   grâce à l'esprit critique.
 
-_Financé par l'Union européenne dans le cadre des programmes Erasmus+ et Horizon
-Europe._
 """,
     "es": """
 ![AIDEA](aidea-logo.png)
@@ -123,8 +117,6 @@ herramienta, sino como un catalizador de transformación pedagógica.
 - **Enseñar para la IA** — preparar al alumnado para un futuro marcado por la IA
   mediante el pensamiento crítico.
 
-_Financiado por la Unión Europea a través de los programas Erasmus+ y Horizon
-Europe._
 """,
     "it": """
 ![AIDEA](aidea-logo.png)
@@ -149,7 +141,6 @@ come uno strumento, ma come un catalizzatore di trasformazione pedagogica.
 - **Insegnare per l'IA** — preparare gli studenti a un futuro plasmato dall'IA
   attraverso il pensiero critico.
 
-_Finanziato dall'Unione europea tramite i programmi Erasmus+ e Horizon Europe._
 """,
     "fi": """
 ![AIDEA](aidea-logo.png)
@@ -174,7 +165,6 @@ muutoksen katalyyttinä.
 - **Tekoälyä varten opettaminen** — oppilaiden valmistaminen tekoälyvetoiseen
   tulevaisuuteen kriittisen ajattelun avulla.
 
-_Rahoittaa Euroopan unioni Erasmus+- ja Horizon Europe -ohjelmien kautta._
 """,
     "sv": """
 ![AIDEA](aidea-logo.png)
@@ -198,7 +188,6 @@ pedagogisk förändring.
 - **Undervisa för AI** — förbereda elever för en AI-driven framtid genom
   kritiskt tänkande.
 
-_Finansieras av Europeiska unionen genom programmen Erasmus+ och Horizon Europe._
 """,
     "no": """
 ![AIDEA](aidea-logo.png)
@@ -222,8 +211,6 @@ katalysator for pedagogisk endring.
 - **Undervise for KI** — forberede elever på en KI-drevet framtid gjennom
   kritisk tenkning.
 
-_Finansiert av Den europeiske union gjennom programmene Erasmus+ og Horizon
-Europe._
 """,
     "de": """
 ![AIDEA](aidea-logo.png)
@@ -248,8 +235,6 @@ sondern als Katalysator für pädagogische Transformation begreift.
 - **Für KI unterrichten** — Vorbereitung der Schülerinnen und Schüler auf eine
   KI-geprägte Zukunft durch kritisches Denken.
 
-_Gefördert von der Europäischen Union über die Programme Erasmus+ und Horizont
-Europa._
 """,
 }
 

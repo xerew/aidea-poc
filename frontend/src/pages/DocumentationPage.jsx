@@ -56,8 +56,6 @@ export default function DocumentationPage() {
         ))}
       </section>
 
-      <p className="doc-funding">{t('documentation.funding')}</p>
-
       {/* User guide */}
       <section className="doc-guide">
         <div className="doc-guide-head">
