@@ -7,6 +7,7 @@ import HtmlContent from '../lesson/HtmlContent'
 import MediaItem from '../lesson/MediaItem'
 import TypeIcon from './TypeIcon'
 import { useResourceTracking } from '../../lib/tracking/TrackingContext'
+import { createQuizClock } from '../../lib/tracking/quizClock'
 import { TYPE_ICONS, resourceShape } from './resourceMeta'
 
 const base = (courseId, activityId, resourceId) =>
@@ -41,7 +42,6 @@ function MediaBody({ resource }) {
 
 // Clock reads live outside components (React compiler purity rule).
 const nowMs = () => Date.now()
-const secondsSince = (ms) => Math.round((nowMs() - ms) / 100) / 10
 
 // ─── Quiz ────────────────────────────────────────────────────────────────────
 
@@ -59,9 +59,21 @@ function QuizBody({ resource, endpoint, onComplete }) {
   const [answers, setAnswers] = useState({})     // { [qIdx]: selectedOption }
   const [feedback, setFeedback] = useState({})   // { [qIdx]: {correct, correct_index} }
   const track = useResourceTracking(resource.id)
-  // When the current question appeared, for the seconds-per-question figure.
-  const shownAtRef = useRef(0)
-  useEffect(() => { shownAtRef.current = nowMs() }, [currentIdx])
+  // Seconds per question, counted from when the question appeared but not
+  // before the quiz first came into view.
+  const cardRef = useRef(null)
+  const clockRef = useRef(null)
+  useEffect(() => {
+    clockRef.current = createQuizClock()
+    const el = cardRef.current
+    if (!el) return undefined
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some(e => e.isIntersecting)) clockRef.current?.visible(nowMs())
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  useEffect(() => { clockRef.current?.show(nowMs()) }, [currentIdx])
 
   if (questions.length === 0) {
     return <p className="lp-empty">{t('lesson.quiz.noQuestions')}</p>
@@ -77,7 +89,7 @@ function QuizBody({ resource, endpoint, onComplete }) {
     track.event('quiz_answer', {
       question_index: currentIdx,
       selected: optionIdx,
-      seconds_on_question: secondsSince(shownAtRef.current),
+      seconds_on_question: clockRef.current?.seconds(nowMs()) ?? null,
     })
     try {
       const res = await client.post(`${endpoint}/quiz-check/`, {
@@ -128,7 +140,7 @@ function QuizBody({ resource, endpoint, onComplete }) {
   }
 
   return (
-    <div className="lp-quiz-card">
+    <div className="lp-quiz-card" ref={cardRef}>
       <div className="lp-question-block">
         <p className="lp-question-counter">
           {t('lesson.quiz.questionCounter', { current: currentIdx + 1, total: questions.length })}
