@@ -81,6 +81,22 @@ class ContentMappingTest(TestCase):
         self.assertEqual([r.type for r in res], ['assignment'])
         self.assertEqual(res[0].instructions, 'do this')
 
+    def test_text_blocks_inside_media_are_kept_in_order(self):
+        mixed = Activity.objects.create(
+            module=self.module, title='Mixed', lesson_type='image', order=7, content='',
+            media_items=[
+                {'type': 'text', 'html': '<p>Intro</p>'},
+                {'type': 'image', 'url': 'a.png', 'caption': ''},
+                {'type': 'text', 'html': '   '},          # empty block: dropped
+                {'type': 'text', 'html': '<p>Outro</p>'},
+            ],
+        )
+        build_resources_for_lesson(mixed, Resource)
+        res = list(mixed.resources.order_by('order'))
+        self.assertEqual([r.type for r in res], ['text', 'image', 'text'])
+        self.assertEqual(res[0].content, '<p>Intro</p>')
+        self.assertEqual(res[2].content, '<p>Outro</p>')
+
     def test_malformed_media_items_are_skipped(self):
         bad_list = Activity.objects.create(
             module=self.module, title='BadList', lesson_type='text', order=5,

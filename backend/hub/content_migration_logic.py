@@ -39,7 +39,14 @@ def build_resources_for_lesson(lesson, Resource):
         if not isinstance(mi, dict):
             continue
         mtype = mi.get('type')
-        if mtype in ('image', 'video', 'pdf') and mi.get('url'):
+        # Rich-text blocks interleaved with media (the old editor's "Add text").
+        if mtype == 'text' and str(mi.get('html') or '').strip():
+            order += 1
+            Resource.objects.create(
+                activity_id=lesson.id, type='text', order=order,
+                is_required=lesson.is_required, content=str(mi['html']),
+            )
+        elif mtype in ('image', 'video', 'pdf') and mi.get('url'):
             order += 1
             Resource.objects.create(
                 activity_id=lesson.id, type=mtype, order=order,

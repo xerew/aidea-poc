@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Activity, Course, CourseEditHistory, Module
+from hub.models import Activity, Course, CourseEditHistory, Module, Resource
 from hub.serializers import CourseAuthoringSerializer
 from hub.xlsx_transfer import MAX_IMPORT_BYTES, build_course_workbook, parse_course_workbook
 
@@ -22,7 +22,7 @@ class AuthoringCourseExportView(APIView):
     def get(self, request, pk):
         try:
             course = Course.objects.select_related('pillar').prefetch_related(
-                'modules__lessons',
+                'modules__lessons__resources', 'subjects', 'additional_pillars',
             ).get(pk=pk)
         except Course.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
@@ -45,6 +45,27 @@ class AuthoringCourseTemplateView(APIView):
         response = HttpResponse(buffer.getvalue(), content_type=XLSX_MIME)
         response['Content-Disposition'] = 'attachment; filename="aidea-course-template.xlsx"'
         return response
+
+
+def _create_activity(module, data):
+    resources = [data['resources'][k] for k in sorted(data['resources'])]
+    activity = Activity.objects.create(
+        module=module,
+        title=data['title'],
+        description=data['description'],
+        duration_minutes=data['duration_minutes'],
+        order=data['order'],
+        # Legacy column, kept meaningful for the rollback window.
+        lesson_type=resources[0]['type'],
+        translations=data.get('translations', {}),
+    )
+    for position, r in enumerate(resources, start=1):
+        Resource.objects.create(activity=activity, order=position, **{
+            k: r[k] for k in (
+                'type', 'is_required', 'title', 'content', 'url', 'caption',
+                'instructions', 'quiz_data', 'translations',
+            )
+        })
 
 
 class AuthoringCourseImportView(APIView):
@@ -80,6 +101,12 @@ class AuthoringCourseImportView(APIView):
                 duration_hours=payload['duration_hours'],
                 content_format=payload['content_format'],
                 learning_outcomes=payload['learning_outcomes'],
+                cross_axis_relevance=payload['cross_axis_relevance'],
+                target_audience=payload['target_audience'],
+                target_audience_other=payload['target_audience_other'],
+                educational_levels=payload['educational_levels'],
+                educational_level_other=payload['educational_level_other'],
+                prior_knowledge=payload['prior_knowledge'],
                 translations=payload.get('translations', {}),
                 translation_status=payload.get('translation_status', {}),
                 is_published=False,
@@ -87,6 +114,8 @@ class AuthoringCourseImportView(APIView):
             )
             if payload.get('subjects'):
                 course.subjects.set(payload['subjects'])
+            if payload.get('additional_pillars'):
+                course.additional_pillars.set(payload['additional_pillars'])
             for module_data in payload['modules']:
                 module = Module.objects.create(
                     course=course,
@@ -94,16 +123,11 @@ class AuthoringCourseImportView(APIView):
                     description=module_data['description'],
                     order=module_data['order'],
                     duration_minutes=module_data['duration_minutes'],
+                    related_outcomes=module_data['related_outcomes'],
                     translations=module_data.get('translations', {}),
                 )
-                for lesson_data in sorted(module_data['lessons'].values(), key=lambda lesson: lesson['order']):
-                    Activity.objects.create(module=module, translations=lesson_data.get('translations', {}), **{
-                        k: lesson_data[k] for k in (
-                            'title', 'description', 'lesson_type', 'content',
-                            'duration_minutes', 'order', 'is_required', 'quiz_data',
-                            'media_items',
-                        )
-                    })
+                for activity_data in sorted(module_data['activities'].values(), key=lambda a: a['order']):
+                    _create_activity(module, activity_data)
             CourseEditHistory.objects.create(
                 course=course,
                 editor=request.user,

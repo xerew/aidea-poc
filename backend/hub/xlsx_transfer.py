@@ -1,4 +1,8 @@
-"""Course <-> xlsx workbook conversion. One workbook = one course."""
+"""Course <-> xlsx workbook conversion. One workbook = one course.
+
+Sheets: Course, Modules, Activities, Resources, Quiz, Translations (plus README
+and a hidden Choices sheet feeding the dropdowns).
+"""
 import json
 
 from openpyxl import Workbook
@@ -6,21 +10,33 @@ from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from hub.models import Activity, Course, LearningPillar, Subject
+from hub.models import Course, LearningPillar, Resource, Subject
 from hub.translation import LANGUAGE_NAMES
 
-COURSE_HEADERS = ['title', 'description', 'pillar_slug', 'level',
-                  'duration_hours', 'content_format', 'learning_outcomes', 'subjects']
-MODULE_HEADERS = ['order', 'title', 'description', 'duration_minutes']
-LESSON_HEADERS = ['module_order', 'order', 'title', 'description',
-                  'lesson_type', 'content', 'duration_minutes', 'required']
-QUIZ_HEADERS   = ['module_order', 'lesson_order', 'question_order', 'question',
-                  'option_a', 'option_b', 'option_c', 'option_d', 'option_e',
-                  'option_f', 'correct']
-MEDIA_HEADERS  = ['module_order', 'lesson_order', 'order', 'type', 'url', 'caption']
-TRANSLATION_HEADERS = ['type', 'module_order', 'lesson_order', 'language', 'field', 'value']
+COURSE_HEADERS = [
+    'title', 'description', 'pillar_slug', 'level', 'duration_hours', 'content_format',
+    'learning_outcomes', 'subjects', 'additional_pillars', 'cross_axis_relevance',
+    'target_audience', 'target_audience_other', 'educational_levels',
+    'educational_level_other', 'prior_knowledge',
+]
+MODULE_HEADERS   = ['order', 'title', 'description', 'duration_minutes', 'related_outcomes']
+ACTIVITY_HEADERS = ['module_order', 'order', 'title', 'description', 'duration_minutes']
+RESOURCE_HEADERS = ['module_order', 'activity_order', 'order', 'type', 'required',
+                    'title', 'content', 'url', 'caption', 'instructions']
+QUIZ_HEADERS     = ['module_order', 'activity_order', 'resource_order', 'question_order',
+                    'question', 'option_a', 'option_b', 'option_c', 'option_d',
+                    'option_e', 'option_f', 'correct']
+TRANSLATION_HEADERS = ['type', 'module_order', 'activity_order', 'resource_order',
+                       'language', 'field', 'value']
+TRANSLATION_FIELDS_BY_TYPE = {
+    'course': {'title', 'description', 'learning_outcomes', 'cross_axis_relevance',
+               'prior_knowledge', 'target_audience_other', 'educational_level_other', 'status'},
+    'module': {'title', 'description'},
+    'activity': {'title', 'description'},
+    'resource': {'title', 'content', 'caption', 'instructions', 'quiz_data'},
+}
+
 MEDIA_TYPES    = {'image', 'video', 'pdf'}
-TRANSLATION_FIELDS = {'title', 'description', 'content', 'learning_outcomes', 'quiz_data', 'status'}
 OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F']
 DROPDOWN_ROWS  = 500
 
@@ -47,6 +63,7 @@ def _deser_translation(field, raw):
             return [], False
     return str(raw or ''), True
 
+
 README_LINES = [
     'AIDEA course workbook',
     '',
@@ -54,22 +71,33 @@ README_LINES = [
     'Importing always creates a NEW unpublished draft owned by you.',
     '',
     'Sheets:',
-    '  Course  - exactly one row (row 2). pillar_slug, level and content_format',
-    '            offer dropdowns. learning_outcomes: one outcome per line in the cell',
-    '            (Alt+Enter inside Excel). subjects: comma-separated subject slugs',
-    '            (e.g. physics,astronomy) from the hidden Choices sheet; leave blank',
-    '            for none.',
-    '  Modules - one row per module. "order" must be a unique positive number.',
-    '  Lessons - one row per lesson. module_order refers to the Modules sheet.',
-    '            lesson_type and required offer dropdowns.',
-    '  Quiz    - one row per question, only for lessons whose type is quiz.',
-    '            module_order and lesson_order refer to the Lessons sheet.',
-    '            Fill option_a..option_f (at least two) and put the correct',
-    '            letter(s) in "correct", comma separated, e.g. B or A,C.',
-    '  Translations - the course\'s existing translations, one row per field.',
-    '            type is course/module/lesson; module_order/lesson_order point to',
-    '            the Modules/Lessons sheets; language is a code (el, fr, ...).',
-    '            Auto-filled on export; leave it as-is to keep translations.',
+    '  Course     - exactly one row (row 2). pillar_slug, level and content_format',
+    '               offer dropdowns. learning_outcomes: one outcome per line in the cell',
+    '               (Alt+Enter inside Excel). subjects and additional_pillars:',
+    '               comma-separated slugs from the hidden Choices sheet.',
+    '               target_audience: teachers and/or school_leaders, comma separated.',
+    '               educational_levels: any of primary, lower_secondary,',
+    '               upper_secondary, cross_level, comma separated. The *_other',
+    '               columns, cross_axis_relevance and prior_knowledge are free text.',
+    '  Modules    - one row per module. "order" must be a unique positive number.',
+    '               related_outcomes: numbers of the learning outcomes the module',
+    '               addresses, comma separated (1 = first outcome), e.g. 1,3.',
+    '  Activities - one row per activity. module_order refers to the Modules sheet.',
+    '  Resources  - the content of each activity, in order: one row per resource.',
+    '               module_order/activity_order refer to the Activities sheet.',
+    '               type: text, video, image, pdf, quiz or assignment.',
+    '               text uses "content" (HTML allowed); video/image/pdf use "url"',
+    '               and an optional "caption"; assignment uses "instructions";',
+    '               quiz questions go on the Quiz sheet. required: yes or no.',
+    '               Every activity needs at least one resource.',
+    '  Quiz       - one row per question of a quiz resource (module_order,',
+    '               activity_order, resource_order point to the Resources sheet).',
+    '               Fill option_a..option_f (at least two) and put the correct',
+    '               letter(s) in "correct", comma separated, e.g. B or A,C.',
+    '  Translations - existing translations, one row per field. type is course,',
+    '               module, activity or resource; the *_order columns point to the',
+    '               other sheets; language is a code (el, fr, ...). Auto-filled on',
+    '               export; leave it as-is to keep translations.',
     '',
     'Do not rename sheets or reorder columns. The hidden Choices sheet feeds',
     'the dropdowns - leave it alone.',
@@ -93,7 +121,13 @@ def _list_validation(wb, ws, choices_col, n_choices, target_col, last_row):
     dv.add(f'{target_col}2:{target_col}{last_row}')
 
 
-def build_course_workbook(course: Course | None = None) -> Workbook:
+def _wrap(ws, coord):
+    ws[coord].alignment = ws[coord].alignment.copy(wrap_text=True)
+
+
+# ══ Export ═══════════════════════════════════════════════════════════════════
+
+def build_course_workbook(course: Course | None = None) -> Workbook:  # noqa: C901 - one sheet per block
     """Build a one-course workbook. With ``course=None`` the sheets, headers,
     dropdowns and README are produced with no data rows — a blank import
     template."""
@@ -109,11 +143,13 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     choices = wb.create_sheet('Choices')
     levels          = [c[0] for c in Course.Level.choices]
     content_formats = [c[0] for c in Course.ContentFormat.choices]
-    lesson_types    = [c[0] for c in Activity.LessonType.choices]
+    resource_types  = list(Resource.Type.values)
     pillar_slugs    = list(LearningPillar.objects.values_list('slug', flat=True))
     subject_slugs   = list(Subject.objects.filter(is_active=True).values_list('slug', flat=True))
     yes_no          = ['yes', 'no']
-    for col, values in enumerate([levels, content_formats, lesson_types, pillar_slugs, yes_no, subject_slugs], start=1):
+    for col, values in enumerate(
+        [levels, content_formats, resource_types, pillar_slugs, yes_no, subject_slugs], start=1,
+    ):
         for row, value in enumerate(values, start=1):
             choices.cell(row=row, column=col, value=value)
     choices.sheet_state = 'hidden'
@@ -121,6 +157,7 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     # ── Course ──────────────────────────────────────────────────────────
     course_ws = wb.create_sheet('Course')
     _write_headers(course_ws, COURSE_HEADERS)
+    translation_rows = []
     if course is not None:
         course_ws.append([
             course.title,
@@ -131,93 +168,93 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
             course.content_format,
             '\n'.join(course.learning_outcomes or []),
             ','.join(course.subjects.values_list('slug', flat=True)),
+            ','.join(course.additional_pillars.order_by('order').values_list('slug', flat=True)),
+            course.cross_axis_relevance,
+            ','.join(course.target_audience or []),
+            course.target_audience_other,
+            ','.join(course.educational_levels or []),
+            course.educational_level_other,
+            course.prior_knowledge,
         ])
-        course_ws['G2'].alignment = course_ws['G2'].alignment.copy(wrap_text=True)
+        for coord in ('G2', 'J2', 'O2'):
+            _wrap(course_ws, coord)
+        for lang, st in (course.translation_status or {}).items():
+            translation_rows.append(['course', '', '', '', lang, 'status', st])
+        for lang, blob in (course.translations or {}).items():
+            for field in sorted(TRANSLATION_FIELDS_BY_TYPE['course'] - {'status'}):
+                if field in blob:
+                    translation_rows.append(['course', '', '', '', lang, field, _ser_translation(field, blob[field])])
     _list_validation(wb, course_ws, 'D', max(len(pillar_slugs), 1), 'C', 2)
     _list_validation(wb, course_ws, 'A', len(levels), 'D', 2)
     _list_validation(wb, course_ws, 'B', len(content_formats), 'F', 2)
 
-    # ── Translations (collected as we go, written to its own sheet) ──────
-    translation_rows = []
-    if course is not None:
-        for lang, st in (course.translation_status or {}).items():
-            translation_rows.append(['course', '', '', lang, 'status', st])
-        for lang, blob in (course.translations or {}).items():
-            for field in ('title', 'description', 'learning_outcomes'):
-                if field in blob:
-                    translation_rows.append(['course', '', '', lang, field, _ser_translation(field, blob[field])])
-
     # ── Modules ─────────────────────────────────────────────────────────
     modules_ws = wb.create_sheet('Modules')
     _write_headers(modules_ws, MODULE_HEADERS)
-    modules = list(course.modules.order_by('order').prefetch_related('lessons')) if course else []
+    modules = (
+        list(course.modules.order_by('order').prefetch_related('lessons__resources'))
+        if course else []
+    )
     for module in modules:
-        modules_ws.append([module.order, module.title, module.description, module.duration_minutes])
+        modules_ws.append([
+            module.order, module.title, module.description, module.duration_minutes,
+            ','.join(str(i + 1) for i in (module.related_outcomes or [])),
+        ])
         for lang, blob in (module.translations or {}).items():
             for field in ('title', 'description'):
                 if field in blob:
-                    translation_rows.append(['module', module.order, '', lang, field, _ser_translation(field, blob[field])])
+                    translation_rows.append(['module', module.order, '', '', lang, field,
+                                             _ser_translation(field, blob[field])])
 
-    # ── Lessons ─────────────────────────────────────────────────────────
-    lessons_ws = wb.create_sheet('Lessons')
-    _write_headers(lessons_ws, LESSON_HEADERS)
+    # ── Activities, Resources, Quiz ─────────────────────────────────────
+    activities_ws = wb.create_sheet('Activities')
+    _write_headers(activities_ws, ACTIVITY_HEADERS)
+    resources_ws = wb.create_sheet('Resources')
+    _write_headers(resources_ws, RESOURCE_HEADERS)
     quiz_rows = []
-    media_rows = []
     for module in modules:
-        for lesson in module.lessons.order_by('order'):
-            lessons_ws.append([
-                module.order,
-                lesson.order,
-                lesson.title,
-                lesson.description,
-                lesson.lesson_type,
-                lesson.content,
-                lesson.duration_minutes,
-                'yes' if lesson.is_required else 'no',
+        for activity in sorted(module.lessons.all(), key=lambda a: a.order):
+            activities_ws.append([
+                module.order, activity.order, activity.title, activity.description,
+                activity.duration_minutes,
             ])
-            for lang, blob in (lesson.translations or {}).items():
-                for field in ('title', 'description', 'content', 'quiz_data'):
-                    if field in blob:
-                        translation_rows.append([
-                            'lesson', module.order, lesson.order, lang, field,
-                            _ser_translation(field, blob[field]),
+            for lang, blob in (activity.translations or {}).items():
+                for field in ('title', 'description'):
+                    if blob.get(field):
+                        translation_rows.append(['activity', module.order, activity.order, '', lang,
+                                                 field, _ser_translation(field, blob[field])])
+            # Number resources by position so the sheet's keys are always unique.
+            for r_order, resource in enumerate(sorted(activity.resources.all(), key=lambda r: r.order), start=1):
+                resources_ws.append([
+                    module.order, activity.order, r_order, resource.type,
+                    'yes' if resource.is_required else 'no',
+                    resource.title, resource.content, resource.url, resource.caption,
+                    resource.instructions,
+                ])
+                for lang, blob in (resource.translations or {}).items():
+                    for field in sorted(TRANSLATION_FIELDS_BY_TYPE['resource']):
+                        if blob.get(field):
+                            translation_rows.append(['resource', module.order, activity.order, r_order,
+                                                     lang, field, _ser_translation(field, blob[field])])
+                if resource.type == Resource.Type.QUIZ:
+                    for q_idx, question in enumerate(resource.quiz_data or [], start=1):
+                        options = question.get('options', [])[:len(OPTION_LETTERS)]
+                        texts = [opt.get('text', '') for opt in options]
+                        texts += [''] * (len(OPTION_LETTERS) - len(texts))
+                        correct = ','.join(
+                            OPTION_LETTERS[i] for i, opt in enumerate(options) if opt.get('is_correct')
+                        )
+                        quiz_rows.append([
+                            module.order, activity.order, r_order, q_idx,
+                            question.get('question', ''), *texts, correct,
                         ])
-            for m_idx, item in enumerate(lesson.media_items or [], start=1):
-                if item.get('type') == 'text':
-                    # Text blocks reuse the caption column for their HTML.
-                    media_rows.append([module.order, lesson.order, m_idx, 'text', '', item.get('html', '')])
-                else:
-                    media_rows.append([
-                        module.order, lesson.order, m_idx,
-                        item.get('type', ''), item.get('url', ''), item.get('caption', ''),
-                    ])
-            if lesson.lesson_type == Activity.LessonType.QUIZ:
-                for q_idx, question in enumerate(lesson.quiz_data or [], start=1):
-                    options = question.get('options', [])[:len(OPTION_LETTERS)]
-                    texts = [opt.get('text', '') for opt in options]
-                    texts += [''] * (len(OPTION_LETTERS) - len(texts))
-                    correct = ','.join(
-                        OPTION_LETTERS[i] for i, opt in enumerate(options)
-                        if opt.get('is_correct')
-                    )
-                    quiz_rows.append([
-                        module.order, lesson.order, q_idx,
-                        question.get('question', ''), *texts, correct,
-                    ])
-    _list_validation(wb, lessons_ws, 'C', len(lesson_types), 'E', DROPDOWN_ROWS)
-    _list_validation(wb, lessons_ws, 'E', len(yes_no), 'H', DROPDOWN_ROWS)
+    _list_validation(wb, resources_ws, 'C', len(resource_types), 'D', DROPDOWN_ROWS)
+    _list_validation(wb, resources_ws, 'E', len(yes_no), 'E', DROPDOWN_ROWS)
 
-    # ── Quiz ────────────────────────────────────────────────────────────
     quiz_ws = wb.create_sheet('Quiz')
     _write_headers(quiz_ws, QUIZ_HEADERS)
     for row in quiz_rows:
         quiz_ws.append(row)
-
-    # ── Media ───────────────────────────────────────────────────────────
-    media_ws = wb.create_sheet('Media')
-    _write_headers(media_ws, MEDIA_HEADERS)
-    for row in media_rows:
-        media_ws.append(row)
 
     # ── Translations ────────────────────────────────────────────────────
     translations_ws = wb.create_sheet('Translations')
@@ -225,32 +262,33 @@ def build_course_workbook(course: Course | None = None) -> Workbook:
     for row in translation_rows:
         translations_ws.append(row)
 
-    for ws in (course_ws, modules_ws, lessons_ws, quiz_ws, media_ws, translations_ws):
+    for ws in (course_ws, modules_ws, activities_ws, resources_ws, quiz_ws, translations_ws):
         for col in range(1, ws.max_column + 1):
             ws.column_dimensions[get_column_letter(col)].width = 22
 
     return wb
 
 
+# ══ Import ═══════════════════════════════════════════════════════════════════
+
 MAX_IMPORT_BYTES = 5 * 1024 * 1024
 
 _YES_NO = {'yes': True, 'no': False, '': True, None: True}
+
+# PositiveSmallIntegerField maps to Postgres smallint: CHECK (>= 0), max 32767.
+# Values outside this range must fail phase-1 validation, not blow up the insert.
+INT_MAX = 32767
 
 
 def _cell(sheet, col_idx, row):
     return f'{sheet}!{get_column_letter(col_idx)}{row}'
 
 
-def _rows(ws):
-    """Non-empty data rows as (row_number, values) with header-length padding."""
+def _rows(ws, width):
+    """Non-empty data rows as (row_number, values padded to `width`)."""
     for row_num, values in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
         if any(v not in (None, '') for v in values):
-            yield row_num, values
-
-
-# PositiveSmallIntegerField maps to Postgres smallint: CHECK (>= 0), max 32767.
-# Values outside this range must fail phase-1 validation, not blow up the insert.
-INT_MAX = 32767
+            yield row_num, list(values) + [None] * (width - len(values))
 
 
 def _as_int(value, default=0):
@@ -267,44 +305,113 @@ def _as_int(value, default=0):
     return number, True
 
 
-def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
+def _tokens(raw):
+    """Comma/semicolon/newline-separated cell → lower-cased tokens."""
+    text = str(raw or '').replace(';', ',').replace('\n', ',')
+    return [t.strip().lower() for t in text.split(',') if t.strip()]
+
+
+def _yes_no(raw, sheet, col, row_num, errors):
+    key = str(raw).strip().lower() if raw not in (None, '') else ''
+    if key not in _YES_NO:
+        errors.append(f'{_cell(sheet, col, row_num)}: required must be yes or no.')
+        key = ''
+    return _YES_NO[key]
+
+
+def _parse_quiz_row(values, start, sheet, row_num, errors):
+    """Parse question + options + correct letters beginning at column index
+    `start` (the question). Returns the question dict or None on error."""
+    question = values[start]
+    option_texts, correct = values[start + 1:start + 7], values[start + 7]
+    if not (question or '').strip():
+        errors.append(f'{_cell(sheet, start + 1, row_num)}: question is required.')
+        return None
+    present = {
+        OPTION_LETTERS[i]: str(text).strip()
+        for i, text in enumerate(option_texts)
+        if text not in (None, '') and str(text).strip()
+    }
+    if len(present) < 2:
+        errors.append(f'{_cell(sheet, start + 2, row_num)}: at least two options are required.')
+        return None
+    correct_letters = [c.strip().upper() for c in str(correct or '').split(',') if c.strip()]
+    if not correct_letters or any(c not in present for c in correct_letters):
+        errors.append(f'{_cell(sheet, start + 8, row_num)}: correct must list letters of filled options, e.g. A,C.')
+        return None
+    return {
+        'question': str(question).strip(),
+        'options': [
+            {'text': text, 'is_correct': letter in correct_letters}
+            for letter, text in present.items()
+        ],
+    }
+
+
+def _sorted_values(pairs):
+    return [item for _, item in sorted(pairs, key=lambda pair: pair[0])]
+
+
+def parse_course_workbook(file):
+    """Validate a workbook. Returns (payload, []) or (None, errors)."""
     from openpyxl import load_workbook
 
-    errors: list[str] = []
     try:
         wb = load_workbook(file, data_only=True)
     except Exception:
         return None, ['File is not a valid xlsx workbook.']
 
-    for sheet in ('Course', 'Modules', 'Lessons'):
-        if sheet not in wb.sheetnames:
-            errors.append(f'Missing sheet: {sheet}.')
+    required = ('Course', 'Modules', 'Activities', 'Resources')
+    errors = [f'Missing sheet: {sheet}.' for sheet in required if sheet not in wb.sheetnames]
     if errors:
         return None, errors
 
+    course_payload = _parse_course_sheet(wb, errors)
+    if course_payload is None:
+        return None, errors
+    modules = _parse_modules_sheet(wb, course_payload, errors)
+    _parse_content_sheets(wb, modules, course_payload, errors)
+
+    if errors:
+        return None, errors
+    course_payload['modules'] = [modules[k] for k in sorted(modules)]
+    return course_payload, []
+
+
+def _parse_course_sheet(wb, errors):  # noqa: C901 - flat field-by-field validation
     levels          = {c[0] for c in Course.Level.choices}
     content_formats = {c[0] for c in Course.ContentFormat.choices}
-    lesson_types    = {c[0] for c in Activity.LessonType.choices}
     pillar_by_slug  = {p.slug: p for p in LearningPillar.objects.all()}
     subject_by_slug = {s.slug: s for s in Subject.objects.filter(is_active=True)}
 
-    # ── Course sheet ────────────────────────────────────────────────────
-    course_rows = list(_rows(wb['Course']))
+    course_rows = list(_rows(wb['Course'], len(COURSE_HEADERS)))
     if not course_rows:
-        return None, ['Course!A2: course row is missing.']
+        errors.append('Course!A2: course row is missing.')
+        return None
     row_num, values = course_rows[0]
-    values = list(values) + [None] * (len(COURSE_HEADERS) - len(values))
-    title, description, pillar_slug, level, duration_hours, content_format, outcomes, subjects = values[:8]
+    (title, description, pillar_slug, level, duration_hours, content_format, outcomes, subjects,
+     extra_pillars, cross_axis, audience, audience_other, edu_levels, edu_other, prior) = values[:15]
 
     subject_objs = []
-    for token in str(subjects or '').replace(';', ',').replace('\n', ',').split(','):
-        slug = token.strip().lower()
-        if not slug:
-            continue
+    for slug in _tokens(subjects):
         if slug not in subject_by_slug:
             errors.append(f'{_cell("Course", 8, row_num)}: unknown subject slug {slug!r}.')
         else:
             subject_objs.append(subject_by_slug[slug])
+
+    extra_pillar_objs = []
+    for slug in _tokens(extra_pillars):
+        if slug not in pillar_by_slug:
+            errors.append(f'{_cell("Course", 9, row_num)}: unknown pillar slug {slug!r}.')
+        elif slug != pillar_slug:  # the primary pillar is never also an additional one
+            extra_pillar_objs.append(pillar_by_slug[slug])
+
+    def _choice_list(raw, allowed, col, name):
+        picked = _tokens(raw)
+        bad = [v for v in picked if v not in allowed]
+        if bad:
+            errors.append(f'{_cell("Course", col, row_num)}: {name} must be from {allowed}, got {bad}.')
+        return [v for v in allowed if v in picked]
 
     if not (title or '').strip():
         errors.append(f'{_cell("Course", 1, row_num)}: title is required.')
@@ -320,26 +427,32 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
     elif content_format not in content_formats:
         errors.append(f'{_cell("Course", 6, row_num)}: content_format must be one of {sorted(content_formats)}.')
 
-    course_payload = {
+    return {
         'title': (title or '').strip(),
         'description': description or '',
         'pillar': pillar_by_slug.get(pillar_slug),
         'level': level,
         'duration_hours': duration_hours,
         'content_format': content_format,
-        'learning_outcomes': [
-            line.strip() for line in str(outcomes or '').splitlines() if line.strip()
-        ],
+        'learning_outcomes': [line.strip() for line in str(outcomes or '').splitlines() if line.strip()],
         'subjects': subject_objs,
+        'additional_pillars': extra_pillar_objs,
+        'cross_axis_relevance': str(cross_axis or ''),
+        'target_audience': _choice_list(audience, Course.AUDIENCE_CHOICES, 11, 'target_audience'),
+        'target_audience_other': str(audience_other or '')[:200],
+        'educational_levels': _choice_list(edu_levels, Course.EDUCATIONAL_LEVEL_CHOICES, 13, 'educational_levels'),
+        'educational_level_other': str(edu_other or '')[:200],
+        'prior_knowledge': str(prior or ''),
         'translations': {},
         'translation_status': {},
     }
 
-    # ── Modules sheet ───────────────────────────────────────────────────
+
+def _parse_modules_sheet(wb, course_payload, errors):
+    outcome_count = len(course_payload['learning_outcomes'])
     modules: dict[int, dict] = {}
-    for row_num, values in _rows(wb['Modules']):
-        values = list(values) + [None] * (len(MODULE_HEADERS) - len(values))
-        order, m_title, m_desc, m_minutes = values[:4]
+    for row_num, values in _rows(wb['Modules'], len(MODULE_HEADERS)):
+        order, m_title, m_desc, m_minutes, m_outcomes = values[:5]
         order, ok = _as_int(order, default=-1)
         if not ok or order < 1:
             errors.append(f'{_cell("Modules", 1, row_num)}: order must be a positive number.')
@@ -353,177 +466,154 @@ def parse_course_workbook(file):  # noqa: C901 - single cohesive validator
         m_minutes, ok = _as_int(m_minutes)
         if not ok:
             errors.append(f'{_cell("Modules", 4, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
+        related = set()
+        for token in _tokens(m_outcomes):
+            number, ok = _as_int(token, default=-1)
+            if not ok or not 1 <= number <= outcome_count:
+                errors.append(
+                    f'{_cell("Modules", 5, row_num)}: related_outcomes must be outcome numbers '
+                    f'between 1 and {outcome_count}, got {token!r}.'
+                )
+                continue
+            related.add(number - 1)
         modules[order] = {
             'order': order, 'title': m_title.strip(), 'description': m_desc or '',
-            'duration_minutes': m_minutes, 'lessons': {}, 'translations': {},
+            'duration_minutes': m_minutes, 'related_outcomes': sorted(related),
+            'activities': {}, 'translations': {},
         }
     if not modules:
         errors.append('Modules!A2: at least one module is required.')
+    return modules
 
-    # ── Lessons sheet ───────────────────────────────────────────────────
-    for row_num, values in _rows(wb['Lessons']):
-        values = list(values) + [None] * (len(LESSON_HEADERS) - len(values))
-        m_order, order, l_title, l_desc, l_type, content, minutes, required = values[:8]
+
+def _parse_content_sheets(wb, modules, course_payload, errors):  # noqa: C901 - one block per sheet
+    # ── Activities ──────────────────────────────────────────────────────
+    activity_rows = {}
+    for row_num, values in _rows(wb['Activities'], len(ACTIVITY_HEADERS)):
+        m_order, order, a_title, a_desc, minutes = values[:5]
         m_order, ok = _as_int(m_order, default=-1)
         if not ok or m_order not in modules:
-            errors.append(f'{_cell("Lessons", 1, row_num)}: module_order {m_order!r} does not match any module.')
+            errors.append(f'{_cell("Activities", 1, row_num)}: module_order {m_order!r} does not match any module.')
             continue
         order, ok = _as_int(order, default=-1)
         if not ok or order < 1:
-            errors.append(f'{_cell("Lessons", 2, row_num)}: order must be a positive number.')
+            errors.append(f'{_cell("Activities", 2, row_num)}: order must be a positive number.')
             continue
-        if order in modules[m_order]['lessons']:
-            errors.append(f'{_cell("Lessons", 2, row_num)}: duplicate lesson order {order} in module {m_order}.')
+        activities = modules[m_order]['activities']
+        if order in activities:
+            errors.append(f'{_cell("Activities", 2, row_num)}: duplicate activity order {order} in module {m_order}.')
             continue
-        if not (l_title or '').strip():
-            errors.append(f'{_cell("Lessons", 3, row_num)}: title is required.')
-            continue
-        if l_type not in lesson_types:
-            errors.append(f'{_cell("Lessons", 5, row_num)}: unknown lesson_type {l_type!r}.')
+        if not (a_title or '').strip():
+            errors.append(f'{_cell("Activities", 3, row_num)}: title is required.')
             continue
         minutes, ok = _as_int(minutes)
         if not ok:
-            errors.append(f'{_cell("Lessons", 7, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
-        req_key = str(required).strip().lower() if required not in (None, '') else ''
-        if req_key not in _YES_NO:
-            errors.append(f'{_cell("Lessons", 8, row_num)}: required must be yes or no.')
-            req_key = ''
-        modules[m_order]['lessons'][order] = {
-            'order': order, 'title': l_title.strip(), 'description': l_desc or '',
-            'lesson_type': l_type, 'content': content or '',
-            'duration_minutes': minutes, 'is_required': _YES_NO[req_key],
-            'quiz_data': [], 'media_items': [], 'translations': {},
+            errors.append(f'{_cell("Activities", 5, row_num)}: duration_minutes must be a whole number between 0 and 32767.')
+        activities[order] = {
+            'order': order, 'title': a_title.strip(), 'description': a_desc or '',
+            'duration_minutes': minutes, 'resources': {}, 'translations': {},
+        }
+        activity_rows[(m_order, order)] = row_num
+
+    def _activity(m_order, a_order):
+        m_order, ok_m = _as_int(m_order, default=-1)
+        a_order, ok_a = _as_int(a_order, default=-1)
+        if not (ok_m and ok_a):
+            return None
+        return modules.get(m_order, {}).get('activities', {}).get(a_order)
+
+    # ── Resources ───────────────────────────────────────────────────────
+    resource_types = set(Resource.Type.values)
+    for row_num, values in _rows(wb['Resources'], len(RESOURCE_HEADERS)):
+        m_order, a_order, order, r_type, required, r_title, content, url, caption, instructions = values[:10]
+        activity = _activity(m_order, a_order)
+        if activity is None:
+            errors.append(f'{_cell("Resources", 1, row_num)}: module_order/activity_order do not match any activity.')
+            continue
+        order, ok = _as_int(order, default=-1)
+        if not ok or order < 1:
+            errors.append(f'{_cell("Resources", 3, row_num)}: order must be a positive number.')
+            continue
+        if order in activity['resources']:
+            errors.append(f'{_cell("Resources", 3, row_num)}: duplicate resource order {order} in this activity.')
+            continue
+        if r_type not in resource_types:
+            errors.append(f'{_cell("Resources", 4, row_num)}: type must be one of {sorted(resource_types)}.')
+            continue
+        url = str(url or '').strip()
+        if r_type in MEDIA_TYPES and not url:
+            errors.append(f'{_cell("Resources", 8, row_num)}: url is required for {r_type} resources.')
+            continue
+        activity['resources'][order] = {
+            'order': order, 'type': r_type,
+            'is_required': _yes_no(required, 'Resources', 5, row_num, errors),
+            'title': str(r_title or '')[:200], 'content': str(content or ''),
+            'url': url[:500], 'caption': str(caption or '')[:300],
+            'instructions': str(instructions or ''), 'quiz_data': [], 'translations': {},
         }
 
-    # ── Media sheet (optional) ──────────────────────────────────────────
-    if 'Media' in wb.sheetnames:
-        media_by_lesson: dict = {}
-        for row_num, values in _rows(wb['Media']):
-            values = list(values) + [None] * (len(MEDIA_HEADERS) - len(values))
-            m_order, l_order, item_order, m_type, url, caption = values[:6]
-            m_order, ok_m = _as_int(m_order, default=-1)
-            l_order, ok_l = _as_int(l_order, default=-1)
-            lesson = modules.get(m_order, {}).get('lessons', {}).get(l_order) if ok_m and ok_l else None
-            if lesson is None:
-                errors.append(f'{_cell("Media", 1, row_num)}: module_order/lesson_order do not match any lesson.')
-                continue
-            item_order, _ = _as_int(item_order, default=len(lesson['media_items']) + 1)
-            media_by_lesson.setdefault(id(lesson), lesson)
-            if m_type == 'text':
-                # Text block: the caption column carries the HTML body.
-                lesson['media_items'].append((item_order, {'type': 'text', 'html': str(caption or '')}))
-                continue
-            if m_type not in MEDIA_TYPES:
-                errors.append(f'{_cell("Media", 4, row_num)}: type must be text or one of {sorted(MEDIA_TYPES)}.')
-                continue
-            if not (url or '').strip():
-                errors.append(f'{_cell("Media", 5, row_num)}: url is required.')
-                continue
-            lesson['media_items'].append((item_order, {
-                'type': m_type, 'url': str(url).strip(), 'caption': str(caption or ''),
-            }))
-        # Sort each lesson's media by item order and strip the sort key.
-        for lesson in media_by_lesson.values():
-            lesson['media_items'] = [
-                item for _, item in sorted(lesson['media_items'], key=lambda pair: pair[0])
-            ]
+    for (m_order, a_order), row_num in activity_rows.items():
+        if not modules[m_order]['activities'][a_order]['resources']:
+            errors.append(f'{_cell("Activities", 1, row_num)}: activity has no resources on the Resources sheet.')
 
-    # ── Quiz sheet (optional) ───────────────────────────────────────────
+    def _resource(m_order, a_order, r_order):
+        activity = _activity(m_order, a_order)
+        r_order, ok = _as_int(r_order, default=-1)
+        return activity['resources'].get(r_order) if activity and ok else None
+
+    # ── Quiz ────────────────────────────────────────────────────────────
     if 'Quiz' in wb.sheetnames:
-        for row_num, values in _rows(wb['Quiz']):
-            values = list(values) + [None] * (len(QUIZ_HEADERS) - len(values))
-            m_order, l_order, q_order, question = values[0], values[1], values[2], values[3]
-            option_texts, correct = values[4:10], values[10]
-            m_order, ok_m = _as_int(m_order, default=-1)
-            l_order, ok_l = _as_int(l_order, default=-1)
-            lesson = modules.get(m_order, {}).get('lessons', {}).get(l_order) if ok_m and ok_l else None
-            if lesson is None:
-                errors.append(f'{_cell("Quiz", 1, row_num)}: module_order/lesson_order do not match any lesson.')
+        for row_num, values in _rows(wb['Quiz'], len(QUIZ_HEADERS)):
+            resource = _resource(values[0], values[1], values[2])
+            if resource is None:
+                errors.append(f'{_cell("Quiz", 1, row_num)}: module/activity/resource order do not match any resource.')
                 continue
-            if lesson['lesson_type'] != Activity.LessonType.QUIZ:
-                errors.append(f'{_cell("Quiz", 2, row_num)}: lesson {m_order}/{l_order} is not a quiz.')
+            if resource['type'] != Resource.Type.QUIZ:
+                errors.append(f'{_cell("Quiz", 3, row_num)}: that resource is not a quiz.')
                 continue
-            if not (question or '').strip():
-                errors.append(f'{_cell("Quiz", 4, row_num)}: question is required.')
-                continue
-            present = {
-                OPTION_LETTERS[i]: str(text).strip()
-                for i, text in enumerate(option_texts)
-                if text not in (None, '') and str(text).strip()
-            }
-            if len(present) < 2:
-                errors.append(f'{_cell("Quiz", 5, row_num)}: at least two options are required.')
-                continue
-            correct_letters = [
-                c.strip().upper() for c in str(correct or '').split(',') if c.strip()
-            ]
-            invalid = [c for c in correct_letters if c not in present]
-            if not correct_letters or invalid:
-                errors.append(f'{_cell("Quiz", 11, row_num)}: correct must list letters of filled options, e.g. A,C.')
-                continue
-            q_order, ok = _as_int(q_order, default=len(lesson['quiz_data']) + 1)
-            lesson['quiz_data'].append((q_order, {
-                'question': str(question).strip(),
-                'options': [
-                    {'text': text, 'is_correct': letter in correct_letters}
-                    for letter, text in present.items()
-                ],
-            }))
+            question = _parse_quiz_row(values, 4, 'Quiz', row_num, errors)
+            if question is not None:
+                q_order, _ = _as_int(values[3], default=len(resource['quiz_data']) + 1)
+                resource['quiz_data'].append((q_order, question))
+        for module in modules.values():
+            for activity in module['activities'].values():
+                for resource in activity['resources'].values():
+                    resource['quiz_data'] = _sorted_values(resource['quiz_data'])
 
-    # ── Translations sheet (optional) ───────────────────────────────────
+    # ── Translations ────────────────────────────────────────────────────
     if 'Translations' in wb.sheetnames:
-        for row_num, values in _rows(wb['Translations']):
-            values = list(values) + [None] * (len(TRANSLATION_HEADERS) - len(values))
-            t_type, m_order, l_order, language, field, value = values[:6]
+        for row_num, values in _rows(wb['Translations'], len(TRANSLATION_HEADERS)):
+            t_type, m_order, a_order, r_order, language, field, value = values[:7]
             t_type = str(t_type or '').strip().lower()
             language = str(language or '').strip()
             field = str(field or '').strip()
+            if t_type not in TRANSLATION_FIELDS_BY_TYPE:
+                errors.append(f'{_cell("Translations", 1, row_num)}: type must be course, module, activity or resource.')
+                continue
             if language not in LANGUAGE_NAMES:
-                errors.append(f'{_cell("Translations", 4, row_num)}: unknown language {language!r}.')
+                errors.append(f'{_cell("Translations", 5, row_num)}: unknown language {language!r}.')
                 continue
-            if field not in TRANSLATION_FIELDS:
-                errors.append(f'{_cell("Translations", 5, row_num)}: unknown field {field!r}.')
+            if field not in TRANSLATION_FIELDS_BY_TYPE[t_type]:
+                errors.append(f'{_cell("Translations", 6, row_num)}: unknown {t_type} field {field!r}.')
                 continue
-
             if t_type == 'course':
                 if field == 'status':
                     course_payload['translation_status'][language] = str(value or '').strip()
                     continue
-                target = course_payload['translations'].setdefault(language, {})
+                owner = course_payload
             elif t_type == 'module':
-                m_order, ok = _as_int(m_order, default=-1)
-                module = modules.get(m_order)
-                if not ok or module is None:
-                    errors.append(f'{_cell("Translations", 2, row_num)}: module_order does not match any module.')
-                    continue
-                target = module['translations'].setdefault(language, {})
-            elif t_type == 'lesson':
-                m_order, ok_m = _as_int(m_order, default=-1)
-                l_order, ok_l = _as_int(l_order, default=-1)
-                lesson = modules.get(m_order, {}).get('lessons', {}).get(l_order) if ok_m and ok_l else None
-                if lesson is None:
-                    errors.append(f'{_cell("Translations", 3, row_num)}: module_order/lesson_order do not match any lesson.')
-                    continue
-                target = lesson['translations'].setdefault(language, {})
+                number, ok = _as_int(m_order, default=-1)
+                owner = modules.get(number) if ok else None
+            elif t_type == 'activity':
+                owner = _activity(m_order, a_order)
             else:
-                errors.append(f'{_cell("Translations", 1, row_num)}: type must be course, module or lesson.')
+                owner = _resource(m_order, a_order, r_order)
+            if owner is None:
+                errors.append(f'{_cell("Translations", 2, row_num)}: the *_order columns do not match any {t_type}.')
                 continue
-
             parsed, ok = _deser_translation(field, value)
             if not ok:
-                errors.append(f'{_cell("Translations", 6, row_num)}: {field} value is not valid.')
+                errors.append(f'{_cell("Translations", 7, row_num)}: {field} value is not valid.')
                 continue
-            target[field] = parsed
+            owner['translations'].setdefault(language, {})[field] = parsed
 
-    if errors:
-        return None, errors
-
-    # Sort quiz questions by question_order and strip the sort key
-    for module in modules.values():
-        for lesson in module['lessons'].values():
-            lesson['quiz_data'] = [
-                q for _, q in sorted(lesson['quiz_data'], key=lambda pair: pair[0])
-            ]
-
-    course_payload['modules'] = [modules[k] for k in sorted(modules)]
-    return course_payload, []
