@@ -99,6 +99,9 @@ jobs:
       - name: Check locale parity
         run: npm run check:locales
 
+      - name: Unit tests — tracking
+        run: npm test
+
       - name: Build
         env:
           VITE_API_URL: http://localhost:8000/api

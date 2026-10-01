@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "check:locales": "node scripts/check-locales.mjs",
+    "test": "node --test \"src/lib/tracking/*.test.js\"",
     "preview": "vite preview"
   },
   "dependencies": {
