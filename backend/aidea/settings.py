@@ -247,6 +247,7 @@ REST_FRAMEWORK = {
         'login_ip':        '60/min',   # per source IP (backstop; roomy for school NAT)
         'pw_reset_email':  '3/hour',   # per target email
         'pw_reset_ip':     '15/hour',  # per source IP (backstop)
+        'tracking':        '30/min',   # activity-page messages per user (normal use ≈ 2–4/min)
     },
 }
 

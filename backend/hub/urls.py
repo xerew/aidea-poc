@@ -99,6 +99,7 @@ from .views import (
 from .views.assignments import ReviewQueueCountView
 from .views.authoring_course import TranslationServiceStatusView
 from .views.authoring_module_library import ModuleImportView, ModuleLibraryView
+from .views.tracking import TrackingView
 
 urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='auth-login'),
@@ -134,6 +135,7 @@ urlpatterns = [
     path('preference-quiz/',      PreferenceQuizView.as_view(),      name='preference-quiz'),
     path('subjects/',             SubjectsView.as_view(),             name='subjects'),
     path('maintenance/',          MaintenanceView.as_view(),          name='maintenance'),
+    path('tracking/',             TrackingView.as_view(),             name='tracking'),
     path('users/<int:pk>/profile/', PublicProfileView.as_view(),       name='public-profile'),
     # Messaging
     path('messages/conversations/', ConversationListView.as_view(),    name='conversation-list'),

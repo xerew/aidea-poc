@@ -58,3 +58,11 @@ class PasswordResetEmailThrottle(_LiveRateThrottle):
         if not email:
             return None
         return self.cache_format % {'scope': self.scope, 'ident': email}
+
+
+class TrackingUserThrottle(_LiveRateThrottle):
+    """Activity-page tracking messages, per signed-in user."""
+    scope = 'tracking'
+
+    def get_cache_key(self, request, view):
+        return self.cache_format % {'scope': self.scope, 'ident': request.user.pk}
