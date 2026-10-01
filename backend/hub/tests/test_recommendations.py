@@ -37,13 +37,32 @@ class RecommendationsGetTestCase(APITestCase):
         self.assertEqual(response.data[0]['title'], 'AI Basics')
         self.assertEqual(response.data[0]['score'], 0.95)
 
-    def test_content_creator_gets_403(self):
-        creator = User.objects.create_user(username='creator1', password='pass')
-        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
-        login = self.client.post(reverse('auth-login'), {'username': 'creator1', 'password': 'pass'})
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
-        response = self.client.get(reverse('recommendations'))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+    def _login_staff(self, user_type, username):
+        user = User.objects.create_user(username=username, password='pass')
+        UserProfile.objects.create(user=user, user_type=user_type)
+        self.client.force_authenticate(user)
+        return user
+
+    def test_staff_roles_get_recommendations_computed_on_first_visit(self):
+        from unittest.mock import patch
+
+        from django.core.cache import cache
+        for i, role in enumerate([UserProfile.UserType.CONTENT_CREATOR,
+                                  UserProfile.UserType.AIDEA_PARTNER,
+                                  UserProfile.UserType.ADMIN]):
+            user = self._login_staff(role, f'staff{i}')
+            cache.delete(f'recs_first_compute:{user.id}')
+            with patch('hub.tasks.compute_user_recommendations.delay') as compute:
+                first = self.client.get(reverse('recommendations'))
+                self.client.get(reverse('recommendations'))  # no second queueing
+            self.assertEqual(first.status_code, status.HTTP_200_OK, role)
+            compute.assert_called_once_with(user.id)
+
+    def test_teacher_without_recommendations_does_not_queue(self):
+        from unittest.mock import patch
+        with patch('hub.tasks.compute_user_recommendations.delay') as compute:
+            self.client.get(reverse('recommendations'))
+        compute.assert_not_called()  # teachers get theirs at onboarding
 
 
 class RecommendationSourceFieldTest(APITestCase):
@@ -130,13 +149,39 @@ class RecommendationEventAPITest(APITestCase):
         })
         self.assertEqual(response.status_code, 400)
 
-    def test_content_creator_gets_403(self):
+    def test_staff_events_are_accepted_but_not_stored(self):
+        # Events tune the weights and are study data: teachers only.
         from hub.models import UserProfile as UP
         creator = User.objects.create_user(username='creator2', password='pass')
         UP.objects.create(user=creator, user_type=UP.UserType.CONTENT_CREATOR)
-        login = self.client.post(reverse('auth-login'), {'username': 'creator2', 'password': 'pass'})
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
+        self.client.force_authenticate(creator)
         response = self.client.post(reverse('recommendation-event'), {
             'course_id': self.course.id, 'event_type': 'shown', 'rank': 1, 'source': 'personal',
         })
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(RecommendationEvent.objects.count(), 0)
+
+    def test_staff_enrolment_from_recommendation_not_logged(self):
+        from hub.models import UserProfile as UP
+        creator = User.objects.create_user(username='creator3', password='pass')
+        UP.objects.create(user=creator, user_type=UP.UserType.CONTENT_CREATOR)
+        CourseRecommendation.objects.create(user=creator, course=self.course, score=0.9, reason='r')
+        self.client.force_authenticate(creator)
+        self.client.post(f'/api/courses/{self.course.id}/enroll/')
+        self.assertEqual(RecommendationEvent.objects.count(), 0)
+
+
+class RecomputeAllIncludesStaffTest(APITestCase):
+    def test_nightly_refresh_covers_onboarded_teachers_and_staff(self):
+        from unittest.mock import patch
+
+        from hub.tasks import recompute_all_recommendations
+        onboarded = make_teacher('t_on')
+        onboarded.profile.onboarding_completed = True
+        onboarded.profile.save()
+        make_teacher('t_off')  # not onboarded: skipped
+        partner = User.objects.create_user(username='partner_n', password='pass')
+        UserProfile.objects.create(user=partner, user_type=UserProfile.UserType.AIDEA_PARTNER)
+        with patch('hub.tasks.compute_user_recommendations.delay') as compute:
+            recompute_all_recommendations()
+        self.assertEqual({c.args[0] for c in compute.call_args_list}, {onboarded.id, partner.id})

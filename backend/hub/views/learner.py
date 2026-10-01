@@ -59,7 +59,8 @@ class CourseEnrollView(APIView):
             course=course,
         )
 
-        if created:
+        from hub.views.recommendations import records_recommendation_events
+        if created and records_recommendation_events(request.user):
             from hub.models.recommendations import (
                 CourseRecommendation,
                 RecommendationConfig,
