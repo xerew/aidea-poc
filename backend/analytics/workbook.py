@@ -7,6 +7,7 @@ export uses the same sheets, with course columns on every row."""
 from datetime import UTC
 
 from openpyxl import Workbook
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
@@ -79,7 +80,8 @@ README = [
     f'Status: completed = course finished; inactive = no activity for {INACTIVE_DAYS}+ days; '
     f'stuck = {STUCK_VISITS}+ visits to one resource without finishing it, or a quiz score below '
     'the pass threshold; on_track = otherwise. Checked in that order.',
-    'Not tracked: work done before time tracking began has completion dates and scores but 0 visits and no time.',
+    'Blank time = no measured visit: the item was never opened, or was done before time tracking began '
+    '(such items still have completion dates and scores). Blank is not zero; leave it out of averages.',
     'Video % watched: share of the video actually played, in the best single visit.',
     "TZ offset: minutes ahead of UTC on the learner's device (Athens in summer = 180).",
     'Study participant (consented): the learner joined the AIDEA research study and gave consent.',
@@ -102,6 +104,27 @@ def blank(value):
 
 def _minutes(seconds):
     return round(seconds / 60, 1)
+
+
+def _times(summary):
+    """Active and on-screen seconds, or empty cells (None) when nothing was
+    measured, so statistics tools read them as missing rather than zero."""
+    if not summary['visits']:
+        return [None, None]
+    return [summary['active_s'], summary['visible_s']]
+
+
+def _cell(value):
+    """Text Excel can store and will not run: control characters removed, and
+    a leading = + - @ quoted so names or quiz text never become formulas."""
+    if not isinstance(value, str):
+        return value
+    value = ILLEGAL_CHARACTERS_RE.sub('', value)
+    return f"'{value}" if value[:1] in ('=', '+', '-', '@') else value
+
+
+def _append(ws, row):
+    ws.append([_cell(v) for v in row])
 
 
 def _base(cd, user):
@@ -130,8 +153,7 @@ def _learners(cd):
         position = f"{pos['module']} › {pos['activity']} › {pos['resource']}" if pos else ''
         yield _base(cd, e.user) + [
             e.user.email, iso(e.enrolled_at), iso(row['last_active']), iso(e.completed_at),
-            e.progress_pct, row['active_s'], row['visible_s'], row['visits'], row['status'],
-            position,
+            e.progress_pct, *_times(row), row['visits'], row['status'], position,
         ] + _profile_columns(e.user)
 
 
@@ -149,7 +171,7 @@ def _modules(cd):
             pct = cd.module_pct(uid, m.id)
             resources = [r for a in activities for r in cd.resources_of.get(a.id, [])]
             yield _base(cd, e.user) + [
-                m.id, m.order, m.title, t['active_s'], t['visible_s'], t['visits'],
+                m.id, m.order, m.title, *_times(t), t['visits'],
                 sum(cd.activity_done(uid, a.id) for a in activities), len(activities), blank(pct),
                 iso(t['first_opened']), iso(t['last_seen']),
                 iso(_latest_completion(cd, uid, resources)) if pct == 100 else '',
@@ -165,7 +187,7 @@ def _activities(cd):
                 resources = cd.resources_of.get(a.id, [])
                 done = cd.activity_done(uid, a.id)
                 yield _base(cd, e.user) + [
-                    m.id, m.order, m.title, a.id, a.order, a.title, t['active_s'], t['visible_s'],
+                    m.id, m.order, m.title, a.id, a.order, a.title, *_times(t),
                     t['visits'], sum(cd.completed_at(uid, r.id) is not None for r in resources),
                     len(resources), yes_no(done), iso(t['first_opened']), iso(t['last_seen']),
                     iso(_latest_completion(cd, uid, resources)) if done else '',
@@ -180,7 +202,7 @@ def _resources(cd):
             score = d['quiz_score']
             yield _base(cd, e.user) + [
                 a.module_id, a.module.order, a.id, a.order, a.title, r.id, r.order,
-                resource_label(r), r.type, yes_no(r.is_required), d['active_s'], d['visible_s'],
+                resource_label(r), r.type, yes_no(r.is_required), *_times(d),
                 d['visits'], iso(d['first_opened']), iso(d['completed_at']),
                 round(score * 100) if score is not None else '', blank(d['video_pct']),
                 blank(d['scroll_pct']), blank(d['pdf_opened']), blank(d['pdf_downloaded']),
@@ -259,12 +281,14 @@ def _overview(ws, data):
                 if i < len(cd.modules):
                     m = cd.modules[i]
                     t = time_summary(cd.module_visits(e.user_id, m.id))
-                    row += [_minutes(t['active_s']), blank(cd.module_pct(e.user_id, m.id))]
+                    active = _minutes(t['active_s']) if t['visits'] else None
+                    row += [active, blank(cd.module_pct(e.user_id, m.id))]
                 else:
                     row += ['', '']
             t = time_summary(cd.user_visits(e.user_id))
-            row += [_minutes(t['active_s']), _minutes(t['visible_s']), e.progress_pct, cd.status(e)]
-            ws.append(row)
+            totals = [_minutes(s) if s is not None else None for s in _times(t)]
+            row += [*totals, e.progress_pct, cd.status(e)]
+            _append(ws, row)
 
 
 def _write_header(ws, header):
@@ -282,7 +306,7 @@ def build_learning_workbook(courses, now=None):
     readme = wb.active
     readme.title = 'README'
     for line in README:
-        readme.append([line])
+        _append(readme, [line])
     readme['A1'].font = Font(bold=True)
     readme.column_dimensions['A'].width = 120
     _overview(wb.create_sheet('Overview'), data)
@@ -291,5 +315,5 @@ def build_learning_workbook(courses, now=None):
         _write_header(ws, HEADERS[name])
         for cd in data:
             for row in rows(cd):
-                ws.append(row)
+                _append(ws, row)
     return wb

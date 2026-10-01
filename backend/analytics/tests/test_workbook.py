@@ -70,8 +70,35 @@ class WorkbookTests(APITestCase):
         pdf = next(r for r in by_learner(ws, 'Bo Bit') if r['Resource'] == 'Sheet')
         self.assertEqual((pdf['PDF opened'], pdf['PDF downloaded']), (1, 1))
         old_text = next(r for r in by_learner(ws, 'old') if r['Resource'] == 'Intro')
-        self.assertEqual((old_text['Visits'], old_text['Active s']), (0, 0))
+        # Done before tracking began: no visits, so time is blank, not 0.
+        self.assertEqual((old_text['Visits'], old_text['Active s'], old_text['On-screen s']), (0, None, None))
         self.assertTrue(old_text['Completed at'])
+
+    def test_unmeasured_time_is_blank_at_every_level(self):
+        [old] = by_learner(self.wb['Learners'], 'old')
+        self.assertEqual((old['Visits'], old['Active s'], old['On-screen s']), (0, None, None))
+        [old_m1] = [r for r in by_learner(self.wb['Modules'], 'old') if r['Module'] == 'Basics']
+        self.assertEqual((old_m1['Visits'], old_m1['Active s']), (0, None))
+        [old_a1] = [r for r in by_learner(self.wb['Activities'], 'old') if r['Activity'] == 'Read and watch']
+        self.assertEqual((old_a1['Visits'], old_a1['Active s']), (0, None))
+        [old_o] = by_learner(self.wb['Overview'], 'old')
+        self.assertEqual((old_o['M1 Basics — active min'], old_o['Total active min']), (None, None))
+        [ada] = by_learner(self.wb['Learners'], 'Ada Byte')
+        self.assertEqual(ada['Active s'], 350)   # measured time is still a number
+
+    def test_text_cells_are_safe(self):
+        f = self.f
+        f.ada.first_name = '=HYPERLINK("http://x")'
+        f.ada.save()
+        f.quiz.quiz_data[0]['question'] = 'Q\x01 one'
+        f.quiz.save()
+        wb = build_learning_workbook([f.course], now=NOW)
+        buffer = BytesIO()
+        wb.save(buffer)  # control characters would raise IllegalCharacterError
+        names = [r['Learner'] for r in rows(load_workbook(BytesIO(buffer.getvalue()))['Learners'])]
+        self.assertIn("'=HYPERLINK(\"http://x\") Byte", names)
+        questions = [r['Question'] for r in rows(load_workbook(BytesIO(buffer.getvalue()))['Quiz answers'])]
+        self.assertIn('Q one', questions)
 
     def test_visits_sheet(self):
         visits = by_learner(self.wb['Visits'], 'Ada Byte')

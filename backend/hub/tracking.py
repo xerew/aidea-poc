@@ -1,9 +1,13 @@
 """Ingest of the activity page's tracking messages (POST /api/tracking/).
 
 The page sends running totals per visit, so a resent message is harmless:
-totals only move forward, and by at most MAX_STEP_SECONDS per message. Events
+totals only move forward. Each message may add MAX_STEP_SECONDS, or the
+wall-clock time since the visit's previous message when that is longer (so
+time from a lost message is recovered), and a visit's total never exceeds its
+own age plus MAX_STEP_SECONDS (so rapid messages cannot inflate it). Events
 carry a browser-made key and are stored once. Anything malformed, or about a
 course the user is not enrolled in, is skipped silently."""
+import re
 import uuid
 from datetime import timedelta
 
@@ -13,13 +17,15 @@ from django.utils.dateparse import parse_datetime
 
 from hub.models import LearningEvent, Resource, ResourceVisit
 
-MAX_STEP_SECONDS = 35        # most a visit's time may grow per message
+MAX_STEP_SECONDS = 35        # most a visit's time may grow per message (beyond elapsed time)
+CLOCK_SLACK_SECONDS = 5      # timer jitter allowed on top of wall-clock time
 MAX_VISITS_PER_MESSAGE = 50
 MAX_EVENTS_PER_MESSAGE = 200
 MAX_EVENT_AGE = timedelta(days=1)
 MAX_TZ_OFFSET = 14 * 60      # UTC-14 … UTC+14
 DEVICES = {value for value, _ in ResourceVisit.Device.choices}
 EVENT_TYPES = {value for value, _ in LearningEvent.Type.choices}
+LANGUAGE_TAG = re.compile(r'^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$')  # e.g. el, pt-BR
 EVENT_DATA_KEYS = {'position', 'from', 'to', 'question_index', 'selected', 'seconds_on_question'}
 
 
@@ -52,8 +58,9 @@ def _context_fields(context):
     if not isinstance(context, dict):
         return {}
     fields = {}
-    if isinstance(context.get('language'), str):
-        fields['language'] = context['language'][:8]
+    language = context.get('language')
+    if isinstance(language, str) and LANGUAGE_TAG.match(language):
+        fields['language'] = language[:8]
     if context.get('device') in DEVICES:
         fields['device'] = context['device']
     fields['local_hour'] = _int_in(context.get('local_hour'), 0, 23)
@@ -77,12 +84,23 @@ def _merge_media(old, new):
     return merged
 
 
-def _step(old, new_total):
-    """Advance a running total by at most MAX_STEP_SECONDS; never backwards."""
+def _step(old, new_total, limit):
+    """Advance a running total towards new_total, never past limit(old) and
+    never backwards."""
     n = _number(new_total)
     if n is None:
         return old
-    return max(old, min(int(n), old + MAX_STEP_SECONDS))
+    return max(old, min(int(n), limit(old)))
+
+
+def _limit_for(visit, now):
+    """How far a total may grow in this message (see the module docstring)."""
+    if visit.pk is None:
+        return lambda old: old + MAX_STEP_SECONDS
+    since_last = int((now - visit.last_seen_at).total_seconds())
+    age = int((now - visit.started_at).total_seconds())
+    step = max(MAX_STEP_SECONDS, since_last + CLOCK_SLACK_SECONDS)
+    return lambda old: min(old + step, age + MAX_STEP_SECONDS)
 
 
 def _apply_visit(user, entry, resource, visit_key, page_key, now):
@@ -99,8 +117,9 @@ def _apply_visit(user, entry, resource, visit_key, page_key, now):
         )
     elif visit.resource_id != resource.id:
         return None
-    visible = _step(visit.visible_seconds, entry.get('visible_s'))
-    active = min(_step(visit.active_seconds, entry.get('active_s')), visible)
+    limit = _limit_for(visit, now)
+    visible = _step(visit.visible_seconds, entry.get('visible_s'), limit)
+    active = min(_step(visit.active_seconds, entry.get('active_s'), limit), visible)
     visit.visible_seconds, visit.active_seconds = visible, active
     if entry.get('completed') is True:
         visit.completed_during = True

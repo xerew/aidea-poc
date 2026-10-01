@@ -171,6 +171,37 @@ class TrackingEndpointTests(APITestCase):
         v = ResourceVisit.objects.get(visit_key=key)
         self.assertEqual((v.language, v.device, v.local_hour, v.tz_offset_minutes), ('el-GR-ex', '', None, None))
 
+    def test_language_must_look_like_a_language_tag(self):
+        cases = {'el': 'el', 'pt-BR': 'pt-BR', '\u0000': '', '\u0001x': '', '<b>': '', 'e1': ''}
+        for sent, stored in cases.items():
+            key = uuid.uuid4()
+            res = self.post([self.visit(key, visible_s=5, context={'language': sent})])
+            self.assertEqual(res.status_code, status.HTTP_200_OK, sent)
+            self.assertEqual(ResourceVisit.objects.get(visit_key=key).language, stored, sent)
+
+    def _age(self, key, seconds):
+        """Pretend the visit started and was last seen `seconds` earlier."""
+        v = ResourceVisit.objects.get(visit_key=key)
+        ResourceVisit.objects.filter(pk=v.pk).update(
+            started_at=v.started_at - timedelta(seconds=seconds),
+            last_seen_at=v.last_seen_at - timedelta(seconds=seconds),
+        )
+
+    def test_backlog_after_a_lost_message_is_accepted(self):
+        key = uuid.uuid4()
+        self.post([self.visit(key, active_s=20, visible_s=20)])
+        self._age(key, 150)  # a message was lost; the next one carries 150 s of time
+        self.post([self.visit(key, active_s=150, visible_s=150)])
+        v = ResourceVisit.objects.get(visit_key=key)
+        self.assertEqual((v.active_seconds, v.visible_seconds), (150, 150))
+
+    def test_rapid_messages_cannot_run_ahead_of_the_clock(self):
+        key = uuid.uuid4()
+        for _ in range(4):
+            self.post([self.visit(key, active_s=500, visible_s=500)])
+        v = ResourceVisit.objects.get(visit_key=key)
+        self.assertEqual(v.visible_seconds, 70)  # first 35 s, then at most the visit's age + 35 s
+
     def test_media_progress_keeps_maximums(self):
         key = uuid.uuid4()
         self.post([self.visit(key, self.video, visible_s=10, media={'covered_pct': 40, 'furthest_s': 120, 'duration_s': 300})])
