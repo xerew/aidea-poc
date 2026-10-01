@@ -53,8 +53,14 @@ class UserLearningPathSerializer(serializers.ModelSerializer):
             return 'intermediate'
         return 'advanced'
 
+    def _published_ids(self, obj):
+        ids = obj.course_ids or []
+        live = set(Course.objects.filter(id__in=ids, is_published=True).values_list('id', flat=True))
+        return [cid for cid in ids if cid in live]
+
     def get_courses(self, obj):
-        order_map = {cid: i + 1 for i, cid in enumerate(obj.course_ids or [])}
+        # Courses unpublished since the pathway was generated drop out.
+        order_map = {cid: i + 1 for i, cid in enumerate(self._published_ids(obj))}
         courses = list(Course.objects.filter(id__in=order_map).select_related('pillar'))
         courses.sort(key=lambda c: order_map.get(c.id, 0))
         return PathwayCourseSerializer(
@@ -62,7 +68,7 @@ class UserLearningPathSerializer(serializers.ModelSerializer):
         ).data
 
     def get_progress(self, obj):
-        course_ids = obj.course_ids or []
+        course_ids = self._published_ids(obj)
         total      = len(course_ids)
         completed  = Enrollment.objects.filter(
             user=obj.user, course_id__in=course_ids, progress_pct=100,

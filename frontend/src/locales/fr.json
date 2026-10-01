@@ -442,7 +442,17 @@
     "loadError": "Impossible de charger votre parcours.",
     "loading": "Chargement de votre parcours…",
     "completed": "{{done}} cours sur {{total}} terminés",
-    "durationHoursShort": "{{count}} h"
+    "durationHoursShort": "{{count}} h",
+    "empty": {
+      "title": "Votre parcours ne contient pas encore de cours",
+      "no_published_courses": "Aucun cours n’est encore publié sur la plateforme. Votre parcours se remplira automatiquement dès que des cours seront publiés.",
+      "above_level": "Tous les cours publiés sont actuellement au-dessus de votre niveau de compétence ; aucun n’a donc été ajouté. L’auto-évaluation des compétences en IA peut vous placer à un niveau supérieur ; votre parcours se met aussi à jour quand de nouveaux cours de votre niveau sont publiés.",
+      "study_curriculum_empty": "Vous suivez le programme fixe de l’étude et aucun de ses cours n’est encore publié. Revenez plus tard."
+    },
+    "notOnboarded": "Votre parcours est créé lorsque vous terminez la courte prise en main (matière, niveau d’enseignement, rôle et objectifs).",
+    "startOnboarding": "Terminer la prise en main",
+    "takeAssessment": "Faire l’auto-évaluation des compétences en IA",
+    "browseCourses": "Voir tous les cours"
   },
   "lesson": {
     "type": {

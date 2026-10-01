@@ -442,7 +442,17 @@
     "loadError": "Ihr Lernpfad konnte nicht geladen werden.",
     "loading": "Ihr Lernpfad wird geladen…",
     "completed": "{{done}} von {{total}} Kursen abgeschlossen",
-    "durationHoursShort": "{{count}} Std."
+    "durationHoursShort": "{{count}} Std.",
+    "empty": {
+      "title": "Ihr Lernpfad enthält noch keine Kurse",
+      "no_published_courses": "Auf der Plattform sind noch keine Kurse veröffentlicht. Ihr Lernpfad füllt sich automatisch, sobald Kurse veröffentlicht werden.",
+      "above_level": "Alle veröffentlichten Kurse liegen derzeit über Ihrem Kompetenzniveau, daher wurde keiner hinzugefügt. Die KI-Kompetenz-Selbsteinschätzung kann Sie einem höheren Niveau zuordnen; Ihr Lernpfad wird außerdem aktualisiert, wenn neue Kurse für Ihr Niveau erscheinen.",
+      "study_curriculum_empty": "Sie folgen dem festen Programm der Studie, und keiner seiner Kurse ist bisher veröffentlicht. Schauen Sie später wieder vorbei."
+    },
+    "notOnboarded": "Ihr Lernpfad wird erstellt, wenn Sie das kurze Onboarding abschließen (Fach, Unterrichtsstufe, Rolle und Ziele).",
+    "startOnboarding": "Onboarding abschließen",
+    "takeAssessment": "KI-Kompetenz-Selbsteinschätzung machen",
+    "browseCourses": "Alle Kurse ansehen"
   },
   "lesson": {
     "type": {

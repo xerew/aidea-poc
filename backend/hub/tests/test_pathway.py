@@ -193,3 +193,72 @@ class PathwaySeedOrderingTests(TestCase):
             LearningPathCourse.objects.filter(path=path).order_by('order').values_list('course__level', flat=True)
         )
         self.assertEqual(ordered, ['beginner', 'intermediate', 'advanced'])
+
+
+class PathwayEmptyStateTests(APITestCase):
+    """An empty pathway says why, and fills itself once suitable courses exist."""
+
+    def setUp(self):
+        self.user = make_teacher('empty_t')
+        self.user.profile.competency_score = 0      # beginner
+        self.user.profile.onboarding_completed = True
+        self.user.profile.save()
+        self.path = LearningPath.objects.create(name='B', slug='b-empty', competency_min=0, competency_max=6)
+        self.user_path = UserLearningPath.objects.create(user=self.user, path=self.path, course_ids=[])
+        self.client.force_authenticate(self.user)
+        self.pillar = make_pillar()
+
+    def _get(self):
+        return self.client.get(reverse('pathway')).data
+
+    def test_no_published_courses(self):
+        data = self._get()
+        self.assertEqual(data['courses'], [])
+        self.assertEqual(data['empty_reason'], 'no_published_courses')
+
+    def test_all_courses_above_level(self):
+        Course.objects.create(title='Adv', pillar=self.pillar, level='advanced', is_published=True)
+        self.assertEqual(self._get()['empty_reason'], 'above_level')
+
+    def test_regenerates_when_a_suitable_course_appears(self):
+        course = make_course(self.pillar, 'Fits')  # beginner, published
+        data = self._get()
+        self.assertEqual([c['id'] for c in data['courses']], [course.id])
+        self.assertIsNone(data['empty_reason'])
+        self.user_path.refresh_from_db()
+        self.assertEqual(self.user_path.course_ids, [course.id])
+
+    def test_unpublished_course_drops_out_of_list_and_progress(self):
+        live = make_course(self.pillar, 'Live')
+        gone = make_course(self.pillar, 'Gone')
+        self.user_path.course_ids = [gone.id, live.id]
+        self.user_path.save()
+        gone.is_published = False
+        gone.save()
+        data = self._get()
+        self.assertEqual([c['id'] for c in data['courses']], [live.id])
+        self.assertEqual(data['progress']['total'], 1)
+
+
+class PathwayFollowsCompetencyChangeTests(TestCase):
+    def test_level_change_rebuilds_course_list(self):
+        from hub.competency import apply_competency_delta
+        pillar = make_pillar()
+        beginner = make_course(pillar, 'Beginner course')
+        advanced = Course.objects.create(title='Advanced course', pillar=pillar, level='advanced',
+                                         is_published=True)
+        LearningPath.objects.create(name='Beginner', slug='beg', competency_min=0, competency_max=2)
+        LearningPath.objects.create(name='Advanced', slug='adv', competency_min=5, competency_max=6)
+        user = make_teacher('climber')
+        user.profile.competency_score = 2
+        user.profile.save()
+        from hub.pathway_gen import generate_pathway
+        UserLearningPath.objects.create(user=user, path=LearningPath.objects.get(slug='beg'),
+                                        course_ids=generate_pathway(user))
+        self.assertNotIn(advanced.id, UserLearningPath.objects.get(user=user).course_ids)
+
+        apply_competency_delta(user, 4, recompute=False)  # 2 -> 6: beginner -> advanced band
+        user_path = UserLearningPath.objects.get(user=user)
+        self.assertEqual(user_path.path.slug, 'adv')
+        self.assertIn(advanced.id, user_path.course_ids)
+        self.assertIn(beginner.id, user_path.course_ids)

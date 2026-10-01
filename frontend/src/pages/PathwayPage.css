@@ -138,3 +138,11 @@
   .pathway-cta { width: 100%; }
   .pathway-cta a { display: block; text-align: center; }
 }
+
+/* Empty pathway: why, and what to do next */
+.pathway-empty { margin-bottom: 1rem; border-color: #bfdbfe; background: #eff6ff; }
+.pathway-empty-content { display: flex; gap: 0.85rem; align-items: flex-start; padding: 1.1rem 1.25rem; }
+.pathway-empty-icon { color: #2563eb; flex-shrink: 0; margin-top: 0.1rem; }
+.pathway-empty-title { margin: 0 0 0.3rem; font-size: 1rem; font-weight: 600; color: #1e3a8a; }
+.pathway-empty-text { margin: 0 0 0.75rem; font-size: 0.9rem; line-height: 1.5; color: #1e40af; }
+.pathway-empty-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }

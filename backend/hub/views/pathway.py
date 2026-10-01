@@ -9,6 +9,21 @@ from hub.study_logic import active_group
 from hub.views.permissions import HasProfile
 
 
+def _published(course_ids):
+    return Course.objects.filter(id__in=course_ids or [], is_published=True).exists()
+
+
+def _empty_reason(fixed):
+    """Why a pathway has no courses, so the page can explain it."""
+    if fixed:
+        return 'study_curriculum_empty'   # the study's control curriculum has none published
+    if not Course.objects.filter(is_published=True).exists():
+        return 'no_published_courses'
+    # The only exclusion in pathway_gen is level: courses more than one level
+    # above the user's competency band.
+    return 'above_level'
+
+
 class PathwayView(APIView):
     """Every role gets a pathway the same way: by completing onboarding
     (subject, teaching level, role at school, goals), which assigns it."""
@@ -28,7 +43,13 @@ class PathwayView(APIView):
             )
         # Fixed-group participants follow the study's control curriculum instead
         # of their personalised pathway (the experimental manipulation).
-        if active_group(request.user) == 'fixed':
+        fixed = active_group(request.user) == 'fixed'
+        if not fixed and not _published(user_path.course_ids):
+            # Generated before any suitable course existed: try again now.
+            from hub.pathway_gen import generate_pathway
+            user_path.course_ids = generate_pathway(request.user)
+            user_path.save(update_fields=['course_ids'])
+        if fixed:
             control = StudyConfig.get().control_path
             if control:
                 ordered = list(
@@ -41,4 +62,6 @@ class PathwayView(APIView):
         serializer = UserLearningPathSerializer(
             user_path, context={'user': request.user, 'request': request},
         )
-        return Response(serializer.data)
+        data = serializer.data
+        data['empty_reason'] = None if data['courses'] else _empty_reason(fixed)
+        return Response(data)

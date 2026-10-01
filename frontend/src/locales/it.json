@@ -442,7 +442,17 @@
     "loadError": "Impossibile caricare il tuo percorso.",
     "loading": "Caricamento del tuo percorso…",
     "completed": "{{done}} di {{total}} corsi completati",
-    "durationHoursShort": "{{count}}h"
+    "durationHoursShort": "{{count}}h",
+    "empty": {
+      "title": "Il tuo percorso non ha ancora corsi",
+      "no_published_courses": "Non ci sono ancora corsi pubblicati sulla piattaforma. Il tuo percorso si riempirà automaticamente appena verranno pubblicati dei corsi.",
+      "above_level": "Tutti i corsi pubblicati sono attualmente sopra il tuo livello di competenza, quindi non ne è stato aggiunto nessuno. L’autovalutazione delle competenze sull’IA può collocarti a un livello più alto; il percorso si aggiorna anche quando vengono pubblicati nuovi corsi per il tuo livello.",
+      "study_curriculum_empty": "Segui il programma fisso dello studio e nessuno dei suoi corsi è ancora pubblicato. Torna più tardi."
+    },
+    "notOnboarded": "Il tuo percorso viene creato quando completi la breve configurazione iniziale (materia, livello di insegnamento, ruolo e obiettivi).",
+    "startOnboarding": "Completa la configurazione iniziale",
+    "takeAssessment": "Fai l’autovalutazione delle competenze sull’IA",
+    "browseCourses": "Vedi tutti i corsi"
   },
   "lesson": {
     "type": {
