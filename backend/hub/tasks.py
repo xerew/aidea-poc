@@ -466,12 +466,9 @@ def apply_competency_decay() -> None:
 @shared_task
 def recompute_all_recommendations() -> None:
     from django.contrib.auth.models import User
-    from django.db.models import Q
-
-    # Onboarded teachers, plus creators/partners/admins (who never onboard).
+    # Every onboarded user, whatever their role.
     user_ids = list(
-        User.objects.filter(is_active=True, profile__isnull=False)
-        .filter(Q(profile__onboarding_completed=True) | ~Q(profile__user_type='teacher'))
+        User.objects.filter(is_active=True, profile__onboarding_completed=True)
         .values_list('id', flat=True)
     )
     for uid in user_ids:

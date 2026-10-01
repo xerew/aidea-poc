@@ -17,7 +17,7 @@ from hub.serializers.onboarding import (
     OnboardingSubmitSerializer,
     SelfEfficacySubmitSerializer,
 )
-from hub.views.permissions import IsTeacher
+from hub.views.permissions import HasProfile
 
 
 def get_competency_level(score: int) -> str:
@@ -140,9 +140,10 @@ def self_efficacy_payload(request):
 
 
 class OnboardingView(APIView):
-    """Quick profile step (subject/teaching level/goals) completed at
-    registration. The AI self-efficacy assessment is separate and skippable."""
-    permission_classes = [IsTeacher]
+    """Quick profile step (subject/teaching level/role/goals) completed by every
+    user, whatever their role; it assigns the pathway and recommendations. The
+    AI self-efficacy assessment is separate and skippable."""
+    permission_classes = [HasProfile]
 
     def get(self, request):
         profile = request.user.profile

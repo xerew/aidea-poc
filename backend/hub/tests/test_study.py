@@ -149,6 +149,8 @@ class StudyExperienceBranchTests(APITestCase):
         self.config.save()
 
         self.teacher = make_teacher('branch_t')
+        self.teacher.profile.onboarding_completed = True
+        self.teacher.profile.save()
         # Adaptive personalised pathway differs from the control curriculum.
         band = LearningPath.objects.create(name='Band', slug='band')
         UserLearningPath.objects.create(user=self.teacher, path=band, course_ids=[self.c2.id])

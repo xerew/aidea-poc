@@ -7,10 +7,9 @@ RequireOnboarding.propTypes = { children: PropTypes.node.isRequired }
 export default function RequireOnboarding({ children }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
-  if (
-    user.profile?.user_type === 'teacher' &&
-    !user.profile?.onboarding_completed
-  ) {
+  // Every role completes onboarding first: it sets up the pathway and
+  // recommendations the same way for teachers, creators, partners and admins.
+  if (user.profile && !user.profile.onboarding_completed) {
     return <Navigate to="/onboarding" replace />
   }
   return children

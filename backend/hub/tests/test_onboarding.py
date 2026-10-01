@@ -46,13 +46,14 @@ class OnboardingGetTestCase(APITestCase):
         self.assertFalse(response.data['completed'])
         self.assertIsNone(response.data['competency_level'])
 
-    def test_content_creator_cannot_access(self):
+    def test_content_creator_can_onboard_too(self):
         creator = User.objects.create_user(username='creator1', password='pass')
         UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
         login = self.client.post(reverse('auth-login'), {'username': 'creator1', 'password': 'pass'})
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {login.data["access"]}')
         response = self.client.get(reverse('onboarding'))
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data['completed'])
 
 
 class OnboardingPostTestCase(APITestCase):
