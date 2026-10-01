@@ -8,7 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Feedback, UserProfile
+from hub.models import Feedback
 from hub.serializers.feedback import FeedbackSerializer
 
 from .permissions import IsAdmin
@@ -38,8 +38,7 @@ def _clean_attachments(raw):
 
 
 def _stream_for(user):
-    is_partner = getattr(getattr(user, 'profile', None), 'user_type', None) == UserProfile.UserType.AIDEA_PARTNER
-    return Feedback.Stream.PARTNER if is_partner else Feedback.Stream.USER
+    return Feedback.stream_for_role(getattr(getattr(user, 'profile', None), 'user_type', None))
 
 
 class FeedbackView(APIView):

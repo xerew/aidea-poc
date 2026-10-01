@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from hub.models import Feedback, UserProfile
@@ -105,3 +106,45 @@ class FeedbackTests(APITestCase):
         self.client.force_authenticate(None)
         res = self.client.post('/api/feedback/', {'category': 'bug', 'message': 'x'}, format='json')
         self.assertEqual(res.status_code, 401)
+
+
+class FeedbackStreamFollowsRoleTests(APITestCase):
+    """A user's feedback lives in the stream matching their current role."""
+
+    def setUp(self):
+        self.admin = make_user('fb_admin', UserProfile.UserType.ADMIN)
+        self.user = make_user('fb_soon_partner', UserProfile.UserType.TEACHER)
+        self.item = Feedback.objects.create(user=self.user, category='bug', message='Broken link')
+        self.client.force_authenticate(self.admin)
+        self.role_url = reverse('admin-user-role', kwargs={'pk': self.user.pk})
+
+    def test_promotion_to_partner_moves_feedback_and_demotion_moves_it_back(self):
+        self.assertEqual(self.item.stream, 'user')
+        self.client.patch(self.role_url, {'user_type': 'aidea_partner'}, format='json')
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.stream, 'partner')
+
+        self.client.patch(self.role_url, {'user_type': 'content_creator'}, format='json')
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.stream, 'user')
+
+    def test_unrelated_profile_save_leaves_stream_alone(self):
+        Feedback.objects.filter(pk=self.item.pk).update(stream='partner')  # e.g. set by hand
+        self.user.profile.bio = 'Hello'
+        self.user.profile.save()
+        self.item.refresh_from_db()
+        self.assertEqual(self.item.stream, 'partner')
+
+    def test_data_migration_resyncs_existing_feedback(self):
+        import importlib
+
+        from django.apps import apps
+        migration = importlib.import_module('hub.migrations.0054_sync_feedback_stream_with_role')
+        partner = make_user('fb_old_partner', UserProfile.UserType.AIDEA_PARTNER)
+        stuck = Feedback.objects.create(user=partner, category='bug', message='old', stream='user')
+        stale = Feedback.objects.create(user=self.user, category='bug', message='x', stream='partner')
+        migration.sync_streams(apps, None)
+        stuck.refresh_from_db()
+        stale.refresh_from_db()
+        self.assertEqual(stuck.stream, 'partner')
+        self.assertEqual(stale.stream, 'user')

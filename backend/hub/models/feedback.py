@@ -7,6 +7,12 @@ class Feedback(models.Model):
         USER    = 'user',    'User feedback'
         PARTNER = 'partner', 'Partner feedback'
 
+    @classmethod
+    def stream_for_role(cls, user_type):
+        """Feedback from AIDEA partners goes to the partner stream. A user's
+        feedback follows their current role (see hub.signals)."""
+        return cls.Stream.PARTNER if user_type == 'aidea_partner' else cls.Stream.USER
+
     class Category(models.TextChoices):
         BUG             = 'bug',             'Bug'
         SUGGESTION      = 'suggestion',      'Suggestion'
