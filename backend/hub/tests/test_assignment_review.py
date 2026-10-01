@@ -130,6 +130,18 @@ class AssignmentFlowTests(APITestCase):
         self.client.force_authenticate(self.learner)
         self.assertEqual(self.client.get('/api/reviews/').status_code, 403)
 
+    def test_pending_count_matches_queue_scope(self):
+        self._submit()
+        url = '/api/reviews/count/'
+        self.client.force_authenticate(self.creator)
+        self.assertEqual(self.client.get(url).data, {'pending': 1})
+        self.client.force_authenticate(self.other_creator)
+        self.assertEqual(self.client.get(url).data, {'pending': 0})
+        self.client.force_authenticate(self.partner)
+        self.assertEqual(self.client.get(url).data, {'pending': 1})
+        self.client.force_authenticate(self.learner)
+        self.assertEqual(self.client.get(url).status_code, 403)
+
     def test_approve_completes_lesson_and_progress(self):
         self._submit()
         sub = AssignmentSubmission.objects.get(user=self.learner, lesson=self.assignment)

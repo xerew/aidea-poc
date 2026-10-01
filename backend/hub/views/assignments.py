@@ -226,6 +226,19 @@ class ReviewQueueView(APIView):
         return Response(ReviewQueueSerializer(queryset, many=True).data)
 
 
+class ReviewQueueCountView(APIView):
+    """GET /api/reviews/count/ — how many submissions await this reviewer
+    (same scope as the queue); drives the sidebar badge."""
+    permission_classes = [IsReviewer]
+
+    def get(self, request):
+        pending = _reviewer_scope(
+            AssignmentSubmission.objects.filter(status=AssignmentSubmission.Status.PENDING),
+            request.user,
+        ).count()
+        return Response({'pending': pending})
+
+
 class ReviewActionView(APIView):
     permission_classes = [IsReviewer]
 

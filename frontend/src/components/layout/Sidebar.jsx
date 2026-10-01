@@ -1,77 +1,120 @@
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { House, BookOpen, GraduationCap, BarChart2, User, PenLine, Map, Shield, ClipboardCheck, FileText, MessageCircle } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useMessages } from '../../context/MessagesContext'
 import { MESSAGING_ENABLED } from '../../config'
+import client from '../../api/client'
 import './Sidebar.css'
 
-const BASE_NAV = [
-  { to: '/',          labelKey: 'nav.home',       Icon: House },
-  { to: '/courses',   labelKey: 'nav.courses',    Icon: BookOpen },
-  { to: '/learning',  labelKey: 'nav.myLearning',  Icon: GraduationCap },
-  { to: '/pathway',   labelKey: 'nav.myPathway',   Icon: Map },
-  { to: '/messages',  labelKey: 'nav.messages',    Icon: MessageCircle, badgeKey: 'messages' },
-  { to: '/profile',   labelKey: 'nav.profile',     Icon: User },
+// Grouped by what the user is doing. Everyone learns; creators, AIDEA partners
+// and admins also create; admins also manage. Personal and help items sit at
+// the bottom for everyone.
+const LEARN = [
+  { to: '/',         labelKey: 'nav.home',       Icon: House },
+  { to: '/courses',  labelKey: 'nav.courses',    Icon: BookOpen },
+  { to: '/learning', labelKey: 'nav.myLearning', Icon: GraduationCap },
+  { to: '/pathway',  labelKey: 'nav.myPathway',  Icon: Map },
+]
+const CREATE = [
+  { to: '/authoring', labelKey: 'nav.authoring', Icon: PenLine },
+  { to: '/reviews',   labelKey: 'nav.reviews',   Icon: ClipboardCheck, badgeKey: 'reviews' },
+  { to: '/analytics', labelKey: 'nav.analytics', Icon: BarChart2 },
+]
+const MANAGE = [
+  { to: '/admin/users', labelKey: 'nav.admin', Icon: Shield },
+]
+const BOTTOM = [
+  { to: '/messages',      labelKey: 'nav.messages',      Icon: MessageCircle, badgeKey: 'messages' },
   { to: '/documentation', labelKey: 'nav.documentation', Icon: FileText },
+  { to: '/profile',       labelKey: 'nav.profile',       Icon: User },
 ]
 
-const ANALYTICS_ITEM = { to: '/analytics',   labelKey: 'nav.analytics', Icon: BarChart2 }
-const AUTHORING_ITEM = { to: '/authoring',    labelKey: 'nav.authoring', Icon: PenLine }
-const ADMIN_ITEM     = { to: '/admin/users',  labelKey: 'nav.admin',     Icon: Shield  }
-const REVIEWS_ITEM   = { to: '/reviews',      labelKey: 'nav.reviews',   Icon: ClipboardCheck }
+const CREATOR_ROLES = ['content_creator', 'aidea_partner', 'admin']
 
-// Content Analytics is a content-creation tool, so it's hidden from teachers.
-// Creators, AIDEA partners and admins share the content-creation nav (analytics
-// + reviews + authoring) on top of the learner nav, pathway included. Admins
-// additionally get the Admin dashboard.
-const CREATOR_NAV = [...BASE_NAV, ANALYTICS_ITEM, REVIEWS_ITEM, AUTHORING_ITEM]
+function badgeText(count) {
+  return count > 99 ? '99+' : String(count)
+}
+
+NavItems.propTypes = {
+  items: PropTypes.array.isRequired,
+  badges: PropTypes.object.isRequired,
+  onNavigate: PropTypes.func,
+  className: PropTypes.string,
+}
+function NavItems({ items, badges, onNavigate, className }) {
+  const { t } = useTranslation()
+  return (
+    <ul className={className}>
+      {items.map(({ to, labelKey, Icon: NavIcon, badgeKey }) => (
+        <li key={to}>
+          <NavLink
+            to={to}
+            end={to === '/'}
+            onClick={onNavigate}
+            className={({ isActive }) => (isActive ? 'active' : '')}
+          >
+            <NavIcon size={18} className="nav-icon" />
+            <span>{t(labelKey)}</span>
+            {badgeKey && badges[badgeKey] > 0 && (
+              <span className="nav-badge" aria-label={t('nav.pendingCount', { count: badges[badgeKey] })}>
+                {badgeText(badges[badgeKey])}
+              </span>
+            )}
+          </NavLink>
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 export default function Sidebar({ open = false, onNavigate }) {
   const { t } = useTranslation()
   const { user } = useAuth()
+  const { pathname } = useLocation()
   const { unreadCount = 0 } = useMessages() ?? {}
-  const userType = user?.profile?.user_type
+  const [pendingReviews, setPendingReviews] = useState(0)
 
-  let navItems
-  if (userType === 'admin') {
-    navItems = [...CREATOR_NAV, ADMIN_ITEM]
-  } else if (userType === 'content_creator' || userType === 'aidea_partner') {
-    navItems = CREATOR_NAV
-  } else {
-    navItems = BASE_NAV
-  }
-  // Messaging is hidden behind a feature flag.
-  if (!MESSAGING_ENABLED) navItems = navItems.filter(item => item.to !== '/messages')
+  const userType = user?.profile?.user_type
+  const canCreate = CREATOR_ROLES.includes(userType)
+  const isAdmin = userType === 'admin'
+
+  // Submissions awaiting this reviewer; refreshed on navigation so the badge
+  // drops as soon as reviews are done.
+  useEffect(() => {
+    if (!canCreate) return
+    let cancelled = false
+    client.get('/reviews/count/')
+      .then((res) => { if (!cancelled) setPendingReviews(res.data.pending ?? 0) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [canCreate, pathname])
+
+  const sections = [
+    { key: 'learn', items: LEARN },
+    canCreate && { key: 'create', items: CREATE },
+    isAdmin && { key: 'manage', items: MANAGE },
+  ].filter(Boolean)
+  // A single section needs no heading (teachers).
+  const showLabels = sections.length > 1
+  const bottom = MESSAGING_ENABLED ? BOTTOM : BOTTOM.filter((item) => item.to !== '/messages')
+  const badges = { messages: unreadCount, reviews: canCreate ? pendingReviews : 0 }
 
   return (
     <aside className={`sidebar${open ? ' sidebar--open' : ''}`}>
       <div className="sidebar-logo">
-        <img
-          src="/images/logos/aidea-logo.png"
-          alt="AIDEA"
-        />
+        <img src="/images/logos/aidea-logo.png" alt="AIDEA" />
       </div>
-      <nav>
-        <ul>
-          {navItems.map(({ to, labelKey, Icon: NavIcon, badgeKey }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={to === '/'}
-                onClick={onNavigate}
-                className={({ isActive }) => isActive ? 'active' : ''}
-              >
-                <NavIcon size={18} className="nav-icon" />
-                <span>{t(labelKey)}</span>
-                {badgeKey === 'messages' && unreadCount > 0 && (
-                  <span className="nav-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
-                )}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+      <nav className="sidebar-nav">
+        {sections.map(({ key, items }) => (
+          <div key={key} className="nav-section">
+            {showLabels && <p className="nav-section-label">{t(`nav.sections.${key}`)}</p>}
+            <NavItems items={items} badges={badges} onNavigate={onNavigate} />
+          </div>
+        ))}
+        <NavItems items={bottom} badges={badges} onNavigate={onNavigate} className="nav-bottom" />
       </nav>
     </aside>
   )

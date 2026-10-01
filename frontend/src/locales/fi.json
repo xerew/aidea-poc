@@ -11,7 +11,13 @@
     "reviews": "Arvioinnit",
     "openMenu": "Avaa valikko",
     "documentation": "Dokumentaatio",
-    "messages": "Viestit"
+    "messages": "Viestit",
+    "sections": {
+      "learn": "Opi",
+      "create": "Luo",
+      "manage": "Hallinnoi"
+    },
+    "pendingCount": "{{count}} odottaa"
   },
   "common": {
     "search": "Hae kursseja...",

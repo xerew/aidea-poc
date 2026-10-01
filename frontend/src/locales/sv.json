@@ -11,7 +11,13 @@
     "reviews": "Granskningar",
     "openMenu": "Öppna meny",
     "documentation": "Dokumentation",
-    "messages": "Meddelanden"
+    "messages": "Meddelanden",
+    "sections": {
+      "learn": "Lär dig",
+      "create": "Skapa",
+      "manage": "Hantera"
+    },
+    "pendingCount": "{{count}} väntar"
   },
   "common": {
     "search": "Sök kurser…",

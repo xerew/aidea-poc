@@ -1,6 +1,10 @@
 .sidebar {
   width: 240px;
-  min-height: 100vh;
+  /* Screen-tall and sticky, so the bottom group stays in view while scrolling. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
   display: flex;
@@ -21,8 +25,36 @@
 
 .sidebar ul {
   list-style: none;
-  margin: 0.75rem 0 0;
+  margin: 0;
   padding: 0;
+}
+
+/* ── Grouped navigation ─────────────────────────────────────────────────────── */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0 0.75rem;
+}
+
+.nav-section { padding: 0.35rem 0; }
+.nav-section + .nav-section { border-top: 1px solid var(--color-border); }
+
+.nav-section-label {
+  margin: 0.35rem 0 0.2rem;
+  padding: 0 1.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+/* Personal and help items, pinned to the bottom for everyone. */
+.sidebar .nav-bottom {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
 }
 
 .sidebar li a {

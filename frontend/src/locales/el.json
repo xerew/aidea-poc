@@ -11,7 +11,13 @@
     "reviews": "Αξιολογήσεις",
     "openMenu": "Άνοιγμα μενού",
     "documentation": "Τεκμηρίωση",
-    "messages": "Μηνύματα"
+    "messages": "Μηνύματα",
+    "sections": {
+      "learn": "Μάθηση",
+      "create": "Δημιουργία",
+      "manage": "Διαχείριση"
+    },
+    "pendingCount": "{{count}} σε αναμονή"
   },
   "common": {
     "search": "Αναζήτηση μαθημάτων...",
