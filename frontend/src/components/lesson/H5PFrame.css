@@ -1,0 +1,7 @@
+.h5p-frame {
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  border: 0;
+  background: transparent;
+}

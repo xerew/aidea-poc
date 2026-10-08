@@ -473,7 +473,8 @@
       "quiz": "Quiz",
       "image": "Bilde",
       "pdf": "PDF",
-      "assignment": "Oppgave"
+      "assignment": "Oppgave",
+      "h5p": "H5P-aktivitet"
     },
     "noContent": "Ikke noe innhold ennå.",
     "assignment": {
@@ -523,6 +524,10 @@
       "done": "Fullført",
       "markDone": "Merk som fullført",
       "progress": "{{done}} av {{total}} fullført"
+    },
+    "h5p": {
+      "missing": "Denne H5P-aktiviteten har ingen fil ennå.",
+      "loadError": "Aktiviteten kunne ikke lastes inn."
     }
   },
   "authoring": {

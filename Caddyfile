@@ -22,7 +22,23 @@ www.{$DOMAIN:localhost} {
     }
     handle /media/* {
         root * /srv
+        # Unpacked H5P packages: readable from the sandboxed player frame
+        # (opaque origin), never runnable as AIDEA pages if opened directly.
+        header /media/h5p/* {
+            Access-Control-Allow-Origin "*"
+            Content-Security-Policy "sandbox allow-scripts"
+            X-Content-Type-Options "nosniff"
+        }
         file_server
+    }
+    # The H5P player page: sandboxed even when opened as a top-level page.
+    handle /h5p/* {
+        header {
+            Access-Control-Allow-Origin "*"
+            Content-Security-Policy "sandbox allow-scripts allow-popups allow-forms"
+            X-Content-Type-Options "nosniff"
+        }
+        reverse_proxy frontend:80
     }
     handle {
         reverse_proxy frontend:80

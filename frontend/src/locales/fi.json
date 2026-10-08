@@ -473,7 +473,8 @@
       "quiz": "Tietovisa",
       "image": "Kuva",
       "pdf": "PDF",
-      "assignment": "Tehtävä"
+      "assignment": "Tehtävä",
+      "h5p": "H5P-tehtävä"
     },
     "noContent": "Ei sisältöä vielä.",
     "assignment": {
@@ -523,6 +524,10 @@
       "done": "Valmis",
       "markDone": "Merkitse valmiiksi",
       "progress": "{{done}}/{{total}} suoritettu"
+    },
+    "h5p": {
+      "missing": "Tällä H5P-tehtävällä ei ole vielä tiedostoa.",
+      "loadError": "Tehtävää ei voitu ladata."
     }
   },
   "authoring": {

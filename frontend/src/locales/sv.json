@@ -473,7 +473,8 @@
       "quiz": "Quiz",
       "image": "Bild",
       "pdf": "PDF",
-      "assignment": "Uppgift"
+      "assignment": "Uppgift",
+      "h5p": "H5P-aktivitet"
     },
     "noContent": "Inget innehåll än.",
     "assignment": {
@@ -523,6 +524,10 @@
       "done": "Klar",
       "markDone": "Markera som klar",
       "progress": "{{done}} av {{total}} klara"
+    },
+    "h5p": {
+      "missing": "Den här H5P-aktiviteten har ingen fil än.",
+      "loadError": "Aktiviteten kunde inte laddas."
     }
   },
   "authoring": {

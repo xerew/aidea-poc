@@ -473,7 +473,8 @@
       "quiz": "Quiz",
       "image": "Image",
       "pdf": "PDF",
-      "assignment": "Devoir"
+      "assignment": "Devoir",
+      "h5p": "Activité H5P"
     },
     "noContent": "Pas encore de contenu.",
     "assignment": {
@@ -523,6 +524,10 @@
       "done": "Terminé",
       "markDone": "Marquer comme terminé",
       "progress": "{{done}} sur {{total}} terminés"
+    },
+    "h5p": {
+      "missing": "Cette activité H5P n'a pas encore de fichier.",
+      "loadError": "Impossible de charger cette activité."
     }
   },
   "authoring": {

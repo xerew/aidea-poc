@@ -8,6 +8,8 @@ import MediaItem from '../lesson/MediaItem'
 import TypeIcon from './TypeIcon'
 import { useResourceTracking } from '../../lib/tracking/TrackingContext'
 import { createQuizClock } from '../../lib/tracking/quizClock'
+import { createH5PSession } from '../../lib/tracking/h5pStatements'
+import H5PFrame from '../lesson/H5PFrame'
 import { TYPE_ICONS, resourceShape } from './resourceMeta'
 
 const base = (courseId, activityId, resourceId) =>
@@ -366,6 +368,42 @@ function AssignmentBody({ resource, endpoint, uploadUrl, onSubmissionChange }) {
   )
 }
 
+// ─── H5P ─────────────────────────────────────────────────────────────────────
+
+H5PBody.propTypes = { resource: resourceShape.isRequired, onComplete: PropTypes.func.isRequired }
+function H5PBody({ resource, onComplete }) {
+  const { t } = useTranslation()
+  const track = useResourceTracking(resource.id)
+  const pkg = resource.h5p
+  const session = useMemo(
+    () => (pkg ? createH5PSession({ language: pkg.language, packageId: pkg.package_id, packageVersion: pkg.version }) : null),
+    [pkg],
+  )
+  // The first finished attempt completes the resource (its score counts).
+  const doneRef = useRef(resource.is_completed)
+  useEffect(() => { doneRef.current = resource.is_completed }, [resource.is_completed])
+
+  if (!pkg) return <p className="lp-empty">{t('lesson.h5p.missing')}</p>
+
+  const onStatement = (statement, now) => {
+    const { events, finished } = session.handle(statement, now)
+    events.forEach(e => track.event(e.type, e.data))
+    if (finished && !doneRef.current) {
+      doneRef.current = true
+      onComplete({ h5p_result: finished })
+    }
+  }
+  return (
+    <H5PFrame
+      key={`${pkg.package_id}-${pkg.version}`}
+      pkg={pkg}
+      title={resource.title || t('lesson.type.h5p')}
+      onStatement={onStatement}
+      onError={(message) => track.event('h5p_error', { message })}
+    />
+  )
+}
+
 // ─── One resource: header + body + completion control ───────────────────────
 
 ResourceView.propTypes = {
@@ -379,7 +417,9 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
   const { t } = useTranslation()
   const [saving, setSaving] = useState(false)
   const endpoint = base(courseId, activityId, resource.id)
-  const selfCompletes = !['quiz', 'assignment'].includes(resource.type)
+  const selfCompletes = resource.type === 'h5p'
+    ? Boolean(resource.h5p_self_complete)
+    : !['quiz', 'assignment'].includes(resource.type)
 
   const complete = async (payload = {}) => {
     if (saving || resource.is_completed) return
@@ -408,6 +448,9 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
           onSubmissionChange={(sub) => onSubmissionChange(resource.id, sub)}
         />
       )
+      break
+    case 'h5p':
+      body = <H5PBody resource={resource} onComplete={complete} />
       break
     default:
       body = <MediaBody resource={resource} />

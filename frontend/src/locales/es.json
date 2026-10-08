@@ -473,7 +473,8 @@
       "quiz": "Cuestionario",
       "image": "Imagen",
       "pdf": "PDF",
-      "assignment": "Tarea"
+      "assignment": "Tarea",
+      "h5p": "Actividad H5P"
     },
     "noContent": "Aún no hay contenido.",
     "assignment": {
@@ -523,6 +524,10 @@
       "done": "Hecho",
       "markDone": "Marcar como hecho",
       "progress": "{{done}} de {{total}} completados"
+    },
+    "h5p": {
+      "missing": "Esta actividad H5P aún no tiene archivo.",
+      "loadError": "No se pudo cargar esta actividad."
     }
   },
   "authoring": {
