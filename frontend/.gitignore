@@ -25,3 +25,6 @@ dist-ssr
 
 # Self-hosted TinyMCE assets (copied from node_modules by scripts/copy-tinymce.mjs)
 public/tinymce/
+
+# h5p-standalone player (copied from node_modules by scripts/copy-h5p.mjs)
+public/h5p/vendor/
