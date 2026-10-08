@@ -4,6 +4,7 @@ Long-format sheets (one row per learner × item, per visit, per event) for
 statistical analysis, plus a wide Overview sheet. Seconds are plain numbers,
 Overview uses minutes; timestamps are UTC ISO-8601 text. The all-courses
 export uses the same sheets, with course columns on every row."""
+import json
 from datetime import UTC
 
 from openpyxl import Workbook
@@ -23,7 +24,7 @@ from .learning import (
 
 SHEET_NAMES = [
     'README', 'Overview', 'Learners', 'Modules', 'Activities', 'Resources',
-    'Visits', 'Quiz answers', 'Events',
+    'Visits', 'Quiz answers', 'H5P answers', 'Events',
 ]
 
 BASE = ['Course ID', 'Course', 'Learner ID', 'Learner']
@@ -48,7 +49,7 @@ HEADERS = {
     'Resources': BASE + [
         'Module ID', 'Module order', 'Activity ID', 'Activity order', 'Activity',
         'Resource ID', 'Resource order', 'Resource', 'Type', 'Required', 'Active s',
-        'On-screen s', 'Visits', 'First opened', 'Completed at', 'Quiz score %',
+        'On-screen s', 'Visits', 'First opened', 'Completed at', 'Score %', 'H5P attempts',
         'Video % watched', 'Scroll %', 'PDF opened', 'PDF downloaded', 'Image opened',
         'Assignment status',
     ],
@@ -65,7 +66,11 @@ HEADERS = {
     ],
     'Events': BASE + [
         'Resource ID', 'Resource', 'Type', 'Event', 'Time', 'Position s', 'From s', 'To s',
-        'Question #', 'Option picked', 'Seconds on question',
+        'Question #', 'Option picked', 'Seconds on question', 'Data',
+    ],
+    'H5P answers': BASE + [
+        'Module ID', 'Activity ID', 'Activity', 'Resource ID', 'Resource', 'Attempt #',
+        'Question', 'Response', 'Right', 'Points', 'Max points', 'Seconds', 'Answered at',
     ],
 }
 
@@ -85,8 +90,11 @@ README = [
     'Video % watched: share of the video actually played, in the best single visit.',
     "TZ offset: minutes ahead of UTC on the learner's device (Athens in summer = 180).",
     'Study participant (consented): the learner joined the AIDEA research study and gave consent.',
+    'H5P activities: Score % is the first finished attempt (raw ÷ max). Later attempts are practice; '
+    'every attempt and answer is in H5P answers and Events (types h5p_attempt, h5p_answer). '
+    'Attempt # = the attempt an answer belongs to; the last number with no finished attempt is unfinished.',
     'Sheets: Overview (one row per learner, wide), Learners, Modules, Activities, Resources '
-    '(learner × item), Visits (raw), Quiz answers, Events (raw).',
+    '(learner × item), Visits (raw), Quiz answers, H5P answers, Events (raw).',
 ]
 
 
@@ -204,7 +212,8 @@ def _resources(cd):
                 a.module_id, a.module.order, a.id, a.order, a.title, r.id, r.order,
                 resource_label(r), r.type, yes_no(r.is_required), *_times(d),
                 d['visits'], iso(d['first_opened']), iso(d['completed_at']),
-                round(score * 100) if score is not None else '', blank(d['video_pct']),
+                round(score * 100) if score is not None else '', blank(d['h5p_attempts']),
+                blank(d['video_pct']),
                 blank(d['scroll_pct']), blank(d['pdf_opened']), blank(d['pdf_downloaded']),
                 blank(d['image_opened']), blank(d['assignment_status']),
             ]
@@ -252,12 +261,29 @@ def _events(cd):
                     blank(data.get('position')), blank(data.get('from')), blank(data.get('to')),
                     index + 1 if isinstance(index, int) else '', blank(data.get('selected')),
                     blank(data.get('seconds_on_question')),
+                    json.dumps(data, ensure_ascii=False, sort_keys=True),
+                ]
+
+
+def _h5p_answers(cd):
+    for e in cd.enrollments:
+        for r in cd.resources:
+            if r.type != 'h5p':
+                continue
+            for answer in cd.h5p_answers(e.user_id, r):
+                right = answer['correct']
+                yield _base(cd, e.user) + [
+                    r.activity.module_id, r.activity_id, r.activity.title, r.id, resource_label(r),
+                    answer['attempt'], answer['question'], answer['response'],
+                    '' if right is None else yes_no(right), blank(answer['raw']), blank(answer['max']),
+                    blank(answer['seconds']), iso(answer['answered_at']),
                 ]
 
 
 ROWS = {
     'Learners': _learners, 'Modules': _modules, 'Activities': _activities,
     'Resources': _resources, 'Visits': _visits, 'Quiz answers': _quiz_answers,
+    'H5P answers': _h5p_answers,
     'Events': _events,
 }
 

@@ -33,7 +33,7 @@ class WorkbookTests(APITestCase):
         self.assertEqual(self.wb.sheetnames, SHEET_NAMES)
         self.assertEqual(SHEET_NAMES, [
             'README', 'Overview', 'Learners', 'Modules', 'Activities', 'Resources',
-            'Visits', 'Quiz answers', 'Events',
+            'Visits', 'Quiz answers', 'H5P answers', 'Events',
         ])
 
     def test_learners_sheet(self):

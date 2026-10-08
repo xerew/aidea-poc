@@ -194,6 +194,30 @@ class CourseData:
             })
         return rows
 
+    def h5p_attempts(self, uid, resource):
+        """Finished H5P attempts in time order, numbered from 1."""
+        events = self.events_for(uid, resource.id, LearningEvent.Type.H5P_ATTEMPT)
+        return [{
+            'number': i, 'raw': e.data.get('raw'), 'max': e.data.get('max'),
+            'success': e.data.get('success'), 'duration_s': e.data.get('duration_s'),
+            'language': e.data.get('language', ''), 'finished_at': e.occurred_at,
+        } for i, e in enumerate(events, start=1)]
+
+    def h5p_answers(self, uid, resource):
+        """H5P answers, each in the first attempt finishing at or after it;
+        answers after the last finish form an unfinished attempt (n + 1)."""
+        ends = [e.occurred_at for e in self.events_for(uid, resource.id, LearningEvent.Type.H5P_ATTEMPT)]
+        rows = []
+        for e in self.events_for(uid, resource.id, LearningEvent.Type.H5P_ANSWER):
+            number = next((i for i, end in enumerate(ends, start=1) if e.occurred_at <= end), len(ends) + 1)
+            rows.append({
+                'attempt': number, 'question': e.data.get('question', ''),
+                'response': e.data.get('response', ''), 'correct': e.data.get('correct'),
+                'raw': e.data.get('raw'), 'max': e.data.get('max'),
+                'seconds': e.data.get('seconds'), 'answered_at': e.occurred_at,
+            })
+        return rows
+
     def resource_detail(self, uid, resource):
         progress = self.progress_for(uid, resource.id)
         engagement = (progress.engagement_data or {}) if progress else {}
@@ -206,7 +230,8 @@ class CourseData:
         return {
             **time_summary(self.resource_visits(uid, resource.id)),
             'completed_at': progress.completed_at if progress else None,
-            'quiz_score': progress.quiz_score if progress and kind == 'quiz' else None,
+            'quiz_score': progress.quiz_score if progress and kind in ('quiz', 'h5p') else None,
+            'h5p_attempts': count('h5p_attempt') if kind == 'h5p' else None,
             'video_pct': self.video_pct(uid, resource.id) if kind == 'video' else None,
             'scroll_pct': engagement.get('scroll_pct') if kind == 'text' else None,
             'pdf_opened': count('pdf_open') if kind == 'pdf' else None,
@@ -239,7 +264,7 @@ class CourseData:
                     and len(self.resource_visits(uid, resource.id)) >= STUCK_VISITS):
                 return True
             progress = self.progress_for(uid, resource.id)
-            if (resource.type == 'quiz' and progress and progress.quiz_score is not None
+            if (resource.type in ('quiz', 'h5p') and progress and progress.quiz_score is not None
                     and progress.quiz_score < self.pass_threshold):
                 return True
         return False
@@ -325,6 +350,30 @@ def resource_notes(cd, resource):
                 'pct_correct': round(100 * sum(hardest[1]) / len(hardest[1])),
             } if hardest else None,
             'avg_seconds_per_question': _avg(seconds, 1),
+        }
+    if kind == 'h5p':
+        scores, attempts, right_by_question = [], [], defaultdict(list)
+        finished = 0
+        for uid in uids:
+            progress = cd.progress_for(uid, resource.id)
+            if progress and progress.completed_at:
+                finished += 1
+            if progress and progress.quiz_score is not None:
+                scores.append(progress.quiz_score)
+            count = len(cd.h5p_attempts(uid, resource))
+            if count:
+                attempts.append(count)
+            for answer in cd.h5p_answers(uid, resource):
+                if isinstance(answer['correct'], bool) and answer['question']:
+                    right_by_question[answer['question']].append(answer['correct'])
+        hardest = min(right_by_question.items(), key=lambda kv: sum(kv[1]) / len(kv[1]), default=None)
+        return {
+            'finished': finished,
+            'avg_score_pct': _avg([s * 100 for s in scores]),
+            'avg_attempts': _avg(attempts, 1),
+            'hardest_question': {
+                'question': hardest[0], 'pct_correct': round(100 * sum(hardest[1]) / len(hardest[1])),
+            } if hardest else None,
         }
     if kind in ('pdf', 'image'):
         opened = sum(1 for uid in uids if cd.events_for(uid, resource.id, f'{kind}_open'))
@@ -441,6 +490,9 @@ def learner_timeline(cd, user_id):
                 'is_required': r.is_required,
                 **cd.resource_detail(user_id, r),
                 'quiz_answers': cd.quiz_answers(user_id, r) if r.type == 'quiz' else None,
+                'h5p': {
+                    'attempts': cd.h5p_attempts(user_id, r), 'answers': cd.h5p_answers(user_id, r),
+                } if r.type == 'h5p' else None,
             } for r in cd.resources_of.get(activity.id, [])]
             activities.append({
                 'id': activity.id, 'title': activity.title, 'order': activity.order,
