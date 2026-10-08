@@ -11,6 +11,11 @@ www.{$DOMAIN:localhost} {
 
 {$DOMAIN:localhost} {
     handle /api/* {
+        # H5P uploads: refuse anything over the 100 MB limit before it is sent on.
+        @h5pUpload path_regexp ^/api/authoring/.*/h5p/$
+        request_body @h5pUpload {
+            max_size 105MB
+        }
         reverse_proxy backend:8000
     }
     handle /django-admin/* {

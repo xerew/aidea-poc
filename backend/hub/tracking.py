@@ -33,7 +33,9 @@ EVENT_DATA_KEYS = {
 }
 # Free-text keys (H5P answers, load errors): control characters removed, length capped.
 EVENT_TEXT_LIMITS = {'question': 500, 'response': 500, 'sub_content_id': 64, 'language': 8, 'message': 200}
-CONTROL_CHARS = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
+# Also lone UTF-16 surrogates, which PostgreSQL's jsonb rejects (a 500 that would
+# block every later message from the page).
+CONTROL_CHARS = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f\ud800-\udfff]')
 
 
 def _uuid(value):

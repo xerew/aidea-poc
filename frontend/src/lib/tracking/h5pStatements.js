@@ -6,13 +6,16 @@
 const MAX_TEXT = 500
 const DEDUPE_MS = 1500 // H5P can report one finish as both "answered" and "completed"
 
+// Cut by character (code point), never leaving half of an emoji behind.
+const clip = (text, n) => Array.from(text).slice(0, n).join('')
+
 const verbOf = (s) => String(s?.verb?.id ?? '').split('/').pop()
 const subContentId = (s) => /[?&]subContentId=([^&#]+)/.exec(String(s?.object?.id ?? ''))?.[1] ?? null
 
 export function langText(map) {
   if (!map || typeof map !== 'object') return ''
   const value = map['en-US'] ?? Object.values(map)[0] ?? ''
-  return String(value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, MAX_TEXT)
+  return clip(String(value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(), MAX_TEXT)
 }
 
 export function durationSeconds(iso) {
@@ -53,12 +56,12 @@ export function createH5PSession({ language, packageId, packageVersion }) {
         const definition = statement.object?.definition
         events.push({ type: 'h5p_answer', data: {
           question: langText(definition?.description) || langText(definition?.name),
-          response: typeof result.response === 'string' ? result.response.slice(0, MAX_TEXT) : '',
+          response: typeof result.response === 'string' ? clip(result.response, MAX_TEXT) : '',
           ...(typeof result.success === 'boolean' && { correct: result.success }),
           ...score(result),
           ...(seconds != null && { seconds }),
           attempt,
-          ...(sub && { sub_content_id: sub.slice(0, 64) }),
+          ...(sub && { sub_content_id: clip(sub, 64) }),
         } })
       }
 

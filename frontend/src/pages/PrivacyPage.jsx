@@ -102,7 +102,8 @@ export default function PrivacyPage() {
         <li>the interface language, the type of device (desktop, tablet or mobile) and your local time of day.</li>
       </ul>
       <p>
-        We do not record your IP address, your precise location or what you type for this purpose. These
+        We do not record your IP address or your precise location for this purpose, and apart from your
+        answers in quizzes and H5P activities we do not record what you type. These
         records are visible, with your name, to the authors and co-editors of the course, to AIDEA
         partners and to administrators, and may be exported by them for analysis. They are kept like the
         rest of your account data and deleted with your account. The legal basis is our legitimate

@@ -28,3 +28,14 @@ export function itemTime(seconds, visits, completedAt, t) {
   if (visits > 0) return formatDuration(seconds, t)
   return completedAt ? t('analytics.course.notTracked') : '—'
 }
+
+// One finished H5P attempt: "#2 · 8/10 · 30 s · EL" (language version if not the main file).
+export function formatH5PAttempt(attempt, t) {
+  const parts = [
+    t('analytics.course.detail.attemptN', { n: attempt.number }),
+    attempt.max ? `${attempt.raw}/${attempt.max}` : '—',
+  ]
+  if (attempt.duration_s != null) parts.push(formatDuration(attempt.duration_s, t))
+  if (attempt.language) parts.push(attempt.language.toUpperCase())
+  return parts.join(' · ')
+}

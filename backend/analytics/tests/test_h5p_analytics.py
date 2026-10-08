@@ -84,3 +84,39 @@ class H5PAnalyticsTests(TestCase):
                          [(1, 'Q1', 'yes'), (1, 'Q2', 'no'), (2, 'Q1', 'yes'), (3, 'Q1', 'no')])
         first = by_learner(wb['Events'], 'Bob')[0]
         self.assertIn('"question": "Q1"', first['Data'])
+
+
+class H5PAttemptBoundaryTests(TestCase):
+    """dan answers Q1 in one page visit and leaves; next visit he answers Q1, Q2
+    and finishes. The abandoned answer is attempt 1 (unfinished); the finished
+    attempt is number 2 with only that visit's answers."""
+
+    def test_unfinished_visit_is_its_own_attempt(self):
+        import uuid
+
+        from hub.models import LearningEvent
+
+        from .fixtures import add_visit
+        creator = make_user('h5pb_cc', UserProfile.UserType.CONTENT_CREATOR)
+        pillar = LearningPillar.objects.create(name='P', slug='p-h5pb', order=1)
+        course = Course.objects.create(title='B', pillar=pillar, level='beginner', duration_hours=1,
+                                       is_published=True, created_by=creator)
+        module = Module.objects.create(course=course, title='M', order=1)
+        activity = Activity.objects.create(module=module, title='A', order=1)
+        r = Resource.objects.create(activity=activity, type='h5p', order=1)
+        dan = make_user('dan', first='Dan')
+        enroll(dan, course)
+        first, second = add_visit(dan, r, start=at(0)), add_visit(dan, r, start=at(10))
+
+        def event(kind, minute, visit, **data):
+            LearningEvent.objects.create(user=dan, resource=r, course=course, visit=visit,
+                                         event_key=uuid.uuid4(), event_type=kind, occurred_at=at(minute), data=data)
+        event('h5p_answer', 1, first, question='Q1', correct=False)
+        event('h5p_answer', 11, second, question='Q1', correct=True)
+        event('h5p_answer', 12, second, question='Q2', correct=True)
+        event('h5p_attempt', 13, second, raw=2, max=2)
+
+        cd = CourseData(course, now=NOW)
+        self.assertEqual([(a['attempt'], a['question']) for a in cd.h5p_answers(dan.id, r)],
+                         [(1, 'Q1'), (2, 'Q1'), (2, 'Q2')])
+        self.assertEqual([(a['number'], a['raw']) for a in cd.h5p_attempts(dan.id, r)], [(2, 2)])

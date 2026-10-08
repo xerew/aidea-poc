@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatClock, formatDuration, itemTime } from './format.js'
+import { formatClock, formatDuration, formatH5PAttempt, itemTime } from './format.js'
 
 // A stand-in for i18next's t(): the key plus its values, so the test checks
 // which wording is chosen and with what numbers.
@@ -22,4 +22,13 @@ test('itemTime: measured, not tracked (done before tracking) or never opened', (
   assert.equal(itemTime(30, 1, null, t), 'analytics.course.dur.s {"s":30}')
   assert.equal(itemTime(0, 0, '2026-09-01T10:00:00Z', t), 'analytics.course.notTracked')
   assert.equal(itemTime(0, 0, null, t), '—')
+})
+
+test('formatH5PAttempt shows number, score, time and language version', () => {
+  assert.equal(
+    formatH5PAttempt({ number: 2, raw: 8, max: 10, duration_s: 30, language: 'el' }, t),
+    'analytics.course.detail.attemptN {"n":2} · 8/10 · analytics.course.dur.s {"s":30} · EL',
+  )
+  assert.equal(formatH5PAttempt({ number: 1, raw: null, max: null, duration_s: null, language: '' }, t),
+    'analytics.course.detail.attemptN {"n":1} · —')
 })

@@ -384,3 +384,21 @@ class NewActivityWithH5PTests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_201_CREATED, res.data)
         activity = Activity.objects.get(title='H5P task')
         self.assertEqual([r.type for r in activity.resources.all()], ['h5p'])
+
+
+class TrackingSurrogateTests(APITestCase):
+    def test_lone_surrogates_are_removed_from_h5p_text(self):
+        learner = User.objects.create_user('h5p_sur', password='pass12345')
+        UserProfile.objects.create(user=learner, user_type=UserProfile.UserType.TEACHER)
+        course, _, _, resource = make_course()
+        Enrollment.objects.create(user=learner, course=course)
+        self.client.force_authenticate(learner)
+        # As a browser sends it: JSON with escaped lone surrogates.
+        body = json.dumps({'page_key': str(uuid.uuid4()), 'visits': [], 'events': [{
+            'event_key': str(uuid.uuid4()), 'resource_id': resource.id, 'type': 'h5p_answer',
+            'data': {'question': 'Q \ud83d', 'response': '\udc00 ok'},
+        }]})
+        res = self.client.post(reverse('tracking'), body, content_type='application/json')
+        self.assertEqual(res.status_code, 200)
+        data = LearningEvent.objects.get().data
+        self.assertEqual((data['question'], data['response']), ('Q ', ' ok'))

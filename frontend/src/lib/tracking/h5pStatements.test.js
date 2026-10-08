@@ -62,3 +62,13 @@ test('durationSeconds and langText', () => {
   assert.equal(langText(null), '')
   assert.equal(langText({ 'en-US': 'x'.repeat(900) }).length, 500)
 })
+
+test('text is cut by character, never leaving half an emoji', () => {
+  const lone = /[\ud800-\udbff](?![\udc00-\udfff])|(^|[^\ud800-\udbff])[\udc00-\udfff]/
+  const question = langText({ 'en-US': 'x'.repeat(499) + '😀😀' })
+  assert.equal(lone.test(question), false)
+  const { events } = session().handle(stmt('answered', {
+    sub: 'q', description: 'Q', result: { response: 'y'.repeat(499) + '😀😀' },
+  }), 0)
+  assert.equal(lone.test(events[0].data.response), false)
+})

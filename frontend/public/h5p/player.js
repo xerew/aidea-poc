@@ -46,6 +46,10 @@
       h5pJsonPath: src,
       frameJs: vendor + 'frame.bundle.js',
       frameCss: vendor + 'styles/h5p.css',
+      // Run the content in this window (this frame is already the sandbox).
+      // The default nested iframe would get its own window without the
+      // storage shim above, and H5P's init would throw on localStorage.
+      embedType: 'div',
       fullScreen: true,
       // A fixed actor keeps H5P away from storage for an anonymous id; AIDEA
       // knows the learner from the page, not from the statement.

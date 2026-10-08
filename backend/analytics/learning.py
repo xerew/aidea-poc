@@ -194,29 +194,45 @@ class CourseData:
             })
         return rows
 
+    def _h5p_attempt_numbers(self, uid, resource):
+        """Number H5P attempts in time order. An attempt ends when it finishes,
+        or — unfinished — when the learner answers again in a new page visit.
+        Returns ([(number, attempt event)], [(number, answer event)])."""
+        kinds = (LearningEvent.Type.H5P_ATTEMPT, LearningEvent.Type.H5P_ANSWER)
+        events = sorted(self.events_for(uid, resource.id, *kinds), key=lambda e: (e.occurred_at, e.id))
+        finished, answers = [], []
+        number, open_visit, open_has_answers = 1, None, False
+        for e in events:
+            if e.event_type == LearningEvent.Type.H5P_ANSWER:
+                if open_has_answers and e.visit_id != open_visit:
+                    number += 1  # the previous visit's attempt was abandoned
+                answers.append((number, e))
+                open_visit, open_has_answers = e.visit_id, True
+            else:
+                finished.append((number, e))
+                number += 1
+                open_visit, open_has_answers = None, False
+        return finished, answers
+
     def h5p_attempts(self, uid, resource):
-        """Finished H5P attempts in time order, numbered from 1."""
-        events = self.events_for(uid, resource.id, LearningEvent.Type.H5P_ATTEMPT)
+        """Finished H5P attempts in time order, with their attempt numbers
+        (an abandoned attempt uses a number too)."""
+        finished, _ = self._h5p_attempt_numbers(uid, resource)
         return [{
-            'number': i, 'raw': e.data.get('raw'), 'max': e.data.get('max'),
+            'number': n, 'raw': e.data.get('raw'), 'max': e.data.get('max'),
             'success': e.data.get('success'), 'duration_s': e.data.get('duration_s'),
             'language': e.data.get('language', ''), 'finished_at': e.occurred_at,
-        } for i, e in enumerate(events, start=1)]
+        } for n, e in finished]
 
     def h5p_answers(self, uid, resource):
-        """H5P answers, each in the first attempt finishing at or after it;
-        answers after the last finish form an unfinished attempt (n + 1)."""
-        ends = [e.occurred_at for e in self.events_for(uid, resource.id, LearningEvent.Type.H5P_ATTEMPT)]
-        rows = []
-        for e in self.events_for(uid, resource.id, LearningEvent.Type.H5P_ANSWER):
-            number = next((i for i, end in enumerate(ends, start=1) if e.occurred_at <= end), len(ends) + 1)
-            rows.append({
-                'attempt': number, 'question': e.data.get('question', ''),
-                'response': e.data.get('response', ''), 'correct': e.data.get('correct'),
-                'raw': e.data.get('raw'), 'max': e.data.get('max'),
-                'seconds': e.data.get('seconds'), 'answered_at': e.occurred_at,
-            })
-        return rows
+        """H5P answers with the number of the attempt they belong to."""
+        _, answers = self._h5p_attempt_numbers(uid, resource)
+        return [{
+            'attempt': n, 'question': e.data.get('question', ''),
+            'response': e.data.get('response', ''), 'correct': e.data.get('correct'),
+            'raw': e.data.get('raw'), 'max': e.data.get('max'),
+            'seconds': e.data.get('seconds'), 'answered_at': e.occurred_at,
+        } for n, e in answers]
 
     def resource_detail(self, uid, resource):
         progress = self.progress_for(uid, resource.id)

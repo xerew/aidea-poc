@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, CheckCircle2, Circle, XCircle } from 'lucide-react'
 import client from '../../api/client'
 import TypeIcon from '../learner/TypeIcon'
-import { formatDate, formatDuration, itemTime } from './format'
+import { formatDate, formatDuration, formatH5PAttempt, itemTime } from './format'
 
 ResourceDetails.propTypes = { r: PropTypes.object.isRequired }
 function ResourceDetails({ r }) {
@@ -32,6 +32,9 @@ function ResourceDetails({ r }) {
             </li>
           ))}
         </ol>
+      )}
+      {r.h5p?.attempts?.length > 0 && (
+        <p className="acp-notes">{r.h5p.attempts.map(a => formatH5PAttempt(a, t)).join("  |  ")}</p>
       )}
       {r.h5p?.answers?.length > 0 && (
         <ol className="acp-answers">
