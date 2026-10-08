@@ -371,3 +371,16 @@ class LearnerH5PTests(APITestCase):
         self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
         plain = _serve_media(RequestFactory().get('/media/other.txt'), 'other.txt', document_root=str(root))
         self.assertNotIn('Access-Control-Allow-Origin', plain)
+
+
+class NewActivityWithH5PTests(APITestCase):
+    def test_new_activity_can_start_with_an_h5p_resource(self):
+        creator = User.objects.create_user('h5p_cc3', password='pass12345')
+        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        course, module, _, _ = make_course(creator=creator)
+        self.client.force_authenticate(creator)
+        url = reverse('authoring-lesson-create', kwargs={'pk': course.id, 'module_pk': module.id})
+        res = self.client.post(url, {'title': 'H5P task', 'lesson_type': 'h5p'}, format='json')
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED, res.data)
+        activity = Activity.objects.get(title='H5P task')
+        self.assertEqual([r.type for r in activity.resources.all()], ['h5p'])

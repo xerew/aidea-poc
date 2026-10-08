@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Conoscenze / esperienze pregresse consigliate",
       "priorKnowledgePlaceholder": "Indica conoscenze o esperienze utili. Se nessuna, scrivi «Nessuna»."
+    },
+    "h5p": {
+      "upload": "Carica file .h5p",
+      "replace": "Sostituisci file",
+      "uploading": "Caricamento…",
+      "preview": "Anteprima",
+      "hidePreview": "Nascondi anteprima",
+      "version": "versione {{n}}",
+      "languageVersions": "Versioni linguistiche",
+      "languageVersionsHint": "Facoltativo: un .h5p tradotto per chi usa quella lingua. Gli altri vedono il file principale.",
+      "addLanguage": "Aggiungi una versione linguistica…",
+      "remove": "Rimuovi",
+      "selfComplete": "I partecipanti lo segnano come completato da soli",
+      "selfCompleteHint": "Selezionalo per attività senza domande, come Accordion o semplici diapositive.",
+      "fileRequiredError": "Carica prima il file .h5p.",
+      "errors": {
+        "generic": "Caricamento non riuscito. Riprova.",
+        "no_file": "Scegli un file .h5p.",
+        "not_zip": "Questo non è un file .h5p valido.",
+        "too_large": "Il file supera i 100 MB.",
+        "too_large_unpacked": "Il pacchetto è troppo grande una volta estratto (oltre 300 MB).",
+        "too_many_files": "Il pacchetto contiene troppi file.",
+        "unsafe_path": "Il pacchetto contiene un percorso di file non sicuro.",
+        "bad_extension": "Il pacchetto contiene un tipo di file non consentito da H5P.",
+        "no_h5p_json": "Questo non è un pacchetto H5P (h5p.json manca o è illeggibile).",
+        "no_content": "Il pacchetto non ha contenuto (manca content/content.json).",
+        "missing_libraries": "Questo file non include le sue librerie H5P: esportalo di nuovo includendo le librerie.",
+        "bad_language": "Lingua sconosciuta.",
+        "not_h5p": "Questa risorsa non è un’attività H5P."
+      }
     }
   },
   "reviews": {

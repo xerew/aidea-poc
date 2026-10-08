@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Rekommenderade förkunskaper / erfarenhet",
       "priorKnowledgePlaceholder": "Ange användbara förkunskaper eller erfarenheter. Om inga, skriv ”Inga”."
+    },
+    "h5p": {
+      "upload": "Ladda upp .h5p-fil",
+      "replace": "Ersätt fil",
+      "uploading": "Laddar upp…",
+      "preview": "Förhandsvisning",
+      "hidePreview": "Dölj förhandsvisning",
+      "version": "version {{n}}",
+      "languageVersions": "Språkversioner",
+      "languageVersionsHint": "Valfritt: en översatt .h5p för deltagare som använder det språket. Övriga ser huvudfilen.",
+      "addLanguage": "Lägg till en språkversion…",
+      "remove": "Ta bort",
+      "selfComplete": "Deltagarna markerar den som klar själva",
+      "selfCompleteHint": "Markera detta för aktiviteter utan frågor, som Accordion eller enkla bilder.",
+      "fileRequiredError": "Ladda upp .h5p-filen först.",
+      "errors": {
+        "generic": "Uppladdningen misslyckades. Försök igen.",
+        "no_file": "Välj en .h5p-fil.",
+        "not_zip": "Det här är inte en giltig .h5p-fil.",
+        "too_large": "Filen är större än 100 MB.",
+        "too_large_unpacked": "Paketet är för stort när det packas upp (över 300 MB).",
+        "too_many_files": "Paketet innehåller för många filer.",
+        "unsafe_path": "Paketet innehåller en osäker filsökväg.",
+        "bad_extension": "Paketet innehåller en filtyp som H5P inte tillåter.",
+        "no_h5p_json": "Det här är inget H5P-paket (h5p.json saknas eller kan inte läsas).",
+        "no_content": "Paketet saknar innehåll (content/content.json saknas).",
+        "missing_libraries": "Filen innehåller inte sina H5P-bibliotek — exportera den igen med biblioteken inkluderade.",
+        "bad_language": "Okänt språk.",
+        "not_h5p": "Den här resursen är ingen H5P-aktivitet."
+      }
     }
   },
   "reviews": {

@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Recommended Prior Knowledge / Experience",
       "priorKnowledgePlaceholder": "Specify useful prior knowledge or experience. If none, state None."
+    },
+    "h5p": {
+      "upload": "Upload .h5p file",
+      "replace": "Replace file",
+      "uploading": "Uploading…",
+      "preview": "Preview",
+      "hidePreview": "Hide preview",
+      "version": "version {{n}}",
+      "languageVersions": "Language versions",
+      "languageVersionsHint": "Optional: a translated .h5p for learners using that language. Others see the main file.",
+      "addLanguage": "Add a language version…",
+      "remove": "Remove",
+      "selfComplete": "Learners mark it done themselves",
+      "selfCompleteHint": "Tick this for activities without questions, such as Accordion or plain slides.",
+      "fileRequiredError": "Upload the .h5p file first.",
+      "errors": {
+        "generic": "The upload failed. Please try again.",
+        "no_file": "Choose a .h5p file.",
+        "not_zip": "This is not a valid .h5p file.",
+        "too_large": "The file is larger than 100 MB.",
+        "too_large_unpacked": "The package is too large once unpacked (over 300 MB).",
+        "too_many_files": "The package contains too many files.",
+        "unsafe_path": "The package contains an unsafe file path.",
+        "bad_extension": "The package contains a file type H5P does not allow.",
+        "no_h5p_json": "This is not an H5P package (h5p.json is missing or unreadable).",
+        "no_content": "The package has no content (content/content.json is missing).",
+        "missing_libraries": "This file doesn't include its H5P libraries — export it again with libraries included.",
+        "bad_language": "Unknown language.",
+        "not_h5p": "This resource is not an H5P activity."
+      }
     }
   },
   "reviews": {

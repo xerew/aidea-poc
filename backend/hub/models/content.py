@@ -159,6 +159,7 @@ class Activity(models.Model):
         QUIZ       = 'quiz',       'Quiz'
         PDF        = 'pdf',        'PDF'
         ASSIGNMENT = 'assignment', 'Assignment'
+        H5P        = 'h5p',        'H5P activity'
 
     module           = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title            = models.CharField(max_length=200)

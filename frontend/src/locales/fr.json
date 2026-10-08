@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Connaissances / expérience préalables recommandées",
       "priorKnowledgePlaceholder": "Précisez les connaissances ou l’expérience utiles. Si aucune, indiquez « Aucune »."
+    },
+    "h5p": {
+      "upload": "Téléverser un fichier .h5p",
+      "replace": "Remplacer le fichier",
+      "uploading": "Téléversement…",
+      "preview": "Aperçu",
+      "hidePreview": "Masquer l'aperçu",
+      "version": "version {{n}}",
+      "languageVersions": "Versions linguistiques",
+      "languageVersionsHint": "Facultatif : un .h5p traduit pour les apprenants qui utilisent cette langue. Les autres voient le fichier principal.",
+      "addLanguage": "Ajouter une version linguistique…",
+      "remove": "Supprimer",
+      "selfComplete": "Les apprenants le marquent eux-mêmes comme terminé",
+      "selfCompleteHint": "À cocher pour les activités sans questions, comme Accordion ou des diapositives simples.",
+      "fileRequiredError": "Téléversez d'abord le fichier .h5p.",
+      "errors": {
+        "generic": "Le téléversement a échoué. Veuillez réessayer.",
+        "no_file": "Choisissez un fichier .h5p.",
+        "not_zip": "Ce n'est pas un fichier .h5p valide.",
+        "too_large": "Le fichier dépasse 100 Mo.",
+        "too_large_unpacked": "Le paquet est trop volumineux une fois décompressé (plus de 300 Mo).",
+        "too_many_files": "Le paquet contient trop de fichiers.",
+        "unsafe_path": "Le paquet contient un chemin de fichier dangereux.",
+        "bad_extension": "Le paquet contient un type de fichier qu'H5P n'autorise pas.",
+        "no_h5p_json": "Ce n'est pas un paquet H5P (h5p.json est absent ou illisible).",
+        "no_content": "Le paquet n'a pas de contenu (content/content.json est absent).",
+        "missing_libraries": "Ce fichier n'inclut pas ses bibliothèques H5P — exportez-le à nouveau avec les bibliothèques.",
+        "bad_language": "Langue inconnue.",
+        "not_h5p": "Cette ressource n'est pas une activité H5P."
+      }
     }
   },
   "reviews": {

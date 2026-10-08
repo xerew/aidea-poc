@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Suositellut esitiedot / kokemus",
       "priorKnowledgePlaceholder": "Kuvaa hyödylliset esitiedot tai kokemus. Jos ei mitään, kirjoita ”Ei mitään”."
+    },
+    "h5p": {
+      "upload": "Lataa .h5p-tiedosto",
+      "replace": "Korvaa tiedosto",
+      "uploading": "Ladataan…",
+      "preview": "Esikatselu",
+      "hidePreview": "Piilota esikatselu",
+      "version": "versio {{n}}",
+      "languageVersions": "Kieliversiot",
+      "languageVersionsHint": "Valinnainen: käännetty .h5p kyseistä kieltä käyttäville. Muut näkevät päätiedoston.",
+      "addLanguage": "Lisää kieliversio…",
+      "remove": "Poista",
+      "selfComplete": "Osallistujat merkitsevät sen itse valmiiksi",
+      "selfCompleteHint": "Valitse tämä tehtäville, joissa ei ole kysymyksiä, kuten Accordion tai pelkät diat.",
+      "fileRequiredError": "Lataa ensin .h5p-tiedosto.",
+      "errors": {
+        "generic": "Lataus epäonnistui. Yritä uudelleen.",
+        "no_file": "Valitse .h5p-tiedosto.",
+        "not_zip": "Tämä ei ole kelvollinen .h5p-tiedosto.",
+        "too_large": "Tiedosto on yli 100 Mt.",
+        "too_large_unpacked": "Paketti on purettuna liian suuri (yli 300 Mt).",
+        "too_many_files": "Paketissa on liikaa tiedostoja.",
+        "unsafe_path": "Paketissa on vaarallinen tiedostopolku.",
+        "bad_extension": "Paketissa on tiedostotyyppi, jota H5P ei salli.",
+        "no_h5p_json": "Tämä ei ole H5P-paketti (h5p.json puuttuu tai sitä ei voi lukea).",
+        "no_content": "Paketissa ei ole sisältöä (content/content.json puuttuu).",
+        "missing_libraries": "Tiedosto ei sisällä H5P-kirjastojaan — vie se uudelleen kirjastojen kanssa.",
+        "bad_language": "Tuntematon kieli.",
+        "not_h5p": "Tämä materiaali ei ole H5P-tehtävä."
+      }
     }
   },
   "reviews": {

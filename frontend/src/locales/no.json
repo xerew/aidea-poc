@@ -741,6 +741,36 @@
       },
       "priorKnowledge": "Anbefalte forkunnskaper / erfaring",
       "priorKnowledgePlaceholder": "Oppgi nyttige forkunnskaper eller erfaring. Hvis ingen, skriv «Ingen»."
+    },
+    "h5p": {
+      "upload": "Last opp .h5p-fil",
+      "replace": "Erstatt fil",
+      "uploading": "Laster opp…",
+      "preview": "Forhåndsvisning",
+      "hidePreview": "Skjul forhåndsvisning",
+      "version": "versjon {{n}}",
+      "languageVersions": "Språkversjoner",
+      "languageVersionsHint": "Valgfritt: en oversatt .h5p for deltakere som bruker det språket. Andre ser hovedfilen.",
+      "addLanguage": "Legg til en språkversjon…",
+      "remove": "Fjern",
+      "selfComplete": "Deltakerne markerer den som fullført selv",
+      "selfCompleteHint": "Kryss av for aktiviteter uten spørsmål, som Accordion eller enkle lysbilder.",
+      "fileRequiredError": "Last opp .h5p-filen først.",
+      "errors": {
+        "generic": "Opplastingen mislyktes. Prøv igjen.",
+        "no_file": "Velg en .h5p-fil.",
+        "not_zip": "Dette er ikke en gyldig .h5p-fil.",
+        "too_large": "Filen er større enn 100 MB.",
+        "too_large_unpacked": "Pakken er for stor når den pakkes ut (over 300 MB).",
+        "too_many_files": "Pakken inneholder for mange filer.",
+        "unsafe_path": "Pakken inneholder en usikker filbane.",
+        "bad_extension": "Pakken inneholder en filtype H5P ikke tillater.",
+        "no_h5p_json": "Dette er ikke en H5P-pakke (h5p.json mangler eller kan ikke leses).",
+        "no_content": "Pakken har ikke innhold (content/content.json mangler).",
+        "missing_libraries": "Filen inneholder ikke H5P-bibliotekene sine — eksporter den på nytt med bibliotekene inkludert.",
+        "bad_language": "Ukjent språk.",
+        "not_h5p": "Denne ressursen er ikke en H5P-aktivitet."
+      }
     }
   },
   "reviews": {

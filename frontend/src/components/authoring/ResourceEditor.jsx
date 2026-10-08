@@ -7,6 +7,7 @@ import RichTextEditor from '../lesson/RichTextEditor'
 import TypeIcon from '../learner/TypeIcon'
 import QuizBuilder from './QuizBuilder'
 import OriginalHint from './OriginalHint'
+import H5PPanel from './H5PPanel'
 import './ResourceEditor.css'
 
 const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
@@ -19,6 +20,7 @@ const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
 export default function ResourceEditor({
   resource, index, count, locked, translating, error,
   onChange, onSave, onDelete, onMove, original = null, sourceLanguageLabel = '',
+  uploadUrl = '', onRefresh = () => {},
 }) {
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
@@ -156,6 +158,11 @@ export default function ResourceEditor({
           </>
         )}
 
+        {resource.type === 'h5p' && !translating && (
+          <H5PPanel resource={resource} uploadUrl={uploadUrl} locked={structureLocked}
+            onChange={onChange} onRefresh={onRefresh} />
+        )}
+
         <div className="resource-editor-footer">
           <label className="resource-editor-required">
             <input
@@ -190,6 +197,8 @@ ResourceEditor.propTypes = {
     quiz_data: PropTypes.array,
     instructions: PropTypes.string,
     is_required: PropTypes.bool,
+    h5p_packages: PropTypes.array,
+    h5p_self_complete: PropTypes.bool,
     isDirty: PropTypes.bool,
     saving: PropTypes.bool,
   }).isRequired,
@@ -204,4 +213,6 @@ ResourceEditor.propTypes = {
   onMove: PropTypes.func.isRequired,
   original: PropTypes.object,
   sourceLanguageLabel: PropTypes.string,
+  uploadUrl: PropTypes.string,
+  onRefresh: PropTypes.func,
 }

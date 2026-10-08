@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList, Layers,
-  Trash2, GripVertical, Save, Lock, Plus,
+  Trash2, GripVertical, Save, Lock, Plus, Puzzle,
 } from 'lucide-react'
 import client from '../api/client'
 import TranslationBar from '../components/authoring/TranslationBar'
@@ -23,6 +23,7 @@ const RESOURCE_TYPES = [
   { type: 'quiz',       Icon: HelpCircle,   color: 'yellow' },
   { type: 'pdf',        Icon: FileDown,     color: 'red'    },
   { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
+  { type: 'h5p',        Icon: Puzzle,       color: 'teal'   },
 ]
 
 function typeConfig(type) {
@@ -109,6 +110,9 @@ function validateResource(resource, t) {
   if (resource.type === 'assignment' && !(resource.instructions || '').trim()) {
     return t('authoring.moduleEditor.assignmentRequiredError')
   }
+  if (resource.type === 'h5p' && !(resource.h5p_packages ?? []).some(p => p.language === '')) {
+    return t('authoring.h5p.fileRequiredError')
+  }
   return null
 }
 
@@ -130,6 +134,7 @@ function ActivityEditor({
   activity, original, sourceLanguageLabel, resources, locked, translating, errors, resourceErrors,
   onChange, onDelete, onSave,
   onAddResource, onResourceChange, onResourceSave, onResourceDelete, onResourceMove,
+  resourceUrl, onResourceRefresh,
 }) {
   const { t } = useTranslation()
   const err = errors ?? {}
@@ -241,6 +246,8 @@ function ActivityEditor({
                   onSave={() => onResourceSave(resource.id)}
                   onDelete={() => onResourceDelete(resource.id)}
                   onMove={(dir) => onResourceMove(resource.id, dir)}
+                  uploadUrl={`${resourceUrl(resource.id)}h5p/`}
+                  onRefresh={(data) => onResourceRefresh(resource.id, data)}
                 />
               ))}
             </div>
@@ -288,6 +295,8 @@ ActivityEditor.propTypes = {
   onResourceSave: PropTypes.func.isRequired,
   onResourceDelete: PropTypes.func.isRequired,
   onResourceMove: PropTypes.func.isRequired,
+  resourceUrl: PropTypes.func.isRequired,
+  onResourceRefresh: PropTypes.func.isRequired,
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
@@ -606,9 +615,13 @@ export default function ModuleEditorPage() {
       const url = `${resourcesUrl(selectedLessonId)}${resourceId}/`
       let res
       if (activeLang === 'original') {
-        const { title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired } = resource
+        const {
+          title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired,
+          h5p_self_complete: h5pSelfComplete,
+        } = resource
         res = await client.patch(url, {
           title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired,
+          ...(resource.type === 'h5p' && { h5p_self_complete: Boolean(h5pSelfComplete) }),
         })
       } else {
         res = await client.patch(`${url}?lang=${activeLang}`, translationPayload(resource, activeLang))
@@ -876,6 +889,12 @@ export default function ModuleEditorPage() {
               onResourceSave={saveResource}
               onResourceDelete={deleteResource}
               onResourceMove={moveResource}
+              resourceUrl={(resourceId) => `${resourcesUrl(selectedLessonId)}${resourceId}/`}
+              onResourceRefresh={(resourceId, data) => patchResource(resourceId, {
+                h5p_packages: data.h5p_packages,
+                h5p_self_complete: data.h5p_self_complete,
+                ...(data.title && { title: data.title }),
+              })}
             />
           ) : (
             <div className="me-empty-state">
