@@ -2,6 +2,8 @@ import io
 import json
 import tempfile
 import zipfile
+from pathlib import Path
+from unittest import mock
 
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -88,3 +90,65 @@ class H5PModelTests(TestCase):
 
 TMP_MEDIA = tempfile.mkdtemp(prefix='aidea-h5p-test-')
 User  # re-exported for later test classes in this module
+
+from hub import h5p  # noqa: E402  (module under test)
+
+
+class ExtractPackageTests(TestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix='aidea-h5p-x-'))
+        self.dest = self.root / 'pkg'
+
+    def assertCode(self, code, archive):
+        with self.assertRaises(h5p.H5PError) as ctx:
+            h5p.extract_package(archive, self.dest)
+        self.assertEqual(ctx.exception.code, code)
+        self.assertFalse(self.dest.exists(), 'nothing may be left behind')
+
+    def test_valid_package_is_unpacked(self):
+        info = h5p.extract_package(make_h5p(), self.dest)
+        self.assertEqual((info.title, info.main_library), ('Quiz one', 'H5P.MultiChoice'))
+        self.assertTrue((self.dest / 'h5p.json').is_file())
+        self.assertTrue((self.dest / 'H5P.MultiChoice-1.16' / 'js' / 'main.js').is_file())
+        self.assertGreater(info.unpacked_bytes, 0)
+
+    def test_mac_metadata_and_dotfiles_are_ignored(self):
+        h5p.extract_package(make_h5p(extra={'__MACOSX/._h5p.json': 'x', 'content/.DS_Store': 'x'}), self.dest)
+        self.assertFalse((self.dest / '__MACOSX').exists())
+        self.assertFalse((self.dest / 'content' / '.DS_Store').exists())
+
+    def test_not_a_zip(self):
+        self.assertCode('not_zip', io.BytesIO(b'definitely not a zip'))
+
+    def test_missing_h5p_json(self):
+        self.assertCode('no_h5p_json', make_h5p(drop=('h5p.json',)))
+
+    def test_unreadable_h5p_json(self):
+        self.assertCode('no_h5p_json', make_h5p(meta='not json'.split()))
+
+    def test_missing_content(self):
+        self.assertCode('no_content', make_h5p(drop=('content/',)))
+
+    def test_disallowed_extension(self):
+        self.assertCode('bad_extension', make_h5p(extra={'content/page.html': '<script></script>'}))
+
+    def test_path_traversal_is_rejected(self):
+        self.assertCode('unsafe_path', make_h5p(extra={'../evil.js': 'x'}))
+        self.assertFalse((self.root / 'evil.js').exists())
+
+    def test_missing_libraries(self):
+        self.assertCode('missing_libraries', make_h5p(drop=('H5P.Question-1.5/',)))
+        self.assertCode('missing_libraries', make_h5p(drop=('H5P.MultiChoice-1.16/',)))
+
+    def test_unpacked_size_limit(self):
+        with mock.patch.object(h5p, 'MAX_UNPACKED_BYTES', 10):
+            self.assertCode('too_large_unpacked', make_h5p())
+
+    def test_entry_count_limit(self):
+        with mock.patch.object(h5p, 'MAX_ENTRIES', 2):
+            self.assertCode('too_many_files', make_h5p())
+
+    def test_default_self_complete(self):
+        self.assertTrue(h5p.default_self_complete('H5P.Accordion'))
+        self.assertFalse(h5p.default_self_complete('H5P.QuestionSet'))
+        self.assertFalse(h5p.default_self_complete('H5P.InteractiveVideo'))
