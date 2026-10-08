@@ -348,6 +348,7 @@ class ResourceCompleteView(APIView):
             request.user, enrollment, resource,
             quiz_answers_raw=request.data.get('quiz_answers', []),
             engagement_data=request.data.get('engagement_data'),
+            h5p_result=request.data.get('h5p_result'),
         )
         return Response({
             'resource_id': resource.id,

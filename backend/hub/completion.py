@@ -167,7 +167,8 @@ def _engagement(kind, engagement_data, quiz_answers_raw):
     return engagement
 
 
-def _mark_resource_complete(user, resource, quiz_answers_raw=None, engagement_data=None):
+def _mark_resource_complete(user, resource, quiz_answers_raw=None, engagement_data=None,
+                            h5p_result=None):
     """Idempotently mark one resource complete, scoring a quiz resource."""
     rp, _ = ResourceProgress.objects.get_or_create(user=user, resource=resource)
     if rp.completed_at is None:
@@ -177,6 +178,13 @@ def _mark_resource_complete(user, resource, quiz_answers_raw=None, engagement_da
         if resource.type == 'quiz' and quiz_answers_raw and resource.quiz_data:
             rp.quiz_answers, rp.quiz_score = _score_quiz(resource.quiz_data, quiz_answers_raw)
         rp.engagement_data = _engagement(resource.type, engagement_data, quiz_answers_raw)
+        if resource.type == 'h5p':
+            from hub.h5p import clean_result
+            summary = clean_result(h5p_result)
+            if summary is not None:
+                rp.engagement_data = {**rp.engagement_data, 'h5p': summary}
+                if 'max' in summary:
+                    rp.quiz_score = summary['raw'] / summary['max']
         rp.save()
     return rp
 
@@ -227,11 +235,11 @@ def _mirror_legacy_progress(user, activity):
 
 
 def record_resource_completion(user, enrollment, resource, quiz_answers_raw=None,
-                               engagement_data=None, advance_only=False):
+                               engagement_data=None, advance_only=False, h5p_result=None):
     """Mark one resource complete for the learner (idempotent), scoring a quiz
     resource, then re-aggregate the enrollment. Returns (resource_progress,
     progress_pct)."""
-    rp = _mark_resource_complete(user, resource, quiz_answers_raw, engagement_data)
+    rp = _mark_resource_complete(user, resource, quiz_answers_raw, engagement_data, h5p_result)
     _mirror_legacy_progress(user, resource.activity)
     _advance_pointer(enrollment, resource.activity, advance_only)
     return rp, recompute_course_progress(user, enrollment)

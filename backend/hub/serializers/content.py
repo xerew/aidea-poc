@@ -42,13 +42,27 @@ class ResourceLearnSerializer(serializers.ModelSerializer):
     caption = serializers.SerializerMethodField()
     instructions = serializers.SerializerMethodField()
     quiz_data = serializers.SerializerMethodField()
+    h5p = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
         fields = [
             'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
-            'caption', 'quiz_data', 'instructions',
+            'caption', 'quiz_data', 'instructions', 'h5p_self_complete', 'h5p',
         ]
+
+    def get_h5p(self, obj):
+        """The package to play: the viewer's language version, else the main file."""
+        if obj.type != Resource.Type.H5P:
+            return None
+        packages = {p.language: p for p in obj.h5p_packages.all()}
+        package = packages.get(viewer_language(self.context)) or packages.get('')
+        if package is None:
+            return None
+        return {
+            'package_id': package.id, 'path': package.media_path, 'language': package.language,
+            'version': package.version, 'title': package.title, 'main_library': package.main_library,
+        }
 
     def get_content(self, obj):
         return localized(obj, 'content', viewer_language(self.context))

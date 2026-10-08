@@ -2,14 +2,16 @@ import io
 import json
 import shutil
 import tempfile
+import uuid
 import zipfile
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError
-from django.test import TestCase, override_settings
+from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -17,11 +19,13 @@ from rest_framework.test import APITestCase
 from hub.models import (
     Activity,
     Course,
+    Enrollment,
     H5PPackage,
     LearningEvent,
     LearningPillar,
     Module,
     Resource,
+    ResourceProgress,
     UserProfile,
 )
 
@@ -268,3 +272,102 @@ class AuthoringH5PTests(APITestCase):
             {p.folder for p in copied.h5p_packages.all()},
             {p.folder for p in self.resource.h5p_packages.all()},
         )
+
+
+class LearnerH5PTests(APITestCase):
+    def setUp(self):
+        self.creator = User.objects.create_user('h5p_cc2', password='pass12345')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.course, self.module, self.activity, self.resource = make_course(creator=self.creator)
+        for language, folder in (('', 'h5p/main'), ('el', 'h5p/greek')):
+            H5PPackage.objects.create(
+                resource=self.resource, language=language, file='h5p_uploads/x.h5p',
+                folder=folder, main_library='H5P.QuestionSet', title='QS',
+            )
+        self.learner = User.objects.create_user('h5p_learner', password='pass12345')
+        self.profile = UserProfile.objects.create(user=self.learner, user_type=UserProfile.UserType.TEACHER)
+        Enrollment.objects.create(user=self.learner, course=self.course)
+        self.client.force_authenticate(self.learner)
+        self.complete_url = reverse('resource-complete', kwargs={
+            'pk': self.course.id, 'lesson_pk': self.activity.id, 'resource_pk': self.resource.id,
+        })
+
+    def payload(self):
+        from hub.serializers import ResourceLearnSerializer
+        request = SimpleNamespace(user=self.learner)
+        return ResourceLearnSerializer(self.resource, context={'request': request}).data
+
+    def test_learner_gets_their_language_version(self):
+        self.profile.language = 'el'
+        self.profile.save()
+        self.assertEqual(self.payload()['h5p']['path'], '/media/h5p/greek')
+        self.profile.language = 'fr'
+        self.profile.save()
+        data = self.payload()
+        self.assertEqual((data['h5p']['path'], data['h5p']['language']), ('/media/h5p/main', ''))
+        self.assertFalse(data['h5p_self_complete'])
+
+    def test_no_package_means_no_player(self):
+        self.resource.h5p_packages.all().delete()
+        self.assertIsNone(self.payload()['h5p'])
+
+    def test_first_finished_attempt_sets_score(self):
+        res = self.client.post(self.complete_url, {'h5p_result': {
+            'raw': 7, 'max': 10, 'success': True, 'duration_s': 42.25, 'language': '', 'package_id': 1, 'package_version': 2,
+        }}, format='json')
+        self.assertEqual(res.status_code, 200, res.data)
+        rp = ResourceProgress.objects.get(user=self.learner, resource=self.resource)
+        self.assertAlmostEqual(rp.quiz_score, 0.7)
+        self.assertEqual(rp.engagement_data['h5p'], {
+            'raw': 7, 'max': 10, 'success': True, 'duration_s': 42.2, 'language': '', 'package_id': 1, 'package_version': 2,
+        })
+
+    def test_second_completion_keeps_first_score(self):
+        self.client.post(self.complete_url, {'h5p_result': {'raw': 3, 'max': 10}}, format='json')
+        self.client.post(self.complete_url, {'h5p_result': {'raw': 10, 'max': 10}}, format='json')
+        self.assertAlmostEqual(ResourceProgress.objects.get(user=self.learner).quiz_score, 0.3)
+
+    def test_self_complete_without_result(self):
+        res = self.client.post(self.complete_url, {}, format='json')
+        self.assertEqual(res.status_code, 200)
+        rp = ResourceProgress.objects.get(user=self.learner)
+        self.assertIsNone(rp.quiz_score)
+        self.assertIsNotNone(rp.completed_at)
+
+    def test_clean_result_rejects_garbage(self):
+        self.assertIsNone(h5p.clean_result('nope'))
+        self.assertEqual(h5p.clean_result({'raw': '7', 'max': 0, 'success': 'yes', 'duration_s': -3, 'language': 'xx', 'package_id': True}), {})
+        self.assertEqual(h5p.clean_result({'raw': 15, 'max': 10}), {'raw': 10, 'max': 10})
+        res = self.client.post(self.complete_url, {'h5p_result': ['x']}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertIsNone(ResourceProgress.objects.get(user=self.learner).quiz_score)
+
+    def test_tracking_cleans_h5p_text(self):
+        res = self.client.post(reverse('tracking'), {'page_key': str(uuid.uuid4()), 'visits': [], 'events': [{
+            'event_key': str(uuid.uuid4()), 'resource_id': self.resource.id, 'type': 'h5p_answer',
+            'data': {'question': 'Q\x01 ' + 'x' * 700, 'response': '1[,]2', 'correct': False,
+                     'raw': 0, 'max': 1, 'seconds': 3.5, 'attempt': 1, 'evil': 'no'},
+        }]}, format='json')
+        self.assertEqual(res.status_code, 200)
+        data = LearningEvent.objects.get().data
+        self.assertEqual(len(data['question']), 500)
+        self.assertTrue(data['question'].startswith('Q x'))
+        self.assertEqual(
+            {k: data[k] for k in ('response', 'correct', 'raw', 'max', 'seconds', 'attempt')},
+            {'response': '1[,]2', 'correct': False, 'raw': 0, 'max': 1, 'seconds': 3.5, 'attempt': 1},
+        )
+        self.assertNotIn('evil', data)
+
+    def test_dev_media_h5p_headers(self):
+        from aidea.urls import _serve_media
+        root = Path(tempfile.mkdtemp(prefix='aidea-media-'))
+        (root / 'h5p' / 'x').mkdir(parents=True)
+        (root / 'h5p' / 'x' / 'h5p.json').write_text('{}')
+        (root / 'other.txt').write_text('x')
+        request = RequestFactory().get('/media/h5p/x/h5p.json')
+        response = _serve_media(request, 'h5p/x/h5p.json', document_root=str(root))
+        self.assertEqual(response['Access-Control-Allow-Origin'], '*')
+        self.assertTrue(response['Content-Security-Policy'].startswith('sandbox'))
+        self.assertEqual(response['X-Content-Type-Options'], 'nosniff')
+        plain = _serve_media(RequestFactory().get('/media/other.txt'), 'other.txt', document_root=str(root))
+        self.assertNotIn('Access-Control-Allow-Origin', plain)

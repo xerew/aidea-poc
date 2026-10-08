@@ -26,7 +26,14 @@ MAX_TZ_OFFSET = 14 * 60      # UTC-14 … UTC+14
 DEVICES = {value for value, _ in ResourceVisit.Device.choices}
 EVENT_TYPES = {value for value, _ in LearningEvent.Type.choices}
 LANGUAGE_TAG = re.compile(r'^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$')  # e.g. el, pt-BR
-EVENT_DATA_KEYS = {'position', 'from', 'to', 'question_index', 'selected', 'seconds_on_question'}
+EVENT_DATA_KEYS = {
+    'position', 'from', 'to', 'question_index', 'selected', 'seconds_on_question',
+    'raw', 'max', 'correct', 'success', 'duration_s', 'seconds', 'attempt',
+    'package_id', 'package_version',
+}
+# Free-text keys (H5P answers, load errors): control characters removed, length capped.
+EVENT_TEXT_LIMITS = {'question': 500, 'response': 500, 'sub_content_id': 64, 'language': 8, 'message': 200}
+CONTROL_CHARS = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
 
 
 def _uuid(value):
@@ -165,6 +172,9 @@ def _event_data(data):
             clean[key] = value
         elif _number(value) is not None:
             clean[key] = round(value, 1) if isinstance(value, float) else value
+    for key, limit in EVENT_TEXT_LIMITS.items():
+        if isinstance(data.get(key), str):
+            clean[key] = CONTROL_CHARS.sub('', data[key])[:limit]
     return clean
 
 

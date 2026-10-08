@@ -29,6 +29,19 @@ urlpatterns = [
     path('api/analytics/', include('analytics.urls')),
 ]
 
+def _serve_media(request, path, document_root=None):
+    """Dev media serving. Unpacked H5P packages are fetched from a sandboxed
+    (opaque-origin) frame and must never run as AIDEA pages: allow any origin
+    to read them, and sandbox them if opened directly. Caddy does the same in
+    production (see Caddyfile)."""
+    response = serve(request, path, document_root=document_root)
+    if path.startswith('h5p/'):
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Content-Security-Policy'] = 'sandbox allow-scripts'
+        response['X-Content-Type-Options'] = 'nosniff'
+    return response
+
+
 if settings.DEBUG:
     urlpatterns += [
         # Media files are lesson content (e.g. PDFs) meant to be embedded in the
@@ -36,7 +49,7 @@ if settings.DEBUG:
         # protection for this path only so XFrameOptionsMiddleware doesn't block them.
         re_path(
             r'^media/(?P<path>.*)$',
-            xframe_options_exempt(serve),
+            xframe_options_exempt(_serve_media),
             {'document_root': settings.MEDIA_ROOT},
         ),
     ]
