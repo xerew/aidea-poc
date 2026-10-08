@@ -57,6 +57,9 @@ class LearningEvent(models.Model):
         PDF_DOWNLOAD = 'pdf_download', 'PDF downloaded'
         IMAGE_OPEN   = 'image_open',   'Image opened'
         QUIZ_ANSWER  = 'quiz_answer',  'Quiz answer'
+        H5P_ANSWER   = 'h5p_answer',   'H5P answer'
+        H5P_ATTEMPT  = 'h5p_attempt',  'H5P attempt finished'
+        H5P_ERROR    = 'h5p_error',    'H5P failed to load'
 
     user     = models.ForeignKey(User, on_delete=models.CASCADE, related_name='learning_events')
     resource = models.ForeignKey('hub.Resource', on_delete=models.CASCADE, related_name='events')

@@ -108,6 +108,7 @@ class Resource(models.Model):
         PDF        = 'pdf',        'PDF'
         QUIZ       = 'quiz',       'Quiz'
         ASSIGNMENT = 'assignment', 'Assignment'
+        H5P        = 'h5p',        'H5P activity'
 
     activity     = models.ForeignKey('hub.Activity', on_delete=models.CASCADE, related_name='resources')
     type         = models.CharField(max_length=20, choices=Type.choices)
@@ -120,6 +121,8 @@ class Resource(models.Model):
     quiz_data    = models.JSONField(default=list, blank=True)    # quiz
     instructions = models.TextField(blank=True)                  # assignment
     translations = models.JSONField(default=dict, blank=True)
+    # h5p: learners mark it done themselves (types that never report finishing).
+    h5p_self_complete = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['order']

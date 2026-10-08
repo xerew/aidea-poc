@@ -4,6 +4,7 @@ from .assignment import AssignmentSubmission
 from .content import Activity, Course, CourseCollaborator, LearningPillar, Module, Resource
 from .enrollment import Enrollment, LessonProgress, ResourceProgress
 from .feedback import Feedback
+from .h5p import H5PPackage
 from .history import CourseEditHistory
 from .maintenance import MaintenanceNotice
 from .messaging import Conversation, Message
@@ -41,6 +42,7 @@ __all__ = [
     'Conversation',
     'Enrollment',
     'Feedback',
+    'H5PPackage',
     'Message',
     'LearnerActivityConfig',
     'LearningPath',
