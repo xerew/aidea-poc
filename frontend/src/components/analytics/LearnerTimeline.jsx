@@ -11,6 +11,7 @@ function ResourceDetails({ r }) {
   const { t } = useTranslation()
   const bits = []
   if (r.quiz_score != null) bits.push(t('analytics.course.detail.score', { pct: Math.round(r.quiz_score * 100) }))
+  if (r.h5p_attempts) bits.push(t('analytics.course.detail.attempts', { count: r.h5p_attempts }))
   if (r.video_pct != null) bits.push(t('analytics.course.detail.watched', { pct: r.video_pct }))
   if (r.scroll_pct != null) bits.push(t('analytics.course.detail.scrolled', { pct: r.scroll_pct }))
   if (r.pdf_opened) bits.push(t('analytics.course.detail.opened'))
@@ -27,6 +28,21 @@ function ResourceDetails({ r }) {
               {a.is_correct ? <CheckCircle2 size={13} className="acp-right" /> : <XCircle size={13} className="acp-wrong" />}
               <span className="acp-answer-q">{a.question}</span>
               <span className="acp-answer-a">{a.selected_text ?? '—'}</span>
+              {a.seconds != null && <span className="acp-answer-t">{t('analytics.course.detail.answerTime', { s: a.seconds })}</span>}
+            </li>
+          ))}
+        </ol>
+      )}
+      {r.h5p?.answers?.length > 0 && (
+        <ol className="acp-answers">
+          {r.h5p.answers.map((a, i) => (
+            <li key={i}>
+              {a.correct === true ? <CheckCircle2 size={13} className="acp-right" />
+                : a.correct === false ? <XCircle size={13} className="acp-wrong" />
+                  : <Circle size={13} className="acp-muted" />}
+              <span className="acp-answer-t">{t('analytics.course.detail.attemptN', { n: a.attempt })}</span>
+              <span className="acp-answer-q">{a.question}</span>
+              <span className="acp-answer-a">{a.response || '—'}</span>
               {a.seconds != null && <span className="acp-answer-t">{t('analytics.course.detail.answerTime', { s: a.seconds })}</span>}
             </li>
           ))}

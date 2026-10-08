@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s pro Frage",
         "opened": "von {{count}} geöffnet",
         "downloaded": "von {{count}} heruntergeladen",
-        "assignment": "{{submitted}} eingereicht · {{approved}} angenommen · {{waiting}} wartend"
+        "assignment": "{{submitted}} eingereicht · {{approved}} angenommen · {{waiting}} wartend",
+        "h5pFinished": "von {{count}} abgeschlossen",
+        "avgAttempts": "Ø {{n}} Versuche",
+        "hardestText": "schwerste Frage {{pct}} % richtig"
       },
       "detail": {
         "score": "Ergebnis {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "Wartet auf Prüfung",
           "approved": "Angenommen",
           "changes_requested": "Änderungen angefordert"
-        }
+        },
+        "attempts": "{{count}} Versuche",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Zurück zu den Teilnehmenden",
       "totals": "Aktiv {{active}} · auf dem Bildschirm {{onScreen}} · {{visits}} Besuche",

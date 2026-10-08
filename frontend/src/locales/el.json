@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} δευτ. ανά ερώτηση",
         "opened": "άνοιξαν {{count}}",
         "downloaded": "κατέβασαν {{count}}",
-        "assignment": "{{submitted}} υποβλήθηκαν · {{approved}} εγκρίθηκαν · {{waiting}} σε αναμονή"
+        "assignment": "{{submitted}} υποβλήθηκαν · {{approved}} εγκρίθηκαν · {{waiting}} σε αναμονή",
+        "h5pFinished": "ολοκληρώθηκε από {{count}}",
+        "avgAttempts": "μ.ό. {{n}} προσπάθειες",
+        "hardestText": "δυσκολότερη ερώτηση {{pct}}% σωστές"
       },
       "detail": {
         "score": "Βαθμολογία {{pct}}%",
@@ -1042,7 +1045,9 @@
           "pending": "Σε αναμονή αξιολόγησης",
           "approved": "Εγκρίθηκε",
           "changes_requested": "Ζητήθηκαν αλλαγές"
-        }
+        },
+        "attempts": "{{count}} προσπάθειες",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Πίσω στους εκπαιδευόμενους",
       "totals": "Ενεργός {{active}} · στην οθόνη {{onScreen}} · {{visits}} επισκέψεις",

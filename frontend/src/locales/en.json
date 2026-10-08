@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s per question",
         "opened": "opened by {{count}}",
         "downloaded": "downloaded by {{count}}",
-        "assignment": "{{submitted}} submitted · {{approved}} approved · {{waiting}} waiting"
+        "assignment": "{{submitted}} submitted · {{approved}} approved · {{waiting}} waiting",
+        "h5pFinished": "finished by {{count}}",
+        "avgAttempts": "avg. {{n}} attempts",
+        "hardestText": "hardest question {{pct}}% right"
       },
       "detail": {
         "score": "Score {{pct}}%",
@@ -1042,7 +1045,9 @@
           "pending": "Waiting for review",
           "approved": "Approved",
           "changes_requested": "Changes requested"
-        }
+        },
+        "attempts": "{{count}} attempts",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Back to learners",
       "totals": "Active {{active}} · on screen {{onScreen}} · {{visits}} visits",

@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s par question",
         "opened": "ouvert par {{count}}",
         "downloaded": "téléchargé par {{count}}",
-        "assignment": "{{submitted}} rendus · {{approved}} validés · {{waiting}} en attente"
+        "assignment": "{{submitted}} rendus · {{approved}} validés · {{waiting}} en attente",
+        "h5pFinished": "terminé par {{count}}",
+        "avgAttempts": "en moyenne {{n}} tentatives",
+        "hardestText": "question la plus difficile : {{pct}} % de réussite"
       },
       "detail": {
         "score": "Score {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "En attente de relecture",
           "approved": "Validé",
           "changes_requested": "Modifications demandées"
-        }
+        },
+        "attempts": "{{count}} tentatives",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Retour aux apprenants",
       "totals": "Actif {{active}} · à l’écran {{onScreen}} · {{visits}} visites",

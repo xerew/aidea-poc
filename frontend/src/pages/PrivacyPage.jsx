@@ -98,7 +98,7 @@ export default function PrivacyPage() {
       </p>
       <ul>
         <li>the time spent on each resource — both the time you were actively using the page and the time it was on screen;</li>
-        <li>video playback (play, pause, skipping and how much was watched), your quiz answers and the time taken per question, and when a PDF or image is opened or downloaded;</li>
+        <li>video playback (play, pause, skipping and how much was watched), your quiz answers and the time taken per question, your answers and scores in interactive H5P activities, and when a PDF or image is opened or downloaded;</li>
         <li>the interface language, the type of device (desktop, tablet or mobile) and your local time of day.</li>
       </ul>
       <p>

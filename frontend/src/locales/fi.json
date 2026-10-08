@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s / kysymys",
         "opened": "avannut {{count}}",
         "downloaded": "ladannut {{count}}",
-        "assignment": "{{submitted}} palautettu · {{approved}} hyväksytty · {{waiting}} odottaa"
+        "assignment": "{{submitted}} palautettu · {{approved}} hyväksytty · {{waiting}} odottaa",
+        "h5pFinished": "suorittanut {{count}}",
+        "avgAttempts": "keskim. {{n}} yritystä",
+        "hardestText": "vaikein kysymys {{pct}} % oikein"
       },
       "detail": {
         "score": "Pisteet {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "Odottaa arviointia",
           "approved": "Hyväksytty",
           "changes_requested": "Muutoksia pyydetty"
-        }
+        },
+        "attempts": "{{count}} yritystä",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Takaisin osallistujiin",
       "totals": "Aktiivinen {{active}} · näytöllä {{onScreen}} · {{visits}} käyntiä",

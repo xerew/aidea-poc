@@ -77,7 +77,8 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/analytics/courses/<id>/content/` — content tree: reached / done / typical active time / dropped-here per module, activity, resource
 - `GET /api/analytics/courses/<id>/learners/` — learners with time, position and status (completed / on track / stuck / inactive)
 - `GET /api/analytics/courses/<id>/learners/<user_id>/` — one learner's timeline
-- `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — 9-sheet learning analytics workbook
+- `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — learning analytics workbook (incl. H5P answers)
+- `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/h5p/` — upload (multipart `file`, `language`) or remove an H5P package; played by `/h5p/player.html` (h5p-standalone) in a sandboxed iframe
 
 **Auth:** JWT via `djangorestframework-simplejwt`. 60-min access tokens, 7-day refresh with rotation. Token blacklisting enabled for logout.
 

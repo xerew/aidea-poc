@@ -54,6 +54,12 @@ function ResourceNotes({ type, notes }) {
   if ((type === 'pdf' || type === 'image') && notes.opened) parts.push(t('analytics.course.notes.opened', { count: notes.opened }))
   if (type === 'pdf' && notes.downloaded) parts.push(t('analytics.course.notes.downloaded', { count: notes.downloaded }))
   if (type === 'assignment' && notes.submitted) parts.push(t('analytics.course.notes.assignment', notes))
+  if (type === 'h5p') {
+    if (notes.finished) parts.push(t('analytics.course.notes.h5pFinished', { count: notes.finished }))
+    if (notes.avg_score_pct != null) parts.push(t('analytics.course.notes.score', { pct: notes.avg_score_pct }))
+    if (notes.avg_attempts != null) parts.push(t('analytics.course.notes.avgAttempts', { n: notes.avg_attempts }))
+    if (notes.hardest_question) parts.push(t('analytics.course.notes.hardestText', { pct: notes.hardest_question.pct_correct }))
+  }
   if (!parts.length) return null
   return <p className="acp-notes" title={notes.hardest_question?.question}>{parts.join(' · ')}</p>
 }

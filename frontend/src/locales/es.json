@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s por pregunta",
         "opened": "abierto por {{count}}",
         "downloaded": "descargado por {{count}}",
-        "assignment": "{{submitted}} entregadas · {{approved}} aprobadas · {{waiting}} pendientes"
+        "assignment": "{{submitted}} entregadas · {{approved}} aprobadas · {{waiting}} pendientes",
+        "h5pFinished": "completado por {{count}}",
+        "avgAttempts": "media de {{n}} intentos",
+        "hardestText": "pregunta más difícil: {{pct}} % de aciertos"
       },
       "detail": {
         "score": "Puntuación {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "Pendiente de revisión",
           "approved": "Aprobada",
           "changes_requested": "Cambios solicitados"
-        }
+        },
+        "attempts": "{{count}} intentos",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Volver a los participantes",
       "totals": "Activo {{active}} · en pantalla {{onScreen}} · {{visits}} visitas",

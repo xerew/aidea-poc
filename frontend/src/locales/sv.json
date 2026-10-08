@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s per fråga",
         "opened": "öppnad av {{count}}",
         "downloaded": "nedladdad av {{count}}",
-        "assignment": "{{submitted}} inlämnade · {{approved}} godkända · {{waiting}} väntar"
+        "assignment": "{{submitted}} inlämnade · {{approved}} godkända · {{waiting}} väntar",
+        "h5pFinished": "slutförd av {{count}}",
+        "avgAttempts": "i snitt {{n}} försök",
+        "hardestText": "svåraste frågan {{pct}} % rätt"
       },
       "detail": {
         "score": "Resultat {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "Väntar på granskning",
           "approved": "Godkänd",
           "changes_requested": "Ändringar begärda"
-        }
+        },
+        "attempts": "{{count}} försök",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Tillbaka till deltagarna",
       "totals": "Aktiv {{active}} · på skärmen {{onScreen}} · {{visits}} besök",

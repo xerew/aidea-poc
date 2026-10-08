@@ -1029,7 +1029,10 @@
         "perQuestion": "{{s}} s per spørsmål",
         "opened": "åpnet av {{count}}",
         "downloaded": "lastet ned av {{count}}",
-        "assignment": "{{submitted}} levert · {{approved}} godkjent · {{waiting}} venter"
+        "assignment": "{{submitted}} levert · {{approved}} godkjent · {{waiting}} venter",
+        "h5pFinished": "fullført av {{count}}",
+        "avgAttempts": "i snitt {{n}} forsøk",
+        "hardestText": "vanskeligste spørsmål {{pct}} % riktig"
       },
       "detail": {
         "score": "Resultat {{pct}} %",
@@ -1042,7 +1045,9 @@
           "pending": "Venter på vurdering",
           "approved": "Godkjent",
           "changes_requested": "Endringer etterspurt"
-        }
+        },
+        "attempts": "{{count}} forsøk",
+        "attemptN": "#{{n}}"
       },
       "backToLearners": "Tilbake til deltakerne",
       "totals": "Aktiv {{active}} · på skjermen {{onScreen}} · {{visits}} besøk",
