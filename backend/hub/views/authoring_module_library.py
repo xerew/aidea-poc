@@ -40,7 +40,10 @@ def copy_module(source, target_course, order):
     for activity in source.lessons.order_by('order').prefetch_related('resources'):
         new_activity = _clone(activity, module_id=new_module.id)
         for resource in activity.resources.order_by('order'):
-            _clone(resource, activity_id=new_activity.id)
+            new_resource = _clone(resource, activity_id=new_activity.id)
+            # Copies share the unpacked folders, which are never deleted.
+            for package in resource.h5p_packages.all():
+                _clone(package, resource_id=new_resource.id, file=package.file.name)
     return new_module
 
 

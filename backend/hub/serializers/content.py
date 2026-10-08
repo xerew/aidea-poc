@@ -9,16 +9,31 @@ MEDIA_ITEM_TYPES = {'image', 'video', 'pdf'}
 
 class ResourceSerializer(serializers.ModelSerializer):
     """Authoring view of one resource block within an activity."""
+    h5p_packages = serializers.SerializerMethodField()
+
     class Meta:
         model = Resource
         fields = [
             'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
             'caption', 'quiz_data', 'instructions', 'translations',
+            'h5p_self_complete', 'h5p_packages',
         ]
         read_only_fields = ['translations']
 
     def validate_quiz_data(self, value):
         return LessonSerializer().validate_quiz_data(value)
+
+    def get_h5p_packages(self, obj):
+        if obj.type != Resource.Type.H5P:
+            return []
+        return [
+            {
+                'id': p.id, 'language': p.language, 'title': p.title,
+                'main_library': p.main_library, 'size_bytes': p.size_bytes,
+                'version': p.version, 'path': p.media_path, 'uploaded_at': p.uploaded_at,
+            }
+            for p in obj.h5p_packages.all()
+        ]
 
 
 class ResourceLearnSerializer(serializers.ModelSerializer):

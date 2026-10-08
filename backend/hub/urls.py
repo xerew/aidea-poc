@@ -98,6 +98,7 @@ from .views import (
 )
 from .views.assignments import ReviewQueueCountView
 from .views.authoring_course import TranslationServiceStatusView
+from .views.authoring_h5p import AuthoringH5PView
 from .views.authoring_module_library import ModuleImportView, ModuleLibraryView
 from .views.tracking import TrackingView
 
@@ -202,6 +203,7 @@ urlpatterns = [
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/', AuthoringResourceView.as_view(), name='authoring-resource-create'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/reorder/', AuthoringResourceReorderView.as_view(), name='authoring-resource-reorder'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/', AuthoringResourceDetailView.as_view(), name='authoring-resource-detail'),
+    path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/h5p/', AuthoringH5PView.as_view(), name='authoring-resource-h5p'),
     path('authoring/courses/<int:pk>/publish/', AuthoringCoursePublishView.as_view(), name='authoring-course-publish'),
     path('authoring/courses/<int:pk>/unpublish/', AuthoringCourseUnpublishView.as_view(), name='authoring-course-unpublish'),
     path('authoring/courses/<int:pk>/translate/', AuthoringCourseTranslateView.as_view(), name='authoring-course-translate'),
