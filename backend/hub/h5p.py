@@ -82,14 +82,26 @@ def _read_meta(archive, names):
     return meta
 
 
+def _has_library(names, machine_name, version=''):
+    """A library folder is 'Name-1.2/' (current exports) or 'Name/' (exports
+    from 2014–2015, which the player also understands)."""
+    prefixes = (f'{machine_name}-{version}/' if version else f'{machine_name}-', f'{machine_name}/')
+    return any(n.startswith(prefixes) for n in names)
+
+
 def _check_libraries(meta, names):
     deps = [d for d in meta.get('preloadedDependencies') or [] if isinstance(d, dict)]
-    folders = [f"{d.get('machineName')}-{d.get('majorVersion')}.{d.get('minorVersion')}/" for d in deps]
-    main_present = any(n.startswith(f"{meta['mainLibrary']}-") for n in names)
-    if not main_present or any(not any(n.startswith(f) for n in names) for f in folders):
+    missing = [
+        f"{d.get('machineName')}-{d.get('majorVersion')}.{d.get('minorVersion')}" for d in deps
+        if not _has_library(names, d.get('machineName'), f"{d.get('majorVersion')}.{d.get('minorVersion')}")
+    ]
+    if not _has_library(names, meta['mainLibrary']) and meta['mainLibrary'] not in ' '.join(missing):
+        missing.insert(0, meta['mainLibrary'])
+    if missing:
         raise H5PError(
             'missing_libraries',
-            "This file doesn't include its H5P libraries — export it again with libraries included.",
+            "This file doesn't include its H5P libraries — export it again with libraries "
+            f"included. Missing: {', '.join(missing)}",
         )
 
 

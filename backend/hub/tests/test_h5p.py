@@ -145,6 +145,16 @@ class ExtractPackageTests(TestCase):
         self.assertCode('unsafe_path', make_h5p(extra={'../evil.js': 'x'}))
         self.assertFalse((self.root / 'evil.js').exists())
 
+    def test_old_unversioned_library_folders_are_accepted(self):
+        # Exports from 2014–2015 name library folders without the version.
+        archive = make_h5p(
+            drop=('H5P.MultiChoice-1.16/', 'H5P.Question-1.5/'),
+            extra={'H5P.MultiChoice/library.json': '{}', 'H5P.Question/library.json': '{}'},
+        )
+        info = h5p.extract_package(archive, self.dest)
+        self.assertEqual(info.main_library, 'H5P.MultiChoice')
+        self.assertTrue((self.dest / 'H5P.Question' / 'library.json').is_file())
+
     def test_missing_libraries(self):
         self.assertCode('missing_libraries', make_h5p(drop=('H5P.Question-1.5/',)))
         self.assertCode('missing_libraries', make_h5p(drop=('H5P.MultiChoice-1.16/',)))
@@ -402,3 +412,71 @@ class TrackingSurrogateTests(APITestCase):
         self.assertEqual(res.status_code, 200)
         data = LearningEvent.objects.get().data
         self.assertEqual((data['question'], data['response']), ('Q ', ' ok'))
+
+
+class CompleteFromHubTests(TestCase):
+    """Files downloaded from H5P.org lack libraries; the H5P Hub serves each
+    content type as a package with all of them."""
+
+    def hub_package(self, main='H5P.MultiChoice', minor=16):
+        files = {
+            'h5p.json': json.dumps({'mainLibrary': main}),
+            'content/content.json': '{}',
+            f'{main}-1.{minor}/library.json': '{}',
+            f'{main}-1.{minor}/js/main.js': '',
+            'H5P.Question-1.5/library.json': '{}',
+            'H5PEditor.ShowWhen-1.0/library.json': '{}',
+        }
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, 'w') as zf:
+            for name, data in files.items():
+                zf.writestr(name, data)
+        return buf.getvalue()
+
+    def test_adds_missing_libraries_from_the_hub(self):
+        from hub.h5p_hub import complete_from_hub
+        bare = make_h5p(drop=('H5P.MultiChoice-1.16/', 'H5P.Question-1.5/')).getvalue()
+        fetched = []
+        result, report = complete_from_hub(bare, lambda name: fetched.append(name) or self.hub_package())
+        self.assertEqual(fetched, ['H5P.MultiChoice'])
+        self.assertEqual(report['added'], ['H5P.MultiChoice-1.16', 'H5P.Question-1.5', 'H5PEditor.ShowWhen-1.0'])
+        info = h5p.extract_package(io.BytesIO(result), Path(tempfile.mkdtemp()) / 'x')
+        self.assertEqual(info.main_library, 'H5P.MultiChoice')
+
+    def test_newer_minor_version_is_used_and_reported(self):
+        from hub.h5p_hub import complete_from_hub
+        bare = make_h5p(drop=('H5P.MultiChoice-1.16/', 'H5P.Question-1.5/')).getvalue()
+        result, report = complete_from_hub(bare, lambda name: self.hub_package(minor=18))
+        self.assertEqual(report['upgraded'], ['H5P.MultiChoice 1.16 → 1.18'])
+        meta = json.loads(zipfile.ZipFile(io.BytesIO(result)).read('h5p.json'))
+        self.assertIn({'machineName': 'H5P.MultiChoice', 'majorVersion': 1, 'minorVersion': 18},
+                      meta['preloadedDependencies'])
+        h5p.extract_package(io.BytesIO(result), Path(tempfile.mkdtemp()) / 'x')
+
+    def test_versions_written_as_text_are_understood(self):
+        # H5P.org writes "majorVersion": "1" (strings) in h5p.json.
+        from hub.h5p_hub import complete_from_hub
+        meta = {'title': 'T', 'mainLibrary': 'H5P.MultiChoice', 'preloadedDependencies': [
+            {'machineName': 'H5P.MultiChoice', 'majorVersion': '1', 'minorVersion': '16'}]}
+        bare = make_h5p(meta=meta, drop=('H5P.MultiChoice-1.16/', 'H5P.Question-1.5/')).getvalue()
+        _, report = complete_from_hub(bare, lambda name: self.hub_package())
+        self.assertEqual((report['missing'], report['upgraded']), ([], []))
+
+    def test_complete_file_is_left_alone(self):
+        from hub.h5p_hub import complete_from_hub
+        full = make_h5p().getvalue()
+        result, report = complete_from_hub(full, lambda name: self.fail('no download needed'))
+        self.assertEqual((result, report['added']), (full, []))
+
+    def test_command_writes_a_completed_copy(self):
+        from django.core.management import call_command
+        folder = Path(tempfile.mkdtemp())
+        source = folder / 'quiz.h5p'
+        source.write_bytes(make_h5p(drop=('H5P.MultiChoice-1.16/', 'H5P.Question-1.5/')).getvalue())
+        out = io.StringIO()
+        with mock.patch('hub.h5p_hub.fetch_from_hub', lambda name: self.hub_package()):
+            call_command('h5p_add_libraries', str(source), stdout=out)
+        completed = folder / 'quiz-with-libraries.h5p'
+        self.assertTrue(completed.is_file())
+        h5p.extract_package(io.BytesIO(completed.read_bytes()), folder / 'unpacked')
+        self.assertIn('ready to upload', out.getvalue())

@@ -17,6 +17,7 @@ cd backend
 .venv/Scripts/uv.exe run manage.py migrate   # Apply migrations
 .venv/Scripts/uv.exe run manage.py seed      # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234, demo_creator/demo1234)
 .venv/Scripts/uv.exe run manage.py runserver # Start dev server at localhost:8000
+.venv/Scripts/uv.exe run manage.py h5p_add_libraries file.h5p  # Add missing H5P libraries from the H5P Hub (H5P.org downloads)
 ```
 
 **Testing:**
