@@ -72,3 +72,11 @@ test('text is cut by character, never leaving half an emoji', () => {
   }), 0)
   assert.equal(lone.test(events[0].data.response), false)
 })
+
+test('a whole-activity finish with no question text is an attempt only (no empty answer row)', () => {
+  // Real Arithmetic Quiz statement: top-level "answered" with only a score.
+  const { events } = session().handle(stmt('answered', {
+    result: { score: { min: 0, max: 5, raw: 0, scaled: 0 }, completion: true, duration: 'PT29.24S' },
+  }), 0)
+  assert.deepEqual(events.map(e => e.type), ['h5p_attempt'])
+})

@@ -40,6 +40,12 @@ test('content runs in the player window itself (div embed), where the storage sh
   assert.equal(options.h5pJsonPath, 'https://aidea-hub.eu/media/h5p/abc')
 })
 
+test('no H5P "user": it makes H5P fetch saved state from a URL we do not have, and crash', () => {
+  const { options } = run()
+  assert.equal(options.user, undefined)
+  assert.equal(options.contentUserData, undefined)
+})
+
 test('the player refuses to run unframed or for a package outside /media/h5p/', () => {
   assert.deepEqual(run({ framed: false }).posted.map(m => m.message), ['not framed'])
   assert.deepEqual(run({ src: 'https://evil.example/x' }).posted.map(m => m.message), ['invalid package'])

@@ -51,9 +51,9 @@
       // storage shim above, and H5P's init would throw on localStorage.
       embedType: 'div',
       fullScreen: true,
-      // A fixed actor keeps H5P away from storage for an anonymous id; AIDEA
-      // knows the learner from the page, not from the statement.
-      user: { name: 'AIDEA learner', mail: 'learner@aidea-hub.eu' },
+      // No `user`: with one, H5P tries to load saved state from an AJAX URL
+      // we don't provide and crashes on start. AIDEA knows the learner from
+      // the page; the anonymous xAPI actor uses the storage shim above.
     }).then(function () {
       window.H5P.externalDispatcher.on('xAPI', function (event) {
         try {

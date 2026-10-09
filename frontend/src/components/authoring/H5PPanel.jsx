@@ -73,7 +73,7 @@ export default function H5PPanel({ resource, uploadUrl, locked, onChange, onRefr
             </span>
           </div>
           <div className="h5p-package-actions">
-            <button type="button" className="me-media-btn" onClick={() => setPreview(p => !p)}>
+            <button type="button" className="lesson-upload-btn" onClick={() => setPreview(p => !p)}>
               {preview ? <EyeOff size={14} /> : <Eye size={14} />} {preview ? t('authoring.h5p.hidePreview') : t('authoring.h5p.preview')}
             </button>
             {!locked && fileButton('', t('authoring.h5p.replace'))}

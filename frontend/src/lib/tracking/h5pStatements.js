@@ -52,10 +52,13 @@ export function createH5PSession({ language, packageId, packageVersion }) {
         return { events, finished }
       }
 
-      if (verb === 'answered' && result) {
-        const definition = statement.object?.definition
+      const definition = statement.object?.definition
+      const question = langText(definition?.description) || langText(definition?.name)
+      // A whole-activity "answered" with no question text is only the finish
+      // (e.g. Arithmetic Quiz) — recorded as the attempt, not as an answer.
+      if (verb === 'answered' && result && (sub || question)) {
         events.push({ type: 'h5p_answer', data: {
-          question: langText(definition?.description) || langText(definition?.name),
+          question,
           response: typeof result.response === 'string' ? clip(result.response, MAX_TEXT) : '',
           ...(typeof result.success === 'boolean' && { correct: result.success }),
           ...score(result),
