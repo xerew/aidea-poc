@@ -119,4 +119,4 @@ class ProfilePersonalInfoSerializer(serializers.Serializer):
 class ProfileSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model  = UserProfile
-        fields = ['profile_public', 'share_progress']
+        fields = ['profile_public', 'share_progress', 'ai_training_opt_out']

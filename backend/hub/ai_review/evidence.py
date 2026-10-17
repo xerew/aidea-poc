@@ -6,6 +6,7 @@ import base64
 import hashlib
 import io
 import logging
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -95,6 +96,13 @@ def fingerprint(path):
 
 def hamming(a, b):
     return bin(int(a, 16) ^ int(b, 16)).count('1')
+
+
+def anonymise(text, user):
+    """Remove the learner's names, username and any e-mail address (pseudonymisation)."""
+    for value in filter(None, [user.get_full_name(), user.first_name, user.last_name, user.username, user.email]):
+        text = re.sub(re.escape(value), '[learner]', text, flags=re.I)
+    return re.sub(r'[\w.+-]+@[\w-]+\.[\w.]+', '[email]', text)
 
 
 def gather(submission):

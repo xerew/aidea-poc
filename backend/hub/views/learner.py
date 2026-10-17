@@ -200,7 +200,8 @@ class LessonDetailView(APIView):
                 else None
             )
             sub = submissions.get(res['id'])
-            res['submission'] = AssignmentSubmissionSerializer(sub).data if sub else None
+            res['submission'] = (AssignmentSubmissionSerializer(sub, context={'request': request}).data
+                                 if sub else None)
 
         return Response({
             **data,

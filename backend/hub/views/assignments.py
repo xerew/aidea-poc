@@ -7,16 +7,23 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.ai_review.evidence import anonymise
 from hub.models import (
     Activity,
+    AIReview,
     AssignmentSubmission,
     Course,
     CourseCollaborator,
     Enrollment,
     Resource,
+    ReviewExample,
     UserProfile,
 )
-from hub.serializers.assignments import AssignmentSubmissionSerializer, ReviewQueueSerializer
+from hub.serializers.assignments import (
+    AssignmentSubmissionSerializer,
+    ReviewQueueSerializer,
+    latest_ai_review,
+)
 
 from .permissions import IsReviewer, can_edit_course
 
@@ -37,6 +44,12 @@ def _reviewer_scope(queryset, user):
                 lesson__module__course__collaborators__role=CourseCollaborator.Role.CO_EDITOR),
         ).distinct()
     return queryset
+
+
+def can_review(user, submission):
+    """Partners/admins review everything; creators only courses they author or co-edit."""
+    return (user.profile.user_type != UserProfile.UserType.CONTENT_CREATOR
+            or can_edit_course(user, submission.lesson.module.course))
 
 
 def _clean_attachments(raw):
@@ -115,7 +128,7 @@ class AssignmentSubmitView(APIView):
         queue_review(submission)
 
         return Response(
-            AssignmentSubmissionSerializer(submission).data,
+            AssignmentSubmissionSerializer(submission, context={'request': request}).data,
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
 
@@ -173,7 +186,7 @@ class ResourceAssignmentSubmitView(APIView):
         queue_review(submission)
 
         return Response(
-            AssignmentSubmissionSerializer(submission).data,
+            AssignmentSubmissionSerializer(submission, context={'request': request}).data,
             status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
         )
 
@@ -214,13 +227,26 @@ class SubmissionUploadView(APIView):
 class ReviewQueueView(APIView):
     permission_classes = [IsReviewer]
 
+    AI_FILTERS = ('ai_approve', 'ai_unsure', 'flagged')
+
     def get(self, request):
-        queryset = _reviewer_scope(
-            AssignmentSubmission.objects.filter(status=AssignmentSubmission.Status.PENDING)
-            .select_related('user', 'lesson__module__course'),
-            request.user,
-        )
-        return Response(ReviewQueueSerializer(queryset, many=True).data)
+        wanted = request.query_params.get('filter')
+        base = AssignmentSubmission.objects.select_related('user', 'lesson__module__course', 'resource__ai_review_config')
+        if wanted == 'auto_approved':
+            base = base.filter(status=AssignmentSubmission.Status.APPROVED, ai_reviews__auto_approved=True).distinct()
+        else:
+            base = base.filter(status=AssignmentSubmission.Status.PENDING)
+        rows = list(_reviewer_scope(base, request.user))
+        if wanted in self.AI_FILTERS:
+            def keep(sub):
+                review = latest_ai_review(sub)
+                if review is None or review.status != AIReview.Status.DONE:
+                    return False
+                return {'ai_approve': review.verdict == AIReview.Verdict.APPROVE,
+                        'ai_unsure': review.verdict == AIReview.Verdict.UNSURE,
+                        'flagged': review.flagged}[wanted]
+            rows = [s for s in rows if keep(s)]
+        return Response(ReviewQueueSerializer(rows, many=True).data)
 
 
 class ReviewQueueCountView(APIView):
@@ -247,11 +273,7 @@ class ReviewActionView(APIView):
         except AssignmentSubmission.DoesNotExist:
             return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        course = submission.lesson.module.course
-        if (
-            request.user.profile.user_type == UserProfile.UserType.CONTENT_CREATOR
-            and not can_edit_course(request.user, course)
-        ):
+        if not can_review(request.user, submission):
             return Response(
                 {'detail': 'You can only review submissions to courses you author or co-edit.'},
                 status=status.HTTP_403_FORBIDDEN,
@@ -292,4 +314,54 @@ class ReviewActionView(APIView):
             submission, verdict, reason=str(request.data.get('disagreement_reason', '')),
             feedback_used=request.data.get('used_ai_feedback') is True, feedback=feedback,
         )
+        return Response(AssignmentSubmissionSerializer(submission).data)
+
+
+class ReviewExampleView(APIView):
+    """POST /api/reviews/<pk>/example/ — use this submission (anonymised) as an
+    example for the assignment's AI reviewer."""
+    permission_classes = [IsReviewer]
+
+    def post(self, request, pk):
+        submission = (AssignmentSubmission.objects
+                      .select_related('user', 'lesson__module__course', 'resource')
+                      .filter(pk=pk).first())
+        if submission is None or not submission.resource_id:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not can_review(request.user, submission):
+            return Response({'detail': 'Not allowed.'}, status=status.HTTP_403_FORBIDDEN)
+        verdict = request.data.get('verdict')
+        if verdict not in ('approve', 'changes_requested'):
+            return Response({'detail': 'verdict must be approve or changes_requested.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if submission.resource.ai_review_examples.count() >= 5:
+            return Response({'detail': 'This assignment already has 5 examples.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        ReviewExample.objects.create(
+            resource=submission.resource, text=anonymise(submission.text or '', submission.user)[:8000],
+            verdict=verdict, reason=str(request.data.get('reason', ''))[:1000],
+            source_submission=submission, created_by=request.user,
+        )
+        return Response(status=status.HTTP_201_CREATED)
+
+
+class ReviewReopenView(APIView):
+    """POST /api/reviews/<pk>/reopen/ — send an AI-approved submission back to
+    the review queue."""
+    permission_classes = [IsReviewer]
+
+    def post(self, request, pk):
+        submission = (AssignmentSubmission.objects
+                      .select_related('user', 'lesson__module__course')
+                      .filter(pk=pk).first())
+        if submission is None:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not can_review(request.user, submission):
+            return Response({'detail': 'Not allowed.'}, status=status.HTTP_403_FORBIDDEN)
+        if (submission.status != AssignmentSubmission.Status.APPROVED
+                or not submission.ai_reviews.filter(auto_approved=True).exists()):
+            return Response({'detail': 'Only AI-approved submissions can be reopened.'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        from hub.assignment_review import reopen_submission
+        reopen_submission(submission)
         return Response(AssignmentSubmissionSerializer(submission).data)

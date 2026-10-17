@@ -102,7 +102,7 @@ from .views.ai_review import (
     AuthoringAIReviewExampleView,
     AuthoringAIReviewView,
 )
-from .views.assignments import ReviewQueueCountView
+from .views.assignments import ReviewExampleView, ReviewQueueCountView, ReviewReopenView
 from .views.authoring_course import TranslationServiceStatusView
 from .views.authoring_h5p import AuthoringH5PView
 from .views.authoring_module_library import ModuleImportView, ModuleLibraryView
@@ -133,6 +133,8 @@ urlpatterns = [
     path('reviews/', ReviewQueueView.as_view(), name='review-queue'),
     path('reviews/count/', ReviewQueueCountView.as_view(), name='review-queue-count'),
     path('reviews/<int:pk>/', ReviewActionView.as_view(), name='review-action'),
+    path('reviews/<int:pk>/example/', ReviewExampleView.as_view(), name='review-example'),
+    path('reviews/<int:pk>/reopen/', ReviewReopenView.as_view(), name='review-reopen'),
     path('home/', HomeView.as_view(), name='home'),
     path('my-learning/', MyLearningView.as_view(), name='my-learning'),
     path('onboarding/',           OnboardingView.as_view(),           name='onboarding'),
