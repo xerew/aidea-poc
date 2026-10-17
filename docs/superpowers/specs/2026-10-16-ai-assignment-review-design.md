@@ -15,7 +15,7 @@ An AI reviewer for assignment submissions that, assignment by assignment, (A) sa
 | Scope of evidence | **General**: text, PDF/Word (text extracted), images/screenshots (vision), links. Evidence checks are optional plug-ins per assignment: duplicate detection (built in); Trust-AI Lab scenario verification (later, once its API/account matching is settled). |
 | Rubric | A list of **criteria** (name, what "met" looks like, required / nice-to-have), **drafted by the AI** from the assignment instructions and approved by the author. AI review only runs on an approved rubric. |
 | Learner-visible feedback | **Per assignment**: reviewers only (default) or learners immediately, marked preliminary. |
-| Auto-approve | Approvals only; unlocked per assignment after **≥ 30** shadowed reviews with **≥ 95 %** agreement on approvals; requires verdict *approve* with confidence **≥ 0.8**, every required criterion met, no flagged check; **1 in 10** still spot-checked; reviewers can reopen. Rejections are always human. |
+| Auto-approve | Approvals only; unlocked per assignment after **≥ 30** human-checked reviews once the **95 % Wilson lower bound** of agreement on the AI's approvals reaches **90 %** (at least 35 agreeing approvals); requires verdict *approve* with confidence **≥ 0.8**, every required criterion met, no flagged check; **1 in 10** still spot-checked; reviewers can reopen. Rejections are always human. |
 | Training data | **All submissions** may be used, anonymised, to improve the reviewer — stated in the Privacy Policy; learners can opt out in their profile (their work is still pre-checked, only excluded from training data). Confirm with the project's data-protection contact before fine-tuning starts. |
 | Processing | **In the background** right after submission (Celery), never blocking the learner; failures or an offline server leave the submission to humans as today. |
 
@@ -46,7 +46,7 @@ Editable by anyone who can edit the course.
 5. **Validation**: a malformed answer is retried once, then the review is *failed*. If the NTUA server is offline the task retries with back-off for a few hours, then gives up. In every failure case the submission waits for a human.
 6. **Stored per AIReview**: model name, prompt version, rubric snapshot, check results, per-criterion results, verdict, confidence, learner feedback, reviewer notes, status, timing, and later the human verdict, agreement and disagreement reason.
 7. **Auto-approve** (only if unlocked and on): verdict approve, confidence ≥ 0.8, every required criterion met, no flagged check, not drawn for the 1-in-10 spot check → approved through the normal approval path (progress, competency, notifications unchanged), marked *approved by AI*.
-8. **Platform settings** (Django admin singleton): global on/off, model name, Ollama endpoint (reuses the translation settings), confidence threshold (0.8), spot-check rate (10 %), unlock thresholds (30 reviews, 95 %).
+8. **Platform settings** (Django admin singleton): global on/off, model name, Ollama endpoint (reuses the translation settings), confidence threshold (0.8), spot-check rate (10 %), unlock thresholds (30 reviews, 90 % lower bound).
 
 A resubmission gets a fresh AIReview; earlier ones are kept.
 
@@ -66,8 +66,8 @@ A resubmission gets a fresh AIReview; earlier ones are kept.
 
 ## Measuring
 
-- **Course analytics**, per assignment: AI reviews, agreement with reviewers (overall, on approvals), most-missed criteria; the learner timeline shows the AI verdict next to the human one.
-- **Excel**: a new **"AI reviews"** sheet — one row per AIReview: learner, assignment, each criterion's result, AI verdict and confidence, human verdict, agreed?, disagreement reason, model, prompt version, auto-approved?, spot-checked?.
+- **Course analytics**, per assignment: AI reviews, agreement with reviewers (overall plus Cohen's kappa; on approvals plus its lower bound), how often reviewers send the AI's feedback unchanged, most-missed criteria; the learner timeline shows the AI verdict next to the human one.
+- **Excel**: a new **"AI reviews"** sheet — one row per AIReview: learner, assignment, each criterion's result, AI verdict and confidence, human verdict, agreed?, disagreement reason, AI feedback used? and how close the sent feedback is to it, model, prompt version, auto-approved?, spot-checked?.
 - **Training export** (for later fine-tuning): anonymised pairs of submission → human verdict/feedback, excluding opted-out learners and screenshots showing names.
 
 ## Privacy
@@ -80,6 +80,23 @@ Privacy Policy section: assignments are checked by an AI model running on projec
 2. `manage.py ai_review_benchmark`: runs 2–3 candidate models on submissions reviewers already decided; reports agreement, speed, failures and an Excel file with the feedback side by side. The chosen model goes into the admin settings.
 3. Enable for one or two assignments (reviewers only), then widen; learner-visible feedback and auto-approve assignment by assignment as the numbers allow.
 4. Migration: new tables (rubric/criteria, examples, AI reviews, settings, opt-out flag); `Module.llm_review_enabled` carried over to its assignments; no existing data changes.
+
+## Methodology
+
+No single paper is followed; the design combines established methods. The thresholds are engineering choices.
+
+| Idea | Source | Used for |
+|---|---|---|
+| LLM as evaluator, and its biases | Zheng et al., 2023, *Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena* (NeurIPS) | The overall approach; measuring agreement instead of trusting the model |
+| Criterion-by-criterion judging with rubrics | Liu et al., 2023, *G-Eval*; Kim et al., *Prometheus* (ICLR 2024) and *Prometheus 2* (2024) | Rubric criteria with reasons; open models as rubric judges |
+| In-context examples | Brown et al., 2020, *Language Models are Few-Shot Learners* | The ≤ 5 examples per assignment |
+| Selective automation, deferring to humans | Geifman & El-Yaniv, 2017, *Selective Classification for Deep Neural Networks*; Madras et al., 2018, *Predict Responsibly: Learning to Defer* | Auto-approve only clear passes; everything else goes to a human |
+| Self-reported confidence is poorly calibrated | Xiong et al., 2024, *Can LLMs Express Their Uncertainty?* (ICLR) | Unlock depends on measured agreement, not the model's confidence |
+| Chance-corrected agreement | Cohen, 1960, *A Coefficient of Agreement for Nominal Scales* | Kappa next to raw agreement (raw agreement flatters an AI that mostly says "approve") |
+| Confidence interval for a proportion | Wilson, 1927, *Probable Inference, the Law of Succession, and Statistical Inference* | The unlock rule: the lower bound, not the observed rate |
+| Automation bias | Parasuraman & Manzey, 2010, *Complacency and Bias in Human Use of Automation* | Spot checks, reopen, disagreement reasons, logging how much reviewers edit the AI's feedback |
+| Constrained structured output | Willard & Louf, 2023, *Efficient Guided Generation for Large Language Models* | JSON-schema answers |
+| Low-cost fine-tuning | Hu et al., 2021, *LoRA* | The later training step |
 
 ## Testing
 

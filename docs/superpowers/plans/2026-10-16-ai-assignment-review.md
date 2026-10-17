@@ -13,7 +13,7 @@
 
 **Tech Stack:** Django 5 + DRF, Celery, Ollama `/api/chat` (structured outputs, images), Pillow (already installed), `pypdf` and `python-docx` (new), React 19.
 
-**Spec:** `docs/superpowers/specs/2026-10-16-ai-assignment-review-design.md`
+**Spec:** `docs/superpowers/specs/2026-10-16-ai-assignment-review-design.md` (its *Methodology* section lists the research each part draws on)
 
 ## Global Constraints
 
@@ -22,10 +22,14 @@
 - **Verdicts:** `approve` / `changes_requested` / `unsure`. Criterion statuses: `met` / `partly_met` / `not_met` / `cannot_judge`. Confidence is 0–1.
 - **Auto-approve:**
   - approvals only;
-  - unlocked when the assignment has ≥ `unlock_min_reviews` (30) human-decided AI reviews, **and** ≥ `unlock_min_agreement` (0.95) of the AI's *approve* suggestions were approved by humans;
+  - unlocked when the assignment has ≥ `unlock_min_reviews` (30) human-decided AI reviews, **and** the 95% Wilson lower bound of the share of the AI's *approve* suggestions that humans approved is ≥ `unlock_min_lower_bound` (0.90). With no disagreements at all this needs 35 approvals;
   - requires verdict `approve`, confidence ≥ `confidence_threshold` (0.8), every required criterion `met`, and no duplicate flag;
   - `spot_check_rate` (0.1) of eligible submissions stay pending for a human;
   - rejections are always human.
+- **Measurement:**
+  - agreement is always reported with Cohen's kappa (chance-corrected, over approve / changes-requested pairs) next to raw agreement;
+  - every human decision records whether the reviewer started from the AI's feedback (`feedback_used`) and how close the sent feedback is to it (`feedback_similarity`, `difflib.SequenceMatcher` ratio, 1.0 = unchanged; "unchanged" means ≥ 0.95);
+  - all statistics come from one module, `hub/ai_review/metrics.py`, used by the pipeline, the authoring API and analytics.
 - **Failures never block:** a model error or the server being offline leaves the submission pending for humans, exactly as today.
 - **Learner-visible feedback** is per assignment, default off. Learners may resubmit while their submission is pending.
 - **Training data:** anonymised, excluding learners with `UserProfile.ai_training_opt_out`.
@@ -84,14 +88,14 @@
 - Test: `backend/hub/tests/test_ai_review_models.py`
 
 **Interfaces — Produces:**
-- `AIReviewSettings.get()`, with fields `enabled`, `model_name`, `confidence_threshold`, `spot_check_rate`, `unlock_min_reviews` and `unlock_min_agreement`.
+- `AIReviewSettings.get()`, with fields `enabled`, `model_name`, `confidence_threshold`, `spot_check_rate`, `unlock_min_reviews` and `unlock_min_lower_bound`.
 - `AssignmentReviewConfig`:
   - `resource` (OneToOne, `related_name='ai_review_config'`);
   - `enabled`, `criteria` (a list of `{id, name, met, required}`), `rubric_approved`, `criteria_translations` (`{lang: {id: name}}`);
   - `learner_visible`, `auto_approve`, `duplicate_check`;
   - `is_ready()` (enabled, approved, and with criteria).
 - `ReviewExample`: `resource` (`related_name='ai_review_examples'`), `text`, `image_path`, `verdict`, `reason`, `source_submission`, `created_by`, `created_at`.
-- `AIReview`: `submission` (`related_name='ai_reviews'`), `status` (`queued`/`running`/`done`/`failed`), `model_name`, `prompt_version`, `rubric`, `checks`, `criteria_results`, `verdict`, `confidence`, `learner_feedback`, `reviewer_notes`, `error`, `attempts`, `created_at`, `finished_at`, `duration_s`, `auto_approved`, `spot_check`, `human_verdict`, `agreed`, `disagreement_reason`. Properties `flagged` and `resource`.
+- `AIReview`: `submission` (`related_name='ai_reviews'`), `status` (`queued`/`running`/`done`/`failed`), `model_name`, `prompt_version`, `rubric`, `checks`, `criteria_results`, `verdict`, `confidence`, `learner_feedback`, `reviewer_notes`, `error`, `attempts`, `created_at`, `finished_at`, `duration_s`, `auto_approved`, `spot_check`, `human_verdict`, `agreed`, `disagreement_reason`, `feedback_used`, `feedback_similarity`. Properties `flagged` and `resource`.
 - `AIReview.Verdict` (`APPROVE`, `CHANGES`, `UNSURE`), `AIReview.DISAGREEMENT_REASONS`.
 - `UserProfile.ai_training_opt_out`.
 
@@ -129,8 +133,8 @@ class AIReviewModelTests(TestCase):
     def test_settings_singleton_defaults(self):
         s = AIReviewSettings.get()
         self.assertEqual((s.enabled, s.model_name, s.confidence_threshold, s.spot_check_rate,
-                          s.unlock_min_reviews, s.unlock_min_agreement),
-                         (False, 'qwen2.5vl:32b', 0.8, 0.1, 30, 0.95))
+                          s.unlock_min_reviews, s.unlock_min_lower_bound),
+                         (False, 'qwen2.5vl:32b', 0.8, 0.1, 30, 0.9))
         self.assertEqual(AIReviewSettings.get().pk, s.pk)
 
     def test_config_ready_only_when_enabled_approved_with_criteria(self):
@@ -179,7 +183,9 @@ class AIReviewSettings(models.Model):
     confidence_threshold = models.FloatField(default=0.8)
     spot_check_rate      = models.FloatField(default=0.1)
     unlock_min_reviews   = models.PositiveIntegerField(default=30)
-    unlock_min_agreement = models.FloatField(default=0.95)
+    # Auto-approve unlocks when the 95% Wilson lower bound of agreement on the
+    # AI's approvals reaches this (0.9 needs at least 35 agreeing approvals).
+    unlock_min_lower_bound = models.FloatField(default=0.9)
 
     class Meta:
         verbose_name = verbose_name_plural = 'AI review settings'
@@ -266,6 +272,8 @@ class AIReview(models.Model):
     human_verdict       = models.CharField(max_length=20, blank=True)
     agreed              = models.BooleanField(null=True, blank=True)
     disagreement_reason = models.CharField(max_length=20, blank=True)
+    feedback_used       = models.BooleanField(default=False)            # reviewer started from the AI's feedback
+    feedback_similarity = models.FloatField(null=True, blank=True)     # 1.0 = sent unchanged
 
     class Meta:
         ordering = ['-created_at', '-id']
@@ -981,12 +989,12 @@ git push
 ### Task 4: Pipeline: queue on submit, run, auto-approve, shared approval, Celery task
 
 **Files:**
-- Create: `backend/hub/ai_review/pipeline.py`, `backend/hub/assignment_review.py`
+- Create: `backend/hub/ai_review/metrics.py`, `backend/hub/ai_review/pipeline.py`, `backend/hub/assignment_review.py`
 - Modify:
   - `backend/hub/tasks.py`: add `run_ai_review`.
   - `backend/hub/views/assignments.py`: both submit views queue an AI review; `ReviewActionView` uses `hub.assignment_review`.
 - Delete: `backend/hub/llm_review.py`
-- Test: `backend/hub/tests/test_ai_review_pipeline.py`
+- Test: `backend/hub/tests/test_ai_review_metrics.py`, `backend/hub/tests/test_ai_review_pipeline.py`
 
 **Interfaces:**
 - **Consumes:** Task 1's models, Task 2's `gather` and `find_duplicates`, and Task 3's `review_submission`, `ModelOffline`, `ReviewModelError` and `PROMPT_VERSION`.
@@ -997,9 +1005,12 @@ git push
   - `pipeline.queue_review(submission) -> AIReview | None`.
   - `pipeline.run_review(review_id)`: raises `ModelOffline` for the task to retry.
   - `pipeline.mark_failed(review_id, message)`.
-  - `pipeline.assignment_stats(resource) -> {'reviews', 'decided', 'agreement', 'approve_agreement', 'most_missed'}`.
+  - `metrics.wilson_lower(successes, n, z=1.96) -> float | None`.
+  - `metrics.cohen_kappa(pairs) -> float | None`, over `(ai_verdict, human_verdict)` pairs; only approve / changes_requested count, and it's None when undefined.
+  - `metrics.summarise(reviews) -> {'reviews', 'decided', 'agreement', 'kappa', 'approve_agreement', 'approve_lower_bound', 'feedback_used', 'feedback_unchanged', 'most_missed', 'most_missed_name'}`. Ratios are rounded to 3 places, or None when there's nothing to count.
+  - `pipeline.assignment_stats(resource)`: `summarise` over the assignment's done AI reviews.
   - `pipeline.auto_approve_unlocked(resource, settings) -> bool`.
-  - `pipeline.record_human_verdict(submission, verdict, reason='')`.
+  - `pipeline.record_human_verdict(submission, verdict, reason='', feedback_used=False, feedback='')`.
   - Celery task `hub.tasks.run_ai_review(review_id)`, retried every 10 minutes up to 12 times on `ModelOffline`.
 
 - [ ] **Step 1: Write the failing tests.** `backend/hub/tests/test_ai_review_pipeline.py`:
@@ -1108,7 +1119,7 @@ class PipelineTests(TestCase):
         self.config.auto_approve = True
         self.config.save()
         other = self.other_submission()
-        for _ in range(30):
+        for _ in range(40):      # 40/40 agreeing: lower bound 0.912
             AIReview.objects.create(submission=other, status='done', verdict='approve', human_verdict='approve', agreed=True)
 
     def test_locked_assignment_never_auto_approves(self):
@@ -1161,10 +1172,20 @@ class PipelineTests(TestCase):
                                 criteria_results=[{'id': 'c1', 'status': 'not_met', 'reason': ''}])
         stats = pipeline.assignment_stats(self.resource)
         self.assertEqual((stats['reviews'], stats['decided']), (3, 3))
-        self.assertAlmostEqual(stats['agreement'], 2 / 3)
+        self.assertAlmostEqual(stats['agreement'], 2 / 3, places=3)
+        self.assertAlmostEqual(stats['kappa'], 0.4, places=3)
         self.assertAlmostEqual(stats['approve_agreement'], 0.5)
+        self.assertAlmostEqual(stats['approve_lower_bound'], 0.095, places=3)
         self.assertEqual(stats['most_missed'], 'c1')
         self.assertFalse(pipeline.auto_approve_unlocked(self.resource, self.settings))
+
+    def test_unlock_needs_a_reliable_lower_bound(self):
+        other = self.other_submission()
+        for _ in range(34):
+            AIReview.objects.create(submission=other, status='done', verdict='approve', human_verdict='approve', agreed=True)
+        self.assertFalse(pipeline.auto_approve_unlocked(self.resource, self.settings))   # 34/34: lower bound 0.898
+        AIReview.objects.create(submission=other, status='done', verdict='approve', human_verdict='approve', agreed=True)
+        self.assertTrue(pipeline.auto_approve_unlocked(self.resource, self.settings))    # 35/35: 0.901
 
     def test_record_human_verdict(self):
         review, sub = self.run_with(answer())
@@ -1175,6 +1196,18 @@ class PipelineTests(TestCase):
         pipeline.record_human_verdict(sub, 'approve', reason='bogus')
         review.refresh_from_db()
         self.assertEqual((review.agreed, review.disagreement_reason), (True, ''))
+
+    def test_feedback_use_is_recorded(self):
+        review, sub = self.run_with(answer(learner_feedback='Good list of three risks.'))
+        pipeline.record_human_verdict(sub, 'approve', feedback_used=True, feedback='Good list of three risks.')
+        review.refresh_from_db()
+        self.assertEqual((review.feedback_used, review.feedback_similarity), (True, 1.0))
+        pipeline.record_human_verdict(sub, 'approve', feedback_used=True, feedback='Good list. Add a source next time.')
+        review.refresh_from_db()
+        self.assertLess(review.feedback_similarity, 0.95)
+        pipeline.record_human_verdict(sub, 'approve')
+        review.refresh_from_db()
+        self.assertEqual((review.feedback_used, review.feedback_similarity), (False, None))
 
     def test_reopen_auto_approved(self):
         from hub.assignment_review import reopen_submission
@@ -1202,9 +1235,48 @@ class PipelineTests(TestCase):
         self.assertEqual((old.status, old.auto_approved, sub.status), ('done', False, 'pending'))
 ```
 
+`backend/hub/tests/test_ai_review_metrics.py`:
+
+```python
+from types import SimpleNamespace
+
+from django.test import SimpleTestCase
+
+from hub.ai_review.metrics import cohen_kappa, summarise, wilson_lower
+
+A, C = 'approve', 'changes_requested'
+
+
+class MetricsTests(SimpleTestCase):
+    def test_wilson_lower_bound(self):
+        self.assertAlmostEqual(wilson_lower(29, 30), 0.833, places=3)   # 97% observed, 83% safe
+        self.assertAlmostEqual(wilson_lower(30, 30), 0.886, places=3)
+        self.assertAlmostEqual(wilson_lower(35, 35), 0.901, places=3)
+        self.assertIsNone(wilson_lower(0, 0))
+
+    def test_kappa_corrects_for_chance(self):
+        # An AI that always approves, where humans approve 9 in 10: 90% agreement, no skill.
+        self.assertAlmostEqual(cohen_kappa([(A, A)] * 9 + [(A, C)]), 0.0)
+        self.assertAlmostEqual(cohen_kappa([(A, A)] * 8 + [(A, C), (C, C)]), 0.615, places=3)
+        self.assertIsNone(cohen_kappa([(A, A)] * 5))       # undefined: both only ever approve
+        self.assertIsNone(cohen_kappa([]))
+        self.assertAlmostEqual(cohen_kappa([('unsure', A), (A, A), (C, C)]), 1.0)   # unsure is ignored
+
+    def test_summarise_feedback_use(self):
+        def review(used, similarity):
+            return SimpleNamespace(verdict=A, human_verdict=A, agreed=True, criteria_results=[], rubric=[],
+                                   feedback_used=used, feedback_similarity=similarity)
+        stats = summarise([review(True, 1.0), review(True, 0.6), review(False, None), review(False, None)])
+        self.assertEqual((stats['feedback_used'], stats['feedback_unchanged']), (0.5, 0.5))
+
+    def test_summarise_empty(self):
+        stats = summarise([])
+        self.assertEqual((stats['reviews'], stats['agreement'], stats['kappa'], stats['most_missed']), (0, None, None, None))
+```
+
 - [ ] **Step 2: Run the tests to verify they fail.**
-  - Run: `"$UV" run manage.py test hub.tests.test_ai_review_pipeline -v 2`
-  - Expected: ImportError, `cannot import name 'pipeline'`.
+  - Run: `"$UV" run manage.py test hub.tests.test_ai_review_metrics hub.tests.test_ai_review_pipeline -v 2`
+  - Expected: ImportError, `cannot import name 'metrics'` / `'pipeline'`.
 
 - [ ] **Step 3: Implement.** `backend/hub/assignment_review.py`:
 
@@ -1294,18 +1366,90 @@ def reopen_submission(submission):
 
 Match the remaining `_send` arguments to the existing call below it (copy any extra keyword it passes).
 
+`backend/hub/ai_review/metrics.py`:
+
+```python
+"""Agreement statistics for the AI reviewer.
+
+- Cohen's kappa: agreement beyond what chance would give (an AI that always
+  says "approve" scores 0 however often humans approve).
+- Wilson lower bound: how low the true approve-agreement could plausibly be
+  given how few reviews exist (29/30 looks like 97% but may be 83%).
+- Feedback use: how often reviewers send the AI's feedback (nearly) unchanged —
+  the warning sign for rubber-stamping."""
+import math
+
+DEFINITE = ('approve', 'changes_requested')
+UNCHANGED_SIMILARITY = 0.95
+
+
+def _r(x):
+    return None if x is None else round(x, 3)
+
+
+def wilson_lower(successes, n, z=1.96):
+    if n == 0:
+        return None
+    p = successes / n
+    centre = p + z * z / (2 * n)
+    margin = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    return (centre - margin) / (1 + z * z / n)
+
+
+def cohen_kappa(pairs):
+    pairs = [(a, h) for a, h in pairs if a in DEFINITE and h in DEFINITE]
+    n = len(pairs)
+    if n == 0:
+        return None
+    observed = sum(a == h for a, h in pairs) / n
+    expected = sum((sum(a == v for a, _ in pairs) / n) * (sum(h == v for _, h in pairs) / n) for v in DEFINITE)
+    if expected == 1:
+        return None
+    return (observed - expected) / (1 - expected)
+
+
+def summarise(reviews):
+    reviews = list(reviews)
+    decided = [r for r in reviews if r.human_verdict and r.agreed is not None]
+    ai_approves = [r for r in decided if r.verdict == 'approve']
+    approve_ok = sum(r.human_verdict == 'approve' for r in ai_approves)
+    used = [r for r in decided if r.feedback_used]
+    missed = {}
+    for r in reviews:
+        for c in r.criteria_results or []:
+            if c.get('status') in ('not_met', 'partly_met'):
+                missed[c['id']] = missed.get(c['id'], 0) + 1
+    names = {c['id']: c['name'] for r in reviews for c in (r.rubric or [])}
+    worst = max(missed, key=missed.get) if missed else None
+    return {
+        'reviews': len(reviews),
+        'decided': len(decided),
+        'agreement': _r(sum(r.agreed for r in decided) / len(decided)) if decided else None,
+        'kappa': _r(cohen_kappa((r.verdict, r.human_verdict) for r in decided)),
+        'approve_agreement': _r(approve_ok / len(ai_approves)) if ai_approves else None,
+        'approve_lower_bound': _r(wilson_lower(approve_ok, len(ai_approves))),
+        'feedback_used': _r(len(used) / len(decided)) if decided else None,
+        'feedback_unchanged': (_r(sum((r.feedback_similarity or 0) >= UNCHANGED_SIMILARITY for r in used) / len(used))
+                               if used else None),
+        'most_missed': worst,
+        'most_missed_name': names.get(worst) if worst else None,
+    }
+```
+
 `backend/hub/ai_review/pipeline.py`:
 
 ```python
 """Queueing and running AI reviews; auto-approve; agreement statistics."""
 import random
 import time
+from difflib import SequenceMatcher
 
 from django.db import transaction
 from django.utils import timezone
 
 from hub.ai_review import model
 from hub.ai_review.evidence import find_duplicates, gather
+from hub.ai_review.metrics import summarise
 from hub.models import AIReview, AIReviewSettings, AssignmentSubmission
 
 
@@ -1374,28 +1518,13 @@ def mark_failed(review_id, message):
 
 
 def assignment_stats(resource):
-    reviews = AIReview.objects.filter(submission__resource=resource, status=AIReview.Status.DONE)
-    decided = [r for r in reviews if r.human_verdict and r.agreed is not None]
-    ai_approves = [r for r in decided if r.verdict == AIReview.Verdict.APPROVE]
-    missed = {}
-    for r in reviews:
-        for c in r.criteria_results or []:
-            if c.get('status') in ('not_met', 'partly_met'):
-                missed[c['id']] = missed.get(c['id'], 0) + 1
-    return {
-        'reviews': reviews.count(),
-        'decided': len(decided),
-        'agreement': sum(r.agreed for r in decided) / len(decided) if decided else None,
-        'approve_agreement': (sum(r.human_verdict == 'approve' for r in ai_approves) / len(ai_approves)
-                              if ai_approves else None),
-        'most_missed': max(missed, key=missed.get) if missed else None,
-    }
+    return summarise(AIReview.objects.filter(submission__resource=resource, status=AIReview.Status.DONE))
 
 
 def auto_approve_unlocked(resource, settings):
     stats = assignment_stats(resource)
     return (stats['decided'] >= settings.unlock_min_reviews
-            and (stats['approve_agreement'] or 0) >= settings.unlock_min_agreement)
+            and (stats['approve_lower_bound'] or 0) >= settings.unlock_min_lower_bound)
 
 
 def _maybe_auto_approve(review, config):
@@ -1426,17 +1555,23 @@ def _maybe_auto_approve(review, config):
     review.save(update_fields=['auto_approved'])
 
 
-def record_human_verdict(submission, verdict, reason=''):
+def record_human_verdict(submission, verdict, reason='', feedback_used=False, feedback=''):
     review = submission.ai_reviews.filter(status=AIReview.Status.DONE).first()
     if review is None:
         return
     review.human_verdict = verdict
     review.agreed = (review.verdict == verdict) if review.verdict in ('approve', 'changes_requested') else None
     review.disagreement_reason = reason if review.agreed is False and reason in AIReview.DISAGREEMENT_REASONS else ''
-    review.save(update_fields=['human_verdict', 'agreed', 'disagreement_reason'])
+    review.feedback_used = bool(feedback_used and review.learner_feedback)
+    review.feedback_similarity = (round(SequenceMatcher(None, review.learner_feedback, feedback or '').ratio(), 3)
+                                  if review.feedback_used else None)
+    review.save(update_fields=['human_verdict', 'agreed', 'disagreement_reason', 'feedback_used', 'feedback_similarity'])
 ```
 
-Note on the stats test: three decided reviews, two agreed, so 2/3. The AI said approve twice and humans approved once, so `approve_agreement` is 0.5.
+Note on the stats test:
+- three decided reviews, two agreed, so agreement is 2/3;
+- kappa: the AI approved 2/3 and humans 1/3, so chance agreement is 2/9 + 2/9 = 4/9, and kappa = (2/3 − 4/9) / (5/9) = 0.4;
+- the AI said approve twice and humans approved once, so `approve_agreement` is 0.5, and its lower bound with only 2 reviews is 0.095.
 
 `backend/hub/tasks.py`: add
 
@@ -1466,12 +1601,12 @@ def run_ai_review(self, review_id: int) -> None:
 
 - In `ReviewActionView.post`, replace the approve and request-changes bodies with calls to `approve_submission(submission, request.user, feedback)` (catch `ReviewError` and return 400 with its message) and `request_changes(submission, request.user, feedback)`.
 - Remove the trailing `send_assignment_reviewed_email` call, which now lives in those functions.
-- After either action, call `record_human_verdict(submission, 'approve' | 'changes_requested', reason=str(request.data.get('disagreement_reason', '')))`.
+- After either action, call `record_human_verdict(submission, 'approve' | 'changes_requested', reason=str(request.data.get('disagreement_reason', '')), feedback_used=request.data.get('used_ai_feedback') is True, feedback=feedback)`.
 
 Delete `backend/hub/llm_review.py`. Then grep for `llm_review` in `hub/` and `tests/`, and update any test that patched it to patch `hub.ai_review.pipeline.queue_review` instead.
 
 - [ ] **Step 4: Run the tests to verify they pass.**
-  - Run: `"$UV" run manage.py test hub.tests.test_ai_review_pipeline hub.tests.test_assignment_review hub.tests.test_resource_assignment -v 2`
+  - Run: `"$UV" run manage.py test hub.tests.test_ai_review_metrics hub.tests.test_ai_review_pipeline hub.tests.test_assignment_review hub.tests.test_resource_assignment -v 2`
   - Expected: all pass. The existing review tests must still pass unchanged.
 
 - [ ] **Step 5: Lint, full suite and commit.**
@@ -1479,9 +1614,9 @@ Delete `backend/hub/llm_review.py`. Then grep for `llm_review` in `hub/` and `te
 ```bash
 "$UV" run ruff check hub analytics
 "$UV" run manage.py test hub analytics
-git add hub/ai_review/pipeline.py hub/assignment_review.py hub/tasks.py hub/views/assignments.py hub/tests/test_ai_review_pipeline.py hub/emails.py
+git add hub/ai_review/metrics.py hub/ai_review/pipeline.py hub/assignment_review.py hub/tasks.py hub/views/assignments.py hub/tests/test_ai_review_metrics.py hub/tests/test_ai_review_pipeline.py hub/emails.py
 git rm hub/llm_review.py
-git commit -m "feat: AI review pipeline — queue on submit, run, auto-approve rules, shared approval"
+git commit -m "feat: AI review pipeline — queue on submit, run, auto-approve rules, agreement metrics"
 git push
 ```
 
@@ -1496,7 +1631,7 @@ git push
 
 **Interfaces — Produces:**
 - `GET` and `PUT` on `/api/authoring/courses/<pk>/modules/<m>/lessons/<a>/resources/<r>/ai-review/` (`authoring-ai-review`):
-  - The response is `{enabled, criteria, rubric_approved, learner_visible, auto_approve, duplicate_check, platform_enabled, unlocked, stats}`.
+  - The response is `{enabled, criteria, rubric_approved, learner_visible, auto_approve, duplicate_check, platform_enabled, unlocked, unlock_min_reviews, unlock_min_lower_bound, stats}`.
   - `PUT` validates the criteria. Changing the criteria clears `rubric_approved` unless the same request sets it true. `auto_approve: true` is refused with 400 while locked. Approving queues `translate_review_criteria`.
 - `POST …/ai-review/draft/` (`authoring-ai-review-draft`): returns `{criteria}`, or 503 when the model is offline.
 - `GET` and `POST …/ai-review/examples/` (`authoring-ai-review-examples`) and `DELETE …/ai-review/examples/<id>/` (`authoring-ai-review-example`).
@@ -1598,9 +1733,12 @@ class AuthoringAIReviewTests(APITestCase):
         learner = User.objects.create_user('aa_l', password='x')
         UserProfile.objects.create(user=learner)
         sub = AssignmentSubmission.objects.create(user=learner, lesson=self.activity, resource=self.resource, text='t')
-        for _ in range(30):
+        for _ in range(35):
             AIReview.objects.create(submission=sub, status='done', verdict='approve', human_verdict='approve', agreed=True)
-        self.assertTrue(self.client.get(self.url).data['unlocked'])
+        data = self.client.get(self.url).data
+        self.assertTrue(data['unlocked'])
+        self.assertEqual((data['unlock_min_reviews'], data['unlock_min_lower_bound']), (30, 0.9))
+        self.assertIn('kappa', data['stats'])
         self.assertEqual(self.client.put(self.url, {'auto_approve': True}, format='json').status_code, 200)
 ```
 
@@ -1663,6 +1801,8 @@ def _payload(config):
         'learner_visible': config.learner_visible, 'auto_approve': config.auto_approve,
         'duplicate_check': config.duplicate_check, 'platform_enabled': settings.enabled,
         'unlocked': auto_approve_unlocked(config.resource, settings),
+        'unlock_min_reviews': settings.unlock_min_reviews,
+        'unlock_min_lower_bound': settings.unlock_min_lower_bound,
         'stats': assignment_stats(config.resource),
     }
 
@@ -1830,7 +1970,7 @@ git push
 **Interfaces — Produces:**
 - `ReviewQueueSerializer.ai_review`: None, or `{status, verdict, confidence, criteria: [{id, name, status, reason}], learner_feedback, reviewer_notes, duplicates, auto_approved, spot_check}`.
 - `GET /api/reviews/?filter=` accepts `ai_approve`, `ai_unsure`, `flagged` and `auto_approved`. The last one lists *approved* submissions whose latest AI review has `auto_approved`.
-- `POST /api/reviews/<pk>/` accepts an optional `disagreement_reason`.
+- `POST /api/reviews/<pk>/` accepts an optional `disagreement_reason` and `used_ai_feedback` (boolean).
 - `POST /api/reviews/<pk>/example/` (`review-example`): body `{verdict, reason}`; creates an anonymised `ReviewExample`; 400 when the assignment already has 5.
 - `POST /api/reviews/<pk>/reopen/` (`review-reopen`): only for auto-approved submissions.
 - `AssignmentSubmissionSerializer.ai_precheck`: None unless the assignment is `learner_visible`. Otherwise `{status, criteria: [{name, status, reason}], feedback}`, with criterion names in the request user's language, falling back to the source.
@@ -1892,9 +2032,12 @@ class ReviewerAPITests(APITestCase):
 
     def test_decision_records_agreement_and_reason(self):
         self.client.post(reverse('review-action', kwargs={'pk': self.sub.pk}),
-                         {'action': 'request_changes', 'feedback': 'More detail', 'disagreement_reason': 'too_lenient'}, format='json')
+                         {'action': 'request_changes', 'feedback': 'More detail', 'disagreement_reason': 'too_lenient',
+                          'used_ai_feedback': True}, format='json')
         self.review.refresh_from_db()
         self.assertEqual((self.review.agreed, self.review.disagreement_reason), (False, 'too_lenient'))
+        self.assertTrue(self.review.feedback_used)
+        self.assertLess(self.review.feedback_similarity, 0.5)
 
     def test_example_from_submission_is_anonymised(self):
         res = self.client.post(reverse('review-example', kwargs={'pk': self.sub.pk}),
@@ -2134,9 +2277,9 @@ git push
 
 **Interfaces — Produces:**
 - `CourseData` loads the AI reviews of the course's submissions (latest per submission) in `self.ai_reviews = {(uid, rid): AIReview}`.
-- Assignment notes gain `ai: {reviews, decided, agreement, approve_agreement, most_missed}`, or None when there are no AI reviews.
+- Assignment notes gain `ai`: `hub.ai_review.metrics.summarise(...)` over the assignment's latest AI reviews (including `kappa`, `approve_lower_bound`, `feedback_unchanged` and `most_missed_name`), or None when there are none.
 - `resource_detail` for an assignment gains `ai_verdict` and `ai_auto_approved`.
-- Workbook `SHEET_NAMES` gains `'AI reviews'` after `'H5P answers'`, with these columns: BASE + `Module ID`, `Activity ID`, `Activity`, `Resource ID`, `Assignment`, `Submitted at`, `AI status`, `AI verdict`, `Confidence`, one column per criterion `Criterion <id>: <name>` (written as `id=status` pairs in one `Criteria` column), `Human verdict`, `Agreed`, `Disagreement reason`, `Auto-approved`, `Spot check`, `Duplicate flag`, `Model`, `Prompt version`.
+- Workbook `SHEET_NAMES` gains `'AI reviews'` after `'H5P answers'`, with these columns: BASE + `Module ID`, `Activity ID`, `Activity`, `Resource ID`, `Assignment`, `Submitted at`, `AI status`, `AI verdict`, `Confidence`, one column per criterion `Criterion <id>: <name>` (written as `id=status` pairs in one `Criteria` column), `Human verdict`, `Agreed`, `Disagreement reason`, `Used AI feedback`, `Feedback similarity`, `Auto-approved`, `Spot check`, `Duplicate flag`, `Model`, `Prompt version`.
 
 - [ ] **Step 1: Write the failing tests.** `backend/analytics/tests/test_ai_review_analytics.py`:
 
@@ -2184,6 +2327,7 @@ class AIReviewAnalyticsTests(TestCase):
     def test_assignment_notes_include_ai_agreement(self):
         notes = content_tree(CourseData(self.course, now=NOW))['modules'][0]['activities'][0]['resources'][0]['notes']
         self.assertEqual((notes['ai']['reviews'], notes['ai']['agreement']), (2, 0.5))
+        self.assertEqual(notes['ai']['kappa'], 0.0)        # the AI approved both: no skill beyond chance
 
     def test_timeline_shows_ai_verdict(self):
         res = learner_timeline(CourseData(self.course, now=NOW), self.bob.id)['modules'][0]['activities'][0]['resources'][0]
@@ -2228,24 +2372,8 @@ and add this helper:
 
 ```python
 def _ai_notes(reviews):
-    if not reviews:
-        return None
-    decided = [r for r in reviews if r.agreed is not None]
-    ai_approves = [r for r in decided if r.verdict == 'approve']
-    missed = {}
-    for r in reviews:
-        for c in r.criteria_results or []:
-            if c.get('status') in ('not_met', 'partly_met'):
-                missed[c['id']] = missed.get(c['id'], 0) + 1
-    names = {c['id']: c['name'] for r in reviews for c in (r.rubric or [])}
-    worst = max(missed, key=missed.get) if missed else None
-    return {
-        'reviews': len(reviews), 'decided': len(decided),
-        'agreement': round(sum(r.agreed for r in decided) / len(decided), 3) if decided else None,
-        'approve_agreement': (round(sum(r.human_verdict == 'approve' for r in ai_approves) / len(ai_approves), 3)
-                              if ai_approves else None),
-        'most_missed': names.get(worst, worst) if worst else None,
-    }
+    from hub.ai_review.metrics import summarise
+    return summarise(reviews) if reviews else None
 ```
 
 In `resource_detail`, add:
@@ -2259,7 +2387,7 @@ Here `cd` is `self`; adapt to the method's existing variable names.
 
 `analytics/workbook.py`:
 - add `'AI reviews'` to `SHEET_NAMES` after `'H5P answers'`;
-- add `HEADERS['AI reviews'] = BASE + ['Module ID', 'Activity ID', 'Activity', 'Resource ID', 'Assignment', 'Submitted at', 'AI status', 'AI verdict', 'Confidence', 'Criteria', 'Human verdict', 'Agreed', 'Disagreement reason', 'Auto-approved', 'Spot check', 'Duplicate flag', 'Model', 'Prompt version']`;
+- add `HEADERS['AI reviews'] = BASE + ['Module ID', 'Activity ID', 'Activity', 'Resource ID', 'Assignment', 'Submitted at', 'AI status', 'AI verdict', 'Confidence', 'Criteria', 'Human verdict', 'Agreed', 'Disagreement reason', 'Used AI feedback', 'Feedback similarity', 'Auto-approved', 'Spot check', 'Duplicate flag', 'Model', 'Prompt version']`;
 - add this generator and register it in `ROWS` after `'H5P answers'`:
 
 ```python
@@ -2274,12 +2402,13 @@ def _ai_reviews(cd):
                 iso(review.submission.submitted_at), review.status, review.verdict, blank(review.confidence),
                 ', '.join(f"{c['id']}={c['status']}" for c in review.criteria_results or []),
                 review.human_verdict, '' if review.agreed is None else yes_no(review.agreed),
-                review.disagreement_reason, yes_no(review.auto_approved), yes_no(review.spot_check),
+                review.disagreement_reason, yes_no(review.feedback_used), blank(review.feedback_similarity),
+                yes_no(review.auto_approved), yes_no(review.spot_check),
                 yes_no(review.flagged), review.model_name, review.prompt_version,
             ]
 ```
 
-- add a README line: `'AI reviews: one row per learner × assignment (latest AI review); Agreed compares the AI verdict with the human decision.'`
+- add a README line: `'AI reviews: one row per learner × assignment (latest AI review); Agreed compares the AI verdict with the human decision; Feedback similarity is 1.0 when the reviewer sent the AI feedback unchanged.'`
 
 - [ ] **Step 4: Run the tests to verify they pass.**
   - Run: `"$UV" run manage.py test analytics -v 2`
@@ -2523,6 +2652,7 @@ git push
   - `verdictTone(verdict)`: `'approve'` → `'ok'`, `'changes_requested'` → `'bad'`, otherwise `'unsure'`;
   - `statusIcon(status)`: `'met'` → `'check'`, `'partly_met'` → `'half'`, `'not_met'` → `'cross'`, otherwise `'question'`;
   - `percent(x)`: `0.953` → `'95%'`, `null` → `'—'`;
+  - `kappaText(k)`: `0.4` → `'0.40'`, `null` → `'—'`;
   - `disagrees(aiVerdict, action)`: true when the AI said `approve` or `changes_requested` and the human chose the other.
 
 - [ ] **Step 1: Write the failing helper tests.** `frontend/src/components/reviews/aiReview.test.js`:
@@ -2530,7 +2660,7 @@ git push
 ```js
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { disagrees, percent, statusIcon, verdictTone } from './aiReview.js'
+import { disagrees, kappaText, percent, statusIcon, verdictTone } from './aiReview.js'
 
 test('verdict tone and criterion icons', () => {
   assert.equal(verdictTone('approve'), 'ok')
@@ -2539,9 +2669,11 @@ test('verdict tone and criterion icons', () => {
   assert.deepEqual(['met', 'partly_met', 'not_met', 'cannot_judge'].map(statusIcon), ['check', 'half', 'cross', 'question'])
 })
 
-test('percent', () => {
+test('percent and kappa', () => {
   assert.equal(percent(0.953), '95%')
   assert.equal(percent(null), '—')
+  assert.equal(kappaText(0.4), '0.40')
+  assert.equal(kappaText(null), '—')
 })
 
 test('a human decision disagrees only with a definite AI verdict', () => {
@@ -2569,6 +2701,8 @@ export const statusIcon = (status) => ICONS[status] ?? 'question'
 
 export const percent = (x) => (x == null ? '—' : `${Math.round(x * 100)}%`)
 
+export const kappaText = (k) => (k == null ? '—' : k.toFixed(2))
+
 const HUMAN = { approve: 'approve', request_changes: 'changes_requested' }
 export const disagrees = (aiVerdict, action) => (
   ['approve', 'changes_requested'].includes(aiVerdict) && HUMAN[action] !== aiVerdict
@@ -2585,8 +2719,8 @@ The panel:
 - **rubric editor:** rows with name, met and a required checkbox, plus add, remove and up/down buttons; **"Draft with AI"** (`POST draft/`, which fills the rows with a spinner and shows the 503 message on failure); **"Approve rubric"** (`PUT` with `{criteria, rubric_approved: true}`). An "Approved ✓" badge shows when approved, and a "Changes not yet approved" warning when there are local edits;
 - **examples:** a list of `GET examples/`, each with text, verdict and reason, and remove (`DELETE examples/<id>/`); an "Add example" form (textarea, verdict select, reason; `POST examples/`); disabled at 5;
 - **checkboxes:** "Check for duplicate files" (`duplicate_check`) and "Learners see the AI pre-check immediately" (`learner_visible`). Each saves with `PUT` straight away. Below them, a disabled "Trust-AI Lab scenario check" row labelled "coming soon" (`authoring.aiReview.trustAiSoon`);
-- **"Approve clear passes automatically":** disabled unless `unlocked`, with a hint built from `stats`: *"Unlocks after 30 human-checked AI reviews with ≥ 95% agreement on approvals — now: {decided} reviews, {percent(approve_agreement)}"*;
-- **stats line:** *"{reviews} AI reviews · agreement {percent(agreement)} · approvals {percent(approve_agreement)} · most missed: {most_missed name}"*.
+- **"Approve clear passes automatically":** disabled unless `unlocked`, with the hint `authoring.aiReview.autoLocked` filled with `min` = `unlock_min_reviews`, `pct` = `percent(unlock_min_lower_bound)`, `decided` = `stats.decided` and `now` = `percent(stats.approve_lower_bound)`;
+- **stats line:** `authoring.aiReview.stats` with `reviews`, `agreement` = `percent(agreement)`, `kappa` = `kappaText(kappa)`, `approvals` = `percent(approve_agreement)`, `unchanged` = `percent(feedback_unchanged)` and `missed` = `most_missed_name ?? '—'`.
 
 Implement with `useState` and `useEffect` like `H5PPanel` (`client` calls, error text via `t('authoring.aiReview.errors.*')`). Keep one component with small inner components: `CriteriaEditor`, `ExamplesList`. CSS prefix `.air-`.
 
@@ -2597,7 +2731,7 @@ Implement with `useState` and `useEffect` like `H5PPanel` (`client` calls, error
   - a criteria list with an icon from `statusIcon()` (✓ / ◐ / ✗ / ? via lucide `CheckCircle2` / `CircleDot` / `XCircle` / `HelpCircle`) plus name and reason;
   - the duplicates as warning lines, "Same file as {learner} ({match})";
   - the reviewer notes;
-  - a **"Use AI feedback"** button that sets `feedback` to `ai_review.learner_feedback`.
+  - a **"Use AI feedback"** button that sets `feedback` to `ai_review.learner_feedback` and sets a `usedAI` state to true. The decision POST sends `used_ai_feedback: usedAI`, so the backend can measure how much the reviewer edited it.
 - When the AI review is queued or running: "AI pre-check running…".
 - **Disagreement reason:** when the reviewer clicks an action and `disagrees(sub.ai_review?.verdict, action)`, show an inline select (*missed evidence*, *too strict*, *too lenient*, *misread the image*, *other*, *skip*) before sending. Include `disagreement_reason` in the POST body. Keep it one extra step: the select appears with "Send" and "Skip".
 - **"Use as AI example"** button: `POST /reviews/<id>/example/` with `{ verdict: 'approve' | 'changes_requested', reason }`, from a small inline form; shows "Added" or the error.
@@ -2612,7 +2746,7 @@ Implement with `useState` and `useEffect` like `H5PPanel` (`client` calls, error
 - the submit button label for a pending submission is "Update submission".
 
 - [ ] **Step 6: Analytics, profile, privacy.**
-- **`ContentTree.jsx` `ResourceNotes`:** for an assignment with `notes.ai`, push `t('analytics.course.notes.aiAgreement', { pct: Math.round(notes.ai.agreement * 100) })` when `agreement != null`, then `t('analytics.course.notes.aiReviews', { count: notes.ai.reviews })`.
+- **`ContentTree.jsx` `ResourceNotes`:** for an assignment with `notes.ai`, push `t('analytics.course.notes.aiAgreement', { pct: Math.round(notes.ai.agreement * 100) })` when `agreement != null`, then `t('analytics.course.notes.aiKappa', { kappa: kappaText(notes.ai.kappa) })` when `kappa != null`, then `t('analytics.course.notes.aiReviews', { count: notes.ai.reviews })`.
 - **`LearnerTimeline.jsx` `ResourceDetails`:** when `r.ai_verdict`, push `t('analytics.course.detail.aiVerdict', { verdict: t(`reviews.ai.verdict.${r.ai_verdict}`) })`, plus `t('analytics.course.detail.aiAuto')` if `r.ai_auto_approved`.
 - **`ProfilePage.jsx` `PrivacySection`:** add `ai_training_opt_out: false` to the initial form, and a third toggle row: `profile.privacy.aiOptOutTitle` / `aiOptOutSub`.
 - **`PrivacyPage.jsx`:** insert a section after "11. Learning activity records", renumbering "Changes and complaints" to 13:
@@ -2644,8 +2778,8 @@ Implement with `useState` and `useEffect` like `H5PPanel` (`client` calls, error
   "duplicateCheck": "Check for duplicate files", "learnerVisible": "Learners see the AI pre-check immediately",
   "trustAiSoon": "Trust-AI Lab scenario check (coming soon)",
   "autoApprove": "Approve clear passes automatically",
-  "autoLocked": "Unlocks after {{min}} human-checked AI reviews with ≥ {{pct}} agreement on approvals — now {{decided}} reviews, {{now}}.",
-  "stats": "{{reviews}} AI reviews · agreement {{agreement}} · approvals {{approvals}} · most missed: {{missed}}",
+  "autoLocked": "Unlocks once at least {{min}} AI reviews are human-checked and approvals agree reliably (95% lower bound ≥ {{pct}}) — now {{decided}} reviews, lower bound {{now}}.",
+  "stats": "{{reviews}} AI reviews · agreement {{agreement}} (κ {{kappa}}) · approvals {{approvals}} · AI feedback sent unchanged {{unchanged}} · most missed: {{missed}}",
   "errors": { "offline": "The AI server is not reachable right now. Try again later.", "generic": "Something went wrong. Please try again." }
 }},
 "reviews": { "ai": {
@@ -2663,7 +2797,7 @@ Implement with `useState` and `useEffect` like `H5PPanel` (`client` calls, error
   "precheckConfirm": "A reviewer will confirm.", "update": "Update submission"
 }},
 "analytics": { "course": {
-  "notes": { "aiAgreement": "AI agrees with reviewers {{pct}}%", "aiReviews": "{{count}} AI reviews" },
+  "notes": { "aiAgreement": "AI agrees with reviewers {{pct}}%", "aiKappa": "κ {{kappa}} beyond chance", "aiReviews": "{{count}} AI reviews" },
   "detail": { "aiVerdict": "AI: {{verdict}}", "aiAuto": "approved by AI" }
 }},
 "profile": { "privacy": {
