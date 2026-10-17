@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, Circle, Video, Image, FileIcon, Paperclip, Link2, X } from 'lucide-react'
+import { CheckCircle2, Circle, Video, Image, FileIcon, Paperclip, Link2, X, Sparkles } from 'lucide-react'
 import client from '../../api/client'
 import HtmlContent from '../lesson/HtmlContent'
 import MediaItem from '../lesson/MediaItem'
@@ -10,6 +10,7 @@ import { useResourceTracking } from '../../lib/tracking/TrackingContext'
 import { createQuizClock } from '../../lib/tracking/quizClock'
 import { createH5PSession } from '../../lib/tracking/h5pStatements'
 import H5PFrame from '../lesson/H5PFrame'
+import CriteriaList from '../reviews/CriteriaList'
 import { TYPE_ICONS, resourceShape } from './resourceMeta'
 
 const base = (courseId, activityId, resourceId) =>
@@ -195,6 +196,30 @@ AssignmentBody.propTypes = {
   uploadUrl:          PropTypes.string.isRequired,
   onSubmissionChange: PropTypes.func.isRequired,
 }
+/** Preliminary AI feedback on a pending submission (when the assignment shows it). */
+function AIPrecheck({ precheck }) {
+  const { t } = useTranslation()
+  if (precheck.status !== 'done') {
+    return <p className="lp-precheck-note lp-precheck-running"><Sparkles size={14} /> {t('lesson.assignment.precheckRunning')}</p>
+  }
+  return (
+    <div className="lp-precheck">
+      <p className="lp-precheck-title"><Sparkles size={15} /> {t('lesson.assignment.precheckTitle')}</p>
+      <CriteriaList criteria={precheck.criteria} />
+      {precheck.feedback && <p className="lp-precheck-feedback">{precheck.feedback}</p>}
+      <p className="lp-precheck-note">{t('lesson.assignment.precheckConfirm')}</p>
+    </div>
+  )
+}
+
+AIPrecheck.propTypes = {
+  precheck: PropTypes.shape({
+    status: PropTypes.string.isRequired,
+    criteria: PropTypes.array,
+    feedback: PropTypes.string,
+  }).isRequired,
+}
+
 function AssignmentBody({ resource, endpoint, uploadUrl, onSubmissionChange }) {
   const { t } = useTranslation()
   const submission = resource.submission
@@ -207,7 +232,8 @@ function AssignmentBody({ resource, endpoint, uploadUrl, onSubmissionChange }) {
   const fileRef = useRef(null)
 
   const status = submission?.status
-  const locked = status === 'pending' || status === 'approved'
+  // A pending submission can still be revised; only an approved one is final.
+  const locked = status === 'approved'
   const busy = submitting || uploading
 
   const handleFiles = async (e) => {
@@ -270,6 +296,7 @@ function AssignmentBody({ resource, endpoint, uploadUrl, onSubmissionChange }) {
           {t('lesson.assignment.pendingBanner')}
         </div>
       )}
+      {status === 'pending' && submission.ai_precheck && <AIPrecheck precheck={submission.ai_precheck} />}
       {status === 'approved' && (
         <div className="lp-assignment-banner lp-assignment-banner--approved">
           {t('lesson.assignment.approved')}{submission.feedback ? ` — ${submission.feedback}` : ''} ✓
@@ -361,7 +388,8 @@ function AssignmentBody({ resource, endpoint, uploadUrl, onSubmissionChange }) {
         >
           {submitting
             ? t('lesson.assignment.submitting')
-            : status === 'changes_requested' ? t('lesson.assignment.resubmit') : t('lesson.assignment.submit')}
+            : status === 'changes_requested' ? t('lesson.assignment.resubmit')
+              : status === 'pending' ? t('lesson.assignment.update') : t('lesson.assignment.submit')}
         </button>
       )}
     </div>

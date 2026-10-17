@@ -79,6 +79,25 @@ class ReviewerAPITests(APITestCase):
         self.assertEqual(self.sub.status, 'pending')
 
 
+class ResubmitWhilePendingTests(APITestCase):
+    def test_pending_submission_can_be_revised_and_gets_a_fresh_ai_review(self):
+        from hub.models import AIReviewSettings
+        settings = AIReviewSettings.get()
+        settings.enabled = True
+        settings.save()
+        course, _, activity, resource = make_assignment()
+        AssignmentReviewConfig.objects.create(resource=resource, enabled=True, criteria=CRITERIA, rubric_approved=True)
+        learner = User.objects.create_user('rs_l', password='x')
+        UserProfile.objects.create(user=learner)
+        Enrollment.objects.create(user=learner, course=course)
+        self.client.force_authenticate(learner)
+        url = reverse('resource-submit-assignment', kwargs={'pk': course.pk, 'lesson_pk': activity.pk, 'resource_pk': resource.pk})
+        self.assertEqual(self.client.post(url, {'text': 'First try'}, format='json').status_code, 201)
+        res = self.client.post(url, {'text': 'Revised'}, format='json')
+        self.assertEqual((res.status_code, res.data['status'], res.data['text']), (200, 'pending', 'Revised'))
+        self.assertEqual(AIReview.objects.filter(submission__user=learner).count(), 2)
+
+
 class LearnerAPITests(ReviewerAPITests):
     def precheck(self):
         from types import SimpleNamespace

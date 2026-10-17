@@ -324,7 +324,9 @@
       "publicProfileSub": "Tillat andre undervisere å se profilen din",
       "shareProgressTitle": "Del læringsfremgang",
       "shareProgressSub": "Vis kursfremgangen din på profilen din",
-      "saveSettings": "Lagre innstillinger"
+      "saveSettings": "Lagre innstillinger",
+      "aiOptOutTitle": "Ikke bruk oppgavene mine til å forbedre KI-vurdereren",
+      "aiOptOutSub": "Innleveringene dine vurderes fortsatt som vanlig."
     },
     "security": {
       "title": "Sikkerhet",
@@ -496,7 +498,11 @@
       "addFile": "Legg ved bilde eller fil",
       "addLink": "Legg til lenke",
       "videoLinkPlaceholder": "Lim inn en videolenke (YouTube, Vimeo, …)",
-      "removeAttachment": "Fjern vedlegg"
+      "removeAttachment": "Fjern vedlegg",
+      "precheckTitle": "KI-forhåndssjekk (foreløpig)",
+      "precheckRunning": "KI-forhåndssjekk pågår…",
+      "precheckConfirm": "En vurderer bekrefter.",
+      "update": "Oppdater innleveringen"
     },
     "quiz": {
       "noQuestions": "Ingen spørsmål ennå.",
@@ -771,6 +777,42 @@
         "bad_language": "Ukjent språk.",
         "not_h5p": "Denne ressursen er ikke en H5P-aktivitet."
       }
+    },
+    "aiReview": {
+      "title": "KI-vurdering",
+      "enable": "Bruk KI-vurdereren for denne oppgaven",
+      "platformOff": "KI-vurdering er slått av for plattformen — en administrator kan slå den på.",
+      "rubric": "Vurderingskriterier",
+      "criterionName": "Kriterium",
+      "criterionMet": "Oppfylt når…",
+      "required": "Påkrevd",
+      "addCriterion": "Legg til kriterium",
+      "moveUp": "Flytt opp",
+      "moveDown": "Flytt ned",
+      "remove": "Fjern",
+      "draft": "Foreslå med KI",
+      "drafting": "Lager forslag…",
+      "approve": "Godkjenn kriteriene",
+      "approved": "Kriteriene er godkjent",
+      "unapproved": "Ikke godkjent ennå",
+      "examples": "Eksempler",
+      "addExample": "Legg til eksempel",
+      "exampleText": "Eksempelinnlevering",
+      "verdict": "Riktig avgjørelse",
+      "reason": "Hvorfor",
+      "verdictApprove": "Godkjenn",
+      "verdictChanges": "Be om endringer",
+      "maxExamples": "Maks 5 eksempler.",
+      "duplicateCheck": "Se etter like filer",
+      "learnerVisible": "Deltakerne ser KI-forhåndssjekken med en gang",
+      "trustAiSoon": "Sjekk av Trust-AI Lab-scenario (kommer snart)",
+      "autoApprove": "Godkjenn klare beståtte automatisk",
+      "autoLocked": "Låses opp når minst {{min}} KI-vurderinger er kontrollert av et menneske og godkjenningene stemmer pålitelig (95 % nedre grense ≥ {{pct}}) — nå {{decided}} vurderinger, nedre grense {{now}}.",
+      "stats": "{{reviews}} KI-vurderinger · samsvar {{agreement}} (κ {{kappa}}) · godkjenninger {{approvals}} · KI-tilbakemelding sendt uendret {{unchanged}} · oftest mangler: {{missed}}",
+      "errors": {
+        "offline": "KI-serveren er ikke tilgjengelig nå. Prøv igjen senere.",
+        "generic": "Noe gikk galt. Prøv igjen."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Be om endringer",
     "approve": "Godkjenn",
     "working": "Arbeider…",
-    "loadError": "Kunne ikke laste vurderingskøen."
+    "loadError": "Kunne ikke laste vurderingskøen.",
+    "ai": {
+      "title": "KI-forhåndssjekk",
+      "running": "KI-forhåndssjekk pågår…",
+      "confidence": "sikkerhet {{pct}}",
+      "verdict": {
+        "approve": "Foreslår godkjenning",
+        "changes_requested": "Foreslår endringer",
+        "unsure": "Usikker"
+      },
+      "status": {
+        "met": "Oppfylt",
+        "partly_met": "Delvis oppfylt",
+        "not_met": "Ikke oppfylt",
+        "cannot_judge": "Kan ikke vurderes"
+      },
+      "match": {
+        "identical": "identisk",
+        "similar": "svært lik"
+      },
+      "useFeedback": "Bruk KI-tilbakemeldingen",
+      "duplicate": "Samme fil som {{learner}} ({{match}})",
+      "notes": "KI-notater:",
+      "spotCheck": "stikkprøve",
+      "whyDisagree": "Hvorfor er du uenig med KI-en?",
+      "reason": {
+        "missed_evidence": "Overså dokumentasjon",
+        "too_strict": "For streng",
+        "too_lenient": "For snill",
+        "misread_image": "Tolket bildet feil",
+        "other": "Annet"
+      },
+      "send": "Send",
+      "skip": "Hopp over",
+      "cancel": "Avbryt",
+      "useAsExample": "Bruk som KI-eksempel",
+      "exampleAdded": "Lagt til som eksempel.",
+      "filterLabel": "Vis",
+      "filter": {
+        "all": "Alle som venter",
+        "ai_approve": "KI foreslår godkjenning",
+        "ai_unsure": "KI usikker",
+        "flagged": "Flagget",
+        "auto_approved": "Godkjent av KI"
+      },
+      "approvedByAI": "Godkjent av KI",
+      "reopen": "Åpne på nytt"
+    }
   },
   "admin": {
     "title": "Adminpanel",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} levert · {{approved}} godkjent · {{waiting}} venter",
         "h5pFinished": "fullført av {{count}}",
         "avgAttempts": "i snitt {{n}} forsøk",
-        "hardestText": "vanskeligste spørsmål {{pct}} % riktig"
+        "hardestText": "vanskeligste spørsmål {{pct}} % riktig",
+        "aiAgreement": "KI er enig med vurdererne i {{pct}} %",
+        "aiKappa": "κ {{kappa}} utover tilfeldighet",
+        "aiReviews": "KI-vurderinger: {{count}}"
       },
       "detail": {
         "score": "Resultat {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Endringer etterspurt"
         },
         "attempts": "{{count}} forsøk",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "KI: {{verdict}}",
+        "aiAuto": "godkjent av KI"
       },
       "backToLearners": "Tilbake til deltakerne",
       "totals": "Aktiv {{active}} · på skjermen {{onScreen}} · {{visits}} besøk",

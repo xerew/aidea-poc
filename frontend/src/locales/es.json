@@ -324,7 +324,9 @@
       "publicProfileSub": "Permite que otros educadores vean tu perfil",
       "shareProgressTitle": "Compartir progreso de aprendizaje",
       "shareProgressSub": "Muestra el progreso de tus cursos en tu perfil",
-      "saveSettings": "Guardar Configuración"
+      "saveSettings": "Guardar Configuración",
+      "aiOptOutTitle": "No usar mis tareas para mejorar el revisor de IA",
+      "aiOptOutSub": "Tus entregas se siguen revisando como siempre."
     },
     "security": {
       "title": "Seguridad",
@@ -496,7 +498,11 @@
       "addFile": "Adjuntar imagen o archivo",
       "addLink": "Añadir enlace",
       "videoLinkPlaceholder": "Pega un enlace de vídeo (YouTube, Vimeo, …)",
-      "removeAttachment": "Quitar adjunto"
+      "removeAttachment": "Quitar adjunto",
+      "precheckTitle": "Revisión previa de IA (preliminar)",
+      "precheckRunning": "Revisión previa de IA en curso…",
+      "precheckConfirm": "Una persona revisora lo confirmará.",
+      "update": "Actualizar entrega"
     },
     "quiz": {
       "noQuestions": "Aún no hay preguntas.",
@@ -771,6 +777,42 @@
         "bad_language": "Idioma desconocido.",
         "not_h5p": "Este recurso no es una actividad H5P."
       }
+    },
+    "aiReview": {
+      "title": "Revisión con IA",
+      "enable": "Usar el revisor de IA en esta tarea",
+      "platformOff": "La revisión con IA está desactivada en la plataforma; un administrador puede activarla.",
+      "rubric": "Rúbrica (criterios)",
+      "criterionName": "Criterio",
+      "criterionMet": "Se cumple cuando…",
+      "required": "Obligatorio",
+      "addCriterion": "Añadir criterio",
+      "moveUp": "Subir",
+      "moveDown": "Bajar",
+      "remove": "Quitar",
+      "draft": "Proponer con IA",
+      "drafting": "Redactando…",
+      "approve": "Aprobar rúbrica",
+      "approved": "Rúbrica aprobada",
+      "unapproved": "Aún no aprobada",
+      "examples": "Ejemplos",
+      "addExample": "Añadir ejemplo",
+      "exampleText": "Entrega de ejemplo",
+      "verdict": "Decisión correcta",
+      "reason": "Por qué",
+      "verdictApprove": "Aprobar",
+      "verdictChanges": "Pedir cambios",
+      "maxExamples": "Como máximo 5 ejemplos.",
+      "duplicateCheck": "Detectar archivos duplicados",
+      "learnerVisible": "Los participantes ven enseguida la revisión previa de la IA",
+      "trustAiSoon": "Comprobación del escenario de Trust-AI Lab (próximamente)",
+      "autoApprove": "Aprobar automáticamente los aprobados claros",
+      "autoLocked": "Se desbloquea cuando al menos {{min}} revisiones de IA han sido comprobadas por una persona y las aprobaciones coinciden de forma fiable (límite inferior al 95 % ≥ {{pct}}); ahora {{decided}} revisiones, límite inferior {{now}}.",
+      "stats": "{{reviews}} revisiones de IA · acuerdo {{agreement}} (κ {{kappa}}) · aprobaciones {{approvals}} · comentarios de IA enviados sin cambios {{unchanged}} · lo que más falla: {{missed}}",
+      "errors": {
+        "offline": "El servidor de IA no está disponible ahora. Inténtalo más tarde.",
+        "generic": "Algo ha fallado. Inténtalo de nuevo."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Solicitar cambios",
     "approve": "Aprobar",
     "working": "Procesando…",
-    "loadError": "No se pudo cargar la cola de revisión."
+    "loadError": "No se pudo cargar la cola de revisión.",
+    "ai": {
+      "title": "Revisión previa de IA",
+      "running": "Revisión previa de IA en curso…",
+      "confidence": "confianza {{pct}}",
+      "verdict": {
+        "approve": "Sugiere aprobar",
+        "changes_requested": "Sugiere cambios",
+        "unsure": "No está seguro"
+      },
+      "status": {
+        "met": "Cumplido",
+        "partly_met": "Cumplido en parte",
+        "not_met": "No cumplido",
+        "cannot_judge": "No se puede juzgar"
+      },
+      "match": {
+        "identical": "idéntico",
+        "similar": "muy parecido"
+      },
+      "useFeedback": "Usar los comentarios de la IA",
+      "duplicate": "Mismo archivo que {{learner}} ({{match}})",
+      "notes": "Notas de la IA:",
+      "spotCheck": "control aleatorio",
+      "whyDisagree": "¿Por qué no estás de acuerdo con la IA?",
+      "reason": {
+        "missed_evidence": "Pasó por alto evidencias",
+        "too_strict": "Demasiado estricta",
+        "too_lenient": "Demasiado permisiva",
+        "misread_image": "Interpretó mal la imagen",
+        "other": "Otro"
+      },
+      "send": "Enviar",
+      "skip": "Omitir",
+      "cancel": "Cancelar",
+      "useAsExample": "Usar como ejemplo para la IA",
+      "exampleAdded": "Añadido como ejemplo.",
+      "filterLabel": "Mostrar",
+      "filter": {
+        "all": "Todas las pendientes",
+        "ai_approve": "La IA sugiere aprobar",
+        "ai_unsure": "La IA no está segura",
+        "flagged": "Marcadas",
+        "auto_approved": "Aprobadas por la IA"
+      },
+      "approvedByAI": "Aprobada por la IA",
+      "reopen": "Reabrir"
+    }
   },
   "admin": {
     "title": "Panel de Administración",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} entregadas · {{approved}} aprobadas · {{waiting}} pendientes",
         "h5pFinished": "completado por {{count}}",
         "avgAttempts": "media de {{n}} intentos",
-        "hardestText": "pregunta más difícil: {{pct}} % de aciertos"
+        "hardestText": "pregunta más difícil: {{pct}} % de aciertos",
+        "aiAgreement": "La IA coincide con las personas revisoras un {{pct}} %",
+        "aiKappa": "κ {{kappa}} más allá del azar",
+        "aiReviews": "Revisiones de IA: {{count}}"
       },
       "detail": {
         "score": "Puntuación {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Cambios solicitados"
         },
         "attempts": "{{count}} intentos",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "IA: {{verdict}}",
+        "aiAuto": "aprobada por la IA"
       },
       "backToLearners": "Volver a los participantes",
       "totals": "Activo {{active}} · en pantalla {{onScreen}} · {{visits}} visitas",

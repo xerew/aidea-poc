@@ -324,7 +324,9 @@
       "publicProfileSub": "Salli muiden opettajien tarkastella profiiliasi",
       "shareProgressTitle": "Jaa oppimisedistymisesi",
       "shareProgressSub": "Näytä kurssiedistymisesi profiilissasi",
-      "saveSettings": "Tallenna asetukset"
+      "saveSettings": "Tallenna asetukset",
+      "aiOptOutTitle": "Älä käytä tehtäviäni tekoälyarvioijan kehittämiseen",
+      "aiOptOutSub": "Palautuksesi arvioidaan silti tavalliseen tapaan."
     },
     "security": {
       "title": "Tietoturva",
@@ -496,7 +498,11 @@
       "addFile": "Liitä kuva tai tiedosto",
       "addLink": "Lisää linkki",
       "videoLinkPlaceholder": "Liitä videolinkki (YouTube, Vimeo, …)",
-      "removeAttachment": "Poista liite"
+      "removeAttachment": "Poista liite",
+      "precheckTitle": "Tekoälyn esitarkistus (alustava)",
+      "precheckRunning": "Tekoälyn esitarkistus käynnissä…",
+      "precheckConfirm": "Arvioija vahvistaa tuloksen.",
+      "update": "Päivitä palautus"
     },
     "quiz": {
       "noQuestions": "Ei kysymyksiä vielä.",
@@ -771,6 +777,42 @@
         "bad_language": "Tuntematon kieli.",
         "not_h5p": "Tämä materiaali ei ole H5P-tehtävä."
       }
+    },
+    "aiReview": {
+      "title": "Tekoälyarviointi",
+      "enable": "Käytä tekoälyarvioijaa tässä tehtävässä",
+      "platformOff": "Tekoälyarviointi on poistettu käytöstä alustalla — ylläpitäjä voi ottaa sen käyttöön.",
+      "rubric": "Arviointikriteerit",
+      "criterionName": "Kriteeri",
+      "criterionMet": "Täyttyy, kun…",
+      "required": "Pakollinen",
+      "addCriterion": "Lisää kriteeri",
+      "moveUp": "Siirrä ylös",
+      "moveDown": "Siirrä alas",
+      "remove": "Poista",
+      "draft": "Luonnostele tekoälyllä",
+      "drafting": "Luonnostellaan…",
+      "approve": "Hyväksy kriteerit",
+      "approved": "Kriteerit hyväksytty",
+      "unapproved": "Ei vielä hyväksytty",
+      "examples": "Esimerkit",
+      "addExample": "Lisää esimerkki",
+      "exampleText": "Esimerkkipalautus",
+      "verdict": "Oikea ratkaisu",
+      "reason": "Perustelu",
+      "verdictApprove": "Hyväksy",
+      "verdictChanges": "Pyydä muutoksia",
+      "maxExamples": "Enintään 5 esimerkkiä.",
+      "duplicateCheck": "Tarkista päällekkäiset tiedostot",
+      "learnerVisible": "Oppijat näkevät tekoälyn esitarkistuksen heti",
+      "trustAiSoon": "Trust-AI Lab -skenaarion tarkistus (tulossa)",
+      "autoApprove": "Hyväksy selvät suoritukset automaattisesti",
+      "autoLocked": "Avautuu, kun vähintään {{min}} tekoälyarviota on ihmisen tarkistamia ja hyväksynnät täsmäävät luotettavasti (95 %:n alaraja ≥ {{pct}}) — nyt {{decided}} arviota, alaraja {{now}}.",
+      "stats": "{{reviews}} tekoälyarviota · yhtäpitävyys {{agreement}} (κ {{kappa}}) · hyväksynnät {{approvals}} · tekoälyn palaute lähetetty muuttamattomana {{unchanged}} · useimmin puuttuu: {{missed}}",
+      "errors": {
+        "offline": "Tekoälypalvelimeen ei saada nyt yhteyttä. Yritä myöhemmin uudelleen.",
+        "generic": "Jokin meni vikaan. Yritä uudelleen."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Pyydä muutoksia",
     "approve": "Hyväksy",
     "working": "Käsitellään…",
-    "loadError": "Arviointijonon lataaminen epäonnistui."
+    "loadError": "Arviointijonon lataaminen epäonnistui.",
+    "ai": {
+      "title": "Tekoälyn esitarkistus",
+      "running": "Tekoälyn esitarkistus käynnissä…",
+      "confidence": "varmuus {{pct}}",
+      "verdict": {
+        "approve": "Ehdottaa hyväksymistä",
+        "changes_requested": "Ehdottaa muutoksia",
+        "unsure": "Epävarma"
+      },
+      "status": {
+        "met": "Täyttyy",
+        "partly_met": "Täyttyy osittain",
+        "not_met": "Ei täyty",
+        "cannot_judge": "Ei voi arvioida"
+      },
+      "match": {
+        "identical": "identtinen",
+        "similar": "hyvin samanlainen"
+      },
+      "useFeedback": "Käytä tekoälyn palautetta",
+      "duplicate": "Sama tiedosto kuin käyttäjällä {{learner}} ({{match}})",
+      "notes": "Tekoälyn huomiot:",
+      "spotCheck": "pistokoe",
+      "whyDisagree": "Miksi olet eri mieltä tekoälyn kanssa?",
+      "reason": {
+        "missed_evidence": "Ohitti näyttöä",
+        "too_strict": "Liian tiukka",
+        "too_lenient": "Liian lepsu",
+        "misread_image": "Tulkitsi kuvan väärin",
+        "other": "Muu"
+      },
+      "send": "Lähetä",
+      "skip": "Ohita",
+      "cancel": "Peruuta",
+      "useAsExample": "Käytä tekoälyn esimerkkinä",
+      "exampleAdded": "Lisätty esimerkiksi.",
+      "filterLabel": "Näytä",
+      "filter": {
+        "all": "Kaikki odottavat",
+        "ai_approve": "Tekoäly ehdottaa hyväksymistä",
+        "ai_unsure": "Tekoäly epävarma",
+        "flagged": "Merkityt",
+        "auto_approved": "Tekoälyn hyväksymät"
+      },
+      "approvedByAI": "Tekoälyn hyväksymä",
+      "reopen": "Avaa uudelleen"
+    }
   },
   "admin": {
     "title": "Ylläpitopaneeli",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} palautettu · {{approved}} hyväksytty · {{waiting}} odottaa",
         "h5pFinished": "suorittanut {{count}}",
         "avgAttempts": "keskim. {{n}} yritystä",
-        "hardestText": "vaikein kysymys {{pct}} % oikein"
+        "hardestText": "vaikein kysymys {{pct}} % oikein",
+        "aiAgreement": "Tekoäly on samaa mieltä arvioijien kanssa {{pct}} %",
+        "aiKappa": "κ {{kappa}} sattuman yli",
+        "aiReviews": "Tekoälyarvioita: {{count}}"
       },
       "detail": {
         "score": "Pisteet {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Muutoksia pyydetty"
         },
         "attempts": "{{count}} yritystä",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "Tekoäly: {{verdict}}",
+        "aiAuto": "tekoälyn hyväksymä"
       },
       "backToLearners": "Takaisin osallistujiin",
       "totals": "Aktiivinen {{active}} · näytöllä {{onScreen}} · {{visits}} käyntiä",

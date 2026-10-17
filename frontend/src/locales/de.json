@@ -324,7 +324,9 @@
       "publicProfileSub": "Anderen Lehrkräften erlauben, Ihr Profil anzusehen",
       "shareProgressTitle": "Lernfortschritt teilen",
       "shareProgressSub": "Ihren Kursfortschritt in Ihrem Profil anzeigen",
-      "saveSettings": "Einstellungen speichern"
+      "saveSettings": "Einstellungen speichern",
+      "aiOptOutTitle": "Meine Aufgaben nicht zur Verbesserung des KI-Prüfers verwenden",
+      "aiOptOutSub": "Ihre Abgaben werden weiterhin wie gewohnt geprüft."
     },
     "security": {
       "title": "Sicherheit",
@@ -496,7 +498,11 @@
       "addFile": "Bild oder Datei anhängen",
       "addLink": "Link hinzufügen",
       "videoLinkPlaceholder": "Videolink einfügen (YouTube, Vimeo, …)",
-      "removeAttachment": "Anhang entfernen"
+      "removeAttachment": "Anhang entfernen",
+      "precheckTitle": "KI-Vorprüfung (vorläufig)",
+      "precheckRunning": "KI-Vorprüfung läuft…",
+      "precheckConfirm": "Eine prüfende Person bestätigt das Ergebnis.",
+      "update": "Abgabe aktualisieren"
     },
     "quiz": {
       "noQuestions": "Noch keine Fragen vorhanden.",
@@ -771,6 +777,42 @@
         "bad_language": "Unbekannte Sprache.",
         "not_h5p": "Diese Ressource ist keine H5P-Aktivität."
       }
+    },
+    "aiReview": {
+      "title": "KI-Prüfung",
+      "enable": "KI-Prüfer für diese Aufgabe verwenden",
+      "platformOff": "Die KI-Prüfung ist für die Plattform ausgeschaltet – ein Admin kann sie aktivieren.",
+      "rubric": "Bewertungsraster (Kriterien)",
+      "criterionName": "Kriterium",
+      "criterionMet": "Erfüllt, wenn…",
+      "required": "Erforderlich",
+      "addCriterion": "Kriterium hinzufügen",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "remove": "Entfernen",
+      "draft": "Mit KI entwerfen",
+      "drafting": "Wird entworfen…",
+      "approve": "Raster freigeben",
+      "approved": "Raster freigegeben",
+      "unapproved": "Noch nicht freigegeben",
+      "examples": "Beispiele",
+      "addExample": "Beispiel hinzufügen",
+      "exampleText": "Beispielabgabe",
+      "verdict": "Richtige Entscheidung",
+      "reason": "Begründung",
+      "verdictApprove": "Annehmen",
+      "verdictChanges": "Änderungen anfordern",
+      "maxExamples": "Höchstens 5 Beispiele.",
+      "duplicateCheck": "Auf doppelte Dateien prüfen",
+      "learnerVisible": "Lernende sehen die KI-Vorprüfung sofort",
+      "trustAiSoon": "Prüfung des Trust-AI-Lab-Szenarios (demnächst)",
+      "autoApprove": "Eindeutig bestandene automatisch annehmen",
+      "autoLocked": "Wird freigeschaltet, sobald mindestens {{min}} KI-Prüfungen von Menschen geprüft wurden und die Annahmen verlässlich übereinstimmen (95-%-Untergrenze ≥ {{pct}}) – jetzt {{decided}} Prüfungen, Untergrenze {{now}}.",
+      "stats": "{{reviews}} KI-Prüfungen · Übereinstimmung {{agreement}} (κ {{kappa}}) · Annahmen {{approvals}} · KI-Feedback unverändert gesendet {{unchanged}} · am häufigsten verfehlt: {{missed}}",
+      "errors": {
+        "offline": "Der KI-Server ist gerade nicht erreichbar. Bitte später erneut versuchen.",
+        "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Änderungen anfordern",
     "approve": "Genehmigen",
     "working": "Wird verarbeitet…",
-    "loadError": "Die Bewertungswarteschlange konnte nicht geladen werden."
+    "loadError": "Die Bewertungswarteschlange konnte nicht geladen werden.",
+    "ai": {
+      "title": "KI-Vorprüfung",
+      "running": "KI-Vorprüfung läuft…",
+      "confidence": "Sicherheit {{pct}}",
+      "verdict": {
+        "approve": "Empfiehlt Annahme",
+        "changes_requested": "Empfiehlt Änderungen",
+        "unsure": "Unsicher"
+      },
+      "status": {
+        "met": "Erfüllt",
+        "partly_met": "Teilweise erfüllt",
+        "not_met": "Nicht erfüllt",
+        "cannot_judge": "Nicht beurteilbar"
+      },
+      "match": {
+        "identical": "identisch",
+        "similar": "sehr ähnlich"
+      },
+      "useFeedback": "KI-Feedback übernehmen",
+      "duplicate": "Gleiche Datei wie bei {{learner}} ({{match}})",
+      "notes": "KI-Notizen:",
+      "spotCheck": "Stichprobe",
+      "whyDisagree": "Warum sind Sie anderer Meinung als die KI?",
+      "reason": {
+        "missed_evidence": "Belege übersehen",
+        "too_strict": "Zu streng",
+        "too_lenient": "Zu nachsichtig",
+        "misread_image": "Bild falsch gelesen",
+        "other": "Sonstiges"
+      },
+      "send": "Senden",
+      "skip": "Überspringen",
+      "cancel": "Abbrechen",
+      "useAsExample": "Als KI-Beispiel verwenden",
+      "exampleAdded": "Als Beispiel hinzugefügt.",
+      "filterLabel": "Anzeigen",
+      "filter": {
+        "all": "Alle offenen",
+        "ai_approve": "KI empfiehlt Annahme",
+        "ai_unsure": "KI unsicher",
+        "flagged": "Markiert",
+        "auto_approved": "Von der KI angenommen"
+      },
+      "approvedByAI": "Von der KI angenommen",
+      "reopen": "Wieder öffnen"
+    }
   },
   "admin": {
     "title": "Verwaltungsbereich",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} eingereicht · {{approved}} angenommen · {{waiting}} wartend",
         "h5pFinished": "von {{count}} abgeschlossen",
         "avgAttempts": "Ø {{n}} Versuche",
-        "hardestText": "schwerste Frage {{pct}} % richtig"
+        "hardestText": "schwerste Frage {{pct}} % richtig",
+        "aiAgreement": "KI stimmt zu {{pct}} % mit den Prüfenden überein",
+        "aiKappa": "κ {{kappa}} über dem Zufall",
+        "aiReviews": "KI-Prüfungen: {{count}}"
       },
       "detail": {
         "score": "Ergebnis {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Änderungen angefordert"
         },
         "attempts": "{{count}} Versuche",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "KI: {{verdict}}",
+        "aiAuto": "von der KI angenommen"
       },
       "backToLearners": "Zurück zu den Teilnehmenden",
       "totals": "Aktiv {{active}} · auf dem Bildschirm {{onScreen}} · {{visits}} Besuche",

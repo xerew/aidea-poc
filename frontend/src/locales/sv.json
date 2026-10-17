@@ -324,7 +324,9 @@
       "publicProfileSub": "Tillåt andra pedagoger att se din profil",
       "shareProgressTitle": "Dela lärandeframsteg",
       "shareProgressSub": "Visa dina kursframsteg på din profil",
-      "saveSettings": "Spara inställningar"
+      "saveSettings": "Spara inställningar",
+      "aiOptOutTitle": "Använd inte mina uppgifter för att förbättra AI-granskaren",
+      "aiOptOutSub": "Dina inlämningar granskas fortfarande som vanligt."
     },
     "security": {
       "title": "Säkerhet",
@@ -496,7 +498,11 @@
       "addFile": "Bifoga bild eller fil",
       "addLink": "Lägg till länk",
       "videoLinkPlaceholder": "Klistra in en videolänk (YouTube, Vimeo, …)",
-      "removeAttachment": "Ta bort bilaga"
+      "removeAttachment": "Ta bort bilaga",
+      "precheckTitle": "AI-förhandskontroll (preliminär)",
+      "precheckRunning": "AI-förhandskontroll pågår…",
+      "precheckConfirm": "En granskare bekräftar.",
+      "update": "Uppdatera inlämningen"
     },
     "quiz": {
       "noQuestions": "Inga frågor än.",
@@ -771,6 +777,42 @@
         "bad_language": "Okänt språk.",
         "not_h5p": "Den här resursen är ingen H5P-aktivitet."
       }
+    },
+    "aiReview": {
+      "title": "AI-granskning",
+      "enable": "Använd AI-granskaren för den här uppgiften",
+      "platformOff": "AI-granskning är avstängd för plattformen — en administratör kan slå på den.",
+      "rubric": "Bedömningsmatris (kriterier)",
+      "criterionName": "Kriterium",
+      "criterionMet": "Uppfyllt när…",
+      "required": "Obligatoriskt",
+      "addCriterion": "Lägg till kriterium",
+      "moveUp": "Flytta upp",
+      "moveDown": "Flytta ned",
+      "remove": "Ta bort",
+      "draft": "Föreslå med AI",
+      "drafting": "Skapar förslag…",
+      "approve": "Godkänn kriterierna",
+      "approved": "Kriterierna godkända",
+      "unapproved": "Inte godkänt ännu",
+      "examples": "Exempel",
+      "addExample": "Lägg till exempel",
+      "exampleText": "Exempelinlämning",
+      "verdict": "Rätt beslut",
+      "reason": "Varför",
+      "verdictApprove": "Godkänn",
+      "verdictChanges": "Begär ändringar",
+      "maxExamples": "Högst 5 exempel.",
+      "duplicateCheck": "Kontrollera dubblettfiler",
+      "learnerVisible": "Deltagarna ser AI-förhandskontrollen direkt",
+      "trustAiSoon": "Kontroll av Trust-AI Lab-scenario (kommer snart)",
+      "autoApprove": "Godkänn tydligt godkända automatiskt",
+      "autoLocked": "Låses upp när minst {{min}} AI-granskningar har kontrollerats av en människa och godkännandena stämmer tillförlitligt (95 % nedre gräns ≥ {{pct}}) — nu {{decided}} granskningar, nedre gräns {{now}}.",
+      "stats": "{{reviews}} AI-granskningar · överensstämmelse {{agreement}} (κ {{kappa}}) · godkännanden {{approvals}} · AI-återkoppling skickad oförändrad {{unchanged}} · oftast saknat: {{missed}}",
+      "errors": {
+        "offline": "AI-servern går inte att nå just nu. Försök igen senare.",
+        "generic": "Något gick fel. Försök igen."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Begär ändringar",
     "approve": "Godkänn",
     "working": "Arbetar…",
-    "loadError": "Det gick inte att läsa in granskningskön."
+    "loadError": "Det gick inte att läsa in granskningskön.",
+    "ai": {
+      "title": "AI-förhandskontroll",
+      "running": "AI-förhandskontroll pågår…",
+      "confidence": "säkerhet {{pct}}",
+      "verdict": {
+        "approve": "Föreslår godkännande",
+        "changes_requested": "Föreslår ändringar",
+        "unsure": "Osäker"
+      },
+      "status": {
+        "met": "Uppfyllt",
+        "partly_met": "Delvis uppfyllt",
+        "not_met": "Inte uppfyllt",
+        "cannot_judge": "Går inte att bedöma"
+      },
+      "match": {
+        "identical": "identisk",
+        "similar": "mycket lik"
+      },
+      "useFeedback": "Använd AI-återkopplingen",
+      "duplicate": "Samma fil som {{learner}} ({{match}})",
+      "notes": "AI-anteckningar:",
+      "spotCheck": "stickprov",
+      "whyDisagree": "Varför håller du inte med AI:n?",
+      "reason": {
+        "missed_evidence": "Missade belägg",
+        "too_strict": "För sträng",
+        "too_lenient": "För generös",
+        "misread_image": "Läste bilden fel",
+        "other": "Annat"
+      },
+      "send": "Skicka",
+      "skip": "Hoppa över",
+      "cancel": "Avbryt",
+      "useAsExample": "Använd som AI-exempel",
+      "exampleAdded": "Tillagt som exempel.",
+      "filterLabel": "Visa",
+      "filter": {
+        "all": "Alla väntande",
+        "ai_approve": "AI föreslår godkännande",
+        "ai_unsure": "AI osäker",
+        "flagged": "Flaggade",
+        "auto_approved": "Godkända av AI"
+      },
+      "approvedByAI": "Godkänd av AI",
+      "reopen": "Öppna igen"
+    }
   },
   "admin": {
     "title": "Adminpanel",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} inlämnade · {{approved}} godkända · {{waiting}} väntar",
         "h5pFinished": "slutförd av {{count}}",
         "avgAttempts": "i snitt {{n}} försök",
-        "hardestText": "svåraste frågan {{pct}} % rätt"
+        "hardestText": "svåraste frågan {{pct}} % rätt",
+        "aiAgreement": "AI håller med granskarna i {{pct}} %",
+        "aiKappa": "κ {{kappa}} utöver slumpen",
+        "aiReviews": "AI-granskningar: {{count}}"
       },
       "detail": {
         "score": "Resultat {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Ändringar begärda"
         },
         "attempts": "{{count}} försök",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "AI: {{verdict}}",
+        "aiAuto": "godkänd av AI"
       },
       "backToLearners": "Tillbaka till deltagarna",
       "totals": "Aktiv {{active}} · på skärmen {{onScreen}} · {{visits}} besök",

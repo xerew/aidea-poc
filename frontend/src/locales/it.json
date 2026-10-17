@@ -324,7 +324,9 @@
       "publicProfileSub": "Consenti ad altri educatori di visualizzare il tuo profilo",
       "shareProgressTitle": "Condividi i progressi di apprendimento",
       "shareProgressSub": "Mostra i tuoi progressi nei corsi sul tuo profilo",
-      "saveSettings": "Salva impostazioni"
+      "saveSettings": "Salva impostazioni",
+      "aiOptOutTitle": "Non usare i miei compiti per migliorare il revisore IA",
+      "aiOptOutSub": "Le tue consegne vengono comunque revisionate come di consueto."
     },
     "security": {
       "title": "Sicurezza",
@@ -496,7 +498,11 @@
       "addFile": "Allega immagine o file",
       "addLink": "Aggiungi link",
       "videoLinkPlaceholder": "Incolla un link video (YouTube, Vimeo, …)",
-      "removeAttachment": "Rimuovi allegato"
+      "removeAttachment": "Rimuovi allegato",
+      "precheckTitle": "Pre-controllo IA (preliminare)",
+      "precheckRunning": "Pre-controllo IA in corso…",
+      "precheckConfirm": "Un revisore confermerà.",
+      "update": "Aggiorna consegna"
     },
     "quiz": {
       "noQuestions": "Nessuna domanda ancora disponibile.",
@@ -771,6 +777,42 @@
         "bad_language": "Lingua sconosciuta.",
         "not_h5p": "Questa risorsa non è un’attività H5P."
       }
+    },
+    "aiReview": {
+      "title": "Revisione con IA",
+      "enable": "Usa il revisore IA per questo compito",
+      "platformOff": "La revisione con IA è disattivata sulla piattaforma: un amministratore può attivarla.",
+      "rubric": "Rubrica (criteri)",
+      "criterionName": "Criterio",
+      "criterionMet": "Soddisfatto quando…",
+      "required": "Obbligatorio",
+      "addCriterion": "Aggiungi criterio",
+      "moveUp": "Sposta su",
+      "moveDown": "Sposta giù",
+      "remove": "Rimuovi",
+      "draft": "Proponi con IA",
+      "drafting": "Generazione…",
+      "approve": "Approva rubrica",
+      "approved": "Rubrica approvata",
+      "unapproved": "Non ancora approvata",
+      "examples": "Esempi",
+      "addExample": "Aggiungi esempio",
+      "exampleText": "Consegna di esempio",
+      "verdict": "Decisione corretta",
+      "reason": "Perché",
+      "verdictApprove": "Approva",
+      "verdictChanges": "Chiedi modifiche",
+      "maxExamples": "Al massimo 5 esempi.",
+      "duplicateCheck": "Controlla i file duplicati",
+      "learnerVisible": "I partecipanti vedono subito il pre-controllo IA",
+      "trustAiSoon": "Verifica dello scenario Trust-AI Lab (in arrivo)",
+      "autoApprove": "Approva automaticamente i superamenti netti",
+      "autoLocked": "Si sblocca quando almeno {{min}} revisioni IA sono state verificate da una persona e le approvazioni concordano in modo affidabile (limite inferiore al 95% ≥ {{pct}}): ora {{decided}} revisioni, limite inferiore {{now}}.",
+      "stats": "{{reviews}} revisioni IA · accordo {{agreement}} (κ {{kappa}}) · approvazioni {{approvals}} · feedback IA inviato senza modifiche {{unchanged}} · più spesso mancato: {{missed}}",
+      "errors": {
+        "offline": "Il server IA non è raggiungibile al momento. Riprova più tardi.",
+        "generic": "Qualcosa è andato storto. Riprova."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Richiedi modifiche",
     "approve": "Approva",
     "working": "Elaborazione in corso…",
-    "loadError": "Impossibile caricare la coda di revisione."
+    "loadError": "Impossibile caricare la coda di revisione.",
+    "ai": {
+      "title": "Pre-controllo IA",
+      "running": "Pre-controllo IA in corso…",
+      "confidence": "affidabilità {{pct}}",
+      "verdict": {
+        "approve": "Suggerisce di approvare",
+        "changes_requested": "Suggerisce modifiche",
+        "unsure": "Incerto"
+      },
+      "status": {
+        "met": "Soddisfatto",
+        "partly_met": "Parzialmente soddisfatto",
+        "not_met": "Non soddisfatto",
+        "cannot_judge": "Non valutabile"
+      },
+      "match": {
+        "identical": "identico",
+        "similar": "molto simile"
+      },
+      "useFeedback": "Usa il feedback dell’IA",
+      "duplicate": "Stesso file di {{learner}} ({{match}})",
+      "notes": "Note dell’IA:",
+      "spotCheck": "controllo a campione",
+      "whyDisagree": "Perché non sei d’accordo con l’IA?",
+      "reason": {
+        "missed_evidence": "Prove non viste",
+        "too_strict": "Troppo severa",
+        "too_lenient": "Troppo indulgente",
+        "misread_image": "Ha letto male l’immagine",
+        "other": "Altro"
+      },
+      "send": "Invia",
+      "skip": "Salta",
+      "cancel": "Annulla",
+      "useAsExample": "Usa come esempio per l’IA",
+      "exampleAdded": "Aggiunto come esempio.",
+      "filterLabel": "Mostra",
+      "filter": {
+        "all": "Tutte in attesa",
+        "ai_approve": "L’IA suggerisce di approvare",
+        "ai_unsure": "IA incerta",
+        "flagged": "Segnalate",
+        "auto_approved": "Approvate dall’IA"
+      },
+      "approvedByAI": "Approvata dall’IA",
+      "reopen": "Riapri"
+    }
   },
   "admin": {
     "title": "Pannello di amministrazione",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} consegnati · {{approved}} approvati · {{waiting}} in attesa",
         "h5pFinished": "completato da {{count}}",
         "avgAttempts": "in media {{n}} tentativi",
-        "hardestText": "domanda più difficile: {{pct}}% corrette"
+        "hardestText": "domanda più difficile: {{pct}}% corrette",
+        "aiAgreement": "L’IA concorda con i revisori al {{pct}}%",
+        "aiKappa": "κ {{kappa}} oltre il caso",
+        "aiReviews": "Revisioni IA: {{count}}"
       },
       "detail": {
         "score": "Punteggio {{pct}}%",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Modifiche richieste"
         },
         "attempts": "{{count}} tentativi",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "IA: {{verdict}}",
+        "aiAuto": "approvata dall’IA"
       },
       "backToLearners": "Torna ai partecipanti",
       "totals": "Attivo {{active}} · sullo schermo {{onScreen}} · {{visits}} visite",

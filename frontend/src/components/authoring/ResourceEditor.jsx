@@ -8,6 +8,7 @@ import TypeIcon from '../learner/TypeIcon'
 import QuizBuilder from './QuizBuilder'
 import OriginalHint from './OriginalHint'
 import H5PPanel from './H5PPanel'
+import AIReviewPanel from './AIReviewPanel'
 import './ResourceEditor.css'
 
 const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
@@ -20,7 +21,7 @@ const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
 export default function ResourceEditor({
   resource, index, count, locked, translating, error,
   onChange, onSave, onDelete, onMove, original = null, sourceLanguageLabel = '',
-  uploadUrl = '', onRefresh = () => {},
+  uploadUrl = '', onRefresh = () => {}, aiReviewUrl = '',
 }) {
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
@@ -155,6 +156,7 @@ export default function ResourceEditor({
               placeholder={t('authoring.moduleEditor.assignmentPlaceholder')}
             />
             {hint('instructions', true)}
+            {!translating && aiReviewUrl && <AIReviewPanel aiReviewUrl={aiReviewUrl} locked={locked} />}
           </>
         )}
 
@@ -215,4 +217,5 @@ ResourceEditor.propTypes = {
   sourceLanguageLabel: PropTypes.string,
   uploadUrl: PropTypes.string,
   onRefresh: PropTypes.func,
+  aiReviewUrl: PropTypes.string,
 }

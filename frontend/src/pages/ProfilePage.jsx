@@ -367,7 +367,7 @@ function PreferencesSection() {
 
 function PrivacySection() {
   const { t } = useTranslation()
-  const [form, setForm]   = useState({ profile_public: false, share_progress: false })
+  const [form, setForm]   = useState({ profile_public: false, share_progress: false, ai_training_opt_out: false })
   const [loading, setLoading] = useState(true)
   const { saving, saved, error, setError, save } = useSectionSave('/profile/settings/')
 
@@ -399,6 +399,13 @@ function PrivacySection() {
             <div>
               <span className="toggle-title">{t('profile.privacy.shareProgressTitle')}</span>
               <span className="toggle-sub">{t('profile.privacy.shareProgressSub')}</span>
+            </div>
+          </label>
+          <label className="profile-toggle-row">
+            <input type="checkbox" checked={form.ai_training_opt_out} onChange={set('ai_training_opt_out')} />
+            <div>
+              <span className="toggle-title">{t('profile.privacy.aiOptOutTitle')}</span>
+              <span className="toggle-sub">{t('profile.privacy.aiOptOutSub')}</span>
             </div>
           </label>
         </div>

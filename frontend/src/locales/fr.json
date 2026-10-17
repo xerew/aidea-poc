@@ -324,7 +324,9 @@
       "publicProfileSub": "Autoriser les autres enseignants à consulter votre profil",
       "shareProgressTitle": "Partager la progression d'apprentissage",
       "shareProgressSub": "Afficher votre progression de cours sur votre profil",
-      "saveSettings": "Enregistrer les paramètres"
+      "saveSettings": "Enregistrer les paramètres",
+      "aiOptOutTitle": "Ne pas utiliser mes devoirs pour améliorer l’évaluateur IA",
+      "aiOptOutSub": "Vos rendus sont toujours évalués normalement."
     },
     "security": {
       "title": "Sécurité",
@@ -496,7 +498,11 @@
       "addFile": "Joindre une image ou un fichier",
       "addLink": "Ajouter un lien",
       "videoLinkPlaceholder": "Collez un lien vidéo (YouTube, Vimeo, …)",
-      "removeAttachment": "Supprimer la pièce jointe"
+      "removeAttachment": "Supprimer la pièce jointe",
+      "precheckTitle": "Pré-vérification IA (provisoire)",
+      "precheckRunning": "Pré-vérification IA en cours…",
+      "precheckConfirm": "Un évaluateur confirmera.",
+      "update": "Mettre à jour le rendu"
     },
     "quiz": {
       "noQuestions": "Pas encore de questions.",
@@ -771,6 +777,42 @@
         "bad_language": "Langue inconnue.",
         "not_h5p": "Cette ressource n'est pas une activité H5P."
       }
+    },
+    "aiReview": {
+      "title": "Évaluation par IA",
+      "enable": "Utiliser l’évaluateur IA pour ce devoir",
+      "platformOff": "L’évaluation par IA est désactivée sur la plateforme — un administrateur peut l’activer.",
+      "rubric": "Grille (critères)",
+      "criterionName": "Critère",
+      "criterionMet": "Atteint quand…",
+      "required": "Obligatoire",
+      "addCriterion": "Ajouter un critère",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "remove": "Supprimer",
+      "draft": "Proposer avec l’IA",
+      "drafting": "Rédaction…",
+      "approve": "Valider la grille",
+      "approved": "Grille validée",
+      "unapproved": "Pas encore validée",
+      "examples": "Exemples",
+      "addExample": "Ajouter un exemple",
+      "exampleText": "Exemple de rendu",
+      "verdict": "Décision correcte",
+      "reason": "Pourquoi",
+      "verdictApprove": "Valider",
+      "verdictChanges": "Demander des modifications",
+      "maxExamples": "5 exemples au maximum.",
+      "duplicateCheck": "Détecter les fichiers en double",
+      "learnerVisible": "Les apprenants voient tout de suite la pré-vérification IA",
+      "trustAiSoon": "Vérification du scénario Trust-AI Lab (bientôt)",
+      "autoApprove": "Valider automatiquement les réussites nettes",
+      "autoLocked": "Se débloque quand au moins {{min}} évaluations IA ont été vérifiées par une personne et que les validations concordent de façon fiable (borne inférieure à 95 % ≥ {{pct}}) — actuellement {{decided}} évaluations, borne inférieure {{now}}.",
+      "stats": "{{reviews}} évaluations IA · accord {{agreement}} (κ {{kappa}}) · validations {{approvals}} · retours IA envoyés tels quels {{unchanged}} · le plus souvent manqué : {{missed}}",
+      "errors": {
+        "offline": "Le serveur IA est injoignable pour le moment. Réessayez plus tard.",
+        "generic": "Une erreur s’est produite. Veuillez réessayer."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Demander des modifications",
     "approve": "Approuver",
     "working": "Traitement en cours…",
-    "loadError": "Échec du chargement de la file d'évaluation."
+    "loadError": "Échec du chargement de la file d'évaluation.",
+    "ai": {
+      "title": "Pré-vérification IA",
+      "running": "Pré-vérification IA en cours…",
+      "confidence": "confiance {{pct}}",
+      "verdict": {
+        "approve": "Suggère de valider",
+        "changes_requested": "Suggère des modifications",
+        "unsure": "Incertain"
+      },
+      "status": {
+        "met": "Atteint",
+        "partly_met": "Partiellement atteint",
+        "not_met": "Non atteint",
+        "cannot_judge": "Impossible à juger"
+      },
+      "match": {
+        "identical": "identique",
+        "similar": "très similaire"
+      },
+      "useFeedback": "Utiliser le retour de l’IA",
+      "duplicate": "Même fichier que {{learner}} ({{match}})",
+      "notes": "Notes de l’IA :",
+      "spotCheck": "contrôle par sondage",
+      "whyDisagree": "Pourquoi n’êtes-vous pas d’accord avec l’IA ?",
+      "reason": {
+        "missed_evidence": "Éléments manqués",
+        "too_strict": "Trop sévère",
+        "too_lenient": "Trop indulgente",
+        "misread_image": "A mal lu l’image",
+        "other": "Autre"
+      },
+      "send": "Envoyer",
+      "skip": "Passer",
+      "cancel": "Annuler",
+      "useAsExample": "Utiliser comme exemple pour l’IA",
+      "exampleAdded": "Ajouté comme exemple.",
+      "filterLabel": "Afficher",
+      "filter": {
+        "all": "Tous en attente",
+        "ai_approve": "L’IA propose de valider",
+        "ai_unsure": "IA incertaine",
+        "flagged": "Signalés",
+        "auto_approved": "Validés par l’IA"
+      },
+      "approvedByAI": "Validé par l’IA",
+      "reopen": "Rouvrir"
+    }
   },
   "admin": {
     "title": "Panneau d'administration",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} rendus · {{approved}} validés · {{waiting}} en attente",
         "h5pFinished": "terminé par {{count}}",
         "avgAttempts": "en moyenne {{n}} tentatives",
-        "hardestText": "question la plus difficile : {{pct}} % de réussite"
+        "hardestText": "question la plus difficile : {{pct}} % de réussite",
+        "aiAgreement": "L’IA est d’accord avec les évaluateurs à {{pct}} %",
+        "aiKappa": "κ {{kappa}} au-delà du hasard",
+        "aiReviews": "Évaluations IA : {{count}}"
       },
       "detail": {
         "score": "Score {{pct}} %",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Modifications demandées"
         },
         "attempts": "{{count}} tentatives",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "IA : {{verdict}}",
+        "aiAuto": "validé par l’IA"
       },
       "backToLearners": "Retour aux apprenants",
       "totals": "Actif {{active}} · à l’écran {{onScreen}} · {{visits}} visites",

@@ -72,3 +72,28 @@
 .rv-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .rv-btn--approve { background: var(--color-primary); color: #fff; }
 .rv-btn--changes { background: none; border: 1px solid #b91c1c; color: #b91c1c; }
+.rv-btn:not(.rv-btn--approve):not(.rv-btn--changes) {
+  background: var(--color-bg); border: 1px solid var(--color-border); color: inherit;
+}
+.rv-btn--changes svg { vertical-align: -2px; }
+
+/* AI review */
+.rv-filter { display: flex; justify-content: flex-end; margin: -0.5rem 0 0.9rem; }
+.rv-filter select { padding: 0.4rem 0.6rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.85rem; background: var(--color-surface); color: inherit; }
+.rv-ai-chip {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.75rem; padding: 0.1rem 0.5rem; border-radius: 999px;
+  background: var(--color-bg); border: 1px solid var(--color-border); color: var(--color-text-muted);
+}
+.rv-ai-chip--approve { border-color: #16a34a; color: #166534; }
+.rv-ai-chip--changes_requested { border-color: #dc2626; color: #991b1b; }
+.rv-row-body .rv-ai { margin: 0 0 0.85rem; }
+.rv-disagree { display: flex; align-items: flex-end; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.rv-disagree-label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; }
+.rv-disagree-label select { padding: 0.4rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.85rem; }
+.rv-example { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.75rem; }
+.rv-example-form { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.rv-example-form select, .rv-example-form input { padding: 0.4rem 0.5rem; border: 1px solid var(--color-border); border-radius: 8px; font-size: 0.85rem; }
+.rv-link-btn { background: none; border: 0; padding: 0; color: var(--color-primary); cursor: pointer; font-size: 0.85rem; }
+.rv-link-btn:hover { text-decoration: underline; }
+.rv-example-msg { font-size: 0.8rem; color: var(--color-text-muted); }

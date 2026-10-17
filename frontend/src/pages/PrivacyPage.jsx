@@ -111,7 +111,18 @@ export default function PrivacyPage() {
         consent also applies.
       </p>
 
-      <h2>12. Changes and complaints</h2>
+      <h2>12. AI review of assignments</h2>
+      <p>
+        Assignment submissions may be checked by an AI model running on servers operated by the
+        AIDEA project (not an external AI service). It compares your submission with the
+        assignment&rsquo;s criteria and suggests feedback. A person makes or confirms every decision to
+        ask for changes; when the course enables it, clear passes may be approved automatically and
+        are spot-checked by a person. Anonymised submissions and review decisions may be used to
+        improve the AI reviewer. You can opt out of that use in your profile&rsquo;s privacy settings;
+        your submissions are still reviewed as usual.
+      </p>
+
+      <h2>13. Changes and complaints</h2>
       <p>
         We may update this Policy; material changes will be notified through the platform. If you
         believe your data has been handled improperly, you may lodge a complaint with your national

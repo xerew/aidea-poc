@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import TypeIcon from '../learner/TypeIcon'
 import { formatClock, formatDuration } from './format'
+import { kappaText } from '../reviews/aiReview'
 
 const statsShape = PropTypes.shape({
   reached: PropTypes.number,
@@ -54,6 +55,12 @@ function ResourceNotes({ type, notes }) {
   if ((type === 'pdf' || type === 'image') && notes.opened) parts.push(t('analytics.course.notes.opened', { count: notes.opened }))
   if (type === 'pdf' && notes.downloaded) parts.push(t('analytics.course.notes.downloaded', { count: notes.downloaded }))
   if (type === 'assignment' && notes.submitted) parts.push(t('analytics.course.notes.assignment', notes))
+  if (type === 'assignment' && notes.ai) {
+    const ai = notes.ai
+    if (ai.agreement != null) parts.push(t('analytics.course.notes.aiAgreement', { pct: Math.round(ai.agreement * 100) }))
+    if (ai.kappa != null) parts.push(t('analytics.course.notes.aiKappa', { kappa: kappaText(ai.kappa) }))
+    parts.push(t('analytics.course.notes.aiReviews', { count: ai.reviews }))
+  }
   if (type === 'h5p') {
     if (notes.finished) parts.push(t('analytics.course.notes.h5pFinished', { count: notes.finished }))
     if (notes.avg_score_pct != null) parts.push(t('analytics.course.notes.score', { pct: notes.avg_score_pct }))

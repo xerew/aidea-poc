@@ -247,6 +247,7 @@ function ActivityEditor({
                   onDelete={() => onResourceDelete(resource.id)}
                   onMove={(dir) => onResourceMove(resource.id, dir)}
                   uploadUrl={`${resourceUrl(resource.id)}h5p/`}
+                  aiReviewUrl={`${resourceUrl(resource.id)}ai-review/`}
                   onRefresh={(data) => onResourceRefresh(resource.id, data)}
                 />
               ))}

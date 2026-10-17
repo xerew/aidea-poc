@@ -324,7 +324,9 @@
       "publicProfileSub": "Allow other educators to view your profile",
       "shareProgressTitle": "Share learning progress",
       "shareProgressSub": "Display your course progress on your profile",
-      "saveSettings": "Save Settings"
+      "saveSettings": "Save Settings",
+      "aiOptOutTitle": "Don’t use my assignments to improve the AI reviewer",
+      "aiOptOutSub": "Your submissions are still reviewed as usual."
     },
     "security": {
       "title": "Security",
@@ -496,7 +498,11 @@
       "addFile": "Attach image or file",
       "addLink": "Add link",
       "videoLinkPlaceholder": "Paste a video link (YouTube, Vimeo, …)",
-      "removeAttachment": "Remove attachment"
+      "removeAttachment": "Remove attachment",
+      "precheckTitle": "AI pre-check (preliminary)",
+      "precheckRunning": "AI pre-check in progress…",
+      "precheckConfirm": "A reviewer will confirm.",
+      "update": "Update submission"
     },
     "quiz": {
       "noQuestions": "No questions yet.",
@@ -771,6 +777,42 @@
         "bad_language": "Unknown language.",
         "not_h5p": "This resource is not an H5P activity."
       }
+    },
+    "aiReview": {
+      "title": "AI review",
+      "enable": "Use the AI reviewer for this assignment",
+      "platformOff": "AI review is switched off for the platform — an admin can enable it.",
+      "rubric": "Rubric (criteria)",
+      "criterionName": "Criterion",
+      "criterionMet": "Met when…",
+      "required": "Required",
+      "addCriterion": "Add criterion",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "remove": "Remove",
+      "draft": "Draft with AI",
+      "drafting": "Drafting…",
+      "approve": "Approve rubric",
+      "approved": "Rubric approved",
+      "unapproved": "Not approved yet",
+      "examples": "Examples",
+      "addExample": "Add example",
+      "exampleText": "Example submission",
+      "verdict": "Correct verdict",
+      "reason": "Why",
+      "verdictApprove": "Approve",
+      "verdictChanges": "Ask for changes",
+      "maxExamples": "At most 5 examples.",
+      "duplicateCheck": "Check for duplicate files",
+      "learnerVisible": "Learners see the AI pre-check immediately",
+      "trustAiSoon": "Trust-AI Lab scenario check (coming soon)",
+      "autoApprove": "Approve clear passes automatically",
+      "autoLocked": "Unlocks once at least {{min}} AI reviews are human-checked and approvals agree reliably (95% lower bound ≥ {{pct}}) — now {{decided}} reviews, lower bound {{now}}.",
+      "stats": "{{reviews}} AI reviews · agreement {{agreement}} (κ {{kappa}}) · approvals {{approvals}} · AI feedback sent unchanged {{unchanged}} · most missed: {{missed}}",
+      "errors": {
+        "offline": "The AI server is not reachable right now. Try again later.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "reviews": {
@@ -784,7 +826,54 @@
     "requestChanges": "Request changes",
     "approve": "Approve",
     "working": "Working…",
-    "loadError": "Failed to load the review queue."
+    "loadError": "Failed to load the review queue.",
+    "ai": {
+      "title": "AI pre-check",
+      "running": "AI pre-check running…",
+      "confidence": "confidence {{pct}}",
+      "verdict": {
+        "approve": "Suggests approve",
+        "changes_requested": "Suggests changes",
+        "unsure": "Unsure"
+      },
+      "status": {
+        "met": "Met",
+        "partly_met": "Partly met",
+        "not_met": "Not met",
+        "cannot_judge": "Can’t tell"
+      },
+      "match": {
+        "identical": "identical",
+        "similar": "very similar"
+      },
+      "useFeedback": "Use AI feedback",
+      "duplicate": "Same file as {{learner}} ({{match}})",
+      "notes": "AI notes:",
+      "spotCheck": "spot check",
+      "whyDisagree": "Why do you disagree with the AI?",
+      "reason": {
+        "missed_evidence": "Missed evidence",
+        "too_strict": "Too strict",
+        "too_lenient": "Too lenient",
+        "misread_image": "Misread the image",
+        "other": "Other"
+      },
+      "send": "Send",
+      "skip": "Skip",
+      "cancel": "Cancel",
+      "useAsExample": "Use as AI example",
+      "exampleAdded": "Added as an example.",
+      "filterLabel": "Show",
+      "filter": {
+        "all": "All waiting",
+        "ai_approve": "AI says approve",
+        "ai_unsure": "AI unsure",
+        "flagged": "Flagged",
+        "auto_approved": "Approved by AI"
+      },
+      "approvedByAI": "Approved by AI",
+      "reopen": "Reopen"
+    }
   },
   "admin": {
     "title": "Admin Panel",
@@ -1032,7 +1121,10 @@
         "assignment": "{{submitted}} submitted · {{approved}} approved · {{waiting}} waiting",
         "h5pFinished": "finished by {{count}}",
         "avgAttempts": "avg. {{n}} attempts",
-        "hardestText": "hardest question {{pct}}% right"
+        "hardestText": "hardest question {{pct}}% right",
+        "aiAgreement": "AI agrees with reviewers {{pct}}%",
+        "aiKappa": "κ {{kappa}} beyond chance",
+        "aiReviews": "AI reviews: {{count}}"
       },
       "detail": {
         "score": "Score {{pct}}%",
@@ -1047,7 +1139,9 @@
           "changes_requested": "Changes requested"
         },
         "attempts": "{{count}} attempts",
-        "attemptN": "#{{n}}"
+        "attemptN": "#{{n}}",
+        "aiVerdict": "AI: {{verdict}}",
+        "aiAuto": "approved by AI"
       },
       "backToLearners": "Back to learners",
       "totals": "Active {{active}} · on screen {{onScreen}} · {{visits}} visits",
