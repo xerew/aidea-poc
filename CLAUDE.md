@@ -18,6 +18,8 @@ cd backend
 .venv/Scripts/uv.exe run manage.py seed      # Populate DB with demo data (3 pillars, 11 courses, 55+ modules, demo_teacher/demo1234, demo_creator/demo1234)
 .venv/Scripts/uv.exe run manage.py runserver # Start dev server at localhost:8000
 .venv/Scripts/uv.exe run manage.py h5p_add_libraries file.h5p  # Add missing H5P libraries from the H5P Hub (H5P.org downloads)
+.venv/Scripts/uv.exe run manage.py ai_review_benchmark --models a,b --limit 30  # Compare AI review models on human-decided submissions (writes xlsx, stores nothing)
+.venv/Scripts/uv.exe run manage.py ai_review_export --out train.jsonl  # Anonymised AI-review training data (opted-out learners excluded)
 ```
 
 **Testing:**
@@ -80,6 +82,10 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/analytics/courses/<id>/learners/<user_id>/` — one learner's timeline
 - `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — learning analytics workbook (incl. H5P answers)
 - `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/h5p/` — upload (multipart `file`, `language`) or remove an H5P package; played by `/h5p/player.html` (h5p-standalone) in a sandboxed iframe
+- `GET/PUT /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/ai-review/` — an assignment's AI reviewer set-up (rubric, visibility, auto-approve, agreement stats); `POST …/ai-review/draft/` drafts criteria with the model; `…/ai-review/examples/` lists/adds (≤ 5) and `…/examples/<id>/` deletes examples
+- `GET /api/reviews/?filter=ai_approve|ai_unsure|flagged|auto_approved`; `POST /api/reviews/<id>/` also takes `disagreement_reason` and `used_ai_feedback`; `POST /api/reviews/<id>/example/` (anonymised example) and `POST /api/reviews/<id>/reopen/` (undo an AI approval)
+
+**AI reviewer** (`hub/ai_review/`): a self-hosted vision model on the NTUA Ollama server (same tunnel as translation) pre-checks assignment submissions in Celery (`run_ai_review`) against the author-approved rubric. Platform switch and thresholds in Django admin → AI review settings. Auto-approve (approvals only) unlocks per assignment once the 95% Wilson lower bound of agreement on the AI's approvals reaches the threshold; stats (`hub/ai_review/metrics.py`) include Cohen's kappa and how often reviewers send the AI's feedback unchanged. Tests mock `hub.ai_review.model._chat` — never call Ollama.
 
 **Auth:** JWT via `djangorestframework-simplejwt`. 60-min access tokens, 7-day refresh with rotation. Token blacklisting enabled for logout.
 
