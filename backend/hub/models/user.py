@@ -88,6 +88,8 @@ class UserProfile(models.Model):
     progress_reminders   = models.BooleanField(default=True)
     profile_public       = models.BooleanField(default=False)
     share_progress       = models.BooleanField(default=False)
+    # Exclude this learner's assignments from AI-reviewer training data.
+    ai_training_opt_out  = models.BooleanField(default=False)
     gender               = models.CharField(
         max_length=20, choices=Gender.choices, blank=True,
     )

@@ -7,6 +7,8 @@ from django.utils.html import format_html, mark_safe
 from .models import (
     AccessRequest,
     Activity,
+    AIReview,
+    AIReviewSettings,
     AssignmentSubmission,
     Course,
     CourseCollaborator,
@@ -24,6 +26,7 @@ from .models import (
     PreferenceOption,
     PreferenceQuestion,
     ResourceVisit,
+    ReviewExample,
     StudyAssessmentOption,
     StudyAssessmentQuestion,
     StudyConfig,
@@ -464,6 +467,40 @@ class _ReadOnlyAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+
+@admin.register(AIReviewSettings)
+class AIReviewSettingsAdmin(admin.ModelAdmin):
+    fieldsets = [
+        ('AI assignment reviewer', {
+            'fields': ['enabled', 'model_name'],
+            'description': 'Self-hosted model on the NTUA Ollama server (same tunnel as translation).',
+        }),
+        ('Auto-approve', {
+            'fields': ['confidence_threshold', 'spot_check_rate', 'unlock_min_reviews', 'unlock_min_lower_bound'],
+            'description': (
+                'Unlocks per assignment after at least the minimum human-checked reviews, once the '
+                '95% Wilson lower bound of agreement on the AI\'s approvals reaches the threshold.'
+            ),
+        }),
+    ]
+
+    def has_add_permission(self, request):
+        return not AIReviewSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(AIReview)
+class AIReviewAdmin(_ReadOnlyAdmin):
+    list_display = ['submission', 'status', 'verdict', 'confidence', 'auto_approved', 'agreed', 'created_at']
+    list_filter = ['status', 'verdict', 'auto_approved', 'agreed']
+
+
+@admin.register(ReviewExample)
+class ReviewExampleAdmin(_ReadOnlyAdmin):
+    list_display = ['resource', 'verdict', 'created_by', 'created_at']
 
 
 @admin.register(ResourceVisit)

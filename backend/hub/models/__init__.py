@@ -1,5 +1,6 @@
 from .access_request import AccessRequest
 from .activity import LearnerActivityConfig, LessonSession
+from .ai_review import AIReview, AIReviewSettings, AssignmentReviewConfig, ReviewExample
 from .assignment import AssignmentSubmission
 from .content import Activity, Course, CourseCollaborator, LearningPillar, Module, Resource
 from .enrollment import Enrollment, LessonProgress, ResourceProgress
@@ -32,6 +33,9 @@ from .user import UserProfile
 
 __all__ = [
     'AccessRequest',
+    'AIReview',
+    'AIReviewSettings',
+    'AssignmentReviewConfig',
     'AssignmentSubmission',
     'Course',
     'CourseCollaborator',
@@ -54,6 +58,7 @@ __all__ = [
     'LessonProgress',
     'ResourceProgress',
     'ResourceVisit',
+    'ReviewExample',
     'LessonSession',
     'Module',
     'Resource',
