@@ -662,3 +662,18 @@ def check_translation_service() -> None:
     """Every 15 minutes (Celery beat): is the NTUA translation server up?"""
     from hub.translation_health import check_now
     check_now()
+
+
+@shared_task(bind=True, max_retries=12, default_retry_delay=600)
+def run_ai_review(self, review_id: int) -> None:
+    """Run one AI review; retried every 10 minutes while the NTUA server is
+    offline, then given up (the submission simply waits for a human)."""
+    from hub.ai_review.model import ModelOffline
+    from hub.ai_review.pipeline import mark_failed, run_review
+    try:
+        run_review(review_id)
+    except ModelOffline as exc:
+        if self.request.retries >= self.max_retries:
+            mark_failed(review_id, f'Model server offline: {exc}')
+            return
+        raise self.retry(exc=exc)

@@ -172,6 +172,20 @@ def send_assignment_reviewed_email(submission):
     approved = submission.status == submission.Status.APPROVED
     outcome = 'approved' if approved else 'sent back with change requests'
     link = f'{settings.FRONTEND_BASE_URL}/courses/{course.id}/learn/{lesson.id}'
+    if submission.status == submission.Status.PENDING:
+        # An AI approval was reopened: a person now checks it again.
+        _send(
+            to=user.email,
+            subject='Your submission is being reviewed again',
+            name=user.get_full_name() or user.username,
+            tag='Assignment reviewed',
+            heading='Your submission is being reviewed again',
+            paragraphs=[f'Your submission for “{lesson.title}” in “{course.title}” was approved '
+                        'automatically and is now being checked by a reviewer. You will hear back soon.'],
+            cta_label='Open the lesson',
+            cta_link=link,
+        )
+        return
     paragraphs = [
         f'Your submission for “{lesson.title}” in “{course.title}” has been '
         f'reviewed and {outcome}.',

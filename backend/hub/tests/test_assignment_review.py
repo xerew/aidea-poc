@@ -44,10 +44,6 @@ class AssignmentModelTests(TestCase):
         _, module, _ = make_assignment_course(slug='par2')
         self.assertFalse(module.llm_review_enabled)
 
-    def test_llm_stub_returns_none(self):
-        from hub.llm_review import review_submission
-        self.assertIsNone(review_submission(None))
-
 
 class CompleteEndpointAssignmentGateTests(APITestCase):
     def setUp(self):

@@ -3,7 +3,6 @@ import uuid
 
 from django.core.files.storage import default_storage
 from django.db.models import Q
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -112,9 +111,8 @@ class AssignmentSubmitView(APIView):
             )
             created = True
 
-        if lesson.module.llm_review_enabled:
-            from hub.llm_review import review_submission
-            review_submission(submission)  # stub: returns None, humans review
+        from hub.ai_review.pipeline import queue_review
+        queue_review(submission)
 
         return Response(
             AssignmentSubmissionSerializer(submission).data,
@@ -171,9 +169,8 @@ class ResourceAssignmentSubmitView(APIView):
             )
             created = True
 
-        if resource.activity.module.llm_review_enabled:
-            from hub.llm_review import review_submission
-            review_submission(submission)
+        from hub.ai_review.pipeline import queue_review
+        queue_review(submission)
 
         return Response(
             AssignmentSubmissionSerializer(submission).data,
@@ -268,56 +265,31 @@ class ReviewActionView(APIView):
         action = request.data.get('action')
         feedback = str(request.data.get('feedback', '')).strip()
 
+        from hub.ai_review.pipeline import record_human_verdict
+        from hub.assignment_review import ReviewError, approve_submission, request_changes
+
         if action == 'approve':
-            enrollment = Enrollment.objects.filter(user=submission.user, course=course).first()
-            if enrollment is None:
-                return Response(
-                    {'detail': 'The learner is no longer enrolled in this course.'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            from django.db import transaction
-
-            from hub.completion import record_lesson_completion, record_resource_completion
-            with transaction.atomic():
-                submission.status = AssignmentSubmission.Status.APPROVED
-                if feedback:
-                    submission.feedback = feedback
-                submission.reviewed_by = request.user
-                submission.reviewed_at = timezone.now()
-                submission.save()
-
-                # Prefer the resource-based path; fall back to the lesson for
-                # legacy submissions not yet repointed.
-                if submission.resource_id:
-                    record_resource_completion(
-                        submission.user, enrollment, submission.resource,
-                        engagement_data={'submission': submission.text},
-                        advance_only=True,
-                    )
-                else:
-                    record_lesson_completion(
-                        submission.user, enrollment, submission.lesson,
-                        engagement_data={'submission': submission.text},
-                        advance_only=True,
-                    )
+            try:
+                approve_submission(submission, request.user, feedback)
+            except ReviewError as exc:
+                return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            verdict = 'approve'
         elif action == 'request_changes':
             if not feedback:
                 return Response(
                     {'detail': 'feedback is required when requesting changes.'},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            submission.status = AssignmentSubmission.Status.CHANGES_REQUESTED
-            submission.feedback = feedback
-            submission.reviewed_by = request.user
-            submission.reviewed_at = timezone.now()
-            submission.save()
+            request_changes(submission, request.user, feedback)
+            verdict = 'changes_requested'
         else:
             return Response(
                 {'detail': "action must be 'approve' or 'request_changes'."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        from hub.emails import send_assignment_reviewed_email
-        send_assignment_reviewed_email(submission)
-
+        record_human_verdict(
+            submission, verdict, reason=str(request.data.get('disagreement_reason', '')),
+            feedback_used=request.data.get('used_ai_feedback') is True, feedback=feedback,
+        )
         return Response(AssignmentSubmissionSerializer(submission).data)
