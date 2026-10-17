@@ -677,3 +677,22 @@ def run_ai_review(self, review_id: int) -> None:
             mark_failed(review_id, f'Model server offline: {exc}')
             return
         raise self.retry(exc=exc)
+
+
+@shared_task
+def translate_review_criteria(config_id: int) -> None:
+    """Criterion names in each of the course's translated languages, so the
+    learner's pre-check reads in their language."""
+    from hub.models import AssignmentReviewConfig
+    from hub.translation import TranslationError, translate_text
+    from hub.translation_sync import _target_langs
+    config = AssignmentReviewConfig.objects.select_related('resource__activity__module__course').get(pk=config_id)
+    course = config.resource.activity.module.course
+    source = course.source_language or 'en'
+    translations = dict(config.criteria_translations or {})
+    for lang in _target_langs(course):
+        try:
+            translations[lang] = {c['id']: translate_text(c['name'], source, lang) for c in config.criteria}
+        except TranslationError:
+            continue
+    AssignmentReviewConfig.objects.filter(pk=config_id).update(criteria_translations=translations)
