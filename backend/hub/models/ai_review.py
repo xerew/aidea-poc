@@ -101,6 +101,10 @@ class AIReview(models.Model):
     disagreement_reason = models.CharField(max_length=20, blank=True)
     feedback_used       = models.BooleanField(default=False)            # reviewer started from the AI's feedback
     feedback_similarity = models.FloatField(null=True, blank=True)     # 1.0 = sent unchanged
+    # What was judged and what the human sent — the submission itself changes on resubmission.
+    submission_text     = models.TextField(blank=True)
+    attachment_names    = models.JSONField(default=list, blank=True)
+    sent_feedback       = models.TextField(blank=True)
 
     class Meta:
         ordering = ['-created_at', '-id']

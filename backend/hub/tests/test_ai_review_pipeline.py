@@ -214,4 +214,5 @@ class PipelineTests(TestCase):
             pipeline.run_review(old.id)
         sub.refresh_from_db()
         old.refresh_from_db()
-        self.assertEqual((old.status, old.auto_approved, sub.status), ('done', False, 'pending'))
+        # The older version's review is superseded (not run at all), so it cannot approve.
+        self.assertEqual((old.status, old.auto_approved, sub.status), ('failed', False, 'pending'))

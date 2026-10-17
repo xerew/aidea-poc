@@ -91,6 +91,9 @@ services:
       OLLAMA_URL: http://ollama-tunnel:11434
       OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma3-translator}
     command: uv run celery -A aidea worker -l warning
+    volumes:
+      # The AI reviewer reads uploaded attachments (screenshots, PDFs, Word files).
+      - media_files:/app/media
     depends_on:
       - db
       - redis

@@ -180,6 +180,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'hub.tasks.check_translation_service',
         'schedule': crontab(minute='*/15'),
     },
+    'sweep-stale-ai-reviews': {
+        'task': 'hub.tasks.sweep_stale_ai_reviews',
+        'schedule': crontab(minute='*/30'),
+    },
 }
 
 

@@ -177,7 +177,7 @@ function SubmissionRow({ sub, onDone }) {
           )}
           {autoApproved && error && <p className="rv-error">{error}</p>}
 
-          {ai && (
+          {ai?.example_allowed && (
             <div className="rv-example">
               {example ? (
                 <div className="rv-example-form">

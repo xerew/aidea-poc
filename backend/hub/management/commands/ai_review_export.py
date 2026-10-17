@@ -25,10 +25,13 @@ class Command(BaseCommand):
                     'assignment_id': sub.resource_id,
                     'instructions': sub.resource.instructions if sub.resource_id else '',
                     'rubric': r.rubric,
-                    'submission_text': anonymise(sub.text or '', user),
+                    # The version this review judged and the feedback sent on it
+                    # (the submission itself may have been revised since).
+                    'submission_text': anonymise(r.submission_text, user),
+                    'attachments': r.attachment_names,
                     'ai': {'verdict': r.verdict, 'confidence': r.confidence, 'criteria': r.criteria_results},
                     'human_verdict': r.human_verdict,
-                    'feedback': anonymise(sub.feedback or '', user),
+                    'feedback': anonymise(r.sent_feedback, user),
                 }, ensure_ascii=False) + '\n')
                 count += 1
         self.stdout.write(f'Wrote {count} examples to {opts["out"]}')

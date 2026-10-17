@@ -28,6 +28,7 @@ class CommandTests(TestCase):
                                                       text=f'{name.title()} wrote: bias, privacy', status=status,
                                                       feedback=f'Thanks {name.title()}')
             AIReview.objects.create(submission=sub, status='done', rubric=CRITERIA, verdict='approve', confidence=0.9,
+                                    submission_text=sub.text, sent_feedback=sub.feedback,
                                     human_verdict='approve' if status == 'approved' else 'changes_requested',
                                     agreed=status == 'approved')
             self.subs.append(sub)

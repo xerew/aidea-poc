@@ -4,7 +4,9 @@ from hub.models import AIReview, AssignmentSubmission
 
 
 def latest_ai_review(submission):
-    return submission.ai_reviews.exclude(status=AIReview.Status.FAILED).first()
+    """The review of the current version only — never an older version's,
+    even when the newest one failed."""
+    return submission.ai_reviews.first()
 
 
 def _criterion_names(review, language=None, translations=None):
@@ -26,7 +28,7 @@ class AssignmentSubmissionSerializer(serializers.ModelSerializer):
         if config is None or not config.learner_visible:
             return None
         review = latest_ai_review(obj)
-        if review is None:
+        if review is None or review.status == AIReview.Status.FAILED:
             return None
         if review.status != AIReview.Status.DONE:
             return {'status': review.status, 'criteria': [], 'feedback': ''}
@@ -62,8 +64,12 @@ class ReviewQueueSerializer(serializers.ModelSerializer):
         review = latest_ai_review(obj)
         if review is None:
             return None
+        if review.status != AIReview.Status.DONE:
+            return {'status': review.status}
         names = _criterion_names(review)
+        profile = getattr(obj.user, 'profile', None)
         return {
+            'example_allowed': not getattr(profile, 'ai_training_opt_out', False),
             'status': review.status, 'verdict': review.verdict, 'confidence': review.confidence,
             'criteria': [{'id': c['id'], 'name': names.get(c['id'], c['id']), 'status': c['status'], 'reason': c['reason']}
                          for c in review.criteria_results],

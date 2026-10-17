@@ -1,4 +1,5 @@
 """Queueing and running AI reviews; auto-approve; agreement statistics."""
+import logging
 import random
 import time
 from difflib import SequenceMatcher
@@ -9,7 +10,9 @@ from django.utils import timezone
 from hub.ai_review import model
 from hub.ai_review.evidence import find_duplicates, gather
 from hub.ai_review.metrics import summarise
-from hub.models import AIReview, AIReviewSettings, AssignmentSubmission
+from hub.models import AIReview, AIReviewSettings, AssignmentReviewConfig, AssignmentSubmission
+
+log = logging.getLogger(__name__)
 
 
 def queue_review(submission):
@@ -21,10 +24,33 @@ def queue_review(submission):
     review = AIReview.objects.create(
         submission=submission, model_name=AIReviewSettings.get().model_name,
         prompt_version=model.PROMPT_VERSION, rubric=config.criteria,
+        submission_text=submission.text or '',
+        attachment_names=[a.get('name') or a.get('url', '') for a in submission.attachments or []],
     )
-    from hub.tasks import run_ai_review
-    transaction.on_commit(lambda: run_ai_review.delay(review.id))
+    transaction.on_commit(lambda: _dispatch(review.id))
     return review
+
+
+def _dispatch(review_id):
+    """Hand the review to Celery; if the broker is down the submission is
+    already saved, so the review is just marked failed (humans review)."""
+    from hub.tasks import run_ai_review
+    try:
+        run_ai_review.delay(review_id)
+    except Exception as exc:  # noqa: BLE001 — any broker error
+        log.warning('AI review %s could not be queued: %s', review_id, exc)
+        mark_failed(review_id, f'Could not be queued: {exc}')
+
+
+def _switched_on(resource_id):
+    """Platform switch and the assignment's set-up, read fresh (an admin may
+    have switched AI review off while this review waited)."""
+    config = AssignmentReviewConfig.objects.filter(resource_id=resource_id).first()
+    return AIReviewSettings.get().enabled and config is not None and config.is_ready(), config
+
+
+def _is_latest(review):
+    return review.submission.ai_reviews.values_list('id', flat=True).first() == review.id
 
 
 def _examples(resource):
@@ -37,7 +63,14 @@ def run_review(review_id):
     ).get(pk=review_id)
     if review.status in (AIReview.Status.DONE, AIReview.Status.FAILED):
         return
-    submission, config = review.submission, review.submission.resource.ai_review_config
+    submission = review.submission
+    if not _is_latest(review):
+        mark_failed(review.id, 'Superseded by a newer version of the submission.')
+        return
+    on, config = _switched_on(submission.resource_id)
+    if not on:
+        mark_failed(review.id, 'AI review was switched off.')
+        return
     started = time.monotonic()
     review.status, review.attempts = AIReview.Status.RUNNING, review.attempts + 1
     review.save(update_fields=['status', 'attempts'])
@@ -68,7 +101,7 @@ def run_review(review_id):
     review.status, review.finished_at = AIReview.Status.DONE, timezone.now()
     review.duration_s = round(time.monotonic() - started, 1)
     review.save()
-    _maybe_auto_approve(review, config)
+    _maybe_auto_approve(review)
 
 
 def mark_failed(review_id, message):
@@ -86,9 +119,12 @@ def auto_approve_unlocked(resource, settings):
             and (stats['approve_lower_bound'] or 0) >= settings.unlock_min_lower_bound)
 
 
-def _maybe_auto_approve(review, config):
+def _maybe_auto_approve(review):
+    """Approve a clear pass — re-checking everything against fresh state, since
+    a human, the learner or an admin may have acted during the model call."""
     settings = AIReviewSettings.get()
-    if not (config.auto_approve and auto_approve_unlocked(config.resource, settings)):
+    on, config = _switched_on(review.submission.resource_id)
+    if not (on and config.auto_approve and auto_approve_unlocked(config.resource, settings)):
         return
     required = {c['id'] for c in review.rubric if c.get('required')}
     clear = (
@@ -96,8 +132,6 @@ def _maybe_auto_approve(review, config):
         and (review.confidence or 0) >= settings.confidence_threshold
         and all(c['status'] == 'met' for c in review.criteria_results if c['id'] in required)
         and not review.flagged
-        and review.submission.status == AssignmentSubmission.Status.PENDING
-        and review.submission.ai_reviews.first().id == review.id   # not an older version
     )
     if not clear:
         return
@@ -106,17 +140,23 @@ def _maybe_auto_approve(review, config):
         review.save(update_fields=['spot_check'])
         return
     from hub.assignment_review import ReviewError, approve_submission
-    try:
-        approve_submission(review.submission, reviewer=None, feedback=review.learner_feedback)
-    except ReviewError:
-        return
-    review.auto_approved = True
-    review.save(update_fields=['auto_approved'])
+    with transaction.atomic():
+        submission = AssignmentSubmission.objects.select_for_update().get(pk=review.submission_id)
+        if submission.status != AssignmentSubmission.Status.PENDING or not _is_latest(review):
+            return
+        try:
+            approve_submission(submission, reviewer=None, feedback=review.learner_feedback)
+        except ReviewError:
+            return
+        review.auto_approved = True
+        review.save(update_fields=['auto_approved'])
 
 
 def record_human_verdict(submission, verdict, reason='', feedback_used=False, feedback=''):
-    review = submission.ai_reviews.filter(status=AIReview.Status.DONE).first()
-    if review is None:
+    """Store the human decision on the review of *this* version only: if the
+    newest review is not done yet (or failed), there is nothing to compare."""
+    review = submission.ai_reviews.first()
+    if review is None or review.status != AIReview.Status.DONE:
         return
     review.human_verdict = verdict
     review.agreed = (review.verdict == verdict) if review.verdict in ('approve', 'changes_requested') else None
@@ -124,4 +164,6 @@ def record_human_verdict(submission, verdict, reason='', feedback_used=False, fe
     review.feedback_used = bool(feedback_used and review.learner_feedback)
     review.feedback_similarity = (round(SequenceMatcher(None, review.learner_feedback, feedback or '').ratio(), 3)
                                   if review.feedback_used else None)
-    review.save(update_fields=['human_verdict', 'agreed', 'disagreement_reason', 'feedback_used', 'feedback_similarity'])
+    review.sent_feedback = feedback or ''
+    review.save(update_fields=['human_verdict', 'agreed', 'disagreement_reason', 'feedback_used',
+                               'feedback_similarity', 'sent_feedback'])

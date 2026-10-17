@@ -69,7 +69,7 @@ def image_b64(path):
             img.thumbnail((MAX_IMAGE_SIDE, MAX_IMAGE_SIDE))
             buffer = io.BytesIO()
             img.save(buffer, format='JPEG', quality=85)
-    except (UnidentifiedImageError, OSError, ValueError):
+    except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
         return None
     return base64.b64encode(buffer.getvalue()).decode()
 
@@ -78,7 +78,7 @@ def _dhash(path):
     try:
         with Image.open(path) as img:
             small = img.convert('L').resize((9, 8))
-    except (UnidentifiedImageError, OSError, ValueError):
+    except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError):
         return ''
     pixels = list(small.getdata())
     bits = 0
@@ -113,15 +113,23 @@ def gather(submission):
         if att.get('type') == 'video' or path is None:
             ev.links.append(f"{name} ({att.get('url', '')})" if name != att.get('url') else name)
             continue
-        ev.fingerprints.append({'name': name, **fingerprint(path)})
-        if path.suffix.lower() in IMAGE_SUFFIXES:
-            encoded = image_b64(path) if len(ev.images) < MAX_IMAGES else None
-            if encoded:
-                ev.images.append({'name': name, 'b64': encoded})
-        else:
-            text = extract_text(path)
-            if text:
-                ev.documents.append({'name': name, 'text': text})
+        try:
+            ev.fingerprints.append({'name': name, **fingerprint(path)})
+            if path.suffix.lower() in IMAGE_SUFFIXES:
+                encoded = image_b64(path) if len(ev.images) < MAX_IMAGES else None
+                if encoded:
+                    ev.images.append({'name': name, 'b64': encoded})
+                    continue
+            else:
+                text = extract_text(path)
+                if text:
+                    ev.documents.append({'name': name, 'text': text})
+                    continue
+        except Exception as exc:  # noqa: BLE001 — one unreadable file never stops the review
+            log.info('AI review: skipped attachment %s: %s', path, exc)
+        # Attached, but the model cannot see it: say so, so it answers "cannot_judge"
+        # instead of claiming the evidence is missing.
+        ev.links.append(f'{name} (attached file)')
     return ev
 
 

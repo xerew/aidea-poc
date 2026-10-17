@@ -233,7 +233,9 @@ class ReviewQueueView(APIView):
         wanted = request.query_params.get('filter')
         base = AssignmentSubmission.objects.select_related('user', 'lesson__module__course', 'resource__ai_review_config')
         if wanted == 'auto_approved':
-            base = base.filter(status=AssignmentSubmission.Status.APPROVED, ai_reviews__auto_approved=True).distinct()
+            # Still approved by the AI: no human has approved it since (e.g. after a reopen).
+            base = base.filter(status=AssignmentSubmission.Status.APPROVED, reviewed_by__isnull=True,
+                               ai_reviews__auto_approved=True).distinct()
         else:
             base = base.filter(status=AssignmentSubmission.Status.PENDING)
         rows = list(_reviewer_scope(base, request.user))
@@ -334,6 +336,9 @@ class ReviewExampleView(APIView):
         if verdict not in ('approve', 'changes_requested'):
             return Response({'detail': 'verdict must be approve or changes_requested.'},
                             status=status.HTTP_400_BAD_REQUEST)
+        if getattr(getattr(submission.user, 'profile', None), 'ai_training_opt_out', False):
+            return Response({'detail': 'This learner opted out of their work being used to improve the AI reviewer.'},
+                            status=status.HTTP_400_BAD_REQUEST)
         if submission.resource.ai_review_examples.count() >= 5:
             return Response({'detail': 'This assignment already has 5 examples.'},
                             status=status.HTTP_400_BAD_REQUEST)
@@ -359,6 +364,7 @@ class ReviewReopenView(APIView):
         if not can_review(request.user, submission):
             return Response({'detail': 'Not allowed.'}, status=status.HTTP_403_FORBIDDEN)
         if (submission.status != AssignmentSubmission.Status.APPROVED
+                or submission.reviewed_by_id is not None
                 or not submission.ai_reviews.filter(auto_approved=True).exists()):
             return Response({'detail': 'Only AI-approved submissions can be reopened.'},
                             status=status.HTTP_400_BAD_REQUEST)

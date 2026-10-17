@@ -44,9 +44,10 @@ class ParseTests(SimpleTestCase):
             with self.assertRaises(model.ReviewModelError, msg=bad[:40]):
                 model.parse_review(bad, CRITERIA)
 
-    def test_parse_clamps_confidence_and_strips_prose(self):
-        out = model.parse_review('Here you go:\n' + answer(confidence=1.7) + '\nThanks', CRITERIA)
-        self.assertEqual(out['confidence'], 1.0)
+    def test_parse_strips_prose_around_the_json(self):
+        # (Out-of-range confidence is rejected, not clamped — see test_ai_review_fixes.)
+        out = model.parse_review('Here you go:\n' + answer(confidence=0.9) + '\nThanks', CRITERIA)
+        self.assertEqual(out['confidence'], 0.9)
 
 
 class MessageTests(SimpleTestCase):
@@ -62,7 +63,7 @@ class MessageTests(SimpleTestCase):
         user = msgs[-1]
         self.assertEqual(user['images'], ['AAAA'])
         for needle in ('Describe three AI risks.', '[c1]', 'Names at least three AI risks', 'My answer',
-                       'Risk register', 'cannot be watched', 'Bob', 'Greek', 'Bias, privacy, jobs'):
+                       'Risk register', 'cannot be watched', 's.png (identical)', 'Greek', 'Bias, privacy, jobs'):
             self.assertIn(needle, user['content'])
         self.assertNotIn('<p>', user['content'])
 

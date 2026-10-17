@@ -1,9 +1,11 @@
 import logging
 import math
 import random
+from datetime import timedelta
 
 from celery import shared_task
 from django.db import transaction
+from django.utils import timezone
 
 from hub.translation import translate_text
 
@@ -677,6 +679,24 @@ def run_ai_review(self, review_id: int) -> None:
             mark_failed(review_id, f'Model server offline: {exc}')
             return
         raise self.retry(exc=exc)
+    except Exception as exc:  # noqa: BLE001 — never leave a review "running" forever
+        logger.exception('AI review %s failed', review_id)
+        mark_failed(review_id, f'Unexpected error: {exc}')
+
+
+# Longer than the offline retries (12 × 10 min), so only truly stuck reviews.
+AI_REVIEW_STALE_AFTER = timedelta(hours=3)
+
+
+@shared_task
+def sweep_stale_ai_reviews() -> None:
+    """Every 30 minutes (Celery beat): fail AI reviews stuck queued/running
+    (worker restarted mid-call, lost message), so screens stop saying "checking"."""
+    from hub.models import AIReview
+    AIReview.objects.filter(
+        status__in=[AIReview.Status.QUEUED, AIReview.Status.RUNNING],
+        created_at__lt=timezone.now() - AI_REVIEW_STALE_AFTER,
+    ).update(status=AIReview.Status.FAILED, error='Timed out.', finished_at=timezone.now())
 
 
 @shared_task
