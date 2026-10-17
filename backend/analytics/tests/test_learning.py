@@ -68,7 +68,7 @@ class LearningAggregationTests(TestCase):
         self.assertEqual(self.node(tree, f.m2.id, f.a3.id, f.pdf.id)['notes'], {'opened': 1, 'downloaded': 1})
         self.assertEqual(
             self.node(tree, f.m2.id, f.a3.id, f.assign.id)['notes'],
-            {'submitted': 1, 'approved': 1, 'waiting': 0, 'changes_requested': 0},
+            {'submitted': 1, 'approved': 1, 'waiting': 0, 'changes_requested': 0, 'ai': None},
         )
 
     def test_activity_and_module_aggregate_children(self):

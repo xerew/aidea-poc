@@ -14,6 +14,7 @@ from django.utils import timezone
 from hub.completion import activity_completion
 from hub.models import (
     Activity,
+    AIReview,
     AssignmentSubmission,
     Enrollment,
     LearnerActivityConfig,
@@ -96,6 +97,12 @@ class CourseData:
         self._submissions_of = defaultdict(list)
         for s in self.submissions.values():
             self._submissions_of[s.user_id].append(s)
+        self.ai_reviews = {}
+        for review in (AIReview.objects
+                       .filter(submission__resource__activity__module__course=course, submission__user_id__in=user_ids)
+                       .exclude(status=AIReview.Status.FAILED)
+                       .select_related('submission').order_by('created_at', 'id')):
+            self.ai_reviews[(review.submission.user_id, review.submission.resource_id)] = review   # latest wins
         self._completion = {e.user_id: activity_completion(e.user, course) for e in self.enrollments}
         self.pass_threshold = LearnerActivityConfig.get().quiz_pass_threshold
 
@@ -239,6 +246,7 @@ class CourseData:
         engagement = (progress.engagement_data or {}) if progress else {}
         submission = self.submissions.get((uid, resource.id))
         kind = resource.type
+        ai_review = self.ai_reviews.get((uid, resource.id)) if kind == 'assignment' else None
 
         def count(*types):
             return len(self.events_for(uid, resource.id, *types))
@@ -254,6 +262,8 @@ class CourseData:
             'pdf_downloaded': count('pdf_download') if kind == 'pdf' else None,
             'image_opened': count('image_open') if kind == 'image' else None,
             'assignment_status': submission.status if submission else None,
+            'ai_verdict': ai_review.verdict if ai_review else None,
+            'ai_auto_approved': bool(ai_review and ai_review.auto_approved),
         }
 
     # ── Learner state ────────────────────────────────────────────────────────
@@ -405,8 +415,14 @@ def resource_notes(cd, resource):
             'approved': statuses.count(status.APPROVED),
             'waiting': statuses.count(status.PENDING),
             'changes_requested': statuses.count(status.CHANGES_REQUESTED),
+            'ai': _ai_notes([r for uid in uids if (r := cd.ai_reviews.get((uid, resource.id)))]),
         }
     return {}
+
+
+def _ai_notes(reviews):
+    from hub.ai_review.metrics import summarise
+    return summarise(reviews) if reviews else None
 
 
 def content_tree(cd):

@@ -24,7 +24,7 @@ from .learning import (
 
 SHEET_NAMES = [
     'README', 'Overview', 'Learners', 'Modules', 'Activities', 'Resources',
-    'Visits', 'Quiz answers', 'H5P answers', 'Events',
+    'Visits', 'Quiz answers', 'H5P answers', 'AI reviews', 'Events',
 ]
 
 BASE = ['Course ID', 'Course', 'Learner ID', 'Learner']
@@ -72,6 +72,12 @@ HEADERS = {
         'Module ID', 'Activity ID', 'Activity', 'Resource ID', 'Resource', 'Attempt #',
         'Question', 'Response', 'Right', 'Points', 'Max points', 'Seconds', 'Answered at',
     ],
+    'AI reviews': BASE + [
+        'Module ID', 'Activity ID', 'Activity', 'Resource ID', 'Assignment', 'Submitted at',
+        'AI status', 'AI verdict', 'Confidence', 'Criteria', 'Human verdict', 'Agreed',
+        'Disagreement reason', 'Used AI feedback', 'Feedback similarity', 'Auto-approved',
+        'Spot check', 'Duplicate flag', 'Model', 'Prompt version',
+    ],
 }
 
 README = [
@@ -93,8 +99,10 @@ README = [
     'H5P activities: Score % is the first finished attempt (raw ÷ max). Later attempts are practice; '
     'every attempt and answer is in H5P answers and Events (types h5p_attempt, h5p_answer). '
     'Attempt # = the attempt an answer belongs to; the last number with no finished attempt is unfinished.',
+    'AI reviews: one row per learner × assignment (latest AI review); Agreed compares the AI verdict with '
+    'the human decision; Feedback similarity is 1.0 when the reviewer sent the AI feedback unchanged.',
     'Sheets: Overview (one row per learner, wide), Learners, Modules, Activities, Resources '
-    '(learner × item), Visits (raw), Quiz answers, H5P answers, Events (raw).',
+    '(learner × item), Visits (raw), Quiz answers, H5P answers, AI reviews, Events (raw).',
 ]
 
 
@@ -280,10 +288,27 @@ def _h5p_answers(cd):
                 ]
 
 
+def _ai_reviews(cd):
+    for e in cd.enrollments:
+        for r in cd.resources:
+            review = cd.ai_reviews.get((e.user_id, r.id))
+            if r.type != 'assignment' or review is None:
+                continue
+            yield _base(cd, e.user) + [
+                r.activity.module_id, r.activity_id, r.activity.title, r.id, resource_label(r),
+                iso(review.submission.submitted_at), review.status, review.verdict, blank(review.confidence),
+                ', '.join(f"{c['id']}={c['status']}" for c in review.criteria_results or []),
+                review.human_verdict, '' if review.agreed is None else yes_no(review.agreed),
+                review.disagreement_reason, yes_no(review.feedback_used), blank(review.feedback_similarity),
+                yes_no(review.auto_approved), yes_no(review.spot_check),
+                yes_no(review.flagged), review.model_name, review.prompt_version,
+            ]
+
+
 ROWS = {
     'Learners': _learners, 'Modules': _modules, 'Activities': _activities,
     'Resources': _resources, 'Visits': _visits, 'Quiz answers': _quiz_answers,
-    'H5P answers': _h5p_answers,
+    'H5P answers': _h5p_answers, 'AI reviews': _ai_reviews,
     'Events': _events,
 }
 
