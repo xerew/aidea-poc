@@ -260,6 +260,7 @@ class CourseData:
             'scroll_pct': engagement.get('scroll_pct') if kind == 'text' else None,
             'pdf_opened': count('pdf_open') if kind == 'pdf' else None,
             'pdf_downloaded': count('pdf_download') if kind == 'pdf' else None,
+            'presentation_downloaded': count('presentation_download') if kind == 'presentation' else None,
             'image_opened': count('image_open') if kind == 'image' else None,
             'assignment_status': submission.status if submission else None,
             'ai_verdict': ai_review.verdict if ai_review else None,
@@ -407,6 +408,8 @@ def resource_notes(cd, resource):
             return {'opened': opened}
         downloaded = sum(1 for uid in uids if cd.events_for(uid, resource.id, 'pdf_download'))
         return {'opened': opened, 'downloaded': downloaded}
+    if kind == 'presentation':
+        return {'downloaded': sum(1 for uid in uids if cd.events_for(uid, resource.id, 'presentation_download'))}
     if kind == 'assignment':
         statuses = [s.status for uid in uids if (s := cd.submissions.get((uid, resource.id)))]
         status = AssignmentSubmission.Status

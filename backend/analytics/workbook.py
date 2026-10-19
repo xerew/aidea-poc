@@ -51,7 +51,7 @@ HEADERS = {
         'Resource ID', 'Resource order', 'Resource', 'Type', 'Required', 'Active s',
         'On-screen s', 'Visits', 'First opened', 'Completed at', 'Score %', 'H5P attempts',
         'Video % watched', 'Scroll %', 'PDF opened', 'PDF downloaded', 'Image opened',
-        'Assignment status',
+        'Assignment status', 'Presentation downloaded',
     ],
     'Visits': BASE + [
         'Module ID', 'Module', 'Activity ID', 'Activity', 'Resource ID', 'Resource', 'Type',
@@ -223,7 +223,7 @@ def _resources(cd):
                 round(score * 100) if score is not None else '', blank(d['h5p_attempts']),
                 blank(d['video_pct']),
                 blank(d['scroll_pct']), blank(d['pdf_opened']), blank(d['pdf_downloaded']),
-                blank(d['image_opened']), blank(d['assignment_status']),
+                blank(d['image_opened']), blank(d['assignment_status']), blank(d['presentation_downloaded']),
             ]
 
 
