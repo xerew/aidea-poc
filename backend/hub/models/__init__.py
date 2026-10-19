@@ -12,6 +12,7 @@ from .messaging import Conversation, Message
 from .onboarding_quiz import OnboardingDimension, OnboardingQuestion
 from .pathway import LearningPath, LearningPathCourse, UserLearningPath
 from .preference_quiz import PreferenceOption, PreferenceQuestion
+from .presentation import PresentationFile
 from .recommendations import (
     CourseEmbedding,
     CourseRecommendation,
@@ -66,6 +67,7 @@ __all__ = [
     'OnboardingQuestion',
     'PreferenceOption',
     'PreferenceQuestion',
+    'PresentationFile',
     'RecommendationConfig',
     'RecommendationEvent',
     'SelfEfficacyAttempt',

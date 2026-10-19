@@ -109,6 +109,7 @@ class Resource(models.Model):
         QUIZ       = 'quiz',       'Quiz'
         ASSIGNMENT = 'assignment', 'Assignment'
         H5P        = 'h5p',        'H5P activity'
+        PRESENTATION = 'presentation', 'Presentation'
 
     activity     = models.ForeignKey('hub.Activity', on_delete=models.CASCADE, related_name='resources')
     type         = models.CharField(max_length=20, choices=Type.choices)
@@ -123,6 +124,8 @@ class Resource(models.Model):
     translations = models.JSONField(default=dict, blank=True)
     # h5p: learners mark it done themselves (types that never report finishing).
     h5p_self_complete = models.BooleanField(default=False)
+    # presentation: learners may download the .pptx (forced on for decks over the viewer limit).
+    presentation_downloadable = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['order']
@@ -160,6 +163,7 @@ class Activity(models.Model):
         PDF        = 'pdf',        'PDF'
         ASSIGNMENT = 'assignment', 'Assignment'
         H5P        = 'h5p',        'H5P activity'
+        PRESENTATION = 'presentation', 'Presentation'
 
     module           = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     title            = models.CharField(max_length=200)

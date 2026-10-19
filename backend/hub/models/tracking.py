@@ -55,6 +55,7 @@ class LearningEvent(models.Model):
         VIDEO_ENDED  = 'video_ended',  'Video ended'
         PDF_OPEN     = 'pdf_open',     'PDF opened'
         PDF_DOWNLOAD = 'pdf_download', 'PDF downloaded'
+        PRESENTATION_DOWNLOAD = 'presentation_download', 'Presentation downloaded'
         IMAGE_OPEN   = 'image_open',   'Image opened'
         QUIZ_ANSWER  = 'quiz_answer',  'Quiz answer'
         H5P_ANSWER   = 'h5p_answer',   'H5P answer'
@@ -68,7 +69,7 @@ class LearningEvent(models.Model):
     )
     course    = models.ForeignKey('hub.Course', on_delete=models.CASCADE, related_name='+')
     event_key = models.UUIDField()  # made by the browser, so a resent event is stored once
-    event_type  = models.CharField(max_length=20, choices=Type.choices)
+    event_type  = models.CharField(max_length=30, choices=Type.choices)
     occurred_at = models.DateTimeField()
     # e.g. {position} · {from, to} · {question_index, selected, seconds_on_question}
     data = models.JSONField(default=dict, blank=True)

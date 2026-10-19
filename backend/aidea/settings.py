@@ -142,6 +142,11 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Presentation (.pptx) resources: upload limit, and the size above which
+# Microsoft's Office viewer may refuse to play a deck (learners then also get a download).
+PRESENTATION_MAX_MB = int(os.getenv('PRESENTATION_MAX_MB', '100'))
+PRESENTATION_VIEWER_LIMIT_MB = int(os.getenv('PRESENTATION_VIEWER_LIMIT_MB', '10'))
+
 # Celery
 REDIS_URL = os.getenv('REDIS_URL', '')
 
