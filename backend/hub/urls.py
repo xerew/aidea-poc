@@ -106,6 +106,7 @@ from .views.assignments import ReviewExampleView, ReviewQueueCountView, ReviewRe
 from .views.authoring_course import TranslationServiceStatusView
 from .views.authoring_h5p import AuthoringH5PView
 from .views.authoring_module_library import ModuleImportView, ModuleLibraryView
+from .views.authoring_presentation import AuthoringPresentationView
 from .views.tracking import TrackingView
 
 urlpatterns = [
@@ -212,6 +213,7 @@ urlpatterns = [
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/reorder/', AuthoringResourceReorderView.as_view(), name='authoring-resource-reorder'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/', AuthoringResourceDetailView.as_view(), name='authoring-resource-detail'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/h5p/', AuthoringH5PView.as_view(), name='authoring-resource-h5p'),
+    path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/presentation/', AuthoringPresentationView.as_view(), name='authoring-resource-presentation'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/ai-review/', AuthoringAIReviewView.as_view(), name='authoring-ai-review'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/ai-review/draft/', AuthoringAIReviewDraftView.as_view(), name='authoring-ai-review-draft'),
     path('authoring/courses/<int:pk>/modules/<int:module_pk>/lessons/<int:lesson_pk>/resources/<int:resource_pk>/ai-review/examples/', AuthoringAIReviewExamplesView.as_view(), name='authoring-ai-review-examples'),

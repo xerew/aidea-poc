@@ -33,6 +33,23 @@ def _clone(obj, **overrides):
     return type(obj).objects.create(**data)
 
 
+def _copy_deck(deck, new_resource):
+    from django.core.files.base import File
+
+    from hub.models import PresentationFile
+    try:
+        source = deck.file.open('rb')
+    except (FileNotFoundError, OSError):
+        return   # file missing on disk: the copy starts without that deck
+    with source:
+        clone = PresentationFile(
+            resource=new_resource, language=deck.language, title=deck.title,
+            slide_count=deck.slide_count, size_bytes=deck.size_bytes, uploaded_by=deck.uploaded_by,
+        )
+        clone.file.save('deck.pptx', File(source), save=False)
+        clone.save()
+
+
 def copy_module(source, target_course, order):
     """Deep-copy a module into `target_course` at `order`. Links to learning
     outcomes are dropped: they index the source course's outcomes."""
@@ -44,6 +61,9 @@ def copy_module(source, target_course, order):
             # Copies share the unpacked folders, which are never deleted.
             for package in resource.h5p_packages.all():
                 _clone(package, resource_id=new_resource.id, file=package.file.name)
+            # Decks are deleted on replace, so every copy owns its file.
+            for deck in resource.presentation_files.all():
+                _copy_deck(deck, new_resource)
     return new_module
 
 

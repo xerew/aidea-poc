@@ -16,6 +16,11 @@ www.{$DOMAIN:localhost} {
         request_body @h5pUpload {
             max_size 105MB
         }
+        # Presentation uploads: refuse anything over the 100 MB limit before it is sent on.
+        @presentationUpload path_regexp ^/api/authoring/.*/presentation/$
+        request_body @presentationUpload {
+            max_size 105MB
+        }
         reverse_proxy backend:8000
     }
     handle /django-admin/* {
@@ -33,6 +38,12 @@ www.{$DOMAIN:localhost} {
             Access-Control-Allow-Origin "*"
             Content-Security-Policy "sandbox allow-scripts"
             X-Content-Type-Options "nosniff"
+        }
+        # .pptx decks: fetched by Microsoft's Office viewer; served as PowerPoint, never sniffed.
+        header /media/presentations/* {
+            Content-Type "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+            X-Content-Type-Options "nosniff"
+            defer
         }
         file_server
     }

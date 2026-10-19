@@ -10,13 +10,14 @@ MEDIA_ITEM_TYPES = {'image', 'video', 'pdf'}
 class ResourceSerializer(serializers.ModelSerializer):
     """Authoring view of one resource block within an activity."""
     h5p_packages = serializers.SerializerMethodField()
+    presentation_files = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
         fields = [
             'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
             'caption', 'quiz_data', 'instructions', 'translations',
-            'h5p_self_complete', 'h5p_packages',
+            'h5p_self_complete', 'h5p_packages', 'presentation_downloadable', 'presentation_files',
         ]
         read_only_fields = ['translations']
 
@@ -33,6 +34,18 @@ class ResourceSerializer(serializers.ModelSerializer):
                 'version': p.version, 'path': p.media_path, 'uploaded_at': p.uploaded_at,
             }
             for p in obj.h5p_packages.all()
+        ]
+
+    def get_presentation_files(self, obj):
+        if obj.type != Resource.Type.PRESENTATION:
+            return []
+        return [
+            {
+                'id': d.id, 'language': d.language, 'title': d.title, 'slide_count': d.slide_count,
+                'size_bytes': d.size_bytes, 'version': d.version, 'path': d.media_path,
+                'over_viewer_limit': d.over_viewer_limit, 'uploaded_at': d.uploaded_at,
+            }
+            for d in obj.presentation_files.all()
         ]
 
 
