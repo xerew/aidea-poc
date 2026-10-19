@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo } from 'react'
 
-const NOOP = { event() {}, completed() {}, video() {} }
+const NOOP = { event() {}, completed() {}, video() {}, attending() {} }
 
 // Provided by the activity page; anywhere else (e.g. authoring preview)
 // tracking calls do nothing.
@@ -12,5 +12,6 @@ export function useResourceTracking(resourceId) {
   return useMemo(() => ({
     event: (type, data) => api.event(resourceId, type, data),
     video: (e) => api.video(resourceId, e),
+    attending: (on) => api.attending(resourceId, on),
   }), [api, resourceId])
 }

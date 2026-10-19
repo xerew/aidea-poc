@@ -148,6 +148,8 @@ export function createTracker({ root, language }) {
   const api = {
     event: (resourceId, type, data) => { if (!stopped) ledger.addEvent(resourceId, type, data) },
     completed: (resourceId) => { if (!stopped) ledger.markCompleted(resourceId) },
+    // A presentation frame has focus: credited like a playing video (see frameFocus.js).
+    attending: (resourceId, on) => { if (!stopped) setPlaying(resourceId, on) },
     video,
   }
   return { api, flush, stop }

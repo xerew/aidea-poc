@@ -23,5 +23,6 @@ export function useActivityTracker(rootRef, activityId, resourceCount, language)
     event: (...args) => trackerRef.current?.api.event(...args),
     completed: (...args) => trackerRef.current?.api.completed(...args),
     video: (...args) => trackerRef.current?.api.video(...args),
+    attending: (...args) => trackerRef.current?.api.attending(...args),
   }), [])
 }
