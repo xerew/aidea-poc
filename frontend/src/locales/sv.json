@@ -476,7 +476,8 @@
       "image": "Bild",
       "pdf": "PDF",
       "assignment": "Uppgift",
-      "h5p": "H5P-aktivitet"
+      "h5p": "H5P-aktivitet",
+      "presentation": "Presentation"
     },
     "noContent": "Inget innehåll än.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Den här H5P-aktiviteten har ingen fil än.",
       "loadError": "Aktiviteten kunde inte laddas."
+    },
+    "presentation": {
+      "missing": "Den här presentationen har ingen fil ännu.",
+      "fullscreen": "Helskärm",
+      "download": "Ladda ned (.pptx)",
+      "livePreviewOnly": "Bildspelet visas på den publicerade webbplatsen. Här kan du ladda ned filen.",
+      "frameTitle": "Presentation: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "AI-servern går inte att nå just nu. Försök igen senare.",
         "generic": "Något gick fel. Försök igen."
+      }
+    },
+    "presentation": {
+      "upload": "Ladda upp .pptx-fil",
+      "replace": "Ersätt",
+      "uploading": "Laddar upp…",
+      "preview": "Förhandsvisning",
+      "hidePreview": "Dölj förhandsvisning",
+      "remove": "Ta bort",
+      "version": "version {{n}}",
+      "slides": "{{count}} bilder",
+      "formatHint": "Endast PowerPoint .pptx, högst 100 MB. Från LibreOffice Impress: Arkiv → Spara som → PowerPoint (.pptx).",
+      "languageVersions": "Språkversioner",
+      "languageVersionsHint": "Valfritt: en översatt .pptx för deltagare som använder det språket. Övriga ser huvudpresentationen.",
+      "addLanguage": "Lägg till språk…",
+      "downloadable": "Deltagarna kan ladda ned filen",
+      "downloadableHint": "Av: deltagarna kan bara titta på bildspelet.",
+      "overLimit": "Över 10 MB — Microsofts visningsprogram kanske inte spelar upp den; kontrollera förhandsvisningen på den publicerade webbplatsen. Deltagarna får också en nedladdningsknapp.",
+      "fileRequiredError": "Ladda upp .pptx-filen först.",
+      "errors": {
+        "generic": "Uppladdningen misslyckades. Försök igen.",
+        "no_file": "Välj en .pptx-fil.",
+        "too_large": "Filen är större än 100 MB. Använd Arkiv → Komprimera media och Komprimera bilder i PowerPoint, eller lägg videor online och länka till dem.",
+        "not_pptx": "Det här är ingen PowerPoint-fil (.pptx).",
+        "convert_to_pptx": "Spara den som .pptx (i Impress: Arkiv → Spara som → PowerPoint) och ladda upp igen.",
+        "macros": "Presentationer med makron kan inte användas. Spara den som en vanlig .pptx.",
+        "corrupt": "Filen är skadad eller kunde inte läsas.",
+        "no_slides": "Presentationen har inga bilder.",
+        "bad_language": "Okänt språk.",
+        "not_presentation": "Den här resursen är ingen presentation."
       }
     }
   },

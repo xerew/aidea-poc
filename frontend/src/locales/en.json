@@ -476,7 +476,8 @@
       "image": "Image",
       "pdf": "PDF",
       "assignment": "Assignment",
-      "h5p": "H5P activity"
+      "h5p": "H5P activity",
+      "presentation": "Presentation"
     },
     "noContent": "No content yet.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "This H5P activity has no file yet.",
       "loadError": "This activity could not be loaded."
+    },
+    "presentation": {
+      "missing": "This presentation has no file yet.",
+      "fullscreen": "Open full screen",
+      "download": "Download (.pptx)",
+      "livePreviewOnly": "The slideshow plays on the live site. Here you can download the file.",
+      "frameTitle": "Presentation: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "The AI server is not reachable right now. Try again later.",
         "generic": "Something went wrong. Please try again."
+      }
+    },
+    "presentation": {
+      "upload": "Upload .pptx file",
+      "replace": "Replace",
+      "uploading": "Uploading…",
+      "preview": "Preview",
+      "hidePreview": "Hide preview",
+      "remove": "Remove",
+      "version": "version {{n}}",
+      "slides": "{{count}} slides",
+      "formatHint": "PowerPoint .pptx only, up to 100 MB. From LibreOffice Impress: File → Save As → PowerPoint (.pptx).",
+      "languageVersions": "Language versions",
+      "languageVersionsHint": "Optional: a translated .pptx for learners using that language. Others see the main deck.",
+      "addLanguage": "Add language…",
+      "downloadable": "Learners can download the file",
+      "downloadableHint": "Off: learners can only watch the slideshow.",
+      "overLimit": "Over 10 MB — Microsoft’s viewer may not play it; check the preview on the live site. Learners will also get a download button.",
+      "fileRequiredError": "Upload the .pptx file first.",
+      "errors": {
+        "generic": "The upload failed. Please try again.",
+        "no_file": "Choose a .pptx file.",
+        "too_large": "The file is larger than 100 MB. In PowerPoint use File → Compress Media and Compress Pictures, or put videos online and link them.",
+        "not_pptx": "This is not a PowerPoint (.pptx) file.",
+        "convert_to_pptx": "Save it as .pptx (in Impress: File → Save As → PowerPoint), then upload again.",
+        "macros": "Presentations with macros cannot be used. Save it as a normal .pptx.",
+        "corrupt": "The file is damaged or could not be read.",
+        "no_slides": "This presentation has no slides.",
+        "bad_language": "Unknown language.",
+        "not_presentation": "This resource is not a presentation."
       }
     }
   },

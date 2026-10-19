@@ -476,7 +476,8 @@
       "image": "Immagine",
       "pdf": "PDF",
       "assignment": "Compito",
-      "h5p": "Attività H5P"
+      "h5p": "Attività H5P",
+      "presentation": "Presentazione"
     },
     "noContent": "Nessun contenuto ancora disponibile.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Questa attività H5P non ha ancora un file.",
       "loadError": "Impossibile caricare questa attività."
+    },
+    "presentation": {
+      "missing": "Questa presentazione non ha ancora un file.",
+      "fullscreen": "Schermo intero",
+      "download": "Scarica (.pptx)",
+      "livePreviewOnly": "La presentazione si vede sul sito pubblicato. Qui puoi scaricare il file.",
+      "frameTitle": "Presentazione: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "Il server IA non è raggiungibile al momento. Riprova più tardi.",
         "generic": "Qualcosa è andato storto. Riprova."
+      }
+    },
+    "presentation": {
+      "upload": "Carica file .pptx",
+      "replace": "Sostituisci",
+      "uploading": "Caricamento…",
+      "preview": "Anteprima",
+      "hidePreview": "Nascondi anteprima",
+      "remove": "Rimuovi",
+      "version": "versione {{n}}",
+      "slides": "{{count}} diapositive",
+      "formatHint": "Solo PowerPoint .pptx, fino a 100 MB. Da LibreOffice Impress: File → Salva con nome → PowerPoint (.pptx).",
+      "languageVersions": "Versioni linguistiche",
+      "languageVersionsHint": "Facoltativo: un .pptx tradotto per chi usa quella lingua. Gli altri vedono la presentazione principale.",
+      "addLanguage": "Aggiungi lingua…",
+      "downloadable": "I partecipanti possono scaricare il file",
+      "downloadableHint": "Disattivato: i partecipanti possono solo guardare la presentazione.",
+      "overLimit": "Oltre 10 MB: il visualizzatore di Microsoft potrebbe non riprodurla; controlla l’anteprima sul sito pubblicato. I partecipanti avranno anche un pulsante di download.",
+      "fileRequiredError": "Carica prima il file .pptx.",
+      "errors": {
+        "generic": "Il caricamento non è riuscito. Riprova.",
+        "no_file": "Scegli un file .pptx.",
+        "too_large": "Il file supera i 100 MB. In PowerPoint usa File → Comprimi file multimediali e Comprimi immagini, oppure pubblica i video online e inserisci un link.",
+        "not_pptx": "Non è un file PowerPoint (.pptx).",
+        "convert_to_pptx": "Salvalo come .pptx (in Impress: File → Salva con nome → PowerPoint), poi caricalo di nuovo.",
+        "macros": "Le presentazioni con macro non sono ammesse. Salvala come .pptx normale.",
+        "corrupt": "Il file è danneggiato o non è leggibile.",
+        "no_slides": "Questa presentazione non ha diapositive.",
+        "bad_language": "Lingua sconosciuta.",
+        "not_presentation": "Questa risorsa non è una presentazione."
       }
     }
   },

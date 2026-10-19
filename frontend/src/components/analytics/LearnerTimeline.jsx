@@ -17,6 +17,7 @@ function ResourceDetails({ r }) {
   if (r.pdf_opened) bits.push(t('analytics.course.detail.opened'))
   if (r.image_opened) bits.push(t('analytics.course.detail.opened'))
   if (r.pdf_downloaded) bits.push(t('analytics.course.detail.downloaded'))
+  if (r.presentation_downloaded) bits.push(t('analytics.course.detail.downloaded'))
   if (r.assignment_status) bits.push(t(`analytics.course.detail.assignment.${r.assignment_status}`))
   if (r.ai_verdict) bits.push(t('analytics.course.detail.aiVerdict', { verdict: t(`reviews.ai.verdict.${r.ai_verdict}`) }))
   if (r.ai_auto_approved) bits.push(t('analytics.course.detail.aiAuto'))

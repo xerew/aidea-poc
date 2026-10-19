@@ -476,7 +476,8 @@
       "image": "Kuva",
       "pdf": "PDF",
       "assignment": "Tehtävä",
-      "h5p": "H5P-tehtävä"
+      "h5p": "H5P-tehtävä",
+      "presentation": "Esitys"
     },
     "noContent": "Ei sisältöä vielä.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Tällä H5P-tehtävällä ei ole vielä tiedostoa.",
       "loadError": "Tehtävää ei voitu ladata."
+    },
+    "presentation": {
+      "missing": "Tähän esitykseen ei ole vielä lisätty tiedostoa.",
+      "fullscreen": "Koko näyttö",
+      "download": "Lataa (.pptx)",
+      "livePreviewOnly": "Diaesitys toimii julkaistulla sivustolla. Täällä voit ladata tiedoston.",
+      "frameTitle": "Esitys: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "Tekoälypalvelimeen ei saada nyt yhteyttä. Yritä myöhemmin uudelleen.",
         "generic": "Jokin meni vikaan. Yritä uudelleen."
+      }
+    },
+    "presentation": {
+      "upload": "Lataa .pptx-tiedosto",
+      "replace": "Korvaa",
+      "uploading": "Ladataan…",
+      "preview": "Esikatselu",
+      "hidePreview": "Piilota esikatselu",
+      "remove": "Poista",
+      "version": "versio {{n}}",
+      "slides": "{{count}} diaa",
+      "formatHint": "Vain PowerPoint .pptx, enintään 100 Mt. LibreOffice Impressissä: Tiedosto → Tallenna nimellä → PowerPoint (.pptx).",
+      "languageVersions": "Kieliversiot",
+      "languageVersionsHint": "Valinnainen: käännetty .pptx kyseistä kieltä käyttäville oppijoille. Muut näkevät pääesityksen.",
+      "addLanguage": "Lisää kieli…",
+      "downloadable": "Oppijat voivat ladata tiedoston",
+      "downloadableHint": "Pois päältä: oppijat voivat vain katsoa diaesityksen.",
+      "overLimit": "Yli 10 Mt — Microsoftin katseluohjelma ei ehkä toista sitä; tarkista esikatselu julkaistulla sivustolla. Oppijat saavat myös latauspainikkeen.",
+      "fileRequiredError": "Lataa ensin .pptx-tiedosto.",
+      "errors": {
+        "generic": "Lataus epäonnistui. Yritä uudelleen.",
+        "no_file": "Valitse .pptx-tiedosto.",
+        "too_large": "Tiedosto on yli 100 Mt. Käytä PowerPointissa Tiedosto → Pakkaa media ja Pakkaa kuvat, tai vie videot verkkoon ja lisää linkki.",
+        "not_pptx": "Tämä ei ole PowerPoint-tiedosto (.pptx).",
+        "convert_to_pptx": "Tallenna se .pptx-muodossa (Impressissä: Tiedosto → Tallenna nimellä → PowerPoint) ja lataa uudelleen.",
+        "macros": "Makroja sisältäviä esityksiä ei voi käyttää. Tallenna se tavallisena .pptx-tiedostona.",
+        "corrupt": "Tiedosto on vioittunut tai sitä ei voitu lukea.",
+        "no_slides": "Tässä esityksessä ei ole dioja.",
+        "bad_language": "Tuntematon kieli.",
+        "not_presentation": "Tämä sisältö ei ole esitys."
       }
     }
   },

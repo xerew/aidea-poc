@@ -476,7 +476,8 @@
       "image": "Image",
       "pdf": "PDF",
       "assignment": "Devoir",
-      "h5p": "Activité H5P"
+      "h5p": "Activité H5P",
+      "presentation": "Présentation"
     },
     "noContent": "Pas encore de contenu.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Cette activité H5P n'a pas encore de fichier.",
       "loadError": "Impossible de charger cette activité."
+    },
+    "presentation": {
+      "missing": "Cette présentation n’a pas encore de fichier.",
+      "fullscreen": "Plein écran",
+      "download": "Télécharger (.pptx)",
+      "livePreviewOnly": "Le diaporama s’affiche sur le site en ligne. Ici, vous pouvez télécharger le fichier.",
+      "frameTitle": "Présentation : {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "Le serveur IA est injoignable pour le moment. Réessayez plus tard.",
         "generic": "Une erreur s’est produite. Veuillez réessayer."
+      }
+    },
+    "presentation": {
+      "upload": "Téléverser un fichier .pptx",
+      "replace": "Remplacer",
+      "uploading": "Téléversement…",
+      "preview": "Aperçu",
+      "hidePreview": "Masquer l’aperçu",
+      "remove": "Supprimer",
+      "version": "version {{n}}",
+      "slides": "{{count}} diapositives",
+      "formatHint": "PowerPoint .pptx uniquement, jusqu’à 100 Mo. Depuis LibreOffice Impress : Fichier → Enregistrer sous → PowerPoint (.pptx).",
+      "languageVersions": "Versions linguistiques",
+      "languageVersionsHint": "Facultatif : un .pptx traduit pour les apprenants utilisant cette langue. Les autres voient la présentation principale.",
+      "addLanguage": "Ajouter une langue…",
+      "downloadable": "Les apprenants peuvent télécharger le fichier",
+      "downloadableHint": "Désactivé : les apprenants peuvent seulement regarder le diaporama.",
+      "overLimit": "Plus de 10 Mo — la visionneuse de Microsoft risque de ne pas la lire ; vérifiez l’aperçu sur le site en ligne. Les apprenants auront aussi un bouton de téléchargement.",
+      "fileRequiredError": "Téléversez d’abord le fichier .pptx.",
+      "errors": {
+        "generic": "Le téléversement a échoué. Veuillez réessayer.",
+        "no_file": "Choisissez un fichier .pptx.",
+        "too_large": "Le fichier dépasse 100 Mo. Dans PowerPoint, utilisez Fichier → Compresser le média et Compresser les images, ou mettez les vidéos en ligne et ajoutez un lien.",
+        "not_pptx": "Ce n’est pas un fichier PowerPoint (.pptx).",
+        "convert_to_pptx": "Enregistrez-le au format .pptx (dans Impress : Fichier → Enregistrer sous → PowerPoint), puis téléversez-le à nouveau.",
+        "macros": "Les présentations avec macros ne sont pas acceptées. Enregistrez-la en .pptx normal.",
+        "corrupt": "Le fichier est endommagé ou illisible.",
+        "no_slides": "Cette présentation ne contient aucune diapositive.",
+        "bad_language": "Langue inconnue.",
+        "not_presentation": "Cette ressource n’est pas une présentation."
       }
     }
   },

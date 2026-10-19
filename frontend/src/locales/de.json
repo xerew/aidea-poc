@@ -476,7 +476,8 @@
       "image": "Bild",
       "pdf": "PDF",
       "assignment": "Aufgabe",
-      "h5p": "H5P-Aktivität"
+      "h5p": "H5P-Aktivität",
+      "presentation": "Präsentation"
     },
     "noContent": "Noch kein Inhalt vorhanden.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Für diese H5P-Aktivität gibt es noch keine Datei.",
       "loadError": "Diese Aktivität konnte nicht geladen werden."
+    },
+    "presentation": {
+      "missing": "Diese Präsentation hat noch keine Datei.",
+      "fullscreen": "Vollbild",
+      "download": "Herunterladen (.pptx)",
+      "livePreviewOnly": "Die Bildschirmpräsentation läuft auf der Live-Website. Hier können Sie die Datei herunterladen.",
+      "frameTitle": "Präsentation: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "Der KI-Server ist gerade nicht erreichbar. Bitte später erneut versuchen.",
         "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+      }
+    },
+    "presentation": {
+      "upload": ".pptx-Datei hochladen",
+      "replace": "Ersetzen",
+      "uploading": "Wird hochgeladen…",
+      "preview": "Vorschau",
+      "hidePreview": "Vorschau ausblenden",
+      "remove": "Entfernen",
+      "version": "Version {{n}}",
+      "slides": "{{count}} Folien",
+      "formatHint": "Nur PowerPoint .pptx, bis 100 MB. Aus LibreOffice Impress: Datei → Speichern unter → PowerPoint (.pptx).",
+      "languageVersions": "Sprachversionen",
+      "languageVersionsHint": "Optional: eine übersetzte .pptx für Lernende mit dieser Sprache. Alle anderen sehen die Hauptpräsentation.",
+      "addLanguage": "Sprache hinzufügen…",
+      "downloadable": "Lernende können die Datei herunterladen",
+      "downloadableHint": "Aus: Lernende können die Präsentation nur ansehen.",
+      "overLimit": "Über 10 MB – der Microsoft-Viewer spielt sie möglicherweise nicht ab; prüfen Sie die Vorschau auf der Live-Website. Lernende erhalten zusätzlich einen Download-Button.",
+      "fileRequiredError": "Laden Sie zuerst die .pptx-Datei hoch.",
+      "errors": {
+        "generic": "Der Upload ist fehlgeschlagen. Bitte erneut versuchen.",
+        "no_file": "Wählen Sie eine .pptx-Datei.",
+        "too_large": "Die Datei ist größer als 100 MB. Nutzen Sie in PowerPoint Datei → Medien komprimieren und Bilder komprimieren, oder stellen Sie Videos online und verlinken Sie sie.",
+        "not_pptx": "Das ist keine PowerPoint-Datei (.pptx).",
+        "convert_to_pptx": "Speichern Sie sie als .pptx (in Impress: Datei → Speichern unter → PowerPoint) und laden Sie sie erneut hoch.",
+        "macros": "Präsentationen mit Makros können nicht verwendet werden. Speichern Sie sie als normale .pptx.",
+        "corrupt": "Die Datei ist beschädigt oder konnte nicht gelesen werden.",
+        "no_slides": "Diese Präsentation enthält keine Folien.",
+        "bad_language": "Unbekannte Sprache.",
+        "not_presentation": "Diese Ressource ist keine Präsentation."
       }
     }
   },

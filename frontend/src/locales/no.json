@@ -476,7 +476,8 @@
       "image": "Bilde",
       "pdf": "PDF",
       "assignment": "Oppgave",
-      "h5p": "H5P-aktivitet"
+      "h5p": "H5P-aktivitet",
+      "presentation": "Presentasjon"
     },
     "noContent": "Ikke noe innhold ennå.",
     "assignment": {
@@ -534,6 +535,13 @@
     "h5p": {
       "missing": "Denne H5P-aktiviteten har ingen fil ennå.",
       "loadError": "Aktiviteten kunne ikke lastes inn."
+    },
+    "presentation": {
+      "missing": "Denne presentasjonen har ingen fil ennå.",
+      "fullscreen": "Fullskjerm",
+      "download": "Last ned (.pptx)",
+      "livePreviewOnly": "Lysbildefremvisningen vises på det publiserte nettstedet. Her kan du laste ned filen.",
+      "frameTitle": "Presentasjon: {{title}}"
     }
   },
   "authoring": {
@@ -812,6 +820,36 @@
       "errors": {
         "offline": "KI-serveren er ikke tilgjengelig nå. Prøv igjen senere.",
         "generic": "Noe gikk galt. Prøv igjen."
+      }
+    },
+    "presentation": {
+      "upload": "Last opp .pptx-fil",
+      "replace": "Erstatt",
+      "uploading": "Laster opp…",
+      "preview": "Forhåndsvisning",
+      "hidePreview": "Skjul forhåndsvisning",
+      "remove": "Fjern",
+      "version": "versjon {{n}}",
+      "slides": "{{count}} lysbilder",
+      "formatHint": "Bare PowerPoint .pptx, opptil 100 MB. Fra LibreOffice Impress: Fil → Lagre som → PowerPoint (.pptx).",
+      "languageVersions": "Språkversjoner",
+      "languageVersionsHint": "Valgfritt: en oversatt .pptx for deltakere som bruker det språket. Andre ser hovedpresentasjonen.",
+      "addLanguage": "Legg til språk…",
+      "downloadable": "Deltakerne kan laste ned filen",
+      "downloadableHint": "Av: deltakerne kan bare se lysbildefremvisningen.",
+      "overLimit": "Over 10 MB — Microsofts visningsprogram spiller den kanskje ikke av; sjekk forhåndsvisningen på det publiserte nettstedet. Deltakerne får også en nedlastingsknapp.",
+      "fileRequiredError": "Last opp .pptx-filen først.",
+      "errors": {
+        "generic": "Opplastingen mislyktes. Prøv igjen.",
+        "no_file": "Velg en .pptx-fil.",
+        "too_large": "Filen er større enn 100 MB. Bruk Fil → Komprimer medier og Komprimer bilder i PowerPoint, eller legg videoer på nett og lenk til dem.",
+        "not_pptx": "Dette er ikke en PowerPoint-fil (.pptx).",
+        "convert_to_pptx": "Lagre den som .pptx (i Impress: Fil → Lagre som → PowerPoint), og last opp på nytt.",
+        "macros": "Presentasjoner med makroer kan ikke brukes. Lagre den som en vanlig .pptx.",
+        "corrupt": "Filen er skadet eller kunne ikke leses.",
+        "no_slides": "Presentasjonen har ingen lysbilder.",
+        "bad_language": "Ukjent språk.",
+        "not_presentation": "Denne ressursen er ikke en presentasjon."
       }
     }
   },

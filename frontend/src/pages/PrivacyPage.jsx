@@ -122,7 +122,15 @@ export default function PrivacyPage() {
         your submissions are still reviewed as usual.
       </p>
 
-      <h2>13. Changes and complaints</h2>
+      <h2>13. Presentations</h2>
+      <p>
+        Some activities show slide presentations in Microsoft&rsquo;s Office viewer, embedded in the
+        page. To play them, your browser loads the viewer from Microsoft, so Microsoft receives your IP
+        address and browser details, and Microsoft&rsquo;s servers fetch the presentation file from
+        AIDEA. No names or learning records are sent to Microsoft.
+      </p>
+
+      <h2>14. Changes and complaints</h2>
       <p>
         We may update this Policy; material changes will be notified through the platform. If you
         believe your data has been handled improperly, you may lodge a complaint with your national

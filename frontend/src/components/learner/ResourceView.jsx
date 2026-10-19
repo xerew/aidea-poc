@@ -1,8 +1,9 @@
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, Circle, Video, Image, FileIcon, Paperclip, Link2, X, Sparkles } from 'lucide-react'
-import client from '../../api/client'
+import { CheckCircle2, Circle, Video, Image, FileIcon, Paperclip, Link2, X, Sparkles, Download } from 'lucide-react'
+import client, { API_BASE } from '../../api/client'
+import { absoluteUrl, isPrivateHost } from '../../lib/presentation'
 import HtmlContent from '../lesson/HtmlContent'
 import MediaItem from '../lesson/MediaItem'
 import TypeIcon from './TypeIcon'
@@ -10,6 +11,7 @@ import { useResourceTracking } from '../../lib/tracking/TrackingContext'
 import { createQuizClock } from '../../lib/tracking/quizClock'
 import { createH5PSession } from '../../lib/tracking/h5pStatements'
 import H5PFrame from '../lesson/H5PFrame'
+import PresentationFrame from '../lesson/PresentationFrame'
 import CriteriaList from '../reviews/CriteriaList'
 import { TYPE_ICONS, resourceShape } from './resourceMeta'
 
@@ -41,6 +43,30 @@ function MediaBody({ resource }) {
   }), [track])
   if (!resource.url) return <p className="lp-empty">{t('lesson.noContent')}</p>
   return <MediaItem item={{ type: resource.type, url: resource.url, caption: resource.caption }} tracking={tracking} />
+}
+
+// ─── Presentation ────────────────────────────────────────────────────────────
+
+PresentationBody.propTypes = { resource: resourceShape.isRequired }
+function PresentationBody({ resource }) {
+  const { t } = useTranslation()
+  const track = useResourceTracking(resource.id)
+  const deck = resource.presentation
+  const onFocusChange = useCallback((on) => track.attending(on), [track])
+  if (!deck) return <p className="lp-empty">{t('lesson.presentation.missing')}</p>
+  // On a development host Microsoft cannot fetch the file, so the download is the only way to see it.
+  const canDownload = deck.downloadable || isPrivateHost(absoluteUrl(deck.url, API_BASE))
+  return (
+    <div className="lp-presentation">
+      <PresentationFrame url={deck.url} title={deck.title || resource.title} onFocusChange={onFocusChange} />
+      {canDownload && (
+        <a className="media-open-link lp-presentation-download" href={deck.url} download
+          onClick={() => track.event('presentation_download', deck.language ? { language: deck.language } : {})}>
+          <Download size={14} /> {t('lesson.presentation.download')}
+        </a>
+      )}
+    </div>
+  )
 }
 
 // Clock reads live outside components (React compiler purity rule).
@@ -479,6 +505,9 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
       break
     case 'h5p':
       body = <H5PBody resource={resource} onComplete={complete} />
+      break
+    case 'presentation':
+      body = <PresentationBody resource={resource} />
       break
     default:
       body = <MediaBody resource={resource} />

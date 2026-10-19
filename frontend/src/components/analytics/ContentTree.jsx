@@ -54,6 +54,7 @@ function ResourceNotes({ type, notes }) {
   }
   if ((type === 'pdf' || type === 'image') && notes.opened) parts.push(t('analytics.course.notes.opened', { count: notes.opened }))
   if (type === 'pdf' && notes.downloaded) parts.push(t('analytics.course.notes.downloaded', { count: notes.downloaded }))
+  if (type === 'presentation' && notes.downloaded) parts.push(t('analytics.course.notes.downloaded', { count: notes.downloaded }))
   if (type === 'assignment' && notes.submitted) parts.push(t('analytics.course.notes.assignment', notes))
   if (type === 'assignment' && notes.ai) {
     const ai = notes.ai
