@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
   ArrowLeft, FileText, Video, Image, HelpCircle, FileDown, ClipboardList, Layers,
-  Trash2, GripVertical, Save, Lock, Plus, Puzzle,
+  Trash2, GripVertical, Save, Lock, Plus, Puzzle, Presentation,
 } from 'lucide-react'
 import client from '../api/client'
 import TranslationBar from '../components/authoring/TranslationBar'
@@ -24,6 +24,7 @@ const RESOURCE_TYPES = [
   { type: 'pdf',        Icon: FileDown,     color: 'red'    },
   { type: 'assignment', Icon: ClipboardList, color: 'indigo' },
   { type: 'h5p',        Icon: Puzzle,       color: 'teal'   },
+  { type: 'presentation', Icon: Presentation, color: 'orange' },
 ]
 
 function typeConfig(type) {
@@ -112,6 +113,9 @@ function validateResource(resource, t) {
   }
   if (resource.type === 'h5p' && !(resource.h5p_packages ?? []).some(p => p.language === '')) {
     return t('authoring.h5p.fileRequiredError')
+  }
+  if (resource.type === 'presentation' && !(resource.presentation_files ?? []).some(p => p.language === '')) {
+    return t('authoring.presentation.fileRequiredError')
   }
   return null
 }
@@ -248,6 +252,7 @@ function ActivityEditor({
                   onMove={(dir) => onResourceMove(resource.id, dir)}
                   uploadUrl={`${resourceUrl(resource.id)}h5p/`}
                   aiReviewUrl={`${resourceUrl(resource.id)}ai-review/`}
+                  presentationUrl={`${resourceUrl(resource.id)}presentation/`}
                   onRefresh={(data) => onResourceRefresh(resource.id, data)}
                 />
               ))}
@@ -618,11 +623,12 @@ export default function ModuleEditorPage() {
       if (activeLang === 'original') {
         const {
           title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired,
-          h5p_self_complete: h5pSelfComplete,
+          h5p_self_complete: h5pSelfComplete, presentation_downloadable: presentationDownloadable,
         } = resource
         res = await client.patch(url, {
           title, content, url: link, caption, quiz_data: quizData, instructions, is_required: isRequired,
           ...(resource.type === 'h5p' && { h5p_self_complete: Boolean(h5pSelfComplete) }),
+          ...(resource.type === 'presentation' && { presentation_downloadable: Boolean(presentationDownloadable) }),
         })
       } else {
         res = await client.patch(`${url}?lang=${activeLang}`, translationPayload(resource, activeLang))
@@ -894,6 +900,7 @@ export default function ModuleEditorPage() {
               onResourceRefresh={(resourceId, data) => patchResource(resourceId, {
                 h5p_packages: data.h5p_packages,
                 h5p_self_complete: data.h5p_self_complete,
+                presentation_files: data.presentation_files,
                 ...(data.title && { title: data.title }),
               })}
             />

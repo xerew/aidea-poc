@@ -129,6 +129,7 @@
 .me-type-btn--red    { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
 .me-type-btn--indigo { background: #eef2ff; color: #4f46e5; border-color: #c7d2fe; }
 .me-type-btn--teal { background: #f0fdfa; color: #0d9488; border-color: #99f6e4; }
+.me-type-btn--orange { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
 
 /* Lesson list */
 .me-lesson-list {
@@ -195,6 +196,7 @@
 .lesson-type-icon--red    { color: #dc2626; }
 .lesson-type-icon--indigo { color: #4f46e5; }
 .lesson-type-icon--teal { color: #0d9488; }
+.lesson-type-icon--orange { color: #ea580c; }
 
 /* Main panel */
 .module-editor-main {
@@ -240,6 +242,7 @@
 .lesson-editor-icon-wrap--red    { background: #fef2f2; color: #dc2626; }
 .lesson-editor-icon-wrap--indigo { background: #eef2ff; color: #4f46e5; }
 .lesson-editor-icon-wrap--teal { background: #f0fdfa; color: #0d9488; }
+.lesson-editor-icon-wrap--orange { background: #fff7ed; color: #ea580c; }
 
 .lesson-editor-editing-label {
   display: block;

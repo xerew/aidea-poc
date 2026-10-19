@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Video, FileText, HelpCircle, Image, FileIcon, ClipboardList, Puzzle } from 'lucide-react'
+import { Video, FileText, HelpCircle, Image, FileIcon, ClipboardList, Puzzle, Presentation } from 'lucide-react'
 
 export const TYPE_ICONS = {
   video:      Video,
@@ -9,6 +9,7 @@ export const TYPE_ICONS = {
   pdf:        FileIcon,
   assignment: ClipboardList,
   h5p:        Puzzle,
+  presentation: Presentation,
 }
 
 export const resourceShape = PropTypes.shape({
@@ -29,6 +30,15 @@ export const resourceShape = PropTypes.shape({
   }),
   submission:   PropTypes.object,
   h5p_self_complete: PropTypes.bool,
+  presentation: PropTypes.shape({
+    url:               PropTypes.string,
+    title:             PropTypes.string,
+    slides:            PropTypes.number,
+    language:          PropTypes.string,
+    size_bytes:        PropTypes.number,
+    over_viewer_limit: PropTypes.bool,
+    downloadable:      PropTypes.bool,
+  }),
   h5p: PropTypes.shape({
     package_id:   PropTypes.number,
     path:         PropTypes.string,
