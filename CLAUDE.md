@@ -82,8 +82,11 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/analytics/courses/<id>/learners/<user_id>/` — one learner's timeline
 - `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — learning analytics workbook (incl. H5P answers)
 - `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/h5p/` — upload (multipart `file`, `language`) or remove an H5P package; played by `/h5p/player.html` (h5p-standalone) in a sandboxed iframe
+- `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/presentation/` — upload (multipart `file`, `language`) or remove a .pptx deck; played in Microsoft's Office viewer (`view.officeapps.live.com`), so the file URL must be public
 - `GET/PUT /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/ai-review/` — an assignment's AI reviewer set-up (rubric, visibility, auto-approve, agreement stats); `POST …/ai-review/draft/` drafts criteria with the model; `…/ai-review/examples/` lists/adds (≤ 5) and `…/examples/<id>/` deletes examples
 - `GET /api/reviews/?filter=ai_approve|ai_unsure|flagged|auto_approved`; `POST /api/reviews/<id>/` also takes `disagreement_reason` and `used_ai_feedback`; `POST /api/reviews/<id>/example/` (anonymised example) and `POST /api/reviews/<id>/reopen/` (undo an AI approval)
+
+**Presentation resources**: `hub/presentation.py` checks uploaded decks (.pptx only, no macros); `PresentationFile` per resource × language; settings `PRESENTATION_MAX_MB` (100) and `PRESENTATION_VIEWER_LIMIT_MB` (10 — above it learners always get a download). On localhost the viewer can't fetch files, so the learner view shows a notice + download.
 
 **AI reviewer** (`hub/ai_review/`): a self-hosted vision model on the NTUA Ollama server (same tunnel as translation) pre-checks assignment submissions in Celery (`run_ai_review`) against the author-approved rubric. Platform switch and thresholds in Django admin → AI review settings. Auto-approve (approvals only) unlocks per assignment once the 95% Wilson lower bound of agreement on the AI's approvals reaches the threshold; stats (`hub/ai_review/metrics.py`) include Cohen's kappa and how often reviewers send the AI's feedback unchanged. Tests mock `hub.ai_review.model._chat` — never call Ollama.
 
