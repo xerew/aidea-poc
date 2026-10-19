@@ -836,7 +836,7 @@
       "languageVersionsHint": "Valfritt: en översatt .pptx för deltagare som använder det språket. Övriga ser huvudpresentationen.",
       "addLanguage": "Lägg till språk…",
       "downloadable": "Deltagarna kan ladda ned filen",
-      "downloadableHint": "Av: deltagarna kan bara titta på bildspelet.",
+      "downloadableHint": "Av: ingen nedladdningsknapp visas (filen går fortfarande att nå via sin länk).",
       "overLimit": "Över 10 MB — Microsofts visningsprogram kanske inte spelar upp den; kontrollera förhandsvisningen på den publicerade webbplatsen. Deltagarna får också en nedladdningsknapp.",
       "fileRequiredError": "Ladda upp .pptx-filen först.",
       "errors": {

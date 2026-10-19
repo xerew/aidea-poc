@@ -836,7 +836,7 @@
       "languageVersionsHint": "Optional: eine übersetzte .pptx für Lernende mit dieser Sprache. Alle anderen sehen die Hauptpräsentation.",
       "addLanguage": "Sprache hinzufügen…",
       "downloadable": "Lernende können die Datei herunterladen",
-      "downloadableHint": "Aus: Lernende können die Präsentation nur ansehen.",
+      "downloadableHint": "Aus: Es wird kein Download-Button angezeigt (die Datei bleibt über ihren Link erreichbar).",
       "overLimit": "Über 10 MB – der Microsoft-Viewer spielt sie möglicherweise nicht ab; prüfen Sie die Vorschau auf der Live-Website. Lernende erhalten zusätzlich einen Download-Button.",
       "fileRequiredError": "Laden Sie zuerst die .pptx-Datei hoch.",
       "errors": {

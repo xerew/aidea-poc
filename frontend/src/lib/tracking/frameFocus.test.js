@@ -69,3 +69,25 @@ test('stop clears listeners and reports not attending', () => {
   s.clock.advance(0)
   assert.deepEqual(s.changes, [true, false])
 })
+
+test('focus moving straight to another iframe stops counting', () => {
+  const s = setup()
+  s.doc.activeElement = s.frame
+  s.win.dispatchEvent(new Event('blur'))
+  s.clock.advance(0)
+  s.doc.activeElement = { name: 'youtube' }   // no window event: focus moved frame → frame
+  s.clock.advance(1000)
+  assert.deepEqual(s.changes, [true, false])
+})
+
+test('coming back into the frame from another iframe counts again', () => {
+  const s = setup()
+  s.doc.activeElement = s.frame
+  s.win.dispatchEvent(new Event('blur'))
+  s.clock.advance(0)
+  s.doc.activeElement = { name: 'youtube' }
+  s.clock.advance(1000)
+  s.doc.activeElement = s.frame
+  s.clock.advance(1000)
+  assert.deepEqual(s.changes, [true, false, true])
+})

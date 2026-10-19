@@ -4,6 +4,7 @@ Only what the slideshow needs is read: the content types (is it a real,
 macro-free presentation?), the slide list and the title. Parts are size-capped
 before parsing so a crafted file cannot exhaust memory."""
 import zipfile
+import zlib
 from dataclasses import dataclass
 from xml.etree import ElementTree
 
@@ -80,7 +81,10 @@ def _inspect(fileobj):
             if count == 0:
                 raise PresentationError('no_slides')
             return DeckInfo(title=_title(archive, names), slide_count=count)
-    except (zipfile.BadZipFile, zipfile.LargeZipFile, ElementTree.ParseError, KeyError, OSError, EOFError):
+    # zlib.error: damaged compressed data; NotImplementedError: unsupported compression
+    # (e.g. Deflate64); RuntimeError: an encrypted entry. All mean "we cannot read it".
+    except (zipfile.BadZipFile, zipfile.LargeZipFile, ElementTree.ParseError, KeyError, OSError, EOFError,
+            zlib.error, NotImplementedError, RuntimeError, ValueError):
         raise PresentationError('corrupt') from None
 
 

@@ -836,7 +836,7 @@
       "languageVersionsHint": "Valinnainen: käännetty .pptx kyseistä kieltä käyttäville oppijoille. Muut näkevät pääesityksen.",
       "addLanguage": "Lisää kieli…",
       "downloadable": "Oppijat voivat ladata tiedoston",
-      "downloadableHint": "Pois päältä: oppijat voivat vain katsoa diaesityksen.",
+      "downloadableHint": "Pois päältä: latauspainiketta ei näytetä (tiedostoon pääsee silti sen linkin kautta).",
       "overLimit": "Yli 10 Mt — Microsoftin katseluohjelma ei ehkä toista sitä; tarkista esikatselu julkaistulla sivustolla. Oppijat saavat myös latauspainikkeen.",
       "fileRequiredError": "Lataa ensin .pptx-tiedosto.",
       "errors": {

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import { Maximize2 } from 'lucide-react'
 import { API_BASE } from '../../api/client'
-import { absoluteUrl, isPrivateHost, officeViewerUrl } from '../../lib/presentation'
+import { absoluteUrl, isPrivateHost, officeViewerUrl, openFullscreen } from '../../lib/presentation'
 import { watchFrameFocus } from '../../lib/tracking/frameFocus'
 import './PresentationFrame.css'
 
@@ -29,7 +29,7 @@ export default function PresentationFrame({ url, title, onFocusChange }) {
         <iframe ref={frameRef} src={officeViewerUrl(fileUrl)} title={t('lesson.presentation.frameTitle', { title })}
           allowFullScreen />
       </div>
-      <button type="button" className="pres-fullscreen" onClick={() => frameRef.current?.requestFullscreen?.()}>
+      <button type="button" className="pres-fullscreen" onClick={() => openFullscreen(frameRef.current, officeViewerUrl(fileUrl))}>
         <Maximize2 size={14} /> {t('lesson.presentation.fullscreen')}
       </button>
     </div>

@@ -5,6 +5,7 @@ import { AlertTriangle, Eye, EyeOff, Trash2, Upload } from 'lucide-react'
 import client from '../../api/client'
 import { LANGUAGES } from '../../i18n'
 import PresentationFrame from '../lesson/PresentationFrame'
+import { PRESENTATION_MAX_BYTES, uploadErrorCode } from '../../lib/presentation'
 import './PresentationPanel.css'
 
 const mb = (bytes) => (bytes / (1024 * 1024)).toFixed(1)
@@ -26,6 +27,10 @@ export default function PresentationPanel({ resource, uploadUrl, locked, onChang
   const upload = async (file, language) => {
     if (!file) return
     setError('')
+    if (file.size > PRESENTATION_MAX_BYTES) {
+      setError(t('authoring.presentation.errors.too_large'))
+      return
+    }
     setBusy(language || 'main')
     try {
       const form = new FormData()
@@ -35,7 +40,7 @@ export default function PresentationPanel({ resource, uploadUrl, locked, onChang
       onRefresh(res.data)
       setNewLang('')
     } catch (err) {
-      const code = err.response?.data?.code
+      const code = uploadErrorCode(err)
       setError(t(`authoring.presentation.errors.${code}`, { defaultValue: t('authoring.presentation.errors.generic') }))
     } finally {
       setBusy('')
@@ -77,6 +82,12 @@ export default function PresentationPanel({ resource, uploadUrl, locked, onChang
               {preview ? <EyeOff size={14} /> : <Eye size={14} />} {preview ? t('authoring.presentation.hidePreview') : t('authoring.presentation.preview')}
             </button>
             {!locked && fileButton('', t('authoring.presentation.replace'))}
+            {!locked && (
+              <button type="button" className="me-media-btn me-media-btn--danger" onClick={() => remove('')}
+                title={t('authoring.presentation.remove')} aria-label={t('authoring.presentation.remove')}>
+                <Trash2 size={14} />
+              </button>
+            )}
           </div>
         </div>
       ) : (

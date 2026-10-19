@@ -836,7 +836,7 @@
       "languageVersionsHint": "Facultatif : un .pptx traduit pour les apprenants utilisant cette langue. Les autres voient la présentation principale.",
       "addLanguage": "Ajouter une langue…",
       "downloadable": "Les apprenants peuvent télécharger le fichier",
-      "downloadableHint": "Désactivé : les apprenants peuvent seulement regarder le diaporama.",
+      "downloadableHint": "Désactivé : aucun bouton de téléchargement n’est affiché (le fichier reste accessible par son lien).",
       "overLimit": "Plus de 10 Mo — la visionneuse de Microsoft risque de ne pas la lire ; vérifiez l’aperçu sur le site en ligne. Les apprenants auront aussi un bouton de téléchargement.",
       "fileRequiredError": "Téléversez d’abord le fichier .pptx.",
       "errors": {

@@ -836,7 +836,7 @@
       "languageVersionsHint": "Valgfritt: en oversatt .pptx for deltakere som bruker det språket. Andre ser hovedpresentasjonen.",
       "addLanguage": "Legg til språk…",
       "downloadable": "Deltakerne kan laste ned filen",
-      "downloadableHint": "Av: deltakerne kan bare se lysbildefremvisningen.",
+      "downloadableHint": "Av: ingen nedlastingsknapp vises (filen kan fortsatt nås via lenken).",
       "overLimit": "Over 10 MB — Microsofts visningsprogram spiller den kanskje ikke av; sjekk forhåndsvisningen på det publiserte nettstedet. Deltakerne får også en nedlastingsknapp.",
       "fileRequiredError": "Last opp .pptx-filen først.",
       "errors": {

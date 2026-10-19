@@ -94,3 +94,40 @@ class CheckPptxTests(SimpleTestCase):
         f = io.BytesIO(b'just some notes')
         self.code(f)
         self.assertEqual(f.tell(), 0)
+
+
+def _patch_central(buffer, name, offset, value):
+    """Overwrite one little-endian 2-byte field of `name`'s central-directory entry."""
+    data = bytearray(buffer.getvalue())
+    marker = b'PK\x01\x02'
+    pos = data.find(marker)
+    while pos != -1:
+        name_len = int.from_bytes(data[pos + 28:pos + 30], 'little')
+        if data[pos + 46:pos + 46 + name_len].decode() == name:
+            data[pos + offset:pos + offset + 2] = value.to_bytes(2, 'little')
+            return io.BytesIO(bytes(data))
+        pos = data.find(marker, pos + 4)
+    raise AssertionError(f'{name} not found')
+
+
+class DamagedZipTests(SimpleTestCase):
+    def code(self, fileobj):
+        with self.assertRaises(PresentationError) as ctx:
+            check_pptx(fileobj)
+        return ctx.exception.code
+
+    def test_corrupted_deflate_data_is_corrupt(self):
+        buffer = make_pptx(slides=40)
+        with zipfile.ZipFile(buffer) as z:
+            info = z.getinfo('ppt/presentation.xml')
+        data = bytearray(buffer.getvalue())
+        start = info.header_offset + 30 + len(info.filename.encode()) + len(info.extra)
+        for i in range(start + 2, start + min(info.compress_size, 40)):
+            data[i] ^= 0xFF
+        self.assertEqual(self.code(io.BytesIO(bytes(data))), 'corrupt')
+
+    def test_unsupported_compression_is_corrupt(self):
+        self.assertEqual(self.code(_patch_central(make_pptx(), 'ppt/presentation.xml', 10, 9)), 'corrupt')
+
+    def test_encrypted_entry_is_corrupt(self):
+        self.assertEqual(self.code(_patch_central(make_pptx(), 'ppt/presentation.xml', 8, 1)), 'corrupt')

@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { absoluteUrl, isPrivateHost, officeViewerUrl } from './presentation.js'
+import { PRESENTATION_MAX_BYTES, absoluteUrl, isPrivateHost, officeViewerUrl, openFullscreen, uploadErrorCode } from './presentation.js'
 
 test('office viewer url encodes the file url', () => {
   assert.equal(
@@ -23,4 +23,21 @@ test('private and development hosts', () => {
 test('absolute url resolves site-relative paths against the API origin', () => {
   assert.equal(absoluteUrl('/media/p/a.pptx', 'https://aidea-hub.eu/api'), 'https://aidea-hub.eu/media/p/a.pptx')
   assert.equal(absoluteUrl('https://cdn.example/a.pptx', 'https://aidea-hub.eu/api'), 'https://cdn.example/a.pptx')
+})
+
+test('full screen uses the frame, or opens the viewer where element full screen is missing (iPhone)', async () => {
+  const calls = []
+  const frame = { requestFullscreen: () => { calls.push('fs'); return Promise.reject(new Error('denied')) } }
+  const win = { open: (...args) => calls.push(['open', ...args]) }
+  openFullscreen(frame, 'https://view.example/x', win)
+  await new Promise(r => setTimeout(r, 0))   // the rejected promise is handled
+  openFullscreen({}, 'https://view.example/x', win)
+  assert.deepEqual(calls, ['fs', ['open', 'https://view.example/x', '_blank', 'noopener']])
+})
+
+test('upload size and error codes', () => {
+  assert.equal(PRESENTATION_MAX_BYTES, 100 * 1024 * 1024)
+  assert.equal(uploadErrorCode({ response: { status: 413 } }), 'too_large')
+  assert.equal(uploadErrorCode({ response: { status: 400, data: { code: 'macros' } } }), 'macros')
+  assert.equal(uploadErrorCode(new Error('network')), 'generic')
 })

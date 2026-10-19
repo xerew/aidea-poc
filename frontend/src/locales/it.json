@@ -836,7 +836,7 @@
       "languageVersionsHint": "Facoltativo: un .pptx tradotto per chi usa quella lingua. Gli altri vedono la presentazione principale.",
       "addLanguage": "Aggiungi lingua…",
       "downloadable": "I partecipanti possono scaricare il file",
-      "downloadableHint": "Disattivato: i partecipanti possono solo guardare la presentazione.",
+      "downloadableHint": "Disattivato: il pulsante di download non viene mostrato (il file resta raggiungibile tramite il suo link).",
       "overLimit": "Oltre 10 MB: il visualizzatore di Microsoft potrebbe non riprodurla; controlla l’anteprima sul sito pubblicato. I partecipanti avranno anche un pulsante di download.",
       "fileRequiredError": "Carica prima il file .pptx.",
       "errors": {

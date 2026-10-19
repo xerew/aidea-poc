@@ -24,3 +24,23 @@ export function isPrivateHost(url) {
   }
   return PRIVATE.some(re => re.test(host))
 }
+
+// Same limit as the server (PRESENTATION_MAX_MB); checked before uploading so
+// authors are not made to send 100 MB only to be refused.
+export const PRESENTATION_MAX_BYTES = 100 * 1024 * 1024
+
+/** The error code to show for a failed upload (Caddy answers 413 before Django sees it). */
+export function uploadErrorCode(err) {
+  if (err?.response?.status === 413) return 'too_large'
+  return err?.response?.data?.code ?? 'generic'
+}
+
+/** Full screen for the slideshow frame; where element full screen does not
+ *  exist (iPhone Safari) the viewer opens in a new tab instead. */
+export function openFullscreen(frame, viewerUrl, win = window) {
+  if (frame?.requestFullscreen) {
+    frame.requestFullscreen().catch(() => {})
+    return
+  }
+  win.open(viewerUrl, '_blank', 'noopener')
+}
