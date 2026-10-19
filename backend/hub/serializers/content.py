@@ -56,12 +56,13 @@ class ResourceLearnSerializer(serializers.ModelSerializer):
     instructions = serializers.SerializerMethodField()
     quiz_data = serializers.SerializerMethodField()
     h5p = serializers.SerializerMethodField()
+    presentation = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
         fields = [
             'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
-            'caption', 'quiz_data', 'instructions', 'h5p_self_complete', 'h5p',
+            'caption', 'quiz_data', 'instructions', 'h5p_self_complete', 'h5p', 'presentation',
         ]
 
     def get_h5p(self, obj):
@@ -75,6 +76,22 @@ class ResourceLearnSerializer(serializers.ModelSerializer):
         return {
             'package_id': package.id, 'path': package.media_path, 'language': package.language,
             'version': package.version, 'title': package.title, 'main_library': package.main_library,
+        }
+
+    def get_presentation(self, obj):
+        """The deck to show: the viewer's language version, else the main deck."""
+        if obj.type != Resource.Type.PRESENTATION:
+            return None
+        decks = {d.language: d for d in obj.presentation_files.all()}
+        deck = decks.get(viewer_language(self.context)) or decks.get('')
+        if deck is None:
+            return None
+        request = self.context.get('request')
+        url = request.build_absolute_uri(deck.media_path) if request else deck.media_path
+        return {
+            'url': url, 'title': deck.title, 'slides': deck.slide_count, 'language': deck.language,
+            'size_bytes': deck.size_bytes, 'over_viewer_limit': deck.over_viewer_limit,
+            'downloadable': obj.presentation_downloadable or deck.over_viewer_limit,
         }
 
     def get_content(self, obj):
