@@ -471,9 +471,6 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
   const { t } = useTranslation()
   const [saving, setSaving] = useState(false)
   const endpoint = base(courseId, activityId, resource.id)
-  const selfCompletes = resource.type === 'h5p'
-    ? Boolean(resource.h5p_self_complete)
-    : !['quiz', 'assignment'].includes(resource.type)
 
   const complete = async (payload = {}) => {
     if (saving || resource.is_completed) return
@@ -530,20 +527,6 @@ export default function ResourceView({ resource, courseId, activityId, onComplet
 
       <div className="lp-content-card lp-resource-card">{body}</div>
 
-      {selfCompletes && (
-        <div className="lp-resource-footer">
-          <button
-            type="button"
-            className={`lp-complete-btn lp-resource-btn ${resource.is_completed ? 'lp-complete-btn--done' : ''}`}
-            onClick={() => complete()}
-            disabled={saving || resource.is_completed}
-          >
-            {resource.is_completed
-              ? t('common.completedCheck')
-              : saving ? t('common.saving') : t('lesson.resource.markDone')}
-          </button>
-        </div>
-      )}
       {resource.type === 'assignment' && !resource.is_completed
         && resource.submission?.status === 'pending' && (
         <div className="lp-resource-footer">

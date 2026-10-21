@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Circle, Layers } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import ResourceView from '../components/learner/ResourceView'
+import { activityButtonState } from '../lib/activityCompletion'
 import TypeIcon from '../components/learner/TypeIcon'
 import { TrackingContext } from '../lib/tracking/TrackingContext'
 import { useActivityTracker } from '../lib/tracking/useActivityTracker'
@@ -133,6 +134,33 @@ export default function ActivityPage() {
     }))
   }, [courseId, activityId, setActivity, tracking])
 
+  // The activity's single "Mark activity as done" (spec 2026-10-21 §3).
+  const [completingActivity, setCompletingActivity] = useState(false)
+  const completeActivity = useCallback(async () => {
+    setCompletingActivity(true)
+    try {
+      const res = await client.post(`/courses/${courseId}/lessons/${activityId}/complete-resources/`,
+        { scroll_pct: scrollPctRef.current })
+      const { completed_resource_ids: ids, progress_pct: progressPct, activity_completed: activityDone } = res.data
+      ids.forEach(id => tracking.completed(id))
+      setActivity(prev => prev && ({
+        ...prev,
+        is_completed: activityDone,
+        resources: prev.resources.map(r => (ids.includes(r.id) ? { ...r, is_completed: true } : r)),
+      }))
+      setCourseLearn(prev => prev && ({
+        ...prev,
+        progress_pct: progressPct,
+        modules: prev.modules.map(mod => ({
+          ...mod,
+          lessons: mod.lessons.map(a => (a.id === Number(activityId) ? { ...a, is_completed: activityDone } : a)),
+        })),
+      }))
+    } finally {
+      setCompletingActivity(false)
+    }
+  }, [courseId, activityId, setActivity, tracking])
+
   const handleSubmissionChange = useCallback((resourceId, submission) => {
     setActivity(prev => prev && ({
       ...prev,
@@ -145,6 +173,7 @@ export default function ActivityPage() {
   if (error) return <p className="page-error">{error}</p>
 
   const resources = activity?.resources ?? []
+  const doneState = activityButtonState(resources)
   const resourceTypes = [...new Set(resources.map(r => r.type))]
   const required = resources.filter(r => r.is_required)
   const doneRequired = required.filter(r => r.is_completed).length
@@ -251,6 +280,18 @@ export default function ActivityPage() {
                     />
                   ))}
                 </TrackingContext.Provider>
+              )}
+
+              {doneState.show && (
+                <div className="lp-activity-done">
+                  <button type="button"
+                    className={`lp-complete-btn lp-activity-done-btn ${doneState.done ? 'lp-complete-btn--done' : ''}`}
+                    onClick={completeActivity} disabled={doneState.done || completingActivity}>
+                    {doneState.done ? t('common.completedCheck')
+                      : completingActivity ? t('common.saving') : t('lesson.activityDone.button')}
+                  </button>
+                  {doneState.showNote && <p className="lp-activity-done-note">{t('lesson.activityDone.note')}</p>}
+                </div>
               )}
 
               {/* Navigation */}

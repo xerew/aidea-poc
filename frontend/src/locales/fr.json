@@ -542,6 +542,10 @@
       "download": "Télécharger (.pptx)",
       "livePreviewOnly": "Le diaporama s’affiche sur le site en ligne. Ici, vous pouvez télécharger le fichier.",
       "frameTitle": "Présentation : {{title}}"
+    },
+    "activityDone": {
+      "button": "Marquer l’activité comme terminée",
+      "note": "Les quiz et les devoirs sont terminés lorsque vous les envoyez."
     }
   },
   "authoring": {

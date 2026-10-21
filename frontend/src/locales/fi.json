@@ -542,6 +542,10 @@
       "download": "Lataa (.pptx)",
       "livePreviewOnly": "Diaesitys toimii julkaistulla sivustolla. Täällä voit ladata tiedoston.",
       "frameTitle": "Esitys: {{title}}"
+    },
+    "activityDone": {
+      "button": "Merkitse aktiviteetti tehdyksi",
+      "note": "Visat ja tehtävät merkitään tehdyiksi, kun palautat ne."
     }
   },
   "authoring": {

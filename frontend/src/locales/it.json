@@ -542,6 +542,10 @@
       "download": "Scarica (.pptx)",
       "livePreviewOnly": "La presentazione si vede sul sito pubblicato. Qui puoi scaricare il file.",
       "frameTitle": "Presentazione: {{title}}"
+    },
+    "activityDone": {
+      "button": "Segna l’attività come completata",
+      "note": "Quiz e compiti si completano quando li invii."
     }
   },
   "authoring": {

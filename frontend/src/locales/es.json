@@ -542,6 +542,10 @@
       "download": "Descargar (.pptx)",
       "livePreviewOnly": "La presentación se reproduce en el sitio publicado. Aquí puedes descargar el archivo.",
       "frameTitle": "Presentación: {{title}}"
+    },
+    "activityDone": {
+      "button": "Marcar la actividad como hecha",
+      "note": "Los cuestionarios y las tareas se completan al enviarlos."
     }
   },
   "authoring": {

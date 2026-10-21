@@ -542,6 +542,10 @@
       "download": "Last ned (.pptx)",
       "livePreviewOnly": "Lysbildefremvisningen vises på det publiserte nettstedet. Her kan du laste ned filen.",
       "frameTitle": "Presentasjon: {{title}}"
+    },
+    "activityDone": {
+      "button": "Merk aktiviteten som fullført",
+      "note": "Quizer og oppgaver fullføres når du leverer dem."
     }
   },
   "authoring": {

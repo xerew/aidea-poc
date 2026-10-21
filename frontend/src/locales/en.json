@@ -542,6 +542,10 @@
       "download": "Download (.pptx)",
       "livePreviewOnly": "The slideshow plays on the live site. Here you can download the file.",
       "frameTitle": "Presentation: {{title}}"
+    },
+    "activityDone": {
+      "button": "Mark activity as done",
+      "note": "Quizzes and assignments are completed when you submit them."
     }
   },
   "authoring": {

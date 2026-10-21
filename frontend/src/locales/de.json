@@ -542,6 +542,10 @@
       "download": "Herunterladen (.pptx)",
       "livePreviewOnly": "Die Bildschirmpräsentation läuft auf der Live-Website. Hier können Sie die Datei herunterladen.",
       "frameTitle": "Präsentation: {{title}}"
+    },
+    "activityDone": {
+      "button": "Aktivität als erledigt markieren",
+      "note": "Quizze und Aufgaben werden abgeschlossen, wenn Sie sie einreichen."
     }
   },
   "authoring": {

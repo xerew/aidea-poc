@@ -542,6 +542,10 @@
       "download": "Ladda ned (.pptx)",
       "livePreviewOnly": "Bildspelet visas på den publicerade webbplatsen. Här kan du ladda ned filen.",
       "frameTitle": "Presentation: {{title}}"
+    },
+    "activityDone": {
+      "button": "Markera aktiviteten som klar",
+      "note": "Quiz och uppgifter blir klara när du skickar in dem."
     }
   },
   "authoring": {
