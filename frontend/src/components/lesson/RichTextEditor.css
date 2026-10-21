@@ -24,3 +24,10 @@
 
 /* Plain-text (legacy) content keeps its line breaks */
 .rich-html--plain { white-space: pre-wrap; }
+
+/* Tables and images inside rich text (spec 2026-10-21) */
+.rich-html table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; display: block; overflow-x: auto; }
+.rich-html th, .rich-html td { border: 1px solid var(--color-border); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+.rich-html th { background: var(--color-bg); font-weight: 600; }
+.rich-html caption { caption-side: top; text-align: left; font-weight: 600; padding-bottom: 0.35rem; }
+.rich-html img { max-width: 100%; height: auto; border-radius: 6px; }
