@@ -42,11 +42,7 @@ def _ollama_generate(prompt: str) -> str:
     return text
 
 
-def translate_text(text: str, source: str, target: str) -> str:
-    if not text or not text.strip():
-        return text
-    if source == target:
-        return text
+def _translate_plain(text: str, source: str, target: str) -> str:
     src = LANGUAGE_NAMES.get(source, source)
     tgt = LANGUAGE_NAMES.get(target, target)
     prompt = (
@@ -54,3 +50,31 @@ def translate_text(text: str, source: str, target: str) -> str:
         f'Output only the translation, with no notes, quotes, or explanation.\n\n{text}'
     )
     return _ollama_generate(prompt)
+
+
+def _translate_fragment(fragment: str, source: str, target: str) -> str:
+    src = LANGUAGE_NAMES.get(source, source)
+    tgt = LANGUAGE_NAMES.get(target, target)
+    prompt = (
+        f'Translate the text in this HTML fragment from {src} to {tgt}. '
+        f'Keep every HTML tag and attribute exactly as it is; translate only the text between tags. '
+        f'Output only the translated HTML, with no notes or explanation.\n\n{fragment}'
+    )
+    return _ollama_generate(prompt)
+
+
+def translate_text(text: str, source: str, target: str) -> str:
+    """Plain text goes to the model as one piece; HTML (rich text) block by
+    block, keeping tables, images and links intact (hub/html_translate.py)."""
+    if not text or not text.strip():
+        return text
+    if source == target:
+        return text
+    from hub.html_translate import looks_like_html, translate_html
+    if looks_like_html(text):
+        return translate_html(
+            text,
+            lambda fragment: _translate_fragment(fragment, source, target),
+            lambda plain: _translate_plain(plain, source, target),
+        )
+    return _translate_plain(text, source, target)
