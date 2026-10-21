@@ -18,20 +18,17 @@ class LessonSession(models.Model):
 
 
 class LearnerActivityConfig(models.Model):
-    """Singleton config for learner activity tracking and quiz-competency weighting."""
-    quiz_affects_competency = models.BooleanField(default=False)
+    """Singleton config for learner activity tracking and the AI competency rule
+    (docs/superpowers/specs/2026-10-21-competency-performance-design.md)."""
+    # Competency: a course counts as passed at this first-attempt performance (0–1).
     quiz_pass_threshold     = models.FloatField(default=0.7)
-    quiz_weight_pass        = models.FloatField(default=1.0)
-    quiz_weight_fail        = models.FloatField(default=0.5)
 
-    # Decay (see docs/superpowers/specs/2026-07-19-competency-decay-design.md)
-    decay_enabled        = models.BooleanField(default=True)
+    # Slow-pace penalty and idle decay
     slow_ratio_threshold = models.FloatField(default=3.0)
     slow_penalty         = models.PositiveSmallIntegerField(default=1)
     idle_decay_days      = models.PositiveSmallIntegerField(default=30)
     idle_decay_points    = models.PositiveSmallIntegerField(default=1)
-    # Separate switches (spec 2026-10-21): the slow-pace penalty on course
-    # completion, and the nightly idle decay. `decay_enabled` is removed in a later migration.
+    # Separate switches: the slow-pace penalty on course completion, and the nightly idle decay.
     slow_penalty_enabled = models.BooleanField(default=True)
     idle_decay_enabled   = models.BooleanField(default=False)
 
@@ -49,4 +46,4 @@ class LearnerActivityConfig(models.Model):
         return obj
 
     def __str__(self):
-        return f'LearnerActivityConfig (quiz_affects_competency={self.quiz_affects_competency})'
+        return 'Learner activity settings'

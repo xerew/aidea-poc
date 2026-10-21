@@ -75,15 +75,14 @@ class LearnerActivityConfigTest(TestCase):
     def test_defaults(self):
         from hub.models.activity import LearnerActivityConfig
         config = LearnerActivityConfig.get()
-        self.assertFalse(config.quiz_affects_competency)
         self.assertAlmostEqual(config.quiz_pass_threshold, 0.7)
-        self.assertAlmostEqual(config.quiz_weight_pass, 1.0)
-        self.assertAlmostEqual(config.quiz_weight_fail, 0.5)
+        for removed in ('quiz_affects_competency', 'quiz_weight_pass', 'quiz_weight_fail', 'decay_enabled'):
+            self.assertFalse(hasattr(config, removed), removed)
 
     def test_save_enforces_singleton(self):
         from hub.models.activity import LearnerActivityConfig
         config = LearnerActivityConfig.get()
-        config.quiz_affects_competency = True
+        config.tracking_enabled = False
         config.save()
         self.assertEqual(LearnerActivityConfig.objects.count(), 1)
         self.assertEqual(config.pk, 1)

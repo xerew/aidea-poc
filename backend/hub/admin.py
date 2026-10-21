@@ -435,17 +435,25 @@ class LessonSessionAdmin(admin.ModelAdmin):
 @admin.register(LearnerActivityConfig)
 class LearnerActivityConfigAdmin(admin.ModelAdmin):
     fieldsets = [
-        ('Quiz → Competency toggle', {'fields': ['quiz_affects_competency']}),
-        ('Weights (active when toggle is on)', {
-            'fields': ['quiz_pass_threshold', 'quiz_weight_pass', 'quiz_weight_fail'],
+        ('AI competency from performance', {
+            'fields': ['quiz_pass_threshold'],
             'description': (
-                'Weights are rounded to the nearest even integer before applying '
-                '(Python round): ±0.5 rounds to 0, so a fail weight must be -1.0 '
-                'or lower to actually subtract points.'
+                'On completing a course, the first-attempt scores of its quizzes, scored H5P activities '
+                'and assignments (approved on the first review = 100%, changes requested = 0%) are '
+                'averaged per module, then across modules; passed = at least this threshold. '
+                'Course harder than the teacher\'s level: +1 (+2 if two levels) when passed; same level: '
+                '+1 when passed; easier: −1 when not passed; otherwise no change. Courses with no scored '
+                'items give +1. Every change is listed under "Competency changes".'
             ),
         }),
-        ('Decay', {'fields': ['decay_enabled', 'slow_ratio_threshold', 'slow_penalty',
-                              'idle_decay_days', 'idle_decay_points']}),
+        ('Slow-pace penalty', {
+            'fields': ['slow_penalty_enabled', 'slow_ratio_threshold', 'slow_penalty'],
+            'description': 'Subtracted on completion when the time spent averages more than the ratio × the planned time.',
+        }),
+        ('Idle decay', {
+            'fields': ['idle_decay_enabled', 'idle_decay_days', 'idle_decay_points'],
+            'description': 'Nightly: subtract points for each course started and not opened for this many days.',
+        }),
         ('Learning analytics', {
             'fields': ['tracking_enabled'],
             'description': (
