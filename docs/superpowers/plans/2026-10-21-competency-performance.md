@@ -12,6 +12,7 @@
 - `apply_competency_delta` writes a `CompetencyChange` row whenever the score moves.
 - Assignment submissions keep their `first_review_status`.
 - `LearnerActivityConfig`'s single `decay_enabled` switch becomes `slow_penalty_enabled` + `idle_decay_enabled`, and the old quiz toggle and weights are removed.
+- `apply_course_completion` applies the change and stamps `Enrollment.competency_applied_at` in one transaction. A nightly safety net applies changes that were never applied.
 
 **Tech Stack:** Django 5 + DRF, Celery (nightly idle task).
 
@@ -48,6 +49,11 @@
   - for idle decay, `course` = the abandoned course;
   - clamped no-op changes record nothing.
 - **Existing scores** are not recalculated.
+- **Safety net:**
+  - `Enrollment.competency_applied_at` is set in the same transaction as the change, even when the change is 0 or clamped;
+  - an error while applying it on completion is caught and logged, and the completion still succeeds;
+  - nightly (04:00, Celery beat `competency-nightly-check` → `hub.tasks.nightly_competency_check`, replacing `apply-competency-decay-nightly`), enrollments with `completed_at` older than **1 hour** and no marker get the change once (`reason.applied_by = 'nightly'`), then idle decay runs if switched on;
+  - the migration backfills `competency_applied_at = completed_at` for existing completed enrollments.
 - **Runner and git:**
   - from `backend/`, set `UV="/c/Users/Nikos A. Grammatikos/.local/bin/uv.exe"`, then `"$UV" run manage.py test …` and `"$UV" run ruff check hub analytics`;
   - keep line endings; work on `master`, commit and push per task, with the trailer `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
@@ -67,12 +73,14 @@
 - `backend/hub/models/competency.py` (new): `CompetencyChange`.
 - `backend/hub/models/activity.py`: `slow_penalty_enabled` and `idle_decay_enabled` (Task 1); remove `quiz_affects_competency`, `quiz_weight_pass`, `quiz_weight_fail` and `decay_enabled` (Task 3).
 - `backend/hub/models/assignment.py`: `first_review_status`.
+- `backend/hub/models/enrollment.py`: `competency_applied_at`.
+- `backend/aidea/settings.py`: the nightly beat entry (Task 2).
 - `backend/hub/models/__init__.py`, `backend/hub/admin.py`.
 - `backend/hub/migrations/0068_competency_performance.py` (generated), `0069_competency_settings_data.py` (hand-written), `0070_remove_old_competency_settings.py` (generated).
 - `backend/hub/assignment_review.py`: record the first decision.
 - `backend/hub/competency.py`: the new rule and the change record.
-- `backend/hub/completion.py`: call `course_completion_change`.
-- `backend/hub/tasks.py`: the idle task uses `idle_decay_enabled` and records the course.
+- `backend/hub/completion.py`: call `apply_course_completion` (errors caught and logged).
+- `backend/hub/tasks.py`: the idle task uses `idle_decay_enabled` and records the course; the new `nightly_competency_check` task.
 - Tests:
   - new: `hub/tests/test_competency_models.py`, `hub/tests/test_competency_performance.py`;
   - updated: `hub/tests/test_competency_decay.py`, `hub/tests/test_learner_activity.py`.
@@ -91,6 +99,7 @@
 **Interfaces — Produces:**
 - `LearnerActivityConfig.slow_penalty_enabled` (default True) and `.idle_decay_enabled` (default False).
 - `AssignmentSubmission.first_review_status` (str, `''` / `'approved'` / `'changes_requested'`).
+- `Enrollment.competency_applied_at` (datetime or None).
 - `CompetencyChange(user, course|None, old_score, new_score, delta, reason: dict, created_at)`.
 - `approve_submission` and `request_changes` set `first_review_status` only when it is blank.
 
@@ -144,6 +153,9 @@ class CompetencyModelTests(TestCase):
         reopen_submission(sub)
         sub.refresh_from_db()
         self.assertEqual((sub.status, sub.first_review_status), ('pending', 'changes_requested'))
+
+    def test_enrollment_marker_default(self):
+        self.assertIsNone(Enrollment.objects.get(user=self.learner).competency_applied_at)
 
     def test_change_record(self):
         change = CompetencyChange.objects.create(user=self.learner, course=self.course, old_score=3, new_score=4,
@@ -199,6 +211,14 @@ class CompetencyChange(models.Model):
     first_review_status = models.CharField(max_length=20, blank=True)
 ```
 
+`backend/hub/models/enrollment.py`, in `Enrollment`, after `decay_applied_at`:
+
+```python
+    # When this course's competency change was handled (spec 2026-10-21); the
+    # nightly check applies it to completed enrollments still missing this.
+    competency_applied_at = models.DateTimeField(null=True, blank=True)
+```
+
 `backend/hub/models/__init__.py`: add `from .competency import CompetencyChange` (alphabetical position) and `'CompetencyChange'` to `__all__`.
 
 `backend/hub/assignment_review.py`:
@@ -226,12 +246,13 @@ class CompetencyChangeAdmin(_ReadOnlyAdmin):
     readonly_fields = ['user', 'course', 'old_score', 'new_score', 'delta', 'reason', 'created_at']
 ```
 
-Generate the migration with `"$UV" run manage.py makemigrations hub --name competency_performance`. Expected: `0068_competency_performance.py` with the two config fields, `first_review_status` and `CompetencyChange`.
+Generate the migration with `"$UV" run manage.py makemigrations hub --name competency_performance`. Expected: `0068_competency_performance.py` with the two config fields, `first_review_status`, `competency_applied_at` and `CompetencyChange`.
 
 Create `backend/hub/migrations/0069_competency_settings_data.py`:
 
 ```python
 from django.db import migrations
+from django.db.models import F
 
 
 def forwards(apps, schema_editor):
@@ -246,6 +267,10 @@ def forwards(apps, schema_editor):
     Submission = apps.get_model('hub', 'AssignmentSubmission')
     for status in ('approved', 'changes_requested'):
         Submission.objects.filter(status=status, first_review_status='').update(first_review_status=status)
+    # Past completions were already scored by the old rule: never re-score them.
+    Enrollment = apps.get_model('hub', 'Enrollment')
+    Enrollment.objects.filter(completed_at__isnull=False, competency_applied_at__isnull=True).update(
+        competency_applied_at=F('completed_at'))
 
 
 def backwards(apps, schema_editor):
@@ -263,8 +288,8 @@ class Migration(migrations.Migration):
 **Migration check** (Review Focus 5), on the dev database:
 1. Run `"$UV" run manage.py shell -c "from hub.models import LearnerActivityConfig as C; c=C.get(); c.decay_enabled=False; c.save(); print('before', c.decay_enabled)"` **before** migrating.
 2. Run `"$UV" run manage.py migrate`.
-3. Run `"$UV" run manage.py shell -c "from hub.models import LearnerActivityConfig as C; c=C.get(); print(c.slow_penalty_enabled, c.idle_decay_enabled)"`.
-4. Expected: `True False`.
+3. Run `"$UV" run manage.py shell -c "from hub.models import LearnerActivityConfig as C, Enrollment as E; c=C.get(); print(c.slow_penalty_enabled, c.idle_decay_enabled, E.objects.filter(completed_at__isnull=False, competency_applied_at__isnull=True).count())"`.
+4. Expected: `True False 0`.
 
 - [ ] **Step 4: Run the tests to verify they pass.**
   - Run: `"$UV" run manage.py test hub.tests.test_competency_models hub.tests.test_assignment_review hub.tests.test_ai_review_pipeline -v 2`
@@ -275,7 +300,7 @@ class Migration(migrations.Migration):
 ```bash
 "$UV" run ruff check hub analytics
 git add hub/models hub/assignment_review.py hub/admin.py hub/migrations/0068_competency_performance.py hub/migrations/0069_competency_settings_data.py hub/tests/test_competency_models.py
-git commit -m "feat: competency change record, first review decision, separate decay switches"
+git commit -m "feat: competency change record, first review decision, applied marker, separate decay switches"
 git push
 ```
 
@@ -295,17 +320,24 @@ git push
   - `performance_delta(passed: bool, gap: int) -> int`;
   - `course_completion_change(user, course) -> (int, dict)`;
   - `course_completion_delta(user, course) -> int`, kept as a thin wrapper;
-  - `apply_competency_delta(user, delta, recompute=True, course=None, reason=None) -> int`, which records a `CompetencyChange`.
+  - `apply_competency_delta(user, delta, recompute=True, course=None, reason=None) -> int`, which records a `CompetencyChange`;
+  - `apply_course_completion(user, enrollment, applied_by='completion') -> int | None`: applies once and stamps the marker; None when already applied;
+  - `apply_missed_competency_changes(now=None) -> int`: the number of enrollments fixed;
+  - Celery task `hub.tasks.nightly_competency_check()`.
 
 - [ ] **Step 1: Write the failing tests.** `backend/hub/tests/test_competency_performance.py`:
 
 ```python
+from datetime import timedelta
+from unittest import mock
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.utils import timezone
 
 from hub.competency import (
     apply_competency_delta,
+    apply_missed_competency_changes,
     course_completion_change,
     course_performance,
     performance_delta,
@@ -481,6 +513,64 @@ class ChangeRecordTests(Base):
         change = CompetencyChange.objects.get()
         self.assertEqual((self.user.profile.competency_score, change.reason['rule'], change.course),
                          (4, 'performance', course))
+
+
+class NightlySafetyNetTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.course, (m1,) = make_course('advanced', modules=1)
+        self.quiz = add(m1, 'quiz')
+        self.enrollment = Enrollment.objects.create(user=self.user, course=self.course)
+
+    def complete(self):
+        from hub.completion import record_resource_completion
+        record_resource_completion(self.user, self.enrollment, self.quiz, quiz_answers_raw=[0])
+        self.enrollment.refresh_from_db()
+        self.user.profile.refresh_from_db()
+
+    def age(self, **delta):
+        Enrollment.objects.filter(pk=self.enrollment.pk).update(completed_at=timezone.now() - timedelta(**delta))
+
+    def test_completion_sets_the_marker(self):
+        self.complete()
+        self.assertIsNotNone(self.enrollment.competency_applied_at)
+        self.assertEqual(apply_missed_competency_changes(), 0)
+
+    def test_failure_on_completion_is_applied_once_by_the_nightly_check(self):
+        with mock.patch('hub.competency.course_completion_change', side_effect=RuntimeError('boom')):
+            self.complete()                                   # no exception reaches the learner
+        self.assertIsNotNone(self.enrollment.completed_at)
+        self.assertIsNone(self.enrollment.competency_applied_at)
+        self.assertEqual(self.user.profile.competency_score, 3)
+        self.age(hours=2)
+        self.assertEqual(apply_missed_competency_changes(), 1)
+        self.user.profile.refresh_from_db()
+        change = CompetencyChange.objects.get()
+        self.assertEqual((self.user.profile.competency_score, change.reason['applied_by']), (4, 'nightly'))
+        self.assertEqual(apply_missed_competency_changes(), 0)  # a second night does nothing
+        self.assertEqual(CompetencyChange.objects.count(), 1)
+
+    def test_recent_completions_are_left_alone(self):
+        with mock.patch('hub.competency.course_completion_change', side_effect=RuntimeError('boom')):
+            self.complete()
+        self.age(minutes=10)
+        self.assertEqual(apply_missed_competency_changes(), 0)
+
+    def test_clamped_change_still_sets_the_marker(self):
+        self.user.profile.competency_score = 6
+        self.user.profile.save()
+        self.complete()                                       # advanced vs advanced, passed: +1 -> still 6
+        self.assertIsNotNone(self.enrollment.competency_applied_at)
+        self.assertFalse(CompetencyChange.objects.exists())
+
+    def test_nightly_task_runs_the_safety_net(self):
+        from hub.tasks import nightly_competency_check
+        with mock.patch('hub.competency.course_completion_change', side_effect=RuntimeError('boom')):
+            self.complete()
+        self.age(hours=2)
+        nightly_competency_check()
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.competency_score, 4)
 ```
 
 Update the existing tests whose switches change:
@@ -657,6 +747,61 @@ def course_completion_change(user, course):
 
 def course_completion_delta(user, course) -> int:
     return course_completion_change(user, course)[0]
+
+
+def apply_course_completion(user, enrollment, applied_by='completion'):
+    """Apply a completed course's change once, stamping the enrollment in the
+    same transaction (also when the change is 0 or clamped). Returns the delta,
+    or None when it was already applied."""
+    from django.db import transaction
+    from django.utils import timezone
+
+    from hub.models import Enrollment
+    with transaction.atomic():
+        locked = Enrollment.objects.select_for_update().select_related('course').get(pk=enrollment.pk)
+        if locked.competency_applied_at is not None:
+            return None
+        delta, reason = course_completion_change(user, locked.course)
+        if applied_by != 'completion':
+            reason['applied_by'] = applied_by
+        old = user.profile.competency_score
+        new = apply_competency_delta(user, delta, recompute=False, course=locked.course, reason=reason)
+        locked.competency_applied_at = timezone.now()
+        locked.save(update_fields=['competency_applied_at'])
+    enrollment.competency_applied_at = locked.competency_applied_at
+    if new != old:
+        from hub.tasks import compute_user_recommendations
+        compute_user_recommendations.delay(user.id)   # after commit: reads the new score
+    return delta
+
+
+NIGHTLY_GRACE_HOURS = 1   # never race a completion that is still being handled
+
+
+def apply_missed_competency_changes(now=None) -> int:
+    """Nightly safety net: completed courses whose change was never applied
+    (e.g. an error during completion) get it once, by the same rule."""
+    import logging
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from hub.models import Enrollment
+    cutoff = (now or timezone.now()) - timedelta(hours=NIGHTLY_GRACE_HOURS)
+    missed = (
+        Enrollment.objects
+        .filter(completed_at__isnull=False, completed_at__lt=cutoff, competency_applied_at__isnull=True,
+                user__profile__isnull=False)
+        .select_related('user__profile', 'course')
+    )
+    fixed = 0
+    for enrollment in missed:
+        try:
+            if apply_course_completion(enrollment.user, enrollment, applied_by='nightly') is not None:
+                fixed += 1
+        except Exception:  # noqa: BLE001 — one bad enrollment must not stop the others
+            logging.getLogger(__name__).exception('Nightly competency check failed for enrollment %s', enrollment.pk)
+    return fixed
 ```
 
 `backend/hub/completion.py`, in `recompute_course_progress`, replace:
@@ -669,10 +814,14 @@ def course_completion_delta(user, course) -> int:
 with:
 
 ```python
-        from hub.competency import apply_competency_delta, course_completion_change
-        delta, reason = course_completion_change(user, course)
-        apply_competency_delta(user, delta, course=course, reason=reason)
+        from hub.competency import apply_course_completion
+        try:
+            apply_course_completion(user, enrollment)
+        except Exception:  # noqa: BLE001 — the completion stands; the nightly check applies the change
+            logger.exception('Competency change for enrollment %s failed; left for the nightly check', enrollment.pk)
 ```
+
+and at the top of `completion.py` add `import logging` and `logger = logging.getLogger(__name__)` (after the imports).
 
 `backend/hub/tasks.py`, `apply_competency_decay`:
 - change `if not config.decay_enabled:` to `if not config.idle_decay_enabled:`;
@@ -686,6 +835,27 @@ with:
         )
 ```
 
+`backend/hub/tasks.py`: add, after `apply_competency_decay`:
+
+```python
+@shared_task
+def nightly_competency_check() -> None:
+    """04:00 (Celery beat): apply competency changes that were never applied
+    on completion (safety net), then idle decay if it is switched on."""
+    from hub.competency import apply_missed_competency_changes
+    apply_missed_competency_changes()
+    apply_competency_decay()
+```
+
+`backend/aidea/settings.py`, `CELERY_BEAT_SCHEDULE`: replace the `'apply-competency-decay-nightly'` entry with:
+
+```python
+    'competency-nightly-check': {
+        'task': 'hub.tasks.nightly_competency_check',
+        'schedule': crontab(hour=4, minute=0),
+    },
+```
+
 - [ ] **Step 4: Run the tests to verify they pass.**
   - Run: `"$UV" run manage.py test hub.tests.test_competency_performance hub.tests.test_competency_decay hub.tests.test_learner_activity hub.tests.test_competency_scoring -v 2`
   - Expected: all pass.
@@ -695,8 +865,8 @@ with:
 ```bash
 "$UV" run ruff check hub analytics
 "$UV" run manage.py test hub analytics
-git add hub/competency.py hub/completion.py hub/tasks.py hub/tests/test_competency_performance.py hub/tests/test_competency_decay.py hub/tests/test_learner_activity.py
-git commit -m "feat: competency from first-attempt performance vs course difficulty"
+git add hub/competency.py hub/completion.py hub/tasks.py aidea/settings.py hub/tests/test_competency_performance.py hub/tests/test_competency_decay.py hub/tests/test_learner_activity.py
+git commit -m "feat: competency from first-attempt performance vs course difficulty; nightly safety net"
 git push
 ```
 
@@ -779,4 +949,4 @@ docker compose up -d --build backend celery celery-beat
 docker compose exec -T backend uv run python manage.py migrate      # 0068–0070
 ```
 
-Then check in Django admin → Learner activity settings: **Slow-pace penalty** ticked and **Idle decay** unticked. Score changes from then on appear under **Competency changes**.
+`celery-beat` must be rebuilt (above), because the nightly entry changed. Then check in Django admin → Learner activity settings: **Slow-pace penalty** ticked and **Idle decay** unticked. Score changes from then on appear under **Competency changes**.

@@ -25,6 +25,7 @@ The new rule moves the score by **performance relative to the course's difficult
 | Slow pace | **Kept**: −1 when the average time is more than 3× the planned time. Has its own switch. |
 | Idle decay | **Off** (its own switch; the code stays). |
 | Existing scores | **Not recalculated.** The rule applies from the moment it ships. |
+| Nightly check | **Safety net**: completed courses whose change was never applied (e.g. an error during completion) get it once, at night. |
 
 ## The rule
 
@@ -57,6 +58,20 @@ It runs when a teacher **first completes a course** (as today).
 - quizzes completed without answers;
 - assignments with no first review decision yet. In practice there are none at course completion, because a required assignment must be approved first.
 
+## Nightly safety net
+
+Today the course is saved as completed before the score change is applied. If the second step fails, the change is lost for good, because it only happens at the moment of first completion.
+
+- **Marker:** `Enrollment.competency_applied_at`.
+  - It's set in the same database transaction as the score change.
+  - It's also set when the change is zero, or clamped by 0–6, so nothing is retried forever.
+- **On completion:** the change and the marker are applied together. Any error is caught and logged: the teacher still sees the course completed, and the marker stays empty.
+- **Nightly (04:00, replacing the idle-decay-only job):**
+  - completed enrollments with no marker, completed **more than 1 hour ago** (never racing a live completion), get the change once by the same rule, plus the marker;
+  - the change record's reason includes `applied_by: 'nightly'`;
+  - the same job then runs idle decay, if switched on.
+- **Migration:** existing completed enrollments get `competency_applied_at = completed_at`, so past completions are not re-scored.
+
 ## Data
 
 - **`AssignmentSubmission.first_review_status`** (`approved` / `changes_requested`, blank until reviewed).
@@ -75,6 +90,8 @@ It runs when a teacher **first completes a course** (as today).
   - The admin labels say what each setting now does.
 
 ## Testing
+
+- Safety net: a failure during completion is caught, and the nightly check applies it exactly once; a second night does nothing; completions under an hour old are left alone; a clamped change still sets the marker; existing completions are backfilled.
 
 - Every table cell (gap −2…+2 × passed / not passed).
 - The first attempt is used: a later better quiz doesn't change `p`.
