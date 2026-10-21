@@ -83,8 +83,11 @@ User (+ UserProfile) → Enrollment → Course
 - `GET /api/analytics/courses/<id>/export/` and `GET /api/analytics/export/?ids=` — learning analytics workbook (incl. H5P answers)
 - `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/h5p/` — upload (multipart `file`, `language`) or remove an H5P package; played by `/h5p/player.html` (h5p-standalone) in a sandboxed iframe
 - `POST/DELETE /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/presentation/` — upload (multipart `file`, `language`) or remove a .pptx deck; played in Microsoft's Office viewer (`view.officeapps.live.com`), so the file URL must be public
+- `POST /api/courses/<id>/lessons/<a>/complete-resources/` — the activity's "Mark activity as done": completes its text/image/video/PDF/presentation/self-completed H5P resources at once (quizzes, assignments and scoring H5P complete themselves)
 - `GET/PUT /api/authoring/courses/<id>/modules/<m>/lessons/<a>/resources/<r>/ai-review/` — an assignment's AI reviewer set-up (rubric, visibility, auto-approve, agreement stats); `POST …/ai-review/draft/` drafts criteria with the model; `…/ai-review/examples/` lists/adds (≤ 5) and `…/examples/<id>/` deletes examples
 - `GET /api/reviews/?filter=ai_approve|ai_unsure|flagged|auto_approved`; `POST /api/reviews/<id>/` also takes `disagreement_reason` and `used_ai_feedback`; `POST /api/reviews/<id>/example/` (anonymised example) and `POST /api/reviews/<id>/reopen/` (undo an AI approval)
+
+**Rich text**: may hold tables and images (`frontend/src/lib/richText.js` is the single allow-list for the TinyMCE editor and the DOMPurify learner view); HTML is translated block by block with a structure check (`hub/html_translate.py`), plain text as one piece.
 
 **AI competency** (`hub/competency.py`): on course completion the score moves by first-attempt performance vs course difficulty (spec `2026-10-21-competency-performance-design.md`); every change is a `CompetencyChange` row with its reason; a nightly check (04:00) applies changes missed at completion; slow-pace penalty and idle decay have separate switches in Learner activity settings.
 
