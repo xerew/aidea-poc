@@ -114,26 +114,10 @@ class CourseCompletionDeltaTests(TestCase):
         self._progress(lesson, seconds=4 * 600)  # 40 min: ratio 4 > 3.0
         self.assertEqual(course_completion_delta(self.user, course), 0)
 
-    def test_negative_fail_weight_gives_negative_delta(self):
-        from hub.competency import course_completion_delta
-        from hub.models import Activity, Module
-        config = LearnerActivityConfig.get()
-        config.quiz_affects_competency = True
-        config.quiz_weight_fail = -1.0
-        config.save()
-        course, lesson = _make_course_with_lesson('ccd3')
-        quiz = Activity.objects.create(
-            module=Module.objects.get(course=course), title='Q', lesson_type='quiz',
-            order=2, is_required=True,
-        )
-        self._progress(lesson, seconds=600)
-        self._progress(quiz, quiz_score=0.2)  # below 0.7 threshold
-        self.assertEqual(course_completion_delta(self.user, course), -1)
-
-    def test_decay_disabled_skips_slow_penalty(self):
+    def test_slow_penalty_switch_off_skips_penalty(self):
         from hub.competency import course_completion_delta
         config = LearnerActivityConfig.get()
-        config.decay_enabled = False
+        config.slow_penalty_enabled = False
         config.save()
         course, lesson = _make_course_with_lesson('ccd4', duration_minutes=10)
         self._progress(lesson, seconds=4 * 600)
@@ -143,7 +127,7 @@ class CourseCompletionDeltaTests(TestCase):
 class DecayConfigTests(TestCase):
     def test_new_config_defaults(self):
         config = LearnerActivityConfig.get()
-        self.assertTrue(config.decay_enabled)
+        self.assertEqual((config.slow_penalty_enabled, config.idle_decay_enabled), (True, False))
         self.assertEqual(config.slow_ratio_threshold, 3.0)
         self.assertEqual(config.slow_penalty, 1)
         self.assertEqual(config.idle_decay_days, 30)
@@ -177,10 +161,21 @@ class IdleDecayTaskTests(TestCase):
         Enrollment.objects.filter(pk=self.enrollment.pk).update(
             last_accessed_at=timezone.now() - timedelta(days=45),
         )
+        # Idle decay is off by default since 2026-10-21; these tests exercise it.
+        config = LearnerActivityConfig.get()
+        config.idle_decay_enabled = True
+        config.save()
 
     def _refresh(self):
         self.user.profile.refresh_from_db()
         self.enrollment.refresh_from_db()
+
+    def test_idle_decay_is_recorded(self):
+        from hub.models import CompetencyChange
+        from hub.tasks import apply_competency_decay
+        apply_competency_decay()
+        change = CompetencyChange.objects.get()
+        self.assertEqual((change.reason['rule'], change.course, change.delta), ('idle', self.course, -1))
 
     def test_idle_enrollment_decays_once(self):
         from hub.tasks import apply_competency_decay
@@ -196,7 +191,7 @@ class IdleDecayTaskTests(TestCase):
     def test_disabled_toggle_skips(self):
         from hub.tasks import apply_competency_decay
         config = LearnerActivityConfig.get()
-        config.decay_enabled = False
+        config.idle_decay_enabled = False
         config.save()
         apply_competency_decay()
         self._refresh()

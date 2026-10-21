@@ -440,7 +440,7 @@ def apply_competency_decay() -> None:
     from hub.models import Enrollment, LearnerActivityConfig
 
     config = LearnerActivityConfig.get()
-    if not config.decay_enabled:
+    if not config.idle_decay_enabled:
         return
 
     cutoff = timezone.now() - timedelta(days=config.idle_decay_days)
@@ -452,7 +452,7 @@ def apply_competency_decay() -> None:
             last_accessed_at__lt=cutoff,
             decay_applied_at__isnull=True,
         )
-        .select_related('user__profile')
+        .select_related('user__profile', 'course')
     )
     now = timezone.now()
     decayed_user_ids = set()
@@ -460,6 +460,7 @@ def apply_competency_decay() -> None:
         # Batch the recompute: one per affected user, not one per enrollment
         apply_competency_delta(
             enrollment.user, -config.idle_decay_points, recompute=False,
+            course=enrollment.course, reason={'rule': 'idle', 'idle_days': config.idle_decay_days},
         )
         decayed_user_ids.add(enrollment.user_id)
         enrollment.decay_applied_at = now
@@ -467,6 +468,15 @@ def apply_competency_decay() -> None:
 
     for user_id in decayed_user_ids:
         compute_user_recommendations.delay(user_id)
+
+
+@shared_task
+def nightly_competency_check() -> None:
+    """04:00 (Celery beat): apply competency changes that were never applied
+    on completion (safety net), then idle decay if it is switched on."""
+    from hub.competency import apply_missed_competency_changes
+    apply_missed_competency_changes()
+    apply_competency_decay()
 
 
 @shared_task

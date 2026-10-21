@@ -177,8 +177,8 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'hub.tasks.tune_recommendation_weights',
         'schedule': crontab(hour=3, minute=0),
     },
-    'apply-competency-decay-nightly': {
-        'task': 'hub.tasks.apply_competency_decay',
+    'competency-nightly-check': {
+        'task': 'hub.tasks.nightly_competency_check',
         'schedule': crontab(hour=4, minute=0),
     },
     'check-translation-service': {

@@ -4,6 +4,8 @@ assignment-review approval. Single source of truth for progress/competency.
 ResourceProgress is the source of truth. The legacy activity-level entry point
 (record_lesson_completion) completes every resource of the activity and also
 keeps writing LessonProgress, so the rollback window stays current."""
+import logging
+
 from django.db.models import Count, Q
 from django.utils import timezone
 
@@ -14,6 +16,8 @@ from hub.models import (
     Resource,
     ResourceProgress,
 )
+
+logger = logging.getLogger(__name__)
 
 # ── Reads ─────────────────────────────────────────────────────────────────────
 
@@ -94,8 +98,11 @@ def recompute_course_progress(user, enrollment):
     enrollment.save()
 
     if just_completed and hasattr(user, 'profile'):
-        from hub.competency import apply_competency_delta, course_completion_delta
-        apply_competency_delta(user, course_completion_delta(user, course))
+        from hub.competency import apply_course_completion
+        try:
+            apply_course_completion(user, enrollment)
+        except Exception:  # noqa: BLE001 — the completion stands; the nightly check applies the change
+            logger.exception('Competency change for enrollment %s failed; left for the nightly check', enrollment.pk)
     if just_completed:
         _record_recommended_completion(user, course)
 
