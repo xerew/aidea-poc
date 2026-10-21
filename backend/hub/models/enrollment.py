@@ -15,6 +15,9 @@ class Enrollment(models.Model):
     last_accessed_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     decay_applied_at = models.DateTimeField(null=True, blank=True)
+    # When this course's competency change was handled (spec 2026-10-21); the
+    # nightly check applies it to completed enrollments still missing this.
+    competency_applied_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('user', 'course')

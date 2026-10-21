@@ -18,6 +18,8 @@ def approve_submission(submission, reviewer, feedback=''):
     from hub.completion import record_lesson_completion, record_resource_completion
     with transaction.atomic():
         submission.status = AssignmentSubmission.Status.APPROVED
+        if not submission.first_review_status:
+            submission.first_review_status = AssignmentSubmission.Status.APPROVED
         if feedback:
             submission.feedback = feedback
         submission.reviewed_by = reviewer
@@ -35,6 +37,8 @@ def approve_submission(submission, reviewer, feedback=''):
 
 def request_changes(submission, reviewer, feedback):
     submission.status = AssignmentSubmission.Status.CHANGES_REQUESTED
+    if not submission.first_review_status:
+        submission.first_review_status = AssignmentSubmission.Status.CHANGES_REQUESTED
     submission.feedback = feedback
     submission.reviewed_by = reviewer
     submission.reviewed_at = timezone.now()

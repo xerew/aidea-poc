@@ -10,6 +10,7 @@ from .models import (
     AIReview,
     AIReviewSettings,
     AssignmentSubmission,
+    CompetencyChange,
     Course,
     CourseCollaborator,
     CourseEditHistory,
@@ -490,6 +491,13 @@ class AIReviewSettingsAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(CompetencyChange)
+class CompetencyChangeAdmin(_ReadOnlyAdmin):
+    list_display = ['user', 'course', 'old_score', 'new_score', 'delta', 'created_at']
+    search_fields = ['user__username', 'user__email']
+    readonly_fields = ['user', 'course', 'old_score', 'new_score', 'delta', 'reason', 'created_at']
 
 
 @admin.register(AIReview)

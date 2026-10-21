@@ -21,6 +21,8 @@ class AssignmentSubmission(models.Model):
     # List of attachment blocks: {'type': 'image'|'file'|'video', 'url': str, 'name': str}.
     attachments  = models.JSONField(default=list, blank=True)
     status       = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    # The first review decision, never overwritten — what counts for competency.
+    first_review_status = models.CharField(max_length=20, blank=True)
     feedback     = models.TextField(blank=True)
     reviewed_by  = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_submissions',

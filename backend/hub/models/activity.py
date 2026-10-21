@@ -30,6 +30,10 @@ class LearnerActivityConfig(models.Model):
     slow_penalty         = models.PositiveSmallIntegerField(default=1)
     idle_decay_days      = models.PositiveSmallIntegerField(default=30)
     idle_decay_points    = models.PositiveSmallIntegerField(default=1)
+    # Separate switches (spec 2026-10-21): the slow-pace penalty on course
+    # completion, and the nightly idle decay. `decay_enabled` is removed in a later migration.
+    slow_penalty_enabled = models.BooleanField(default=True)
+    idle_decay_enabled   = models.BooleanField(default=False)
 
     # Learning analytics: when off, the activity page stops sending time and
     # interaction data (see hub/tracking.py). Existing data is kept.
