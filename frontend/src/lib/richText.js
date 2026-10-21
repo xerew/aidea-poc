@@ -21,3 +21,24 @@ export function isAllowedImageSrc(src) {
   const value = src.trim()
   return /^https:\/\//i.test(value) || /^\/media\//.test(value) || LOCAL_DEV.test(value)
 }
+
+// TinyMCE rewrites same-origin URLs relative to the editing page by default
+// ("../../media/x.png"), which breaks images for learners on other pages.
+// Keep them absolute paths ("/media/x.png").
+export const EDITOR_URL_OPTIONS = { relative_urls: false, remove_script_host: true, convert_urls: true }
+
+/** TinyMCE image upload via the authoring upload endpoint. A failed upload
+ *  removes the image from the editor (remove: true), so nothing is saved that
+ *  learners would never see. */
+export function makeImageUploader(client) {
+  return async (blobInfo) => {
+    const form = new FormData()
+    form.append('file', blobInfo.blob(), blobInfo.filename())
+    try {
+      const res = await client.post('/authoring/upload/', form)
+      return res.data.url
+    } catch (err) {
+      throw { message: err.response?.data?.error ?? 'Upload failed.', remove: true }
+    }
+  }
+}

@@ -1,20 +1,10 @@
 import PropTypes from 'prop-types'
 import { Editor } from '@tinymce/tinymce-react'
 import client from '../../api/client'
-import { RICH_TEXT_VALID_ELEMENTS } from '../../lib/richText'
+import { EDITOR_URL_OPTIONS, RICH_TEXT_VALID_ELEMENTS, makeImageUploader } from '../../lib/richText'
 import './RichTextEditor.css'
 
-// TinyMCE image upload: same endpoint and checks as image resources.
-async function uploadImage(blobInfo) {
-  const form = new FormData()
-  form.append('file', blobInfo.blob(), blobInfo.filename())
-  try {
-    const res = await client.post('/authoring/upload/', form)
-    return res.data.url
-  } catch (err) {
-    throw new Error(err.response?.data?.error ?? 'Upload failed.')
-  }
-}
+const uploadImage = makeImageUploader(client)
 
 /**
  * Self-hosted TinyMCE editor for lesson text content. Emits HTML.
@@ -37,6 +27,7 @@ export default function RichTextEditor({ value, onChange, disabled = false, plac
           promotion: false,
           height: 320,
           placeholder,
+          ...EDITOR_URL_OPTIONS,
           plugins: 'lists link autolink table image',
           toolbar:
             'undo redo | blocks | bold italic underline | bullist numlist | link image table | removeformat',
