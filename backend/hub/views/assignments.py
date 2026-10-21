@@ -304,7 +304,10 @@ class ReviewActionView(APIView):
                     {'detail': 'feedback is required when requesting changes.'},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-            request_changes(submission, request.user, feedback)
+            try:
+                request_changes(submission, request.user, feedback)
+            except ReviewError as exc:
+                return Response({'detail': str(exc)}, status=status.HTTP_400_BAD_REQUEST)
             verdict = 'changes_requested'
         else:
             return Response(

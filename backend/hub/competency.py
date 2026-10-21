@@ -6,6 +6,8 @@ Spec: docs/superpowers/specs/2026-10-21-competency-performance-design.md
 """
 from collections import defaultdict
 
+from django.db import transaction
+
 from hub.models import (
     AssignmentSubmission,
     CompetencyChange,
@@ -13,6 +15,7 @@ from hub.models import (
     LearningPath,
     ResourceProgress,
     UserLearningPath,
+    UserProfile,
 )
 
 SCORE_MIN = 0
@@ -39,32 +42,47 @@ def apply_competency_delta(user, delta: int, recompute: bool = True, course=None
     (pass recompute=False when the caller batches several deltas). Returns
     the (possibly unchanged) score.
     """
-    profile = user.profile
-    old = profile.competency_score
-    new = max(SCORE_MIN, min(SCORE_MAX, old + delta))
-    if new == old:
-        return old
+    with transaction.atomic():
+        profile = _lock_profile(user)
+        old = profile.competency_score
+        new = max(SCORE_MIN, min(SCORE_MAX, old + delta))
+        if new == old:
+            return old
 
-    profile.competency_score = new
-    profile.save(update_fields=['competency_score'])
-    CompetencyChange.objects.create(user=user, course=course, old_score=old, new_score=new,
-                                    delta=new - old, reason=reason or {})
+        profile.competency_score = new
+        profile.save(update_fields=['competency_score'])
+        CompetencyChange.objects.create(user=user, course=course, old_score=old, new_score=new,
+                                        delta=new - old, reason=reason or {})
 
-    if _band(new) != _band(old):
-        path = LearningPath.objects.filter(
-            competency_min__lte=new, competency_max__gte=new,
-        ).first()
-        if path:
-            # New level: new path and a course list rebuilt for that level.
-            from hub.pathway_gen import generate_pathway
-            UserLearningPath.objects.update_or_create(
-                user=user, defaults={'path': path, 'course_ids': generate_pathway(user)},
-            )
+        if _band(new) != _band(old):
+            path = LearningPath.objects.filter(
+                competency_min__lte=new, competency_max__gte=new,
+            ).first()
+            if path:
+                # New level: new path and a course list rebuilt for that level.
+                from hub.pathway_gen import generate_pathway
+                UserLearningPath.objects.update_or_create(
+                    user=user, defaults={'path': path, 'course_ids': generate_pathway(user)},
+                )
 
     if recompute:
-        from hub.tasks import compute_user_recommendations
-        compute_user_recommendations.delay(user.id)
+        _recompute_after_commit(user)
     return new
+
+
+def _lock_profile(user):
+    """The user's profile as stored now, locked for this transaction — never a
+    copy cached on `user` earlier (two changes for one teacher would otherwise
+    both start from the same old score)."""
+    profile = UserProfile.objects.select_for_update().get(user=user)
+    user.profile = profile
+    return profile
+
+
+def _recompute_after_commit(user):
+    from hub.tasks import compute_user_recommendations
+    # robust: a broker error is logged, never undoes the committed change.
+    transaction.on_commit(lambda: compute_user_recommendations.delay(user.id), robust=True)
 
 
 def course_performance(user, course):
@@ -156,7 +174,6 @@ def apply_course_completion(user, enrollment, applied_by='completion'):
     """Apply a completed course's change once, stamping the enrollment in the
     same transaction (also when the change is 0 or clamped). Returns the delta,
     or None when it was already applied."""
-    from django.db import transaction
     from django.utils import timezone
 
     from hub.models import Enrollment
@@ -164,17 +181,16 @@ def apply_course_completion(user, enrollment, applied_by='completion'):
         locked = Enrollment.objects.select_for_update().select_related('course').get(pk=enrollment.pk)
         if locked.competency_applied_at is not None:
             return None
+        old = _lock_profile(user).competency_score      # lock order: enrollment, then profile
         delta, reason = course_completion_change(user, locked.course)
         if applied_by != 'completion':
             reason['applied_by'] = applied_by
-        old = user.profile.competency_score
         new = apply_competency_delta(user, delta, recompute=False, course=locked.course, reason=reason)
         locked.competency_applied_at = timezone.now()
         locked.save(update_fields=['competency_applied_at'])
+        if new != old:
+            _recompute_after_commit(user)
     enrollment.competency_applied_at = locked.competency_applied_at
-    if new != old:
-        from hub.tasks import compute_user_recommendations
-        compute_user_recommendations.delay(user.id)   # after commit: reads the new score
     return delta
 
 

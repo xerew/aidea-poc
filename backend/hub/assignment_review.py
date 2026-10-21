@@ -10,6 +10,26 @@ class ReviewError(Exception):
     pass
 
 
+def _lock_pending(submission):
+    """The submission's current row, locked; refuses one that someone (a
+    reviewer or the AI) already decided since the caller loaded it."""
+    locked = AssignmentSubmission.objects.select_for_update().get(pk=submission.pk)
+    if locked.status != AssignmentSubmission.Status.PENDING:
+        raise ReviewError('This submission has already been reviewed.')
+    return locked
+
+
+def _decide(locked, status, reviewer, feedback):
+    locked.status = status
+    if not locked.first_review_status:      # the first decision is never overwritten
+        locked.first_review_status = status
+    if feedback:
+        locked.feedback = feedback
+    locked.reviewed_by = reviewer
+    locked.reviewed_at = timezone.now()
+    locked.save(update_fields=['status', 'first_review_status', 'feedback', 'reviewed_by', 'reviewed_at', 'updated_at'])
+
+
 def approve_submission(submission, reviewer, feedback=''):
     course = submission.lesson.module.course
     enrollment = Enrollment.objects.filter(user=submission.user, course=course).first()
@@ -17,14 +37,9 @@ def approve_submission(submission, reviewer, feedback=''):
         raise ReviewError('The learner is no longer enrolled in this course.')
     from hub.completion import record_lesson_completion, record_resource_completion
     with transaction.atomic():
-        submission.status = AssignmentSubmission.Status.APPROVED
-        if not submission.first_review_status:
-            submission.first_review_status = AssignmentSubmission.Status.APPROVED
-        if feedback:
-            submission.feedback = feedback
-        submission.reviewed_by = reviewer
-        submission.reviewed_at = timezone.now()
-        submission.save()
+        locked = _lock_pending(submission)
+        _decide(locked, AssignmentSubmission.Status.APPROVED, reviewer, feedback)
+        submission.refresh_from_db()
         if submission.resource_id:
             record_resource_completion(submission.user, enrollment, submission.resource,
                                        engagement_data={'submission': submission.text}, advance_only=True)
@@ -36,13 +51,10 @@ def approve_submission(submission, reviewer, feedback=''):
 
 
 def request_changes(submission, reviewer, feedback):
-    submission.status = AssignmentSubmission.Status.CHANGES_REQUESTED
-    if not submission.first_review_status:
-        submission.first_review_status = AssignmentSubmission.Status.CHANGES_REQUESTED
-    submission.feedback = feedback
-    submission.reviewed_by = reviewer
-    submission.reviewed_at = timezone.now()
-    submission.save()
+    with transaction.atomic():
+        locked = _lock_pending(submission)
+        _decide(locked, AssignmentSubmission.Status.CHANGES_REQUESTED, reviewer, feedback)
+    submission.refresh_from_db()
     from hub.emails import send_assignment_reviewed_email
     send_assignment_reviewed_email(submission)
 
