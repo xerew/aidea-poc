@@ -63,7 +63,7 @@ It runs when a teacher **first completes a course** (as today).
   - It's set by the first human decision or an AI auto-approve, and never overwritten (not by resubmission, reopen or later reviews).
   - **Migration:** existing reviewed submissions take their current status as a best guess, because their history wasn't kept.
 - **`CompetencyChange`** (new, one row per change in the score):
-  - user, course (null for idle decay), old score, new score, delta, created_at;
+  - user, course (the completed course, or the abandoned one for idle decay), old score, new score, delta, created_at;
   - `reason` (JSON): `{rule: 'performance' | 'completion' | 'idle', performance, passed, course_level, teacher_level, gap, base_delta, slow_penalty}`;
   - read-only in Django admin.
   - A delta that the 0–6 limits clamp to nothing still records nothing, as today.
