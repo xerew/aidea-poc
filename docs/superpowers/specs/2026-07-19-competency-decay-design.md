@@ -1,3 +1,5 @@
+> **Superseded (2026-10-21):** the score rules here are replaced by [2026-10-21-competency-performance-design.md](2026-10-21-competency-performance-design.md). Idle decay is off by default; the slow-pace penalty remains.
+
 # Competency Decay — Design
 
 Approved decisions (user): score can drop from failed quizzes, slowness,
