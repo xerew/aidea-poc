@@ -70,6 +70,7 @@ from .feedback import (
     FeedbackView,
 )
 from .learner import (
+    ActivityCompleteResourcesView,
     CourseDetailView,
     CourseEnrollView,
     CourseLearnView,
@@ -169,6 +170,7 @@ __all__ = [
     'LessonDetailView',
     'QuizCheckView',
     'ResourceCompleteView',
+    'ActivityCompleteResourcesView',
     'ResourceQuizCheckView',
     'IsContentCreator',
     'IsReviewer',

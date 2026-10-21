@@ -362,6 +362,33 @@ class ResourceCompleteView(APIView):
         })
 
 
+class ActivityCompleteResourcesView(APIView):
+    """POST .../lessons/<lesson_pk>/complete-resources/ — the activity's "Mark
+    activity as done": completes its text, image, video, PDF, presentation and
+    self-completed H5P resources at once, then recomputes progress once."""
+
+    def post(self, request, pk, lesson_pk):
+        try:
+            enrollment = Enrollment.objects.select_related('course').get(user=request.user, course_id=pk)
+        except Enrollment.DoesNotExist:
+            if not Course.objects.filter(pk=pk).exists():
+                return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'Not enrolled.'}, status=status.HTTP_403_FORBIDDEN)
+        activity = Activity.objects.filter(pk=lesson_pk, module__course_id=pk).first()
+        if activity is None:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        scroll = request.data.get('scroll_pct')
+        scroll_pct = scroll if isinstance(scroll, (int, float)) and not isinstance(scroll, bool) else None
+
+        from hub.completion import complete_self_completed, completed_activity_ids
+        completed, progress_pct = complete_self_completed(request.user, enrollment, activity, scroll_pct)
+        return Response({
+            'completed_resource_ids': completed,
+            'activity_completed': activity.id in completed_activity_ids(request.user, enrollment.course),
+            'progress_pct': progress_pct,
+        })
+
+
 class MyLearningView(APIView):
     """GET /api/my-learning/ — User's enrollments split into in-progress and completed."""
 

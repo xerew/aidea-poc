@@ -252,6 +252,37 @@ def record_resource_completion(user, enrollment, resource, quiz_answers_raw=None
     return rp, recompute_course_progress(user, enrollment)
 
 
+# Resources the learner completes with the activity's "Mark activity as done"
+# button (spec 2026-10-21): everything except quizzes, assignments and H5P that
+# report their own finish.
+SELF_COMPLETED_TYPES = ('text', 'image', 'video', 'pdf', 'presentation')
+
+
+def self_completes(resource):
+    return resource.type in SELF_COMPLETED_TYPES or (resource.type == 'h5p' and resource.h5p_self_complete)
+
+
+def complete_self_completed(user, enrollment, activity, scroll_pct=None):
+    """Complete every not-yet-done self-completed resource of the activity,
+    then re-aggregate the enrollment once. Returns (completed ids, progress_pct)."""
+    done = set(
+        ResourceProgress.objects.filter(user=user, resource__activity=activity, completed_at__isnull=False)
+        .values_list('resource_id', flat=True)
+    )
+    completed = []
+    for resource in activity.resources.order_by('order'):
+        if resource.id in done or not self_completes(resource):
+            continue
+        engagement = {'scroll_pct': scroll_pct} if resource.type == 'text' and scroll_pct is not None else None
+        _mark_resource_complete(user, resource, engagement_data=engagement)
+        completed.append(resource.id)
+    if not completed:
+        return [], enrollment.progress_pct
+    _mirror_legacy_progress(user, activity)
+    _advance_pointer(enrollment, activity, False)
+    return completed, recompute_course_progress(user, enrollment)
+
+
 def record_lesson_completion(user, enrollment, lesson, quiz_answers_raw=None,
                              engagement_data=None, advance_only=False):
     """Legacy activity-level completion (old /lessons/ endpoints and approvals
