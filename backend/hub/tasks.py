@@ -508,6 +508,7 @@ def _tr_quiz(quiz_data, src, target):
 
 def _translate_course_meta(course, target):
     from hub.models import Course
+    from hub.translation_flags import note_machine_translated
     src = course.source_language
     blob = {
         'title': translate_text(course.title, src, target),
@@ -518,16 +519,19 @@ def _translate_course_meta(course, target):
         if getattr(course, field):
             blob[field] = translate_text(getattr(course, field), src, target)
     _merge_json(Course, course.pk, 'translations', target, blob)
+    note_machine_translated(course, course.pk, target)
 
 
 def _translate_module(module, target):
     from hub.models import Module
+    from hub.translation_flags import note_machine_translated
     src = module.course.source_language
     blob = {
         'title': translate_text(module.title, src, target),
         'description': translate_text(module.description, src, target),
     }
     _merge_json(Module, module.pk, 'translations', target, blob)
+    note_machine_translated(module, module.course_id, target)
 
 
 def _memo(fn):
@@ -545,6 +549,7 @@ def _memo(fn):
 
 def _translate_resource(resource, target, tr=None):
     from hub.models import Resource
+    from hub.translation_flags import note_machine_translated
     tr = tr or translate_text
     src = resource.activity.module.course.source_language
     blob = {}
@@ -570,10 +575,12 @@ def _translate_resource(resource, target, tr=None):
         ]
     if blob:
         _merge_json(Resource, resource.pk, 'translations', target, blob)
+    note_machine_translated(resource, resource.activity.module.course_id, target)
 
 
 def _translate_lesson(lesson, target):
     from hub.models import Activity
+    from hub.translation_flags import note_machine_translated
     tr = _memo(translate_text)
     src = lesson.module.course.source_language
     blob = {
@@ -588,21 +595,26 @@ def _translate_lesson(lesson, target):
     elif lesson.lesson_type == 'quiz':
         blob['quiz_data'] = _tr_quiz(lesson.quiz_data, src, target)
     _merge_json(Activity, lesson.pk, 'translations', target, blob)
+    note_machine_translated(lesson, lesson.module.course_id, target)
     for resource in lesson.resources.all():
         _translate_resource(resource, target, tr)
 
 
-def _finish(course, target, work):
-    """Run a translation unit of work, then flip the course-level status to
-    'done' (needs human re-review) or 'failed'."""
+def _finish(course, target, work, update=False):
+    """Run a translation unit of work, then set the language's status:
+    'failed' on error; otherwise 'done' — or, for an update (sync / partial
+    re-translate) of a language with a review on record, 'reviewed' again."""
     from hub.models import Course
     from hub.translation import TranslationError
     try:
         work()
-        _merge_json(Course, course.pk, 'translation_status', target, 'done')
     except TranslationError as exc:
         logger.error('Translation of course %s into %s failed: %s', course.id, target, exc)
         _merge_json(Course, course.pk, 'translation_status', target, 'failed')
+        return
+    record = Course.objects.filter(pk=course.pk).values_list('translation_reviewed_at', flat=True).first() or {}
+    _merge_json(Course, course.pk, 'translation_status', target,
+                'reviewed' if update and target in record else 'done')
 
 
 @shared_task
@@ -633,7 +645,7 @@ def translate_course_meta(course_id: int, target: str) -> None:
         course = Course.objects.get(pk=course_id)
     except Course.DoesNotExist:
         return
-    _finish(course, target, lambda: _translate_course_meta(course, target))
+    _finish(course, target, lambda: _translate_course_meta(course, target), update=True)
 
 
 @shared_task
@@ -644,7 +656,25 @@ def translate_module_meta(module_id: int, target: str) -> None:
         module = Module.objects.select_related('course').get(pk=module_id)
     except Module.DoesNotExist:
         return
-    _finish(module.course, target, lambda: _translate_module(module, target))
+    _finish(module.course, target, lambda: _translate_module(module, target), update=True)
+
+
+@shared_task
+def translate_module_full(module_id: int, target: str) -> None:
+    """Re-translate one module and all its activities and resources (the
+    editor's "Re-translate → This module")."""
+    from hub.models import Module
+    try:
+        module = Module.objects.select_related('course').prefetch_related('lessons__resources').get(pk=module_id)
+    except Module.DoesNotExist:
+        return
+
+    def work():
+        _translate_module(module, target)
+        for lesson in module.lessons.all():
+            _translate_lesson(lesson, target)
+
+    _finish(module.course, target, work, update=True)
 
 
 @shared_task
@@ -655,7 +685,7 @@ def translate_lesson_meta(lesson_id: int, target: str) -> None:
         lesson = Activity.objects.select_related('module__course').get(pk=lesson_id)
     except Activity.DoesNotExist:
         return
-    _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target))
+    _finish(lesson.module.course, target, lambda: _translate_lesson(lesson, target), update=True)
 
 
 @shared_task
@@ -666,7 +696,7 @@ def translate_resource_meta(resource_id: int, target: str) -> None:
         resource = Resource.objects.select_related('activity__module__course').get(pk=resource_id)
     except Resource.DoesNotExist:
         return
-    _finish(resource.activity.module.course, target, lambda: _translate_resource(resource, target))
+    _finish(resource.activity.module.course, target, lambda: _translate_resource(resource, target), update=True)
 
 
 @shared_task

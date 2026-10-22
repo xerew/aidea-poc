@@ -280,17 +280,14 @@ class AuthoringTranslationReviewView(APIView):
             return Response({'detail': 'That language has no translation.'}, status=status.HTTP_400_BAD_REQUEST)
 
         reviewed = request.data.get('reviewed', True)
-        if reviewed:
-            if current not in ('done', 'reviewed'):
-                return Response(
-                    {'detail': 'Only a completed translation can be marked reviewed.'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            course.translation_status[language] = 'reviewed'
-        elif current == 'reviewed':
-            course.translation_status[language] = 'done'
-
-        course.save(update_fields=['translation_status'])
+        if reviewed and current not in ('done', 'reviewed'):
+            return Response(
+                {'detail': 'Only a completed translation can be marked reviewed.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        from hub.translation_flags import set_reviewed
+        if reviewed or current == 'reviewed':
+            set_reviewed(course, language, bool(reviewed))
         return Response({'translation_status': course.translation_status})
 
 
