@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseEditHistory, LearningPillar
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
 from hub.translation import LANGUAGE_NAMES
+from hub.translation_flags import mark_edited
 from hub.translation_sync import resync_course_meta
 
 from .permissions import (
@@ -120,6 +121,7 @@ class AuthoringCourseDetailView(APIView):
                     blob[field] = request.data[field]
             course.translations[lang] = blob
             course.save(update_fields=['translations'])
+            mark_edited(course, lang)
             return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
         serializer = CourseAuthoringSerializer(course, data=request.data, partial=True)

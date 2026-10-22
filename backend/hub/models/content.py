@@ -48,6 +48,10 @@ class Course(models.Model):
     translations        = models.JSONField(default=dict, blank=True)
     # translation_status: {lang_code: "pending"|"in_progress"|"done"|"failed"}
     translation_status  = models.JSONField(default=dict, blank=True)
+    # translation_flags: {lang: {"edited", "changed", "replaced_edit"}} — see hub/translation_flags.py
+    translation_flags   = models.JSONField(default=dict, blank=True)
+    # {lang: ISO time} — when each language was last marked reviewed (spec 2026-10-21).
+    translation_reviewed_at = models.JSONField(default=dict, blank=True)
 
     # Course-proposal fields. `pillar` stays the primary Academy Pillar (ordering,
     # colour, home-page grouping); `additional_pillars` are the other axes the
@@ -122,6 +126,7 @@ class Resource(models.Model):
     quiz_data    = models.JSONField(default=list, blank=True)    # quiz
     instructions = models.TextField(blank=True)                  # assignment
     translations = models.JSONField(default=dict, blank=True)
+    translation_flags = models.JSONField(default=dict, blank=True)
     # h5p: learners mark it done themselves (types that never report finishing).
     h5p_self_complete = models.BooleanField(default=False)
     # presentation: learners may download the .pptx (forced on for decks over the viewer limit).
@@ -144,6 +149,7 @@ class Module(models.Model):
     llm_review_enabled = models.BooleanField(default=False)
     # translations: {lang_code: {"title": str, "description": str}}
     translations     = models.JSONField(default=dict, blank=True)
+    translation_flags = models.JSONField(default=dict, blank=True)
     # Indices into course.learning_outcomes this module addresses.
     related_outcomes = models.JSONField(default=list, blank=True)
 
@@ -183,6 +189,7 @@ class Activity(models.Model):
     is_required      = models.BooleanField(default=True)
     # translations: {lang_code: {"title": str, "description": str, "content": str}}
     translations     = models.JSONField(default=dict, blank=True)
+    translation_flags = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ['order']

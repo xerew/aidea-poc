@@ -229,11 +229,13 @@ class CourseAuthoringSerializer(serializers.ModelSerializer):
             'duration_hours', 'learning_outcomes', 'is_published', 'module_count', 'modules',
             'subjects', 'subject_ids', 'created_by_id', 'created_by_name',
             'source_language', 'translations', 'translation_status',
+            'translation_flags', 'translation_reviewed_at',
             'collaborators', 'my_role', 'can_edit', 'can_translate', 'can_manage',
             'additional_pillar_ids', 'additional_pillars', 'cross_axis_relevance', 'target_audience', 'target_audience_other',
             'educational_levels', 'educational_level_other', 'prior_knowledge',
         ]
-        read_only_fields = ['is_published', 'translations', 'translation_status']
+        read_only_fields = ['is_published', 'translations', 'translation_status',
+                            'translation_flags', 'translation_reviewed_at']
 
     @staticmethod
     def _checked_list(value, allowed, name):

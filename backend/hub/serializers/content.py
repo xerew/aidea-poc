@@ -16,10 +16,10 @@ class ResourceSerializer(serializers.ModelSerializer):
         model = Resource
         fields = [
             'id', 'type', 'order', 'is_required', 'title', 'content', 'url',
-            'caption', 'quiz_data', 'instructions', 'translations',
+            'caption', 'quiz_data', 'instructions', 'translations', 'translation_flags',
             'h5p_self_complete', 'h5p_packages', 'presentation_downloadable', 'presentation_files',
         ]
-        read_only_fields = ['translations']
+        read_only_fields = ['translations', 'translation_flags']
 
     def validate_quiz_data(self, value):
         return LessonSerializer().validate_quiz_data(value)
@@ -122,9 +122,9 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'lesson_type',
             'content', 'media_items', 'quiz_data', 'duration_minutes', 'order', 'is_required',
-            'translations', 'resources',
+            'translations', 'translation_flags', 'resources',
         ]
-        read_only_fields = ['translations']
+        read_only_fields = ['translations', 'translation_flags']
 
     def validate_media_items(self, value):
         """An ordered list of blocks: a text block {type: 'text', html: str} or a
@@ -239,8 +239,8 @@ class ModuleAuthoringSerializer(ModuleSerializer):
     blob for the course/module editor payloads."""
 
     class Meta(ModuleSerializer.Meta):
-        fields = [*ModuleSerializer.Meta.fields, 'translations']
-        read_only_fields = ['translations']
+        fields = [*ModuleSerializer.Meta.fields, 'translations', 'translation_flags']
+        read_only_fields = ['translations', 'translation_flags']
 
 
 class ModuleLocalizedSerializer(serializers.ModelSerializer):

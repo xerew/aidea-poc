@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from hub.models import Course, CourseEditHistory, Module
 from hub.serializers import ModuleAuthoringSerializer, ModuleWithLessonsSerializer
 from hub.translation import LANGUAGE_NAMES
+from hub.translation_flags import mark_edited
 from hub.translation_sync import resync_module
 
 from .permissions import IsContentCreator, can_edit_course
@@ -76,6 +77,7 @@ class AuthoringModuleDetailView(APIView):
                     blob[field] = request.data[field]
             module.translations[lang] = blob
             module.save(update_fields=['translations'])
+            mark_edited(module, lang)
             return Response(ModuleAuthoringSerializer(module).data)
 
         serializer = ModuleAuthoringSerializer(module, data=request.data, partial=True)
