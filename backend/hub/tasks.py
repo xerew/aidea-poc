@@ -575,7 +575,8 @@ def _translate_resource(resource, target, tr=None):
         ]
     if blob:
         _merge_json(Resource, resource.pk, 'translations', target, blob)
-    note_machine_translated(resource, resource.activity.module.course_id, target)
+        # Media with no prose had nothing translated, so nothing to re-check.
+        note_machine_translated(resource, resource.activity.module.course_id, target)
 
 
 def _translate_lesson(lesson, target):

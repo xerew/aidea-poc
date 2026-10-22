@@ -747,7 +747,8 @@
         "module": "Módulo",
         "activity": "Actividad",
         "resource": "Recurso"
-      }
+      },
+      "leaveUnsaved": "Hay cambios sin guardar en esta página. ¿Salir sin guardar?"
     },
     "collab": {
       "title": "Colaboradores",

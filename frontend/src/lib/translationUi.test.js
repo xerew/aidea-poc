@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isFinished, isRunning, retranslateOptions, statusLabelKey } from './translationUi.js'
+import { inPageTarget, isFinished, isRunning, retranslateOptions, statusLabelKey } from './translationUi.js'
 
 test('status wording and running/finished states', () => {
   assert.equal(statusLabelKey('updating'), 'authoring.translate.statusUpdating')
@@ -18,4 +18,12 @@ test('re-translate options per page', () => {
     [{ scope: 'activity', activity_id: 9 }, { scope: 'module', module_id: 4 }, { scope: 'course' }])
   assert.deepEqual(retranslateOptions({ page: 'module', moduleId: 4, activityId: null }),
     [{ scope: 'module', module_id: 4 }, { scope: 'course' }])
+})
+
+test('a re-check entry in the open module opens in place (no navigation, no reload)', () => {
+  assert.deepEqual(inPageTarget({ kind: 'resource', module_id: 4, activity_id: 9 }, 4), { activityId: 9 })
+  assert.deepEqual(inPageTarget({ kind: 'module', module_id: 4, activity_id: null }, 4), { activityId: null })
+  assert.equal(inPageTarget({ kind: 'resource', module_id: 5, activity_id: 9 }, 4), null)
+  assert.equal(inPageTarget({ kind: 'course', module_id: null, activity_id: null }, 4), null)
+  assert.equal(inPageTarget({ kind: 'activity', module_id: 4, activity_id: 9 }, null), null)
 })

@@ -12,6 +12,7 @@ import OriginalHint from '../components/authoring/OriginalHint'
 import { LANGUAGES } from '../i18n'
 import ResourceEditor from '../components/authoring/ResourceEditor'
 import { emptyQuestion, mergedQuizData } from '../components/authoring/quizUtils'
+import { inPageTarget } from '../lib/translationUi'
 import './ModuleEditorPage.css'
 
 // ── Resource type config ──────────────────────────────────────────────────────
@@ -444,6 +445,18 @@ export default function ModuleEditorPage() {
     setSelectedLessonId(id)
   }
 
+  // A re-check entry from the translation bar: one in this module opens in
+  // place; one elsewhere navigates, after a confirm when edits are unsaved.
+  const openRecheckItem = (item) => {
+    const target = inPageTarget(item, Number(moduleId))
+    if (target) {
+      if (target.activityId && lessons.some((l) => l.id === target.activityId)) selectLesson(target.activityId)
+      return true
+    }
+    const dirty = lessons.some((l) => l.isDirty || (l.resources ?? []).some((r) => r.isDirty))
+    return dirty && !window.confirm(t('authoring.translate.leaveUnsaved'))
+  }
+
   // [+] / "Add activity": a new draft at the bottom of the list. It is saved
   // when the author picks its first resource.
   const addLesson = () => {
@@ -793,6 +806,7 @@ export default function ModuleEditorPage() {
         page="module"
         moduleId={Number(moduleId)}
         activityId={selectedLesson && !selectedLesson.isNew ? selectedLesson.id : null}
+        onOpenItem={openRecheckItem}
       />
 
       <div className="module-editor-layout">

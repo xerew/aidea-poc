@@ -747,7 +747,8 @@
         "module": "Modul",
         "activity": "Aktivitet",
         "resource": "Ressurs"
-      }
+      },
+      "leaveUnsaved": "Det finnes ulagrede endringer på siden. Forlate uten å lagre?"
     },
     "collab": {
       "title": "Samarbeidspartnere",

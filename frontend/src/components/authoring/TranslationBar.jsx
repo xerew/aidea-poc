@@ -27,7 +27,7 @@ const POLL_INTERVAL_MS = 3000
 export default function TranslationBar({
   courseId, sourceLanguage, translationStatus = {}, activeLang,
   onSelectLang, onStatusUpdate, onTranslated, disabled = false,
-  page = 'course', moduleId = null, activityId = null,
+  page = 'course', moduleId = null, activityId = null, onOpenItem = null,
 }) {
   const { t } = useTranslation()
   const [busy, setBusy] = useState(false)
@@ -159,9 +159,11 @@ export default function TranslationBar({
       const res = await client.post(
         `/authoring/courses/${courseId}/translation-review/`, { language: lang, reviewed },
       )
-      onStatusUpdate(res.data.translation_status ?? {})
+      const status = res.data.translation_status ?? {}
+      onStatusUpdate(status)
       setRecheck([])
       setShowRecheck(false)
+      onTranslated(lang, status[lang])   // reload the items' flags, so the badges clear too
     } catch { /* ignore */ } finally {
       setBusy(false)
     }
@@ -250,7 +252,8 @@ export default function TranslationBar({
                     <ul className="translation-recheck-list">
                       {visibleRecheck.map((item) => (
                         <li key={`${item.kind}-${item.id}`}>
-                          <Link to={recheckLink(item)}>
+                          <Link to={recheckLink(item)}
+                                onClick={(e) => { if (onOpenItem?.(item)) e.preventDefault() }}>
                             <span className="translation-recheck-kind">{t(`authoring.translate.kind.${item.kind}`)}</span>
                             {item.title}
                           </Link>
@@ -329,4 +332,6 @@ TranslationBar.propTypes = {
   page: PropTypes.oneOf(['course', 'module']),
   moduleId: PropTypes.number,
   activityId: PropTypes.number,
+  // (item) => true when the page handled the re-check entry itself (no navigation).
+  onOpenItem: PropTypes.func,
 }

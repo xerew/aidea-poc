@@ -747,7 +747,8 @@
         "module": "Modul",
         "activity": "Aktivität",
         "resource": "Ressource"
-      }
+      },
+      "leaveUnsaved": "Auf dieser Seite gibt es ungespeicherte Änderungen. Ohne Speichern verlassen?"
     },
     "collab": {
       "title": "Mitwirkende",

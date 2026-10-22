@@ -67,8 +67,18 @@ def resync_lesson(lesson):
         translate_lesson_meta.delay(lesson.id, lang)
 
 
+def _quiz_has_text(quiz_data):
+    # A new quiz arrives with one blank question — nothing to translate yet.
+    return any(
+        str(q.get('question') or '').strip()
+        or any(str(o.get('text') or '').strip() for o in q.get('options') or [])
+        for q in quiz_data or [] if isinstance(q, dict)
+    )
+
+
 def has_translatable_content(resource):
-    return any([resource.title, resource.content, resource.caption, resource.instructions, resource.quiz_data])
+    return any([resource.title, resource.content, resource.caption, resource.instructions]) \
+        or _quiz_has_text(resource.quiz_data)
 
 
 def resync_resource(resource):

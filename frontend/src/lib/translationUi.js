@@ -17,3 +17,11 @@ export function retranslateOptions({ page, moduleId, activityId }) {
   options.push({ scope: 'course' })
   return options
 }
+
+// A re-check entry inside the module already open: select it in place rather
+// than navigating (a navigation reloads the editor and drops unsaved edits).
+// null = the entry lives on another page.
+export function inPageTarget(item, moduleId) {
+  if (!moduleId || item.kind === 'course' || item.module_id !== moduleId) return null
+  return { activityId: item.activity_id ?? null }
+}

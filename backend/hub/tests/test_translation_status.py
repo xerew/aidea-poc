@@ -86,3 +86,35 @@ class ReviewEndpointTests(APITestCase):
         course.refresh_from_db()
         self.assertEqual(course.translation_status['el'], 'done')
         self.assertNotIn('el', course.translation_reviewed_at)
+
+
+class QuietForNothingToTranslateTests(APITestCase):
+    """Final review: a just-added quiz (one blank question, as the editor sends
+    it) and media with no prose must not reach the re-check list."""
+
+    def setUp(self):
+        self.creator = User.objects.create_user('ts_cc', password='x')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.course, self.m1, _m2, self.a1, *_rest = make_course(creator=self.creator)
+        tf.set_reviewed(self.course, 'el', True)
+        self.client.force_authenticate(self.creator)
+
+    def test_new_blank_quiz_starts_nothing(self):
+        url = (f'/api/authoring/courses/{self.course.id}/modules/{self.m1.id}'
+               f'/lessons/{self.a1.id}/resources/')
+        blank = {'question': '', 'options': [{'text': '', 'is_correct': False} for _ in range(4)]}
+        with mock.patch('hub.tasks.translate_resource_meta.delay') as delay:
+            res = self.client.post(url, {'type': 'quiz', 'quiz_data': [blank]}, format='json')
+        self.assertEqual(res.status_code, 201, res.data)
+        self.assertFalse(delay.called)
+        self.course.refresh_from_db()
+        self.assertEqual(self.course.translation_status['el'], 'reviewed')
+
+    @TR
+    def test_media_without_prose_is_not_flagged(self, _tr):
+        from hub.tasks import translate_module_full
+        video = Resource.objects.create(activity=self.a1, type='video', order=3, url='https://example.org/v.mp4')
+        translate_module_full(self.m1.id, 'el')
+        video.refresh_from_db()
+        self.assertFalse((video.translation_flags.get('el') or {}).get('changed', False))
+        self.assertNotIn(video.id, [i['id'] for i in tf.recheck_items(self.course, 'el') if i['kind'] == 'resource'])

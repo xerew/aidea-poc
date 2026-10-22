@@ -747,7 +747,8 @@
         "module": "Module",
         "activity": "Activity",
         "resource": "Resource"
-      }
+      },
+      "leaveUnsaved": "You have unsaved changes on this page. Leave without saving?"
     },
     "collab": {
       "title": "Collaborators",

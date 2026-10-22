@@ -747,7 +747,8 @@
         "module": "Modul",
         "activity": "Aktivitet",
         "resource": "Resurs"
-      }
+      },
+      "leaveUnsaved": "Det finns osparade ändringar på sidan. Lämna utan att spara?"
     },
     "collab": {
       "title": "Medarbetare",

@@ -747,7 +747,8 @@
         "module": "Module",
         "activity": "Activité",
         "resource": "Ressource"
-      }
+      },
+      "leaveUnsaved": "Des modifications ne sont pas enregistrées sur cette page. Quitter sans enregistrer ?"
     },
     "collab": {
       "title": "Collaborateurs",

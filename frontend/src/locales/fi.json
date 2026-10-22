@@ -747,7 +747,8 @@
         "module": "Moduuli",
         "activity": "Aktiviteetti",
         "resource": "Resurssi"
-      }
+      },
+      "leaveUnsaved": "Tällä sivulla on tallentamattomia muutoksia. Poistutaanko tallentamatta?"
     },
     "collab": {
       "title": "Yhteistyökumppanit",
