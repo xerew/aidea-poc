@@ -22,7 +22,7 @@ const UPLOAD_ACCEPT = { image: '.png,.jpg,.jpeg,.gif,.webp', pdf: '.pdf' }
 export default function ResourceEditor({
   resource, index, count, locked, translating, error,
   onChange, onSave, onDelete, onMove, original = null, sourceLanguageLabel = '',
-  uploadUrl = '', onRefresh = () => {}, aiReviewUrl = '', presentationUrl = '',
+  uploadUrl = '', onRefresh = () => {}, aiReviewUrl = '', presentationUrl = '', reviewFlag = null,
 }) {
   const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
@@ -59,6 +59,12 @@ export default function ResourceEditor({
           <TypeIcon type={resource.type} size={15} />
           {typeLabel}
         </span>
+        {reviewFlag?.changed && (
+          <span className="resource-editor-changed">
+            {t('authoring.translate.changedBadge')}
+            {reviewFlag.replaced_edit ? ` · ${t('authoring.translate.correctionsReplaced')}` : ''}
+          </span>
+        )}
         {!structureLocked && (
           <div className="resource-editor-actions">
             <button type="button" className="me-media-btn" onClick={() => onMove(-1)} disabled={index === 0}
@@ -195,6 +201,7 @@ export default function ResourceEditor({
 }
 
 ResourceEditor.propTypes = {
+  reviewFlag: PropTypes.object,
   resource: PropTypes.shape({
     id: PropTypes.number.isRequired,
     type: PropTypes.string.isRequired,

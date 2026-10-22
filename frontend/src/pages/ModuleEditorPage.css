@@ -737,3 +737,13 @@
   font-size: 0.7rem;
   font-weight: 600;
 }
+/* "Changed since review" — machine-translated after the language was reviewed */
+.me-lesson-changed {
+  font-size: 0.7rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: #fef9c3;
+  color: #854d0e;
+  margin-left: auto;
+  white-space: nowrap;
+}

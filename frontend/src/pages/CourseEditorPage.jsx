@@ -427,6 +427,7 @@ export default function CourseEditorPage() {
         onStatusUpdate={setTranslationStatus}
         onTranslated={reloadTranslations}
         disabled={!canTranslate}
+        page="course"
       />
 
       {/* Hero row */}

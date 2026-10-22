@@ -721,7 +721,33 @@
       "showOriginal": "Show original ({{language}})",
       "hideOriginal": "Hide original",
       "showMore": "Show more",
-      "showLess": "Show less"
+      "showLess": "Show less",
+      "statusUpdating": "Updating",
+      "updating": "Updating translations…",
+      "recheckCount": "{{count}} to re-check",
+      "correctionsReplaced": "corrections replaced",
+      "changedBadge": "Changed since review",
+      "markReviewedAgain": "Mark as reviewed again",
+      "reconfirmScope": "Re-translating {{scope}} into {{language}} will overwrite manual edits to it. Continue?",
+      "reconfirmEdited": "Re-translating {{scope}} into {{language}} will replace {{count}} hand-corrected parts. Continue?",
+      "scope": {
+        "activity": "This activity",
+        "module": "This module",
+        "details": "Course details",
+        "course": "Whole course…"
+      },
+      "scopeName": {
+        "activity": "this activity",
+        "module": "this module",
+        "details": "the course details",
+        "course": "the whole course"
+      },
+      "kind": {
+        "course": "Course details",
+        "module": "Module",
+        "activity": "Activity",
+        "resource": "Resource"
+      }
     },
     "collab": {
       "title": "Collaborators",

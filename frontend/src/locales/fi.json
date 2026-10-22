@@ -721,7 +721,33 @@
       "showOriginal": "Näytä alkuperäinen ({{language}})",
       "hideOriginal": "Piilota alkuperäinen",
       "showMore": "Näytä lisää",
-      "showLess": "Näytä vähemmän"
+      "showLess": "Näytä vähemmän",
+      "statusUpdating": "Päivitetään",
+      "updating": "Päivitetään käännöksiä…",
+      "recheckCount": "{{count}} tarkistettavana uudelleen",
+      "correctionsReplaced": "korjauksia korvattu",
+      "changedBadge": "Muuttunut tarkistuksen jälkeen",
+      "markReviewedAgain": "Merkitse uudelleen tarkistetuksi",
+      "reconfirmScope": "Uudelleenkääntäminen ({{scope}}, {{language}}) korvaa käsin tehdyt muutokset. Jatketaanko?",
+      "reconfirmEdited": "Uudelleenkääntäminen ({{scope}}, {{language}}) korvaa {{count}} käsin korjattua osaa. Jatketaanko?",
+      "scope": {
+        "activity": "Tämä aktiviteetti",
+        "module": "Tämä moduuli",
+        "details": "Kurssin tiedot",
+        "course": "Koko kurssi…"
+      },
+      "scopeName": {
+        "activity": "tämä aktiviteetti",
+        "module": "tämä moduuli",
+        "details": "kurssin tiedot",
+        "course": "koko kurssi"
+      },
+      "kind": {
+        "course": "Kurssin tiedot",
+        "module": "Moduuli",
+        "activity": "Aktiviteetti",
+        "resource": "Resurssi"
+      }
     },
     "collab": {
       "title": "Yhteistyökumppanit",

@@ -721,7 +721,33 @@
       "showOriginal": "Afficher l’original ({{language}})",
       "hideOriginal": "Masquer l’original",
       "showMore": "Afficher plus",
-      "showLess": "Afficher moins"
+      "showLess": "Afficher moins",
+      "statusUpdating": "Mise à jour",
+      "updating": "Mise à jour des traductions…",
+      "recheckCount": "{{count}} à revérifier",
+      "correctionsReplaced": "corrections remplacées",
+      "changedBadge": "Modifié depuis la vérification",
+      "markReviewedAgain": "Marquer à nouveau comme vérifié",
+      "reconfirmScope": "Retraduire {{scope}} en {{language}} écrasera les modifications manuelles. Continuer ?",
+      "reconfirmEdited": "Retraduire {{scope}} en {{language}} remplacera {{count}} parties corrigées à la main. Continuer ?",
+      "scope": {
+        "activity": "Cette activité",
+        "module": "Ce module",
+        "details": "Détails du cours",
+        "course": "Tout le cours…"
+      },
+      "scopeName": {
+        "activity": "cette activité",
+        "module": "ce module",
+        "details": "les détails du cours",
+        "course": "tout le cours"
+      },
+      "kind": {
+        "course": "Détails du cours",
+        "module": "Module",
+        "activity": "Activité",
+        "resource": "Ressource"
+      }
     },
     "collab": {
       "title": "Collaborateurs",

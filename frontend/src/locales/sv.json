@@ -721,7 +721,33 @@
       "showOriginal": "Visa original ({{language}})",
       "hideOriginal": "Dölj original",
       "showMore": "Visa mer",
-      "showLess": "Visa mindre"
+      "showLess": "Visa mindre",
+      "statusUpdating": "Uppdaterar",
+      "updating": "Uppdaterar översättningar…",
+      "recheckCount": "{{count}} att granska igen",
+      "correctionsReplaced": "korrigeringar ersatta",
+      "changedBadge": "Ändrad sedan granskning",
+      "markReviewedAgain": "Markera som granskad igen",
+      "reconfirmScope": "Att översätta om {{scope}} till {{language}} skriver över manuella ändringar. Fortsätta?",
+      "reconfirmEdited": "Att översätta om {{scope}} till {{language}} ersätter {{count}} handkorrigerade delar. Fortsätta?",
+      "scope": {
+        "activity": "Den här aktiviteten",
+        "module": "Den här modulen",
+        "details": "Kursuppgifter",
+        "course": "Hela kursen…"
+      },
+      "scopeName": {
+        "activity": "den här aktiviteten",
+        "module": "den här modulen",
+        "details": "kursuppgifterna",
+        "course": "hela kursen"
+      },
+      "kind": {
+        "course": "Kursuppgifter",
+        "module": "Modul",
+        "activity": "Aktivitet",
+        "resource": "Resurs"
+      }
     },
     "collab": {
       "title": "Medarbetare",

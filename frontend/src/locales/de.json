@@ -721,7 +721,33 @@
       "showOriginal": "Original anzeigen ({{language}})",
       "hideOriginal": "Original ausblenden",
       "showMore": "Mehr anzeigen",
-      "showLess": "Weniger anzeigen"
+      "showLess": "Weniger anzeigen",
+      "statusUpdating": "Wird aktualisiert",
+      "updating": "Übersetzungen werden aktualisiert…",
+      "recheckCount": "{{count}} erneut zu prüfen",
+      "correctionsReplaced": "Korrekturen ersetzt",
+      "changedBadge": "Seit der Prüfung geändert",
+      "markReviewedAgain": "Erneut als geprüft markieren",
+      "reconfirmScope": "Eine Neuübersetzung von {{scope}} ins {{language}} überschreibt manuelle Änderungen. Fortfahren?",
+      "reconfirmEdited": "Eine Neuübersetzung von {{scope}} ins {{language}} ersetzt {{count}} von Hand korrigierte Teile. Fortfahren?",
+      "scope": {
+        "activity": "Diese Aktivität",
+        "module": "Dieses Modul",
+        "details": "Kursdetails",
+        "course": "Ganzer Kurs…"
+      },
+      "scopeName": {
+        "activity": "dieser Aktivität",
+        "module": "dieses Moduls",
+        "details": "der Kursdetails",
+        "course": "des ganzen Kurses"
+      },
+      "kind": {
+        "course": "Kursdetails",
+        "module": "Modul",
+        "activity": "Aktivität",
+        "resource": "Ressource"
+      }
     },
     "collab": {
       "title": "Mitwirkende",

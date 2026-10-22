@@ -721,7 +721,33 @@
       "showOriginal": "Vis original ({{language}})",
       "hideOriginal": "Skjul original",
       "showMore": "Vis mer",
-      "showLess": "Vis mindre"
+      "showLess": "Vis mindre",
+      "statusUpdating": "Oppdaterer",
+      "updating": "Oppdaterer oversettelser…",
+      "recheckCount": "{{count}} å vurdere på nytt",
+      "correctionsReplaced": "rettelser erstattet",
+      "changedBadge": "Endret siden vurdering",
+      "markReviewedAgain": "Merk som vurdert igjen",
+      "reconfirmScope": "Å oversette {{scope}} på nytt til {{language}} overskriver manuelle endringer. Fortsette?",
+      "reconfirmEdited": "Å oversette {{scope}} på nytt til {{language}} erstatter {{count}} håndrettede deler. Fortsette?",
+      "scope": {
+        "activity": "Denne aktiviteten",
+        "module": "Denne modulen",
+        "details": "Kursdetaljer",
+        "course": "Hele kurset…"
+      },
+      "scopeName": {
+        "activity": "denne aktiviteten",
+        "module": "denne modulen",
+        "details": "kursdetaljene",
+        "course": "hele kurset"
+      },
+      "kind": {
+        "course": "Kursdetaljer",
+        "module": "Modul",
+        "activity": "Aktivitet",
+        "resource": "Ressurs"
+      }
     },
     "collab": {
       "title": "Samarbeidspartnere",

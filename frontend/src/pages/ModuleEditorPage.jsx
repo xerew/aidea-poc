@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { useTranslation } from 'react-i18next'
 import {
@@ -136,7 +136,7 @@ const activityShape = PropTypes.shape({
 
 function ActivityEditor({
   activity, original, sourceLanguageLabel, resources, locked, translating, errors, resourceErrors,
-  onChange, onDelete, onSave,
+  activeLang = 'original', onChange, onDelete, onSave,
   onAddResource, onResourceChange, onResourceSave, onResourceDelete, onResourceMove,
   resourceUrl, onResourceRefresh,
 }) {
@@ -245,6 +245,7 @@ function ActivityEditor({
                   count={resources.length}
                   locked={locked}
                   translating={translating}
+                  reviewFlag={translating ? resource.translation_flags?.[activeLang] ?? null : null}
                   error={resourceErrors[resource.id]}
                   onChange={(field, value) => onResourceChange(resource.id, field, value)}
                   onSave={() => onResourceSave(resource.id)}
@@ -291,6 +292,7 @@ ActivityEditor.propTypes = {
   resources: PropTypes.array.isRequired,
   locked: PropTypes.bool.isRequired,
   translating: PropTypes.bool.isRequired,
+  activeLang: PropTypes.string,
   errors: PropTypes.object,
   resourceErrors: PropTypes.object.isRequired,
   onChange: PropTypes.func.isRequired,
@@ -310,6 +312,9 @@ ActivityEditor.propTypes = {
 export default function ModuleEditorPage() {
   const { t } = useTranslation()
   const { id: courseId, moduleId } = useParams()
+  // ?activity=<id> (from the translation bar's re-check list) opens that activity.
+  const [searchParams] = useSearchParams()
+  const wantedActivity = Number(searchParams.get('activity')) || null
   const navigate = useNavigate()
 
   const [module, setModule] = useState(null)
@@ -358,7 +363,7 @@ export default function ModuleEditorPage() {
           setSelectedLessonId(draft.id)
         } else {
           setLessons(loaded)
-          setSelectedLessonId(loaded[0]?.id ?? null)
+          setSelectedLessonId(loaded.find((l) => l.id === wantedActivity)?.id ?? loaded[0]?.id ?? null)
         }
         setIsPublished(courseRes.data.is_published)
         setCaps({
@@ -369,7 +374,7 @@ export default function ModuleEditorPage() {
         setTranslationStatus(courseRes.data.translation_status ?? {})
       })
       .catch(() => setError(t('authoring.moduleEditor.loadError')))
-  }, [courseId, moduleId, t])
+  }, [courseId, moduleId, wantedActivity, t])
 
   const selectedLesson = lessons.find((l) => l.id === selectedLessonId) ?? null
   const displayLesson = selectedLesson && translating
@@ -719,9 +724,10 @@ export default function ModuleEditorPage() {
         return {
           ...l,
           translations: fresh.translations,
+          translation_flags: fresh.translation_flags,
           resources: (l.resources ?? []).map((r) => {
             const fr = fresh.resources?.find((x) => x.id === r.id)
-            return fr ? { ...r, translations: fr.translations } : r
+            return fr ? { ...r, translations: fr.translations, translation_flags: fr.translation_flags } : r
           }),
         }
       }))
@@ -784,6 +790,9 @@ export default function ModuleEditorPage() {
         onStatusUpdate={setTranslationStatus}
         onTranslated={reloadTranslations}
         disabled={!caps.canTranslate}
+        page="module"
+        moduleId={Number(moduleId)}
+        activityId={selectedLesson && !selectedLesson.isNew ? selectedLesson.id : null}
       />
 
       <div className="module-editor-layout">
@@ -857,6 +866,9 @@ export default function ModuleEditorPage() {
                     <GripVertical size={14} className="me-lesson-drag" />
                     <ActivityIcon activity={lesson} size={15} />
                     <span className="me-lesson-title">{lesson.title || t('authoring.moduleEditor.newActivityTitle')}</span>
+                    {translating && lesson.translation_flags?.[activeLang]?.changed && (
+                      <span className="me-lesson-changed">{t('authoring.translate.changedBadge')}</span>
+                    )}
                     {lesson.isNew
                       ? <span className="me-lesson-draft">{t('authoring.moduleEditor.draftBadge')}</span>
                       : <span className="me-lesson-order">{idx + 1}</span>}
@@ -886,6 +898,7 @@ export default function ModuleEditorPage() {
               resources={(selectedLesson.resources ?? []).map((r) => displayResource(r, activeLang))}
               locked={locked}
               translating={translating}
+              activeLang={activeLang}
               errors={lessonErrors[selectedLesson.id]}
               resourceErrors={resourceErrors}
               onChange={updateLessonField}

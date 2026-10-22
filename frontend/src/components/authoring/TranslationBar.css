@@ -123,3 +123,80 @@
 .translation-service-offline > div { display: flex; flex-direction: column; gap: 0.1rem; flex: 1 1 16rem; }
 .translation-service-offline span { color: #a16207; font-size: 0.8rem; }
 .translation-service-offline .add-dashed-btn { margin-top: 0; }
+.translation-status--updating { background: #fef9c3; color: #a16207; }
+
+/* Re-translate ▾ menu */
+.translation-menu-wrap { position: relative; }
+
+.translation-menu {
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  left: 0;
+  z-index: 20;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem;
+  background: var(--color-popover, var(--color-card));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+}
+
+.translation-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.4rem;
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.translation-menu button:hover { background: color-mix(in srgb, var(--color-primary) 8%, transparent); }
+
+/* "N to re-check" list */
+.translation-recheck { flex-basis: 100%; }
+
+.translation-recheck-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: none;
+  background: #fef9c3;
+  color: #854d0e;
+  border-radius: 9999px;
+  padding: 0.15rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.translation-recheck-list {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.translation-recheck-list a { color: var(--color-primary); }
+
+.translation-recheck-kind {
+  color: var(--color-text-muted);
+  margin-right: 0.35rem;
+}
+
+.translation-recheck-kind::after { content: ':'; }
+
+.translation-recheck-replaced {
+  margin-left: 0.4rem;
+  font-size: 0.72rem;
+  color: #b45309;
+}
