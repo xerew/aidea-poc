@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from hub.models import Course, CourseEditHistory, LearningPillar
+from hub.models import Activity, Course, CourseEditHistory, LearningPillar
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
 from hub.translation import LANGUAGE_NAMES
 from hub.translation_flags import mark_edited
@@ -240,6 +240,25 @@ class AuthoringCourseTranslateView(APIView):
         valid = set(LANGUAGE_NAMES) - {course.source_language}
         if language not in valid:
             return Response({'detail': 'Invalid or source language.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Scope: the whole course (default), or — for a language already
+        # translated — only the course details, one module or one activity.
+        scope = request.data.get('scope') or 'course'
+        if scope not in ('course', 'details', 'module', 'activity'):
+            return Response({'detail': 'Unknown scope.'}, status=status.HTTP_400_BAD_REQUEST)
+        target = None
+        if scope != 'course':
+            if (course.translation_status or {}).get(language) not in ('done', 'reviewed'):
+                return Response({'detail': 'Translate the whole course into this language first.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+            if scope in ('module', 'activity'):
+                try:
+                    item_id = int(request.data.get(f'{scope}_id'))
+                except (TypeError, ValueError):
+                    return Response({'detail': f'{scope}_id is required.'}, status=status.HTTP_400_BAD_REQUEST)
+                target = (course.modules.filter(pk=item_id).first() if scope == 'module'
+                          else Activity.objects.filter(pk=item_id, module__course=course).first())
+                if target is None:
+                    return Response({'detail': 'Not part of this course.'}, status=status.HTTP_400_BAD_REQUEST)
         # Check the NTUA translation server first, so an outage is reported
         # now instead of as a 'failed' translation a few minutes later.
         from hub.translation_health import check_now
@@ -250,11 +269,49 @@ class AuthoringCourseTranslateView(APIView):
                  'service': service},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
-        course.translation_status[language] = 'pending'
-        course.save(update_fields=['translation_status'])
-        from hub.tasks import translate_course
-        translate_course.delay(course.id, language)
+        from hub import tasks
+        from hub.translation_flags import forget_review
+        from hub.translation_sync import _mark_updating
+        if scope == 'course':
+            forget_review(course, language)
+            course.translation_status[language] = 'pending'
+            course.save(update_fields=['translation_status'])
+            tasks.translate_course.delay(course.id, language)
+        else:
+            _mark_updating(course, [language])
+            if scope == 'details':
+                tasks.translate_course_meta.delay(course.id, language)
+            elif scope == 'module':
+                tasks.translate_module_full.delay(target.id, language)
+            else:
+                tasks.translate_lesson_meta.delay(target.id, language)
         return Response({'translation_status': course.translation_status}, status=status.HTTP_202_ACCEPTED)
+
+
+class AuthoringCourseTranslationChangesView(APIView):
+    """GET ?language= — items machine-translated since the last review
+    ({items}); with edited=1&scope=… — how many hand-corrected items that
+    re-translation would replace ({edited_count})."""
+    permission_classes = [IsContentCreator]
+
+    def get(self, request, pk):
+        course = Course.objects.filter(pk=pk).first()
+        if course is None:
+            return Response({'detail': 'Not found.'}, status=status.HTTP_404_NOT_FOUND)
+        if not can_translate_course(request.user, course):
+            return Response({'detail': 'You cannot translate this course.'}, status=status.HTTP_403_FORBIDDEN)
+        language = request.query_params.get('language', '')
+        from hub.translation_flags import count_edited, recheck_items
+        if request.query_params.get('edited'):
+            def as_int(name):
+                try:
+                    return int(request.query_params.get(name))
+                except (TypeError, ValueError):
+                    return None
+            scope = request.query_params.get('scope', 'course')
+            return Response({'edited_count': count_edited(course, language, scope,
+                                                          as_int('module_id'), as_int('activity_id'))})
+        return Response({'items': recheck_items(course, language)})
 
 
 class AuthoringTranslationReviewView(APIView):
