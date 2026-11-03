@@ -1,0 +1,34 @@
+/* Self-hosted fonts (spec 2026-11-03): nothing is loaded from Google Fonts.
+   fontsource declares each file with a unicode-range, so a browser downloads a
+   font only when a page uses it, and only the character sets it needs. */
+
+/* Platform fonts */
+@import '@fontsource/lexend/300.css';
+@import '@fontsource/lexend/400.css';
+@import '@fontsource/lexend/500.css';
+@import '@fontsource/lexend/600.css';
+@import '@fontsource/oswald/700.css';
+
+/* Greek fallback for Lexend, and a picker font */
+@import '@fontsource/noto-sans/400.css';
+@import '@fontsource/noto-sans/700.css';
+@import '@fontsource/noto-sans/400-italic.css';
+
+/* Rich-text font picker (lib/richTextStyles.js FONTS) */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/inter/400-italic.css';
+@import '@fontsource/open-sans/400.css';
+@import '@fontsource/open-sans/700.css';
+@import '@fontsource/open-sans/400-italic.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/700.css';
+@import '@fontsource/roboto/400-italic.css';
+@import '@fontsource/noto-serif/400.css';
+@import '@fontsource/noto-serif/700.css';
+@import '@fontsource/noto-serif/400-italic.css';
+@import '@fontsource/literata/400.css';
+@import '@fontsource/literata/700.css';
+@import '@fontsource/literata/400-italic.css';
+@import '@fontsource/fira-code/400.css';
+@import '@fontsource/fira-code/700.css';

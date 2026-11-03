@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 import { createRichHtmlSanitizer } from '../../lib/sanitizeRichHtml'
-import './RichTextEditor.css'
+import '../../styles/richContent.css'
 
 const looksLikeHtml = (s) => /<\/?[a-z][\s\S]*>/i.test(s)
 
