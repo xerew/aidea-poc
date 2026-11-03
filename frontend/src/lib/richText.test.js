@@ -21,9 +21,13 @@ test('editor and sanitizer allow tables and images and nothing new besides', () 
   for (const attr of ['src', 'alt', 'width', 'height', 'colspan', 'rowspan', 'scope', 'href', 'target', 'rel']) {
     assert.ok(SANITIZE_CONFIG.ALLOWED_ATTR.includes(attr), attr)
   }
-  assert.ok(!SANITIZE_CONFIG.ALLOWED_ATTR.includes('style'))
-  assert.ok(!SANITIZE_CONFIG.ALLOWED_TAGS.includes('script'))
-  assert.ok(!SANITIZE_CONFIG.ALLOWED_TAGS.includes('iframe'))
+  // style/class are allowed only through the per-value filter (richTextStyles.js).
+  for (const attr of ['style', 'class']) assert.ok(SANITIZE_CONFIG.ALLOWED_ATTR.includes(attr), attr)
+  for (const el of ['span', 'colgroup', 'col']) {
+    assert.ok(SANITIZE_CONFIG.ALLOWED_TAGS.includes(el), el)
+    assert.ok(RICH_TEXT_VALID_ELEMENTS.includes(el), el)
+  }
+  for (const el of ['script', 'iframe', 'style']) assert.ok(!SANITIZE_CONFIG.ALLOWED_TAGS.includes(el), el)
 })
 
 test('the editor keeps uploaded images as absolute paths (never page-relative)', () => {
