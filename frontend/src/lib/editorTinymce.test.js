@@ -1,7 +1,7 @@
 // The real TinyMCE (core + our plugins) in jsdom, with the exact editor
 // configuration authors get (editorInit) — checks what the editor writes and
 // what survives save, not just our helpers in isolation.
-import { test } from 'node:test'
+import { before, test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -69,7 +69,8 @@ function selectFirstText(editor) {
   editor.selection.setRng(rng)
 }
 
-const editor = await startEditor()
+let editor
+before(async () => { editor = await startEditor() })
 const run = (html, action) => {
   editor.setContent(html)
   selectFirstText(editor)
