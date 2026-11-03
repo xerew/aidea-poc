@@ -77,6 +77,13 @@ def _restore_images(el, originals):
         placeholder.getparent().replace(placeholder, original)
 
 
+def _unwrap_styled_spans(root):
+    """Replace each <span style="…"> (font, size, colour, highlight) in `root`
+    with its own text and children."""
+    for span in [s for s in root.iter('span') if s.get('style') is not None]:
+        span.drop_tag()
+
+
 def _set_inner(el, source):
     for child in list(el):
         el.remove(child)
@@ -113,6 +120,16 @@ def _translate_block(el, translate_fragment, translate_plain):
     expected, source_len = _signature(source), len(source.text_content().strip())
     for _ in range(2):
         candidate = _acceptable(_clean(translate_fragment(fragment)), fragment, expected, source_len)
+        if candidate is not None:
+            _set_inner(el, candidate)
+            _restore_images(el, originals)
+            return
+    # The model could not keep the inline formatting (font, size, colour): try
+    # once without it, so bold, links and images still survive (spec 2026-11-03).
+    if any(s.get('style') is not None for s in source.iter('span')):
+        _unwrap_styled_spans(source)
+        bare = _inner(source)
+        candidate = _acceptable(_clean(translate_fragment(bare)), bare, _signature(source), source_len)
         if candidate is not None:
             _set_inner(el, candidate)
             _restore_images(el, originals)
