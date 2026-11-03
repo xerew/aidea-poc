@@ -28,7 +28,7 @@ test('cleanNodeStyles applies the paste rules to a pasted fragment', () => {
   const root = fragment('<p style="text-align:center; font-family: Calibri"><span style="color: rgb(0,0,0); font-size: 11pt">x</span></p>'
     + '<table class="MsoTable rt-striped"><tbody><tr><td style="background-color:#eee">y</td></tr></tbody></table>')
   cleanNodeStyles(root, cleanPastedStyle)
-  assert.equal(root.innerHTML, '<p style="text-align: center"><span style="color: #111827">x</span></p>'
+  assert.equal(root.innerHTML, '<p style="text-align: center"><span>x</span></p>'
     + '<table class="rt-striped"><tbody><tr><td style="background-color: #f1f5f9">y</td></tr></tbody></table>')
 })
 

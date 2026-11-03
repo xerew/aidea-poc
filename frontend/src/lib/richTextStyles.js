@@ -112,6 +112,7 @@ const BLOCK_RULES = {
 }
 const CELL_RULES = {
   'text-align': ALIGN,
+  'line-height': fromList(LINE_HEIGHTS),
   'vertical-align': fromList(['top', 'middle', 'bottom']),
   'background-color': fromPalette(CELL_BACKGROUNDS),
   width: percentage,
@@ -192,16 +193,29 @@ export function nearestColor(color, palette) {
   return best
 }
 
-/** Pasted formatting: colours snap to the palette, known fonts map to their
- *  stack, everything else goes through filterStyle (so unknown fonts and sizes drop). */
+// Near-neutral colours (low chroma) at the ends of the lightness scale: the
+// default black text and white page that Word and browsers copy onto everything.
+function isNeutral(color, { dark = false, light = false }) {
+  const hex = parseColor(color)
+  if (!hex) return false
+  const [l, a, b] = toLab(hex)
+  if (Math.hypot(a, b) > 10) return false
+  return (dark && l < 25) || (light && l > 95)
+}
+
+/** Pasted formatting: colours snap to the palette (default black text and white
+ *  backgrounds count as no colour), known fonts map to their stack, everything
+ *  else goes through filterStyle (so unknown fonts and sizes drop). */
 export function cleanPastedStyle(style, tag) {
   const t = String(tag ?? '').toLowerCase()
   const decls = []
   for (const [prop, value] of declarations(style)) {
     if (prop === 'color') {
+      if (isNeutral(value, { dark: true, light: true })) continue
       const hex = nearestColor(value, TEXT_COLORS)
       if (hex) decls.push([prop, hex])
     } else if (prop === 'background-color') {
+      if (isNeutral(value, { light: true })) continue
       const hex = nearestColor(value, t === 'td' || t === 'th' ? CELL_BACKGROUNDS : HIGHLIGHTS)
       if (hex) decls.push([prop, hex])
     } else if (prop === 'font-family') {
@@ -227,5 +241,8 @@ export function tinymceFormats() {
     color_map_background: flatColorMap(HIGHLIGHTS),
     table_background_color_map: CELL_BACKGROUNDS.map((c) => ({ title: c.name, value: c.hex })),
     custom_colors: false,
+    // What the split buttons apply before a colour is picked (TinyMCE's default is black).
+    color_default_foreground: TEXT_COLORS[0].hex,
+    color_default_background: HIGHLIGHTS[0].hex,
   }
 }

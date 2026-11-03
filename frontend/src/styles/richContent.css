@@ -39,7 +39,8 @@
   text-align: left;
   vertical-align: top;
 }
-.rich-html th { background: var(--color-bg, #f8fafc); font-weight: 600; }
+.rich-html th,
+.rich-html thead td { background: var(--color-bg, #f8fafc); font-weight: 600; }
 .rich-html caption { caption-side: top; text-align: left; font-weight: 600; padding-bottom: 0.35rem; }
 
 /* Table presets (lib/richTextStyles.js TABLE_CLASSES). A cell's own background

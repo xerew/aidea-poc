@@ -21,4 +21,6 @@ test('rich content CSS: tables fill the width and scroll inside their wrapper', 
   assert.match(css, /\.rich-html table\s*\{[^}]*width:\s*100%/)
   assert.ok(!/\.rich-html table\s*\{[^}]*display:\s*block/.test(css))
   for (const cls of ['.rt-striped', '.rt-borderless', '.rt-pad-compact', '.rt-pad-roomy']) assert.ok(css.includes(cls), cls)
+  // Header rows saved before sectionCells (<thead><td>) still look like headers.
+  assert.match(css, /\.rich-html thead td/)
 })

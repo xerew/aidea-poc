@@ -1,7 +1,10 @@
 // TinyMCE wiring for the rich-text editor (spec 2026-11-03): toolbar, the
 // custom paragraph-spacing and table-preset buttons, and the allow-list
 // applied to everything the editor loads, pastes or saves.
-import { PARAGRAPH_SPACING, TABLE_CLASSES, filterClass, filterStyle } from './richTextStyles.js'
+import { EDITOR_URL_OPTIONS, RICH_TEXT_VALID_ELEMENTS } from './richText.js'
+import {
+  INDENTS, PARAGRAPH_SPACING, TABLE_CLASSES, cleanPastedStyle, filterClass, filterStyle, tinymceFormats,
+} from './richTextStyles.js'
 
 export const EDITOR_TOOLBAR = [
   'undo redo',
@@ -54,7 +57,14 @@ export function cleanNodeStyles(node, clean) {
 // serializer: what gets saved), so the editor never keeps what display drops.
 function addAllowListFilters(target) {
   target.addAttributeFilter('style', (nodes) => {
-    for (const n of nodes) n.attr('style', filterStyle(n.attr('style'), n.name) || null)
+    for (const n of nodes) {
+      const clean = filterStyle(n.attr('style'), n.name) || null
+      n.attr('style', clean)
+      if (n.attr('data-mce-style') !== undefined) n.attr('data-mce-style', clean)
+    }
+  })
+  target.addAttributeFilter('data-mce-style', (nodes) => {
+    for (const n of nodes) n.attr('data-mce-style', filterStyle(n.attr('data-mce-style'), n.name) || null)
   })
   target.addAttributeFilter('class', (nodes) => {
     for (const n of nodes) n.attr('class', filterClass(n.attr('class'), n.name) || null)
@@ -68,10 +78,21 @@ const PADDING = [
 ]
 
 /** TinyMCE `setup(editor)`: allow-list filters and the custom buttons. */
+const MAX_INDENT_EM = parseFloat(INDENTS[INDENTS.length - 1])
+
 export function setupEditor(editor) {
   editor.on('PreInit', () => {
     addAllowListFilters(editor.parser)
     addAllowListFilters(editor.serializer)
+  })
+
+  // Indent stops at the last allowed step (a deeper one would vanish on save).
+  editor.on('BeforeExecCommand', (e) => {
+    if (e.command !== 'Indent') return
+    const blocks = editor.selection.getSelectedBlocks()
+    if (blocks.length && blocks.every((b) => parseFloat(editor.dom.getStyle(b, 'padding-left')) >= MAX_INDENT_EM)) {
+      e.preventDefault()
+    }
   })
 
   const spacingItems = (direction, label) => [
@@ -142,4 +163,55 @@ export function setupEditor(editor) {
       onAction: () => setTableClass(p.cls, paddingClasses),
     }))),
   })
+}
+
+/** The TinyMCE `init` options (everything except script path and licence), so
+ *  the component and the real-editor tests run the same configuration. */
+export function editorInit({ placeholder = '', uploadImage = undefined, contentStyle = '' } = {}) {
+  return {
+    menubar: false,
+    statusbar: false,
+    branding: false,
+    promotion: false,
+    height: 360,
+    placeholder,
+    ...EDITOR_URL_OPTIONS,
+    plugins: 'lists link autolink table image',
+    toolbar: EDITOR_TOOLBAR,
+    toolbar_mode: 'wrap',
+    table_toolbar: TABLE_TOOLBAR,
+    ...tinymceFormats(),
+    // Underline as <u> (TinyMCE's default is a styled span, which the allow-list drops).
+    formats: { ...PARAGRAPH_FORMATS(), underline: { inline: 'u', exact: true } },
+    indentation: '2em',
+    indent_use_margin: false,
+    table_sizing_mode: 'relative',
+    table_use_colgroups: true,
+    // "Header row" makes <th> cells (the default keeps <td> in <thead>, which looks unchanged).
+    table_header_type: 'sectionCells',
+    table_appearance_options: false,
+    table_advtab: false,
+    table_cell_advtab: false,
+    table_row_advtab: false,
+    table_default_styles: {},
+    table_default_attributes: {},
+    image_description: true,
+    image_dimensions: true,
+    image_title: false,
+    automatic_uploads: true,
+    images_upload_handler: uploadImage,
+    images_file_types: 'png,jpg,jpeg,gif,webp',
+    paste_data_images: true,
+    // Chrome/Edge/Safari: keep pasted styles so paste_postprocess can clean them
+    // (TinyMCE's default strips every style before it runs).
+    paste_webkit_styles: 'all',
+    // Pasted formatting: colours snap to the palette, listed fonts kept, the rest dropped.
+    paste_postprocess: (_editor, args) => cleanNodeStyles(args.node, cleanPastedStyle),
+    block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3',
+    body_class: 'rich-html',
+    content_style: contentStyle,
+    // Content creators are trusted, but keep the output conservative.
+    valid_elements: RICH_TEXT_VALID_ELEMENTS,
+    setup: setupEditor,
+  }
 }

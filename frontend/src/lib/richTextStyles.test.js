@@ -56,10 +56,26 @@ test('nearestColor snaps to the palette', () => {
 
 test('pasted styles are snapped, mapped or dropped', () => {
   assert.equal(cleanPastedStyle('color: rgb(0, 0, 0); font-family: Roboto, Arial; font-size: 11pt', 'span'),
-    'color: #111827; font-family: Roboto, sans-serif')
+    'font-family: Roboto, sans-serif')
   assert.equal(cleanPastedStyle('font-family: Calibri, sans-serif; background-color: #ffff00', 'span'),
     'background-color: #fef08a')
   assert.equal(cleanPastedStyle('background-color: #eeeeee', 'td'), 'background-color: #f1f5f9')
+})
+
+test('pasted default black text and white backgrounds mean "no colour", not a palette colour', () => {
+  for (const style of ['color: #000000', 'color: rgb(34, 34, 34)', 'color: #ffffff']) {
+    assert.equal(cleanPastedStyle(style, 'span'), '', style)
+  }
+  for (const [style, tag] of [['background-color: #ffffff', 'span'], ['background-color: rgb(255, 255, 255)', 'td'],
+    ['background-color: #fdfdfd', 'th']]) assert.equal(cleanPastedStyle(style, tag), '', `${tag} ${style}`)
+  assert.equal(cleanPastedStyle('color: #ff0000', 'span'), 'color: #b91c1c')
+  assert.equal(cleanPastedStyle('background-color: #ffff00', 'span'), 'background-color: #fef08a')
+})
+
+test('the colour buttons start on palette colours', () => {
+  const f = tinymceFormats()
+  assert.equal(f.color_default_foreground, '#111827')
+  assert.equal(f.color_default_background, '#fef08a')
 })
 
 test('TinyMCE formats come from the same constants', () => {
