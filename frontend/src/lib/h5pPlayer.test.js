@@ -4,8 +4,10 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import vm from 'node:vm'
+import { JSDOM } from 'jsdom'
 
 const code = readFileSync(new URL('../../public/h5p/player.js', import.meta.url), 'utf8')
+const page = readFileSync(new URL('../../public/h5p/player.html', import.meta.url), 'utf8')
 
 function run({ framed = true, src = 'https://aidea-hub.eu/media/h5p/abc' } = {}) {
   const posted = []
@@ -49,4 +51,16 @@ test('no H5P "user": it makes H5P fetch saved state from a URL we do not have, a
 test('the player refuses to run unframed or for a package outside /media/h5p/', () => {
   assert.deepEqual(run({ framed: false }).posted.map(m => m.message), ['not framed'])
   assert.deepEqual(run({ src: 'https://evil.example/x' }).posted.map(m => m.message), ['invalid package'])
+})
+
+// H5P's own defaults sit behind html.h5p-iframe, which a div embed never sets,
+// so without these the text falls back to the browser's serif font.
+test('the player page gives H5P text a sans-serif font, 16px size and 1.5 line spacing', () => {
+  const { window } = new JSDOM(page)
+  const content = window.document.createElement('div')
+  content.className = 'h5p-content'
+  window.document.getElementById('h5p').append(content)
+  assert.match(window.getComputedStyle(window.document.body).fontFamily, /^Inter, sans-serif$/)
+  assert.equal(window.getComputedStyle(content).fontSize, '16px')
+  assert.equal(window.getComputedStyle(content).lineHeight, '24px')
 })

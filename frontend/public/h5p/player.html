@@ -6,7 +6,11 @@
     <title>H5P</title>
     <style>
       html, body { margin: 0; padding: 0; background: transparent; }
+      /* H5P's own text defaults need html.h5p-iframe, which our div embed never
+         sets. Inter ships with the player (h5p.css) and includes Greek. */
+      body { font-family: Inter, sans-serif; }
       #h5p { max-width: 100%; }
+      #h5p .h5p-content { font-size: 16px; line-height: 1.5em; }
     </style>
   </head>
   <body>
