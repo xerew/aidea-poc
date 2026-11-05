@@ -48,15 +48,22 @@ www.{$DOMAIN:localhost} {
         file_server
     }
     # The H5P player page: sandboxed even when opened as a top-level page.
+    # Same file names in every build, so browsers re-check them.
     handle /h5p/* {
         header {
             Access-Control-Allow-Origin "*"
             Content-Security-Policy "sandbox allow-scripts allow-popups allow-forms"
             X-Content-Type-Options "nosniff"
+            Cache-Control "no-cache"
         }
         reverse_proxy frontend:80
     }
     handle {
+        # Browsers re-check everything but /assets/* (new file names in each
+        # build), so a deployment reaches people without a hard reload. Unchanged
+        # files answer 304. Every app route returns index.html, so match all of them.
+        @unhashed not path /assets/*
+        header @unhashed Cache-Control "no-cache"
         reverse_proxy frontend:80
     }
 }

@@ -119,3 +119,12 @@ class CaddyConfigTests(APITestCase):
         self.assertIn('path_regexp ^/api/authoring/.*/presentation/$', text)
         self.assertIn('header /media/presentations/*', text)
         self.assertIn('application/vnd.openxmlformats-officedocument.presentationml.presentation', text)
+
+    def test_browsers_recheck_everything_the_frontend_serves_except_hashed_assets(self):
+        from django.conf import settings
+        text = (Path(settings.BASE_DIR).parent / 'Caddyfile').read_text(encoding='utf-8')
+        player = text.split('handle /h5p/* {')[1].split('reverse_proxy')[0]
+        self.assertIn('Cache-Control "no-cache"', player)
+        spa = text.rsplit('handle {', 1)[1]
+        self.assertIn('not path /assets/*', spa)
+        self.assertIn('Cache-Control "no-cache"', spa)
