@@ -43,6 +43,7 @@ from .models.recommendations import (
     RecommendationConfig,
     RecommendationEvent,
 )
+from .translation_health import server_summary
 
 # ── User + Profile ────────────────────────────────────────────────────────────
 
@@ -482,7 +483,7 @@ class _ReadOnlyAdmin(admin.ModelAdmin):
 class AIReviewSettingsAdmin(admin.ModelAdmin):
     fieldsets = [
         ('AI assignment reviewer', {
-            'fields': ['enabled', 'model_name'],
+            'fields': ['enabled', 'model_name', 'ollama_server'],
             'description': 'Self-hosted model on the NTUA Ollama server (same tunnel as translation).',
         }),
         ('Auto-approve', {
@@ -493,6 +494,13 @@ class AIReviewSettingsAdmin(admin.ModelAdmin):
             ),
         }),
     ]
+
+    readonly_fields = ['ollama_server']
+
+    @admin.display(description='Ollama server')
+    def ollama_server(self, obj):
+        # Checked live; the tunnel switches between the NTUA addresses by itself.
+        return server_summary()
 
     def has_add_permission(self, request):
         return not AIReviewSettings.objects.exists()

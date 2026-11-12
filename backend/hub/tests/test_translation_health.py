@@ -115,3 +115,69 @@ class TranslateWhenOfflineTests(APITestCase):
         UserProfile.objects.create(user=teacher, user_type=UserProfile.UserType.TEACHER)
         self.client.force_authenticate(teacher)
         self.assertEqual(self.client.get('/api/authoring/translation-service/').status_code, 403)
+
+
+STATUS_FILE = 'hub.translation_health.TUNNEL_STATUS_FILE'
+
+
+class TunnelAddressTests(TestCase):
+    """Which NTUA address the ollama-tunnel container is using (its status file)."""
+
+    def status_file(self, text):
+        import tempfile
+        from pathlib import Path
+        folder = Path(tempfile.mkdtemp())
+        self.addCleanup(__import__('shutil').rmtree, folder, ignore_errors=True)
+        path = folder / 'ollama-tunnel.json'
+        path.write_text(text, encoding='utf-8')
+        return str(path)
+
+    def test_reads_the_address_and_since(self):
+        from hub.translation_health import tunnel_address
+        path = self.status_file('{"host": "147.102.17.66", "since": "2026-11-12T08:42:00Z"}\n')
+        with patch(STATUS_FILE, path):
+            host, since = tunnel_address()
+        self.assertEqual(host, '147.102.17.66')
+        self.assertEqual(since.isoformat(), '2026-11-12T08:42:00+00:00')
+
+    def test_unknown_when_the_file_is_missing_or_garbled(self):
+        from hub.translation_health import tunnel_address
+        with patch(STATUS_FILE, '/nowhere/ollama-tunnel.json'):
+            self.assertEqual(tunnel_address(), (None, None))
+        with patch(STATUS_FILE, self.status_file('{not json')):
+            self.assertEqual(tunnel_address(), (None, None))
+
+    @override_settings(TIME_ZONE='UTC')
+    def test_summary_when_connected_and_when_not(self):
+        from hub.translation_health import server_summary
+        path = self.status_file('{"host": "147.102.23.222", "since": "2026-11-12T08:42:00Z"}')
+        with patch(STATUS_FILE, path), patch(PROBE, return_value=(True, '')):
+            self.assertEqual(server_summary(), 'Connected via 147.102.23.222 since 12 Nov 2026, 08:42.')
+        with patch(STATUS_FILE, path), patch(PROBE, return_value=(False, 'Cannot reach the translation server: refused')):
+            summary = server_summary()
+        self.assertTrue(summary.startswith('Not connected. Trying 147.102.23.222 now.'), summary)
+        self.assertIn('refused', summary)
+
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_check_records_the_address_and_the_outage_email_names_it(self):
+        cache.delete(STATUS_KEY)
+        admin = User.objects.create_user(username='adm2', password='x', email='admin2@example.org')
+        UserProfile.objects.create(user=admin, user_type=UserProfile.UserType.ADMIN)
+        path = self.status_file('{"host": "147.102.17.66", "since": "2026-11-12T08:42:00Z"}')
+        with patch(STATUS_FILE, path), patch(PROBE, return_value=(False, 'refused')):
+            status = check_now()
+        self.assertEqual(status['host'], '147.102.17.66')
+        self.assertIn('147.102.17.66', mail.outbox[0].body)
+
+
+class OllamaServerAdminTests(TestCase):
+    def test_ai_review_settings_page_shows_the_ollama_server(self):
+        from hub.models import AIReviewSettings
+        superuser = User.objects.create_superuser('root', 'root@example.org', 'x')
+        self.client.force_login(superuser)
+        obj = AIReviewSettings.objects.first() or AIReviewSettings.objects.create()
+        with patch('hub.admin.server_summary', return_value='Connected via 147.102.17.66 since 12 Nov 2026, 08:42.'):
+            res = self.client.get(f'/django-admin/hub/aireviewsettings/{obj.pk}/change/')
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'Ollama server')
+        self.assertContains(res, 'Connected via 147.102.17.66')

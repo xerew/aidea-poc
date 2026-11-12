@@ -45,9 +45,11 @@ services:
     build: ./docker/ollama-tunnel
     environment:
       SSH_REMOTE_USER: ${SSH_REMOTE_USER:-ngrammatikos}
-      SSH_REMOTE_HOST: ${SSH_REMOTE_HOST:-147.102.17.66}
+      # The NTUA machine changes address when it moves: tried in turn (see entrypoint.sh).
+      SSH_REMOTE_HOSTS: ${SSH_REMOTE_HOSTS:-147.102.17.66 147.102.23.222}
     volumes:
       - ./docker/ollama-tunnel/keys:/keys:ro
+      - ollama_tunnel_status:/status
     restart: unless-stopped
 
   backend:
@@ -73,6 +75,7 @@ services:
     volumes:
       - static_files:/app/staticfiles
       - media_files:/app/media
+      - ollama_tunnel_status:/ollama-status:ro
     depends_on:
       - db
       - redis
@@ -94,6 +97,7 @@ services:
     volumes:
       # The AI reviewer reads uploaded attachments (screenshots, PDFs, Word files).
       - media_files:/app/media
+      - ollama_tunnel_status:/ollama-status:ro
     depends_on:
       - db
       - redis
@@ -154,3 +158,4 @@ volumes:
   media_files:
   caddy_data:
   caddy_config:
+  ollama_tunnel_status:

@@ -7,11 +7,14 @@ Translate. Admins are emailed when the server goes offline or comes back.
 """
 import json
 import logging
+import os
 import urllib.error
 import urllib.request
 
 from django.core.cache import cache
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.utils.formats import date_format
 
 from hub.translation import OLLAMA_HOST_HEADER, OLLAMA_MODEL, OLLAMA_URL
 
@@ -19,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 STATUS_KEY = 'translation_service_status'
 PROBE_TIMEOUT = 5  # seconds — the tunnel answers instantly when the VM is up
+# Written by the ollama-tunnel container (shared volume): the NTUA address in use.
+TUNNEL_STATUS_FILE = os.getenv('OLLAMA_TUNNEL_STATUS_FILE', '/ollama-status/ollama-tunnel.json')
 
 
 def _reason(exc):
@@ -40,6 +45,29 @@ def probe():
     return True, ''
 
 
+def tunnel_address():
+    """(address, since) the ollama-tunnel container is using; (None, None) if unknown."""
+    try:
+        with open(TUNNEL_STATUS_FILE, encoding='utf-8') as f:
+            data = json.load(f)
+        return (data.get('host') or None), parse_datetime(data.get('since') or '')
+    except (OSError, ValueError, AttributeError, TypeError):
+        return None, None
+
+
+def server_summary():
+    """One live line for Django admin: which address is connected, or why not."""
+    online, error = probe()
+    host, since = tunnel_address()
+    when = f' since {date_format(timezone.localtime(since), "j M Y, H:i")}' if since else ''
+    if online:
+        if host:
+            return f'Connected via {host}{when}.'
+        return 'Connected (the ollama-tunnel container has not reported its address).'
+    trying = f' Trying {host} now.' if host else ''
+    return f'Not connected.{trying} {error}'
+
+
 def get_status():
     """Last recorded status, or None if no check has run yet."""
     return cache.get(STATUS_KEY)
@@ -54,6 +82,7 @@ def check_now():
     status = {
         'online': online,
         'error': error,
+        'host': tunnel_address()[0],
         'checked_at': now,
         # When the current state began (kept across checks while it holds).
         'since': now if changed else previous['since'],

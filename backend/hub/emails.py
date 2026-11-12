@@ -280,6 +280,7 @@ def send_translation_service_email(status):
         heading = 'Translation server is back online'
         paragraphs = [
             'The NTUA translation server is reachable again, so course translations can run.',
+            *([f'Connected via {_html_text(status["host"])}.'] if status.get('host') else []),
             'Translations that failed while it was down are not retried automatically. '
             'Authors can press Translate again for those languages.',
         ]
@@ -290,6 +291,8 @@ def send_translation_service_email(status):
             'The platform cannot reach the NTUA translation server (Ollama, through the '
             'ollama-tunnel container), so course translations cannot run.',
             f'<strong>Details:</strong> {_html_text(status["error"])}',
+            *([f'<strong>Address being tried:</strong> {_html_text(status["host"])} (the tunnel tries '
+                'each NTUA address in turn).'] if status.get('host') else []),
             'Authors see a notice in the translation bar and the Translate button explains the '
             'outage instead of queuing a job. The platform checks again every 15 minutes and will '
             'email you when it is back.',
