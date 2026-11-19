@@ -11,9 +11,12 @@ services:
       - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
 
-  # Scheduled pg_dump backups with rotation. Writes gzipped dumps to ./backups
-  # on the host (daily/weekly/monthly subfolders). Runs at midnight and keeps
-  # 7 daily, 4 weekly and 6 monthly copies — tune via the env vars below.
+  # Scheduled pg_dump backups. Writes gzipped dumps to ./backups on the host.
+  # Runs every two weeks (00:00 on the 1st and 15th) and keeps only the newest
+  # dump plus 6 months of monthly copies. The image always fills the
+  # daily/weekly/monthly folders, but they are hardlinks to the same dump, so
+  # daily/ and weekly/ hold just the newest one and cost no extra space.
+  # Manual backup (e.g. before a risky migration): docker compose exec db-backup /backup.sh
   db-backup:
     image: prodrigestivill/postgres-backup-local:16
     environment:
@@ -21,9 +24,9 @@ services:
       POSTGRES_DB: aidea
       POSTGRES_USER: aidea
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      SCHEDULE: "@daily"          # or a cron expr, e.g. "0 3 * * *" for 03:00
-      BACKUP_KEEP_DAYS: 7
-      BACKUP_KEEP_WEEKS: 4
+      SCHEDULE: "0 0 1,15 * *"    # 5-field cron (minute hour day month weekday)
+      BACKUP_KEEP_DAYS: 1
+      BACKUP_KEEP_WEEKS: 1
       BACKUP_KEEP_MONTHS: 6
       TZ: ${TZ:-Europe/Athens}
     volumes:
