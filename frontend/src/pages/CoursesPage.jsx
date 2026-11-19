@@ -56,7 +56,7 @@ function CourseCard({ course }) {
       </div>
 
       <h3 className="course-title">{course.title}</h3>
-      <p className="course-desc">{course.description}</p>
+      <p className="course-desc" title={course.description}>{course.description}</p>
 
       {course.subjects?.length > 0 && (
         <div className="course-subjects">

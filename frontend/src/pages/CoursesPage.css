@@ -132,7 +132,19 @@
   font-size: 0.875rem;
   color: var(--color-text-muted);
   line-height: 1.55;
-  flex: 1;
+  /* Long descriptions stop at 4 lines (full text on hover and on the course page),
+     so one long card doesn't stretch its whole row. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+/* Whatever follows the description (subjects, or the hours/modules row) goes to
+   the bottom of the card, so cards in a row line up. */
+.course-desc + * {
+  margin-top: auto;
 }
 
 .course-meta {
