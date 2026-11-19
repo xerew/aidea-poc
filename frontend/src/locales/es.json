@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "Revisión con IA",
       "enable": "Usar el revisor de IA en esta tarea",
+      "enableSoon": "Usar el revisor de IA en esta tarea (próximamente)",
       "platformOff": "La revisión con IA está desactivada en la plataforma; un administrador puede activarla.",
       "rubric": "Rúbrica (criterios)",
       "criterionName": "Criterio",

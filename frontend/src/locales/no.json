@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "KI-vurdering",
       "enable": "Bruk KI-vurdereren for denne oppgaven",
+      "enableSoon": "Bruk KI-vurdereren for denne oppgaven (kommer snart)",
       "platformOff": "KI-vurdering er slått av for plattformen — en administrator kan slå den på.",
       "rubric": "Vurderingskriterier",
       "criterionName": "Kriterium",

@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "Tekoälyarviointi",
       "enable": "Käytä tekoälyarvioijaa tässä tehtävässä",
+      "enableSoon": "Käytä tekoälyarvioijaa tässä tehtävässä (tulossa)",
       "platformOff": "Tekoälyarviointi on poistettu käytöstä alustalla — ylläpitäjä voi ottaa sen käyttöön.",
       "rubric": "Arviointikriteerit",
       "criterionName": "Kriteeri",

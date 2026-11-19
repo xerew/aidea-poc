@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "AI-granskning",
       "enable": "Använd AI-granskaren för den här uppgiften",
+      "enableSoon": "Använd AI-granskaren för den här uppgiften (kommer snart)",
       "platformOff": "AI-granskning är avstängd för plattformen — en administratör kan slå på den.",
       "rubric": "Bedömningsmatris (kriterier)",
       "criterionName": "Kriterium",

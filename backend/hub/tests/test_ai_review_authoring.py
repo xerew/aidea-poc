@@ -19,8 +19,9 @@ from .test_ai_review_models import make_assignment
 
 class AuthoringAIReviewTests(APITestCase):
     def setUp(self):
+        # The AI reviewer is admin-only for now; other authors see it as "coming soon".
         self.creator = User.objects.create_user('aa_cc', password='x')
-        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.ADMIN)
         self.course, self.module, self.activity, self.resource = make_assignment()
         self.course.created_by = self.creator
         self.course.save()
@@ -35,6 +36,7 @@ class AuthoringAIReviewTests(APITestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual((res.data['enabled'], res.data['criteria'], res.data['unlocked']), (False, [], False))
         self.assertEqual(res.data['stats']['reviews'], 0)
+        self.assertTrue(res.data['available'])
 
     def test_save_and_approve_rubric(self):
         res = self.client.put(self.url, {'enabled': True, 'criteria': CRITERIA, 'rubric_approved': True}, format='json')
@@ -104,3 +106,38 @@ class AuthoringAIReviewTests(APITestCase):
         self.assertEqual((data['unlock_min_reviews'], data['unlock_min_lower_bound']), (30, 0.9))
         self.assertIn('kappa', data['stats'])
         self.assertEqual(self.client.put(self.url, {'auto_approve': True}, format='json').status_code, 200)
+
+
+class AuthoringAIReviewComingSoonTests(APITestCase):
+    """Course authors who are not admins see the AI reviewer as "coming soon" and cannot set it up."""
+
+    def setUp(self):
+        self.creator = User.objects.create_user('aa_soon', password='x')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.course, self.module, self.activity, self.resource = make_assignment()
+        self.course.created_by = self.creator
+        self.course.save()
+        kw = {'pk': self.course.id, 'module_pk': self.module.id, 'lesson_pk': self.activity.id, 'resource_pk': self.resource.id}
+        self.url = reverse('authoring-ai-review', kwargs=kw)
+        self.draft_url = reverse('authoring-ai-review-draft', kwargs=kw)
+        self.examples_url = reverse('authoring-ai-review-examples', kwargs=kw)
+        self.client.force_authenticate(self.creator)
+
+    def test_get_says_not_available(self):
+        res = self.client.get(self.url)
+        self.assertEqual(res.status_code, 200)
+        self.assertFalse(res.data['available'])
+
+    def test_cannot_switch_on_or_set_up(self):
+        self.assertEqual(self.client.put(self.url, {'enabled': True}, format='json').status_code, 403)
+        self.assertFalse(AssignmentReviewConfig.objects.filter(resource=self.resource, enabled=True).exists())
+        with mock.patch.object(model, 'draft_rubric', return_value=CRITERIA) as draft:
+            self.assertEqual(self.client.post(self.draft_url).status_code, 403)
+        draft.assert_not_called()
+        res = self.client.post(self.examples_url, {'text': 'x', 'verdict': 'approve'}, format='json')
+        self.assertEqual(res.status_code, 403)
+        example = ReviewExample.objects.create(resource=self.resource, text='x', verdict='approve')
+        url = reverse('authoring-ai-review-example', kwargs={'pk': self.course.id, 'module_pk': self.module.id,
+                      'lesson_pk': self.activity.id, 'resource_pk': self.resource.id, 'example_pk': example.id})
+        self.assertEqual(self.client.delete(url).status_code, 403)
+        self.assertTrue(ReviewExample.objects.filter(pk=example.pk).exists())

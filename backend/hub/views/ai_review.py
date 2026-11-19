@@ -7,14 +7,14 @@ from hub.ai_review import model
 from hub.ai_review.pipeline import assignment_stats, auto_approve_unlocked
 from hub.models import AIReviewSettings, AssignmentReviewConfig, Resource, ReviewExample
 
-from .permissions import IsContentCreator, can_edit_course
+from .permissions import IsContentCreator, _is_admin, can_edit_course
 
 MAX_CRITERIA = 10
 MAX_EXAMPLES = 5
 FLAGS = ('enabled', 'learner_visible', 'duplicate_check')
 
 
-def _resource(request, pk, module_pk, lesson_pk, resource_pk):
+def _resource(request, pk, module_pk, lesson_pk, resource_pk, change=False):
     resource = (Resource.objects.select_related('activity__module__course')
                 .filter(pk=resource_pk, activity_id=lesson_pk, activity__module_id=module_pk,
                         activity__module__course_id=pk).first())
@@ -24,6 +24,9 @@ def _resource(request, pk, module_pk, lesson_pk, resource_pk):
         return None, Response({'detail': 'You cannot edit this course.'}, status=status.HTTP_403_FORBIDDEN)
     if resource.type != Resource.Type.ASSIGNMENT:
         return None, Response({'detail': 'AI review is only for assignments.'}, status=status.HTTP_400_BAD_REQUEST)
+    # Admin-only for now: other authors see the AI reviewer as "coming soon" and cannot set it up.
+    if change and not _is_admin(request.user):
+        return None, Response({'detail': 'The AI reviewer is coming soon.'}, status=status.HTTP_403_FORBIDDEN)
     return resource, None
 
 
@@ -41,9 +44,10 @@ def _clean_criteria(raw):
     return cleaned
 
 
-def _payload(config):
+def _payload(config, user):
     settings = AIReviewSettings.get()
     return {
+        'available': _is_admin(user),
         'enabled': config.enabled, 'criteria': config.criteria, 'rubric_approved': config.rubric_approved,
         'learner_visible': config.learner_visible, 'auto_approve': config.auto_approve,
         'duplicate_check': config.duplicate_check, 'platform_enabled': settings.enabled,
@@ -62,10 +66,10 @@ class AuthoringAIReviewView(APIView):
         if failure:
             return failure
         config, _ = AssignmentReviewConfig.objects.get_or_create(resource=resource)
-        return Response(_payload(config))
+        return Response(_payload(config, request.user))
 
     def put(self, request, **kw):
-        resource, failure = _resource(request, **kw)
+        resource, failure = _resource(request, change=True, **kw)
         if failure:
             return failure
         config, _ = AssignmentReviewConfig.objects.get_or_create(resource=resource)
@@ -94,14 +98,14 @@ class AuthoringAIReviewView(APIView):
             from hub.tasks import translate_review_criteria
             translate_review_criteria.delay(config.id)
             config.refresh_from_db()
-        return Response(_payload(config))
+        return Response(_payload(config, request.user))
 
 
 class AuthoringAIReviewDraftView(APIView):
     permission_classes = [IsContentCreator]
 
     def post(self, request, **kw):
-        resource, failure = _resource(request, **kw)
+        resource, failure = _resource(request, change=True, **kw)
         if failure:
             return failure
         course = resource.activity.module.course
@@ -127,7 +131,7 @@ class AuthoringAIReviewExamplesView(APIView):
         return Response([_example(e) for e in resource.ai_review_examples.all()])
 
     def post(self, request, **kw):
-        resource, failure = _resource(request, **kw)
+        resource, failure = _resource(request, change=True, **kw)
         if failure:
             return failure
         if resource.ai_review_examples.count() >= MAX_EXAMPLES:
@@ -145,7 +149,7 @@ class AuthoringAIReviewExampleView(APIView):
     permission_classes = [IsContentCreator]
 
     def delete(self, request, example_pk, **kw):
-        resource, failure = _resource(request, **kw)
+        resource, failure = _resource(request, change=True, **kw)
         if failure:
             return failure
         deleted, _ = resource.ai_review_examples.filter(pk=example_pk).delete()

@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "AI review",
       "enable": "Use the AI reviewer for this assignment",
+      "enableSoon": "Use the AI reviewer for this assignment (coming soon)",
       "platformOff": "AI review is switched off for the platform — an admin can enable it.",
       "rubric": "Rubric (criteria)",
       "criterionName": "Criterion",

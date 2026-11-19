@@ -820,6 +820,7 @@
     "aiReview": {
       "title": "Évaluation par IA",
       "enable": "Utiliser l’évaluateur IA pour ce devoir",
+      "enableSoon": "Utiliser l’évaluateur IA pour ce devoir (bientôt)",
       "platformOff": "L’évaluation par IA est désactivée sur la plateforme — un administrateur peut l’activer.",
       "rubric": "Grille (critères)",
       "criterionName": "Critère",

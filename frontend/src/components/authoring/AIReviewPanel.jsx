@@ -190,6 +190,20 @@ export default function AIReviewPanel({ aiReviewUrl, locked }) {
   }
 
   if (!config) return error ? <p className="media-item-error">{error}</p> : null
+  // Admin-only for now: everyone else sees the switch greyed out as "coming soon".
+  if (!config.available) {
+    return (
+      <div className="air-panel">
+        <div className="air-head">
+          <span className="air-title"><Sparkles size={15} /> {t('authoring.aiReview.title')}</span>
+          <label className="resource-editor-required air-soon">
+            <input type="checkbox" checked={false} disabled readOnly />
+            {t('authoring.aiReview.enableSoon')}
+          </label>
+        </div>
+      </div>
+    )
+  }
   const dirty = JSON.stringify(criteria) !== JSON.stringify(config.criteria)
   const { stats } = config
   const disabled = locked || Boolean(busy)
