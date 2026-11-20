@@ -75,10 +75,14 @@ class AuthoringCourseCollaboratorsView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        previous = CourseCollaborator.objects.filter(course=course, user=user).values_list('role', flat=True).first()
         collab, _ = CourseCollaborator.objects.update_or_create(
             course=course, user=user,
             defaults={'role': role, 'added_by': request.user},
         )
+        if previous != role:  # newly added, or given a different role
+            from hub.emails import send_collaborator_added_email
+            send_collaborator_added_email(collab)
         return Response(_serialize(collab), status=status.HTTP_201_CREATED)
 
 

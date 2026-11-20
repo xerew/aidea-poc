@@ -206,6 +206,33 @@ def send_assignment_reviewed_email(submission):
     )
 
 
+_COLLABORATOR_ROLES = {
+    'co_editor': ('a co-editor', 'You can now edit the course just like its author.'),
+    'translator': ('a translator', 'You can now add and edit its translations.'),
+}
+
+
+def send_collaborator_added_email(collab):
+    """Tell someone they were added to a course as a co-editor or translator."""
+    user, course = collab.user, collab.course
+    adder = collab.added_by
+    adder_name = (adder.get_full_name() or adder.username) if adder else 'The AIDEA team'
+    role, can_do = _COLLABORATOR_ROLES.get(collab.role, (collab.get_role_display().lower(), ''))
+    _send(
+        to=user.email,
+        subject=f'{adder_name} added you to “{course.title}”',
+        name=user.get_full_name() or user.username,
+        tag='Course collaboration',
+        heading='You were added to a course',
+        paragraphs=[p for p in (
+            f'{_html_text(adder_name)} added you as {role} on “{_html_text(course.title)}”.',
+            can_do,
+        ) if p],
+        cta_label='Open the course',
+        cta_link=f'{settings.FRONTEND_BASE_URL}/authoring/courses/{course.id}',
+    )
+
+
 def send_access_request_email(access_request):
     """Notify every admin that a user has requested content-creator access."""
     from django.contrib.auth.models import User

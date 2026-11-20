@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 
 from hub.models import (
@@ -236,3 +238,42 @@ class CollaboratorSerializerFlagsTests(CollaboratorBase):
         d = self._flags_for(self.other_creator)
         self.assertIsNone(d['my_role'])
         self.assertFalse(d['can_edit'] or d['can_translate'] or d['can_manage'])
+
+
+@override_settings(FRONTEND_BASE_URL='https://aidea.test')
+class CollaboratorEmailTests(CollaboratorBase):
+    """The person added to a course hears about it by email."""
+
+    def setUp(self):
+        super().setUp()
+        self.creator.first_name, self.creator.last_name = 'Nikos', 'Grammatikos'
+        self.creator.save()
+        self.other_creator.email = 'maria@example.com'
+        self.other_creator.save()
+        self._login_as(self.creator)
+
+    def _post(self, role):
+        return self.client.post(self._collaborators_url(),
+                                {'user_id': self.other_creator.id, 'role': role}, format='json')
+
+    def test_added_co_editor_gets_an_email_with_the_course_link(self):
+        self.assertEqual(self._post('co_editor').status_code, 201)
+        self.assertEqual(len(mail.outbox), 1)
+        msg = mail.outbox[0]
+        self.assertEqual(msg.to, ['maria@example.com'])
+        self.assertIn('Nikos Grammatikos added you', msg.subject)
+        self.assertIn(self.course.title, msg.subject)
+        self.assertIn(f'Nikos Grammatikos added you as a co-editor on “{self.course.title}”', msg.body)
+        self.assertIn(f'https://aidea.test/authoring/courses/{self.course.id}', msg.body)
+
+    def test_translator_email_says_translator(self):
+        self._post('translator')
+        self.assertIn('as a translator on', mail.outbox[0].body)
+
+    def test_same_role_again_sends_nothing_but_a_role_change_does(self):
+        self._post('co_editor')
+        self._post('co_editor')
+        self.assertEqual(len(mail.outbox), 1)
+        self._post('translator')
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn('as a translator on', mail.outbox[1].body)
