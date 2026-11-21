@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Download, Info } from 'lucide-react'
 import client from '../api/client'
@@ -8,6 +8,7 @@ import ContentTree from '../components/analytics/ContentTree'
 import LearnersTable from '../components/analytics/LearnersTable'
 import LearnerTimeline from '../components/analytics/LearnerTimeline'
 import { downloadXlsx } from '../components/analytics/download'
+import { learnerFromSearch } from '../lib/learnerParam'
 import './AnalyticsCoursePage.css'
 
 const TABS = ['content', 'learners']
@@ -20,7 +21,8 @@ export default function AnalyticsCoursePage() {
   const [tab, setTab] = useState('content')
   const [content, setContent] = useState(null)
   const [learners, setLearners] = useState(null)
-  const [learnerId, setLearnerId] = useState(null)
+  const location = useLocation()
+  const [learnerId, setLearnerId] = useState(() => learnerFromSearch(location.search))
   const [error, setError] = useState('')
 
   useEffect(() => {

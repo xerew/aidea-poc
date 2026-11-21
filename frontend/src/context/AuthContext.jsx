@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import PropTypes from 'prop-types'
 import client from '../api/client'
 import i18n from '../i18n'
+import { setAnalyticsUser } from '../lib/analytics'
 
 const AuthContext = createContext(null)
 
@@ -22,6 +23,7 @@ export function AuthProvider({ children }) {
     localStorage.setItem('refresh_token', data.refresh)
     localStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
+    setAnalyticsUser(data.user?.id ?? null)
     if (data.user?.profile?.language) i18n.changeLanguage(data.user.profile.language)
   }, [])
 
@@ -31,6 +33,7 @@ export function AuthProvider({ children }) {
     sessionStorage.setItem('refresh_token', data.refresh)
     sessionStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
+    setAnalyticsUser(data.user?.id ?? null)
     if (data.user?.profile?.language) i18n.changeLanguage(data.user.profile.language)
   }, [])
 
@@ -41,6 +44,7 @@ export function AuthProvider({ children }) {
     } finally {
       KEYS.forEach(k => { localStorage.removeItem(k); sessionStorage.removeItem(k) })
       setUser(null)
+      setAnalyticsUser(null)
     }
   }, [])
 
@@ -63,6 +67,7 @@ export function AuthProvider({ children }) {
         const store = localStorage.getItem('user') ? localStorage : sessionStorage
         store.setItem('user', JSON.stringify(data))
         setUser(data)
+        setAnalyticsUser(data?.id ?? null)
         if (data?.profile?.language) i18n.changeLanguage(data.profile.language)
       })
       .catch(() => {}) // interceptor handles 401 → login redirect

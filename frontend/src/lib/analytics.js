@@ -12,6 +12,8 @@
 //   Matomo:    VITE_MATOMO_URL       (e.g. https://analytics.aidea-hub.eu/)
 //              VITE_MATOMO_SITE_ID   (e.g. 1)
 
+import { matomoSetupCommands } from './matomoSetup'
+
 const env = import.meta.env
 const PROVIDER = (env.VITE_ANALYTICS_PROVIDER || '').toLowerCase()
 
@@ -46,10 +48,7 @@ function initMatomo() {
   if (!url || !siteId) return
   const base = url.endsWith('/') ? url : `${url}/`
   window._paq = window._paq || []
-  window._paq.push(['disableCookies'])   // cookieless → no consent banner needed
-  window._paq.push(['enableLinkTracking'])
-  window._paq.push(['setTrackerUrl', `${base}matomo.php`])
-  window._paq.push(['setSiteId', String(siteId)])
+  matomoSetupCommands(base, siteId).forEach((command) => window._paq.push(command))
   loadScript(`${base}matomo.js`)
 }
 
@@ -75,4 +74,14 @@ export function trackPageview(url) {
       window._paq.push(['trackPageView'])
     }
   } catch { /* ignore */ }
+}
+
+// Matomo links visits to the signed-in person by their internal user number
+// (never name or email); null on logout. Admins see the visits through the
+// "Open in Matomo" link on the per-user activity page.
+export function setAnalyticsUser(id) {
+  if (PROVIDER !== 'matomo' || !window._paq) return
+  try {
+    window._paq.push(id == null ? ['resetUserId'] : ['setUserId', String(id)])
+  } catch { /* analytics must never break the app */ }
 }
