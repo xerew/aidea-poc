@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search } from 'lucide-react'
+import { Activity, Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
 import { analyticsDashboardUrl } from '../lib/analyticsDashboard'
@@ -133,6 +133,7 @@ function UsersTab() {
             <th>{t('admin.columnUsername')}</th>
             <th>{t('admin.columnEmail')}</th>
             <th>{t('admin.columnRole')}</th>
+            <th>{t('admin.activity.column')}</th>
           </tr>
         </thead>
         <tbody>
@@ -174,6 +175,11 @@ function UsersTab() {
                       {fb.error  && <span className="admin-feedback error">{fb.error}</span>}
                     </div>
                   )}
+                </td>
+                <td>
+                  <Link className="admin-activity-btn" to={`/admin/users/${u.id}/activity`}>
+                    <Activity size={14} /> {t('admin.activity.button')}
+                  </Link>
                 </td>
               </tr>
             )

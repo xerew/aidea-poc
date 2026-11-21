@@ -32,6 +32,7 @@ import ReviewsPage from './pages/ReviewsPage'
 import PublicProfilePage from './pages/PublicProfilePage'
 import DocumentationPage from './pages/DocumentationPage'
 import MessagesPage from './pages/MessagesPage'
+import UserActivityPage from './pages/UserActivityPage'
 import { MESSAGING_ENABLED } from './config'
 
 // Content creators, AIDEA partners and admins all have content-creation access.
@@ -98,6 +99,7 @@ export default function App() {
             <Route path="/authoring/courses/:id"      element={<ContentCreatorRoute element={<CourseEditorPage />} />} />
             <Route path="/authoring/courses/:id/modules/:moduleId" element={<ContentCreatorRoute element={<ModuleEditorPage />} />} />
             <Route path="/admin/users" element={<AdminRoute element={<AdminPage />} />} />
+            <Route path="/admin/users/:id/activity" element={<AdminRoute element={<UserActivityPage />} />} />
             <Route path="/reviews" element={<ReviewerRoute element={<ReviewsPage />} />} />
           </Route>
           <Route path="/courses/:id/learn"                element={<LearnRedirect />} />
