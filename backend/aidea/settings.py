@@ -177,6 +177,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'hub.tasks.tune_recommendation_weights',
         'schedule': crontab(hour=3, minute=0),
     },
+    'delete-old-login-records': {
+        'task': 'hub.tasks.delete_old_login_records',
+        'schedule': crontab(hour=4, minute=30),
+    },
     'competency-nightly-check': {
         'task': 'hub.tasks.nightly_competency_check',
         'schedule': crontab(hour=4, minute=0),

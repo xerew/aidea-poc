@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from hub.activity_log import record_login
 from hub.emails import (
     read_verify_token,
     send_verification_email,
@@ -19,6 +20,14 @@ class LoginView(TokenObtainPairView):
     serializer_class = AideaTokenObtainPairSerializer
     # Brute-force protection: cap attempts per account and per source IP.
     throttle_classes = [LoginUserThrottle, LoginIPThrottle]
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            user = User.objects.filter(username=request.data.get('username')).first()
+            if user is not None:
+                record_login(request, user)
+        return response
 
 
 class LogoutView(APIView):
@@ -44,6 +53,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        record_login(request, user)
         # Best-effort welcome + email-verification (never blocks registration).
         send_welcome_email(user)
         send_verification_email(user)

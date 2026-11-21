@@ -518,6 +518,18 @@ def refresh_after_publish(course_ids: list[int]) -> None:
     recompute_all_recommendations()
 
 
+LOGIN_RETENTION_DAYS = 365
+
+
+@shared_task
+def delete_old_login_records() -> int:
+    """Nightly: login records are kept for 12 months."""
+    from hub.models import LoginRecord
+    cutoff = timezone.now() - timedelta(days=LOGIN_RETENTION_DAYS)
+    deleted, _ = LoginRecord.objects.filter(at__lt=cutoff).delete()
+    return deleted
+
+
 # ── Translation helpers (per-unit; used by both full and partial jobs) ────────
 
 def _tr_quiz(quiz_data, src, target):

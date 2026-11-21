@@ -23,6 +23,7 @@ from .models import (
     LearningPillar,
     LessonProgress,
     LessonSession,
+    LoginRecord,
     Module,
     PreferenceOption,
     PreferenceQuestion,
@@ -615,3 +616,18 @@ class CourseEmbeddingAdmin(admin.ModelAdmin):
         values = list(vec)
         head = ', '.join(f'{float(x):.3f}' for x in values[:8])
         return f'{len(values)}-dim vector [{head}, …]'
+
+
+@admin.register(LoginRecord)
+class LoginRecordAdmin(admin.ModelAdmin):
+    """Read-only: logins are recorded by the platform and deleted after 12 months."""
+    list_display = ['user', 'at', 'device', 'browser']
+    list_filter = ['device', 'browser']
+    search_fields = ['user__username', 'user__email']
+    date_hierarchy = 'at'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
