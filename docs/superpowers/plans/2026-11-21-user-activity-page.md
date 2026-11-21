@@ -321,6 +321,7 @@
     ```
     `base` is `VITE_MATOMO_URL` trimmed, with a `/` added at the end if missing. It returns null when either env value is blank.
   - `learnerFromSearch(search: string) -> number | null`: a positive integer `learner` parameter, otherwise null.
+  - `matomoSetupCommands(base: string, siteId: string) -> Array`, in `frontend/src/lib/matomoSetup.js`: the `_paq` commands that `initMatomo` pushes, in this order: `['disableCookies']`, `['enableLinkTracking']`, `['enableHeartBeatTimer', 15]` (accurate time on every page, including Documentation; added 2026-11-21), `['setTrackerUrl', base + 'matomo.php']`, `['setSiteId', String(siteId)]`. `initMatomo` in `analytics.js` uses it.
 
 - [ ] **Step 1: Write failing node tests.**
   - For `matomoVisitorLogUrl`, using `{VITE_MATOMO_URL: 'https://analytics.aidea-hub.eu', VITE_MATOMO_SITE_ID: '1'}` with user 42:
@@ -328,6 +329,7 @@
     - it contains `idSite=1`;
     - it contains `segment=userId%3D%3D42`.
   - Missing URL → null; missing site id → null.
+  - For `matomoSetupCommands('https://a.example/', '1')`: it deep-equals the five commands above, in order (so the heartbeat stays on and cookies stay off).
   - For `learnerFromSearch`:
     - `'?learner=7'` → 7;
     - `''` → null;
