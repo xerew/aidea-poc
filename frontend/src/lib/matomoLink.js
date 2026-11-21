@@ -7,7 +7,7 @@ export function matomoVisitorLogUrl(env, userId) {
   if (!url || !site) return null
   const base = url.endsWith('/') ? url : `${url}/`
   const segment = encodeURIComponent(`userId==${userId}`)
-  return `${base}index.php?module=CoreHome&action=index&idSite=${site}&period=year&date=today`
-    + `#?idSite=${site}&period=year&date=today&category=General_Visitors&subcategory=Live_VisitorLog`
+  return `${base}index.php?module=CoreHome&action=index&idSite=${site}&period=range&date=last365`
+    + `#?idSite=${site}&period=range&date=last365&category=General_Visitors&subcategory=Live_VisitorLog`
     + `&segment=${segment}`
 }

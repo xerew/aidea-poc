@@ -12,6 +12,12 @@ test('the Open in Matomo link shows that user\'s visits', () => {
   assert.ok(url.includes('segment=userId%3D%3D42'))
 })
 
+test('the Matomo link covers the last 365 days, not just the current calendar year', () => {
+  const url = matomoVisitorLogUrl(ENV, 42)
+  assert.ok(!url.includes('period=year'), url)
+  assert.equal(url.split('period=range&date=last365').length - 1, 2, url) // in the query and the # route
+})
+
 test('no Matomo link unless both the address and the site id are set', () => {
   assert.equal(matomoVisitorLogUrl({ VITE_MATOMO_SITE_ID: '1' }, 42), null)
   assert.equal(matomoVisitorLogUrl({ VITE_MATOMO_URL: 'https://analytics.aidea-hub.eu' }, 42), null)
