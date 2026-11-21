@@ -2,6 +2,8 @@
 logged and never breaks the request that triggered it."""
 import logging
 
+from django.db import transaction
+
 logger = logging.getLogger(__name__)
 
 # Checked in order; the first match wins.
@@ -29,7 +31,9 @@ def record_login(request, user):
     try:
         from hub.models import LoginRecord
         device, browser = parse_user_agent(request.META.get('HTTP_USER_AGENT'))
-        LoginRecord.objects.create(user=user, device=device, browser=browser)
+        # Own savepoint: a failed insert must not break the caller's transaction.
+        with transaction.atomic():
+            LoginRecord.objects.create(user=user, device=device, browser=browser)
     except Exception as exc:
         logger.warning('Could not record a login for user %s: %s', getattr(user, 'pk', None), exc)
 
@@ -38,8 +42,9 @@ def record_action(user, kind, course=None, label='', **details):
     """One PlatformAction row; `label` is a title snapshot (see the model)."""
     try:
         from hub.models import PlatformAction
-        PlatformAction.objects.create(user=user, kind=kind, course=course, label=(label or '')[:255],
-                                      details=details)
+        with transaction.atomic():
+            PlatformAction.objects.create(user=user, kind=kind, course=course, label=(label or '')[:255],
+                                          details=details)
     except Exception as exc:
         logger.warning('Could not record %s for user %s: %s', kind, getattr(user, 'pk', None), exc)
 

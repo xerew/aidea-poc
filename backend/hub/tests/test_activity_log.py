@@ -185,3 +185,28 @@ class PlatformActionTests(CollaboratorBase):
         with patch.object(PlatformAction.objects, 'create', side_effect=RuntimeError('db down')):
             res = self.client.patch(self._resource_url(self.res1), {'content': 'New'}, format='json')
         self.assertEqual(res.status_code, 200)
+
+
+class RecordingSavepointTests(APITestCase):
+    """A failed log insert must not poison the caller's transaction (PostgreSQL
+    aborts the whole transaction otherwise), so each insert runs in a savepoint."""
+
+    def test_each_insert_runs_in_its_own_atomic_block(self):
+        from django.db import transaction
+
+        from hub import activity_log
+        user = User.objects.create_user('sp_user')
+        request = type('R', (), {'META': {}})()
+        with patch.object(activity_log.transaction, 'atomic', wraps=transaction.atomic) as atomic:
+            activity_log.record_login(request, user)
+            activity_log.record_action(user, 'pathways_rebuilt', applied=0)
+        self.assertEqual(atomic.call_count, 2)
+
+    def test_a_failed_insert_inside_a_transaction_leaves_it_usable(self):
+        from django.db import transaction
+
+        from hub.activity_log import record_login
+        request = type('R', (), {'META': {}})()
+        with transaction.atomic():
+            record_login(request, None)            # NOT NULL user → IntegrityError, swallowed
+            self.assertEqual(User.objects.count(), 0)   # the transaction still works

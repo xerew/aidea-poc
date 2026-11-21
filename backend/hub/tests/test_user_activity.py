@@ -135,6 +135,30 @@ class FeedTests(FeedFixture):
         _at(PathwayCourseChange, change, 'changed_at', self.now + timedelta(seconds=2))
         self.assertEqual([i['kind'] for i in feed(self.user)[0]], ['edit_course_published'])
 
+    def test_dedup_only_hides_the_same_direction(self):
+        from hub.user_activity import feed
+        edit = CourseEditHistory.objects.create(course=self.course, editor=self.user,
+                                                changes={'course_unpublished': {'title': 'AI basics'}})
+        change = PathwayCourseChange.objects.create(course=self.course, course_title='AI basics',
+                                                    change='published', changed_by=self.user)
+        _at(CourseEditHistory, edit, 'edited_at', self.now)
+        _at(PathwayCourseChange, change, 'changed_at', self.now + timedelta(seconds=2))
+        self.assertEqual(sorted(i['kind'] for i in feed(self.user)[0]),
+                         ['edit_course_unpublished', 'pathway_published'])
+
+    def test_a_page_costs_few_queries(self):
+        from django.db import connection
+        from django.test.utils import CaptureQueriesContext
+
+        from hub.user_activity import SOURCES, feed
+        for i in range(120):
+            self.login(self.user, self.now - timedelta(minutes=i))
+        with CaptureQueriesContext(connection) as queries:
+            items, before = feed(self.user)
+        self.assertEqual((len(items), before is not None), (50, True))
+        # One query per source, plus the tie and "more?" checks for the one source cut at the limit.
+        self.assertLessEqual(len(queries), len(SOURCES) + 2)
+
     def test_message_has_no_content_or_recipient(self):
         from hub.user_activity import feed
         conversation = Conversation.objects.create(user_a=self.user, user_b=self.other)

@@ -220,12 +220,17 @@ def _pathway_changes_qs(user):
     edit history already shows (same user and course, within 5 seconds)."""
     from hub.models import CourseEditHistory, PathwayCourseChange
     window = timedelta(seconds=5)
-    duplicate = CourseEditHistory.objects.filter(
+    nearby = CourseEditHistory.objects.filter(
         editor=user, course=OuterRef('course'),
         edited_at__gte=OuterRef('changed_at') - window, edited_at__lte=OuterRef('changed_at') + window,
-    ).filter(Q(changes__has_key='course_published') | Q(changes__has_key='course_unpublished'))
-    return (PathwayCourseChange.objects.filter(changed_by=user).annotate(at=F('changed_at'))
-            .exclude(Exists(duplicate)).select_related('course'))
+    )
+    return (PathwayCourseChange.objects.filter(changed_by=user).annotate(
+                at=F('changed_at'),
+                same_publish=Exists(nearby.filter(changes__has_key='course_published')),
+                same_unpublish=Exists(nearby.filter(changes__has_key='course_unpublished')),
+            )
+            .exclude(Q(change='published', same_publish=True) | Q(change='unpublished', same_unpublish=True))
+            .select_related('course'))
 
 
 def _pathway_changes_build(rows):
@@ -350,14 +355,26 @@ def feed(user, before=None, category=None, limit=FEED_PAGE):
     if limit is None:
         return _newest_first(i for source, qs in querysets for i in source.build(qs)), None
 
-    fetched = _newest_first(i for source, qs in querysets for i in source.build(qs[:limit + 1]))
+    # A source that returned limit + 1 rows was cut short: only for those are
+    # the ties at the cut and "more?" asked again. The others returned every row
+    # before `before`, so their ties and older rows are already in hand.
+    per_source = []
+    for source, qs in querysets:
+        items = source.build(qs[:limit + 1])
+        per_source.append((source, qs, items, len(items) > limit))
+    fetched = _newest_first(i for _, _, items, _ in per_source for i in items)
     if len(fetched) <= limit:
         return fetched, None
     cut = fetched[limit - 1]['at']
-    page = [i for i in fetched if i['at'] > cut]
-    for source, qs in querysets:
-        page.extend(source.build(qs.filter(at=cut)))
-    more = any(qs.filter(at__lt=cut).exists() for _, qs in querysets)
+    page, more = [], False
+    for source, qs, items, cut_short in per_source:
+        page += [i for i in items if i['at'] > cut]
+        if cut_short:
+            page += source.build(qs.filter(at=cut))
+            more = more or qs.filter(at__lt=cut).exists()
+        else:
+            page += [i for i in items if i['at'] == cut]
+            more = more or any(i['at'] < cut for i in items)
     return _newest_first(page), (cut if more else None)
 
 
