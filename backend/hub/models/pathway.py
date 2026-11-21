@@ -42,3 +42,24 @@ class UserLearningPath(models.Model):
 
     def __str__(self):
         return f'{self.user.username} → {self.path.name}'
+
+
+class PathwayCourseChange(models.Model):
+    """A course published or unpublished since pathways were last rebuilt. Admins
+    see the pending list and rebuild everyone's pathway when they choose."""
+    class Change(models.TextChoices):
+        PUBLISHED   = 'published',   'Published'
+        UNPUBLISHED = 'unpublished', 'Unpublished'
+
+    course       = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    course_title = models.CharField(max_length=255)
+    change       = models.CharField(max_length=20, choices=Change.choices)
+    changed_by   = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+    changed_at   = models.DateTimeField(auto_now_add=True)
+    applied_at   = models.DateTimeField(null=True, blank=True)   # set when a pathway rebuild took it in
+
+    class Meta:
+        ordering = ['-changed_at', '-id']
+
+    def __str__(self):
+        return f'{self.course_title} {self.change}'

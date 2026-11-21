@@ -122,7 +122,12 @@ def compute_user_recommendations(user_id: int) -> None:
     else:
         alpha, beta, gamma = config.alpha, config.beta, config.gamma
 
-    from hub.personalization import course_pillar_slugs, profile_text, recommendation_factor
+    from hub.personalization import (
+        course_pillar_slugs,
+        profile_text,
+        recommendation_factor,
+        top_recommendations,
+    )
 
     # ── Signal ①: Profile vector ──────────────────────────────────────────
     profile_vec = model.encode(profile_text(profile))
@@ -255,7 +260,7 @@ def compute_user_recommendations(user_id: int) -> None:
     for emb in candidates:
         if course_level_nums.get(emb.course.level, 0) > level_num + 1:
             continue
-        similarity = max(0.0, 1.0 - float(emb.distance))
+        raw_similarity = similarity = max(0.0, 1.0 - float(emb.distance))
         if profile.learning_style and emb.course.content_format == profile.learning_style:
             similarity *= config.style_boost
         if teacher_subject_slug:
@@ -266,10 +271,10 @@ def compute_user_recommendations(user_id: int) -> None:
             similarity *= PILLAR_MATCH_BOOST
         # Educational level vs teaching level; target audience vs school role.
         similarity *= recommendation_factor(profile, emb.course)
-        filtered.append((emb.course, similarity))
+        filtered.append((emb.course, raw_similarity, similarity))
 
-    # Rank by the boosted score (not raw distance) so the boosts decide the top 5.
-    filtered = sorted(filtered, key=lambda pair: pair[1], reverse=True)[:5]
+    # Weak matches are dropped (relevance floor); the boosts then decide the top 5.
+    filtered = top_recommendations(filtered, config.min_similarity)
 
     # ── Write personal recommendations ───────────────────────────────────
     subject_display = profile.subject.name if profile.subject else 'general'
@@ -505,12 +510,12 @@ def refresh_all_pathways() -> None:
 @shared_task
 def refresh_after_publish(course_ids: list[int]) -> None:
     """Courses were published or unpublished: refresh their embeddings, then
-    everyone's recommendations and pathways once (the 02:00 run stays as a safety net)."""
+    everyone's recommendations (the 02:00 run stays as a safety net). Pathways
+    wait for an admin rebuild (refresh_all_pathways)."""
     from hub.models import Course
     for course_id in Course.objects.filter(pk__in=course_ids, is_published=True).values_list('pk', flat=True):
         compute_course_embeddings(course_id)
     recompute_all_recommendations()
-    refresh_all_pathways()
 
 
 # ── Translation helpers (per-unit; used by both full and partial jobs) ────────

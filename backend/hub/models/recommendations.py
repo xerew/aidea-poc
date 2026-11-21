@@ -82,6 +82,9 @@ class RecommendationConfig(models.Model):
     beta        = models.FloatField(default=0.5)
     gamma       = models.FloatField(default=0.2)
     style_boost = models.FloatField(default=1.2)
+    # Personal recommendations need at least this cosine similarity (0-1) to the
+    # person's profile; weaker matches are left out rather than filling 5 slots.
+    min_similarity = models.FloatField(default=0.25)
     # Bandit config
     bandit_active   = models.BooleanField(default=False)
     n_min           = models.IntegerField(default=200)

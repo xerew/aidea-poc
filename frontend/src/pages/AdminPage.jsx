@@ -583,6 +583,59 @@ function MaintenanceCard() {
   )
 }
 
+// ── Learning pathways (admin-triggered rebuild) ───────────────────────────────
+
+function PathwaysCard() {
+  const { t, i18n } = useTranslation()
+  const [data, setData] = useState(null)
+  const [status, setStatus] = useState('idle')  // idle | queuing | queued | error
+
+  const load = useCallback(() => {
+    client.get('/admin/pathways/').then((res) => setData(res.data)).catch(() => setStatus('error'))
+  }, [])
+  useEffect(() => { load() }, [load])
+
+  const rebuild = async () => {
+    setStatus('queuing')
+    try {
+      await client.post('/admin/pathways/rebuild/')
+      setStatus('queued')
+      load()
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  const when = (iso) => new Date(iso).toLocaleString(i18n.language)
+
+  return (
+    <div className="admin-system-card">
+      <h2>{t('admin.pathways.title')}</h2>
+      <p className="admin-system-desc">{t('admin.pathways.description')}</p>
+      {data && (data.pending.length === 0 ? (
+        <p className="admin-system-desc">{t('admin.pathways.nonePending')}</p>
+      ) : (
+        <ul className="admin-pathway-changes">
+          {data.pending.map((c) => (
+            <li key={c.id}>
+              <strong>{c.course_title}</strong> — {t(`admin.pathways.${c.change}`)}
+              {c.changed_by ? ` · ${c.changed_by}` : ''} · {when(c.changed_at)}
+            </li>
+          ))}
+        </ul>
+      ))}
+      {data?.last_rebuilt_at && (
+        <p className="admin-system-desc">{t('admin.pathways.lastRebuilt', { date: when(data.last_rebuilt_at) })}</p>
+      )}
+      <button className="admin-approve-btn" onClick={rebuild} disabled={status === 'queuing'}>
+        {status === 'queuing' ? t('admin.pathways.queuing') : t('admin.pathways.button')}
+      </button>
+      {status === 'queued' && <span className="admin-feedback success">{t('admin.pathways.queued')}</span>}
+      {status === 'error'  && <span className="admin-feedback error">{t('admin.pathways.failed')}</span>}
+    </div>
+  )
+}
+
 // ── System tab ────────────────────────────────────────────────────────────────
 
 function SystemTab() {
@@ -630,6 +683,7 @@ function SystemTab() {
         {status === 'queued' && <span className="admin-feedback success">{t('admin.recompute.queued')}</span>}
         {status === 'error'  && <span className="admin-feedback error">{t('admin.recompute.failed')}</span>}
       </div>
+      <PathwaysCard />
       <MaintenanceCard />
     </div>
   )

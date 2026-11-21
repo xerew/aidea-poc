@@ -42,6 +42,10 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
         GOAL_TO_PILLAR[g] for g in (profile.goals or []) if g in GOAL_TO_PILLAR
     }
     subject_id = profile.subject_id
+    # Relevance floor: when the teacher told us a pillar, goal or subject, a course
+    # must match at least one of them; a short pathway beats one padded with
+    # unrelated courses (user-centric recommender and teacher-PD research).
+    has_interests = bool(preferred or goal_pillars or subject_id)
 
     courses = (
         Course.objects
@@ -58,15 +62,21 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
 
         score = 3.0 - abs(clevel - band)  # closeness to the teacher's band
         pillars = course_pillar_slugs(course)
+        matched = False
         if pillars & preferred:
             score += W_PILLAR
+            matched = True
         if pillars & goal_pillars:
             score += W_GOAL
+            matched = True
         if subject_id:
             subject_slugs = {s.slug for s in course.subjects.all()}
             subject_ids = {s.id for s in course.subjects.all()}
             if subject_id in subject_ids or 'general' in subject_slugs:
                 score += W_SUBJECT
+                matched = True
+        if has_interests and not matched:
+            continue  # nothing the teacher asked for
 
         # Educational level and target audience (teaching level / school role).
         score += pathway_bonus(profile, course)

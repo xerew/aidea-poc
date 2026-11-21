@@ -173,6 +173,36 @@ class GeneratePathwayTests(TestCase):
         user = self._teacher(competency_score=0)  # band 0 — advanced (2) > 0+1
         self.assertNotIn(advanced.id, generate_pathway(user))
 
+    # A course enters the pathway only if it matches something the teacher told us
+    # (preferred pillar, goal or subject); see the relevance-floor rationale.
+    def test_course_matching_nothing_is_left_out(self):
+        from hub.pathway_gen import generate_pathway
+        user = self._teacher(competency_score=1, preferred_pillars=['teach-about-ai'], subject=self.subject)
+        self.assertEqual(generate_pathway(user), [self.c_taa.id])
+
+    def test_subject_match_alone_is_enough(self):
+        from hub.pathway_gen import generate_pathway
+        self.c_twa.subjects.set([self.subject])
+        user = self._teacher(competency_score=1, preferred_pillars=['teach-about-ai'], subject=self.subject)
+        self.assertEqual(set(generate_pathway(user)), {self.c_taa.id, self.c_twa.id})
+
+    def test_general_course_counts_as_a_subject_match(self):
+        from hub.models import Subject
+        from hub.pathway_gen import generate_pathway
+        self.c_tfa.subjects.set([Subject.objects.get(slug='general')])
+        user = self._teacher(competency_score=1, preferred_pillars=['teach-about-ai'], subject=self.subject)
+        self.assertIn(self.c_tfa.id, generate_pathway(user))
+
+    def test_goal_match_alone_is_enough(self):
+        from hub.pathway_gen import generate_pathway
+        user = self._teacher(competency_score=1, goals=['prepare_students'])
+        self.assertEqual(generate_pathway(user), [self.c_tfa.id])
+
+    def test_teacher_without_preferences_gets_every_suitable_course(self):
+        from hub.pathway_gen import generate_pathway
+        user = self._teacher(competency_score=1)
+        self.assertEqual(set(generate_pathway(user)), {self.c_twa.id, self.c_tfa.id, self.c_taa.id})
+
 
 class PathwaySeedOrderingTests(TestCase):
     def test_seeded_path_courses_ordered_by_level(self):
@@ -220,6 +250,12 @@ class PathwayEmptyStateTests(APITestCase):
         Course.objects.create(title='Adv', pillar=self.pillar, level='advanced', is_published=True)
         self.assertEqual(self._get()['empty_reason'], 'above_level')
 
+    def test_no_course_matches_the_teachers_interests(self):
+        self.user.profile.preferred_pillars = ['teach-about-ai']
+        self.user.profile.save()
+        make_course(self.pillar, 'Other pillar')     # beginner, pillar 'pillar'
+        self.assertEqual(self._get()['empty_reason'], 'no_match')
+
     def test_regenerates_when_a_suitable_course_appears(self):
         course = make_course(self.pillar, 'Fits')  # beginner, published
         data = self._get()
@@ -264,63 +300,89 @@ class PathwayFollowsCompetencyChangeTests(TestCase):
         self.assertIn(beginner.id, user_path.course_ids)
 
 
-class PathwayRefreshOnPublishTests(APITestCase):
-    """Publishing or unpublishing a course rebuilds everyone's recommendations and
-    pathways; courses a person has already started stay in their pathway."""
+class PathwayRebuildByAdminTests(APITestCase):
+    """Publishing refreshes recommendations but leaves pathways alone; each publish /
+    unpublish is listed for admins, who rebuild everyone's pathway when they choose.
+    A rebuild keeps courses people started and adds only relevant new ones."""
 
     def setUp(self):
         from unittest import mock
         self.pillar = make_pillar()
+        self.other = LearningPillar.objects.create(name='Other', slug='other', description='')
         self.creator = User.objects.create_user(username='author', password='pass')
         UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.admin = User.objects.create_user(username='boss', password='pass')
+        UserProfile.objects.create(user=self.admin, user_type=UserProfile.UserType.ADMIN)
         self.teacher = make_teacher()
         self.teacher.profile.competency_score = 1      # beginner band: advanced courses are out of range
+        self.teacher.profile.preferred_pillars = ['pillar']
         self.teacher.profile.onboarding_completed = True
         self.teacher.profile.save()
-        self.started = Course.objects.create(title='Started', pillar=self.pillar, level='advanced', is_published=True)
+        self.started = Course.objects.create(title='Started', pillar=self.other, level='advanced', is_published=True)
         Enrollment.objects.create(user=self.teacher, course=self.started, progress_pct=30)
         self.path = LearningPath.objects.create(name='P', slug='p', competency_min=0, competency_max=10)
         self.user_path = UserLearningPath.objects.create(user=self.teacher, path=self.path, course_ids=[self.started.id])
         self.draft = Course.objects.create(title='New', pillar=self.pillar, level='beginner',
                                            is_published=False, created_by=self.creator)
-        self.client.force_authenticate(self.creator)
+        self.unrelated = Course.objects.create(title='Unrelated', pillar=self.other, level='beginner',
+                                               is_published=False, created_by=self.creator)
         patcher = mock.patch('hub.tasks.recompute_all_recommendations')
         self.recompute = patcher.start()
         self.addCleanup(patcher.stop)
 
-    def _post(self, action):
-        url = reverse(f'authoring-course-{action}', kwargs={'pk': self.draft.pk})
+    def _post(self, action, course=None):
+        self.client.force_authenticate(self.creator)
+        url = reverse(f'authoring-course-{action}', kwargs={'pk': (course or self.draft).pk})
         with self.captureOnCommitCallbacks(execute=True):
             return self.client.post(url)
 
-    def test_publishing_adds_the_course_to_pathways_and_refreshes_recommendations(self):
+    def _pending(self):
+        self.client.force_authenticate(self.admin)
+        return self.client.get(reverse('admin-pathways')).data['pending']
+
+    def _rebuild(self):
+        self.client.force_authenticate(self.admin)
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(reverse('admin-pathways-rebuild'))
+
+    def test_publishing_refreshes_recommendations_but_not_pathways(self):
         self.assertEqual(self._post('publish').status_code, 200)
-        self.user_path.refresh_from_db()
-        self.assertIn(self.draft.id, self.user_path.course_ids)
         self.recompute.assert_called_once()
-
-    def test_a_started_course_stays_in_the_pathway(self):
-        self._post('publish')
-        self.user_path.refresh_from_db()
-        self.assertEqual(self.user_path.course_ids, [self.started.id, self.draft.id])
-
-    def test_unpublishing_also_refreshes(self):
-        self._post('publish')
-        self.recompute.reset_mock()
-        self.assertEqual(self._post('unpublish').status_code, 200)
         self.user_path.refresh_from_db()
         self.assertEqual(self.user_path.course_ids, [self.started.id])
-        self.recompute.assert_called_once()
 
-    def test_publishing_from_django_admin_also_refreshes(self):
+    def test_publish_and_unpublish_are_listed_for_admins(self):
+        self._post('publish')
+        self._post('unpublish')
+        pending = self._pending()
+        self.assertEqual([(p['course_title'], p['change']) for p in pending],
+                         [('New', 'unpublished'), ('New', 'published')])
+        self.assertEqual(pending[0]['changed_by'], 'author')
+
+    def test_rebuild_adds_relevant_courses_keeps_started_and_clears_the_list(self):
+        self._post('publish')
+        self._post('publish', self.unrelated)
+        self.assertEqual(self._rebuild().status_code, 202)
+        self.user_path.refresh_from_db()
+        self.assertEqual(self.user_path.course_ids, [self.started.id, self.draft.id])   # unrelated not added
+        self.assertEqual(self._pending(), [])
+
+    def test_only_admins_see_and_rebuild(self):
+        self.client.force_authenticate(self.creator)
+        self.assertEqual(self.client.get(reverse('admin-pathways')).status_code, 403)
+        self.assertEqual(self.client.post(reverse('admin-pathways-rebuild')).status_code, 403)
+
+    def test_publishing_from_django_admin_is_listed_too(self):
         from django.contrib.admin.sites import site
         from django.test import RequestFactory
 
         from hub.admin import CourseAdmin
         admin_obj = CourseAdmin(Course, site)
         admin_obj.message_user = lambda *a, **k: None
+        request = RequestFactory().post('/')
+        request.user = self.admin
         with self.captureOnCommitCallbacks(execute=True):
-            admin_obj.publish_courses(RequestFactory().post('/'), Course.objects.filter(pk=self.draft.pk))
-        self.user_path.refresh_from_db()
-        self.assertIn(self.draft.id, self.user_path.course_ids)
+            admin_obj.publish_courses(request, Course.objects.filter(pk=self.draft.pk))
         self.recompute.assert_called_once()
+        self.assertEqual([(p['course_title'], p['change'], p['changed_by']) for p in self._pending()],
+                         [('New', 'published', 'boss')])

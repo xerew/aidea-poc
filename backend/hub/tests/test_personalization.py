@@ -157,3 +157,21 @@ class RecomputeEmbeddingsCommandTests(TestCase):
         call_command('recompute_course_embeddings', stdout=StringIO())
         compute.assert_called_once_with(live.id)
         refresh.assert_called_once_with()
+
+
+class RecommendationRelevanceFloorTests(TestCase):
+    """Personal recommendations leave out weak matches instead of filling all 5 slots."""
+
+    def test_weak_matches_are_dropped_and_the_rest_ranked_by_boosted_score(self):
+        from hub.personalization import top_recommendations
+        scored = [('weak', 0.10, 0.90), ('ok', 0.40, 0.50), ('best', 0.60, 0.80), ('edge', 0.25, 0.30)]
+        self.assertEqual(top_recommendations(scored, min_similarity=0.25), [('best', 0.80), ('ok', 0.50), ('edge', 0.30)])
+
+    def test_at_most_five(self):
+        from hub.personalization import top_recommendations
+        scored = [(i, 0.9, i) for i in range(8)]
+        self.assertEqual([c for c, _ in top_recommendations(scored, min_similarity=0.25)], [7, 6, 5, 4, 3])
+
+    def test_cut_off_is_a_setting_with_a_sensible_default(self):
+        from hub.models.recommendations import RecommendationConfig
+        self.assertEqual(RecommendationConfig.get().min_similarity, 0.25)

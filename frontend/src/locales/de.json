@@ -396,7 +396,8 @@
       "personalNoSubject": "Passt zu Ihrem Niveau ({{level}})",
       "peers": "{{pct}} % der Lehrkräfte wie Sie ({{subject}}) haben sich eingeschrieben",
       "peersNoSubject": "{{pct}} % der Lehrkräfte wie Sie haben sich eingeschrieben"
-    }
+    },
+    "browseAllCourses": "Alle Kurse ansehen"
   },
   "courses": {
     "title": "Kurse",
@@ -461,7 +462,8 @@
       "title": "Ihr Lernpfad enthält noch keine Kurse",
       "no_published_courses": "Auf der Plattform sind noch keine Kurse veröffentlicht. Ihr Lernpfad füllt sich automatisch, sobald Kurse veröffentlicht werden.",
       "above_level": "Alle veröffentlichten Kurse liegen derzeit über Ihrem Kompetenzniveau, daher wurde keiner hinzugefügt. Die KI-Kompetenz-Selbsteinschätzung kann Sie einem höheren Niveau zuordnen; Ihr Lernpfad wird außerdem aktualisiert, wenn neue Kurse für Ihr Niveau erscheinen.",
-      "study_curriculum_empty": "Sie folgen dem festen Programm der Studie, und keiner seiner Kurse ist bisher veröffentlicht. Schauen Sie später wieder vorbei."
+      "study_curriculum_empty": "Sie folgen dem festen Programm der Studie, und keiner seiner Kurse ist bisher veröffentlicht. Schauen Sie später wieder vorbei.",
+      "no_match": "Keiner der veröffentlichten Kurse auf Ihrem Niveau passt bisher zu Ihren Säulen, Zielen oder Ihrem Fach. Ihr Lernpfad wird aktualisiert, sobald passende Kurse veröffentlicht werden; bis dahin können Sie alle Kurse ansehen."
     },
     "notOnboarded": "Ihr Lernpfad wird erstellt, wenn Sie das kurze Onboarding abschließen (Fach, Unterrichtsstufe, Rolle und Ziele).",
     "startOnboarding": "Onboarding abschließen",
@@ -987,6 +989,18 @@
       "queuing": "Wird eingereiht…",
       "queued": "Aktualisierung der Empfehlungen eingereiht.",
       "failed": "Aktualisierung konnte nicht eingereiht werden. Bitte erneut versuchen."
+    },
+    "pathways": {
+      "title": "Lernpfade",
+      "description": "Das Veröffentlichen eines Kurses ändert niemandes Lernpfad. Wenn Sie so weit sind, bauen Sie alle Lernpfade neu auf: begonnene und abgeschlossene Kurse bleiben, neue Kurse kommen nur hinzu, wenn sie zu den Säulen, Zielen oder dem Fach der Person passen, und zurückgezogene Kurse fallen weg.",
+      "nonePending": "Seit dem letzten Neuaufbau wurde kein Kurs veröffentlicht oder zurückgezogen.",
+      "published": "veröffentlicht",
+      "unpublished": "zurückgezogen",
+      "lastRebuilt": "Zuletzt neu aufgebaut: {{date}}",
+      "button": "Lernpfade neu aufbauen",
+      "queuing": "Wird eingereiht…",
+      "queued": "Neuaufbau der Lernpfade eingereiht.",
+      "failed": "Der Neuaufbau konnte nicht eingereiht werden. Bitte versuchen Sie es erneut."
     },
     "djangoAdmin": {
       "title": "Django-Administration",

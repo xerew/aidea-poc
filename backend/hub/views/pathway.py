@@ -13,15 +13,22 @@ def _published(course_ids):
     return Course.objects.filter(id__in=course_ids or [], is_published=True).exists()
 
 
-def _empty_reason(fixed):
+def _empty_reason(fixed, user):
     """Why a pathway has no courses, so the page can explain it."""
     if fixed:
         return 'study_curriculum_empty'   # the study's control curriculum has none published
     if not Course.objects.filter(is_published=True).exists():
         return 'no_published_courses'
-    # The only exclusion in pathway_gen is level: courses more than one level
-    # above the user's competency band.
-    return 'above_level'
+    # pathway_gen leaves out courses more than one level above the user's band,
+    # and courses matching none of their pillars, goals or subject.
+    return 'no_match' if _has_course_at_level(user) else 'above_level'
+
+
+def _has_course_at_level(user):
+    from hub.pathway_gen import _LEVEL_NUM, competency_band
+    band = competency_band(user.profile.competency_score)
+    allowed = [lvl for lvl, num in _LEVEL_NUM.items() if num <= band + 1]
+    return Course.objects.filter(is_published=True, level__in=allowed).exists()
 
 
 class PathwayView(APIView):
@@ -63,5 +70,5 @@ class PathwayView(APIView):
             user_path, context={'user': request.user, 'request': request},
         )
         data = serializer.data
-        data['empty_reason'] = None if data['courses'] else _empty_reason(fixed)
+        data['empty_reason'] = None if data['courses'] else _empty_reason(fixed, request.user)
         return Response(data)

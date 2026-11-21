@@ -11,7 +11,7 @@ from .history import CourseEditHistory
 from .maintenance import MaintenanceNotice
 from .messaging import Conversation, Message
 from .onboarding_quiz import OnboardingDimension, OnboardingQuestion
-from .pathway import LearningPath, LearningPathCourse, UserLearningPath
+from .pathway import LearningPath, LearningPathCourse, PathwayCourseChange, UserLearningPath
 from .preference_quiz import PreferenceOption, PreferenceQuestion
 from .presentation import PresentationFile
 from .recommendations import (
@@ -81,5 +81,6 @@ __all__ = [
     'StudyPreregistration',
     'Subject',
     'UserLearningPath',
+    'PathwayCourseChange',
     'UserProfile',
 ]

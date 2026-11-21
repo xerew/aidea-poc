@@ -146,3 +146,8 @@
 .pathway-empty-title { margin: 0 0 0.3rem; font-size: 1rem; font-weight: 600; color: #1e3a8a; }
 .pathway-empty-text { margin: 0 0 0.75rem; font-size: 0.9rem; line-height: 1.5; color: #1e40af; }
 .pathway-empty-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* Shown under a pathway with fewer than 6 courses */
+.pathway-more {
+  margin-top: 1rem;
+}

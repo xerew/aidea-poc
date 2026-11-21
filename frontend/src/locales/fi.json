@@ -396,7 +396,8 @@
       "personalNoSubject": "Sopii tasollesi ({{level}})",
       "peers": "{{pct}} % kaltaisistasi opettajista ({{subject}}) ilmoittautui",
       "peersNoSubject": "{{pct}} % kaltaisistasi opettajista ilmoittautui"
-    }
+    },
+    "browseAllCourses": "Selaa kaikkia kursseja"
   },
   "courses": {
     "title": "Kurssit",
@@ -461,7 +462,8 @@
       "title": "Polullasi ei ole vielä kursseja",
       "no_published_courses": "Alustalla ei ole vielä julkaistuja kursseja. Polkusi täyttyy automaattisesti heti, kun kursseja julkaistaan.",
       "above_level": "Kaikki julkaistut kurssit ovat tällä hetkellä osaamistasosi yläpuolella, joten yhtään ei lisätty. Tekoälyosaamisen itsearviointi voi sijoittaa sinut korkeammalle tasolle; polkusi päivittyy myös, kun tasollesi sopivia kursseja julkaistaan.",
-      "study_curriculum_empty": "Seuraat tutkimuksen kiinteää ohjelmaa, eikä sen kursseja ole vielä julkaistu. Tarkista myöhemmin uudelleen."
+      "study_curriculum_empty": "Seuraat tutkimuksen kiinteää ohjelmaa, eikä sen kursseja ole vielä julkaistu. Tarkista myöhemmin uudelleen.",
+      "no_match": "Yksikään tasosi julkaistuista kursseista ei vielä vastaa valitsemiasi pilareita, tavoitteita tai oppiainetta. Polkusi päivittyy, kun sopivia kursseja julkaistaan; sillä välin voit selata kaikkia kursseja."
     },
     "notOnboarded": "Polkusi luodaan, kun teet lyhyen aloituksen (aine, opetusaste, rooli ja tavoitteet).",
     "startOnboarding": "Tee aloitus",
@@ -987,6 +989,18 @@
       "queuing": "Lisätään jonoon…",
       "queued": "Suositusten päivitys lisätty jonoon.",
       "failed": "Päivitystä ei voitu lisätä jonoon. Yritä uudelleen."
+    },
+    "pathways": {
+      "title": "Oppimispolut",
+      "description": "Kurssin julkaiseminen ei muuta kenenkään oppimispolkua. Kun olet valmis, rakenna kaikki polut uudelleen: aloitetut ja suoritetut kurssit säilyvät, uudet kurssit lisätään vain, jos ne vastaavat henkilön pilareita, tavoitteita tai oppiainetta, ja julkaisusta poistetut kurssit poistuvat.",
+      "nonePending": "Yhtään kurssia ei ole julkaistu tai poistettu julkaisusta edellisen uudelleenrakennuksen jälkeen.",
+      "published": "julkaistu",
+      "unpublished": "poistettu julkaisusta",
+      "lastRebuilt": "Rakennettu viimeksi: {{date}}",
+      "button": "Rakenna polut uudelleen",
+      "queuing": "Lisätään jonoon…",
+      "queued": "Polkujen uudelleenrakennus lisätty jonoon.",
+      "failed": "Uudelleenrakennusta ei voitu lisätä jonoon. Yritä uudelleen."
     },
     "djangoAdmin": {
       "title": "Django-hallinta",

@@ -396,7 +396,8 @@
       "personalNoSubject": "Passer ditt nivå ({{level}})",
       "peers": "{{pct}} % av lærere som deg ({{subject}}) har meldt seg på",
       "peersNoSubject": "{{pct}} % av lærere som deg har meldt seg på"
-    }
+    },
+    "browseAllCourses": "Se alle kurs"
   },
   "courses": {
     "title": "Kurs",
@@ -461,7 +462,8 @@
       "title": "Læringsstien din har ingen kurs ennå",
       "no_published_courses": "Det finnes ingen publiserte kurs på plattformen ennå. Læringsstien din fylles automatisk så snart kurs publiseres.",
       "above_level": "Alle publiserte kurs ligger nå over kompetansenivået ditt, så ingen ble lagt til. Egenvurderingen av KI-kompetanse kan plassere deg på et høyere nivå; læringsstien oppdateres også når nye kurs for ditt nivå publiseres.",
-      "study_curriculum_empty": "Du følger studiens faste program, og ingen av kursene er publisert ennå. Sjekk igjen senere."
+      "study_curriculum_empty": "Du følger studiens faste program, og ingen av kursene er publisert ennå. Sjekk igjen senere.",
+      "no_match": "Ingen av de publiserte kursene på ditt nivå passer ennå med søylene, målene eller faget ditt. Læringsstien din oppdateres når relevante kurs publiseres; i mellomtiden kan du se alle kurs."
     },
     "notOnboarded": "Læringsstien din opprettes når du fullfører den korte introduksjonen (fag, undervisningsnivå, rolle og mål).",
     "startOnboarding": "Fullfør introduksjonen",
@@ -987,6 +989,18 @@
       "queuing": "Legger i kø…",
       "queued": "Oppdatering av anbefalinger lagt i kø.",
       "failed": "Kunne ikke legge oppdateringen i kø. Prøv igjen."
+    },
+    "pathways": {
+      "title": "Læringsstier",
+      "description": "Å publisere et kurs endrer ingens læringssti. Når du er klar, bygger du alle stier på nytt: påbegynte og fullførte kurs blir værende, nye kurs legges bare til der de passer med personens søyler, mål eller fag, og avpubliserte kurs fjernes.",
+      "nonePending": "Ingen kurs er publisert eller avpublisert siden forrige gjenoppbygging.",
+      "published": "publisert",
+      "unpublished": "avpublisert",
+      "lastRebuilt": "Sist gjenoppbygd: {{date}}",
+      "button": "Bygg stier på nytt",
+      "queuing": "Legger i kø…",
+      "queued": "Gjenoppbygging av stier er lagt i kø.",
+      "failed": "Kunne ikke legge gjenoppbyggingen i kø. Prøv igjen."
     },
     "djangoAdmin": {
       "title": "Django-administrasjon",

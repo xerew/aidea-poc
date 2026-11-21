@@ -10,6 +10,9 @@ import { CheckCircle, PlayCircle, Circle, Info } from 'lucide-react'
 import client from '../api/client'
 import './PathwayPage.css'
 
+// A full pathway has 6 courses (PATHWAY_SIZE in the backend).
+const FULL_PATHWAY = 6
+
 const LEVEL_VARIANT = { beginner: 'secondary', intermediate: 'outline', advanced: 'default' }
 
 const STATUS_ICON = {
@@ -141,6 +144,13 @@ export default function PathwayPage() {
           )
         })}
       </div>
+
+      {/* Only relevant courses join a pathway, so a short one points to the catalogue. */}
+      {data.courses.length > 0 && data.courses.length < FULL_PATHWAY && (
+        <div className="pathway-more">
+          <Button asChild size="sm" variant="outline"><Link to="/courses">{t('pathway.browseCourses')}</Link></Button>
+        </div>
+      )}
     </div>
   )
 }

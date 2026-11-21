@@ -12,6 +12,8 @@ from .views import (
     AdminFeedbackDetailView,
     AdminFeedbackListView,
     AdminMaintenanceView,
+    AdminPathwaysRebuildView,
+    AdminPathwaysView,
     AdminRecomputeRecommendationsView,
     AdminSelfEfficacyExportView,
     AdminSelfEfficacyPsychometricsView,
@@ -178,6 +180,8 @@ urlpatterns = [
     # Admin
     path('admin/users/',                        AdminUserListView.as_view(),           name='admin-users'),
     path('admin/users/<int:pk>/role/',          AdminUserRoleView.as_view(),           name='admin-user-role'),
+    path('admin/pathways/',                     AdminPathwaysView.as_view(), name='admin-pathways'),
+    path('admin/pathways/rebuild/',             AdminPathwaysRebuildView.as_view(), name='admin-pathways-rebuild'),
     path('admin/recompute-recommendations/',    AdminRecomputeRecommendationsView.as_view(), name='admin-recompute-recommendations'),
     path('admin/access-requests/',              AdminAccessRequestListView.as_view(),  name='admin-access-requests'),
     path('admin/access-requests/<int:pk>/',     AdminAccessRequestReviewView.as_view(), name='admin-access-request-review'),

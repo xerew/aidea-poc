@@ -69,6 +69,39 @@ class AdminRecomputeRecommendationsView(APIView):
         )
 
 
+class AdminPathwaysView(APIView):
+    """GET — courses published / unpublished since pathways were last rebuilt."""
+    permission_classes = [IsAdmin]
+
+    def get(self, request):
+        from django.db.models import Max
+
+        from hub.models import PathwayCourseChange
+        pending = PathwayCourseChange.objects.filter(applied_at__isnull=True).select_related('changed_by')
+        return Response({
+            'pending': [
+                {'id': c.id, 'course_id': c.course_id, 'course_title': c.course_title, 'change': c.change,
+                 'changed_by': c.changed_by.username if c.changed_by else None, 'changed_at': c.changed_at}
+                for c in pending
+            ],
+            'last_rebuilt_at': PathwayCourseChange.objects.aggregate(t=Max('applied_at'))['t'],
+        })
+
+
+class AdminPathwaysRebuildView(APIView):
+    """POST — rebuild every onboarded person's pathway in the background: courses
+    they started or finished stay, newly published courses join only where they
+    are relevant, unpublished ones drop out. Clears the pending list."""
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        from hub.models import PathwayCourseChange
+        from hub.tasks import refresh_all_pathways
+        applied = PathwayCourseChange.objects.filter(applied_at__isnull=True).update(applied_at=timezone.now())
+        transaction.on_commit(refresh_all_pathways.delay)
+        return Response({'detail': 'Pathway rebuild queued.', 'applied': applied}, status=status.HTTP_202_ACCEPTED)
+
+
 class AdminAccessRequestListView(APIView):
     permission_classes = [IsAdmin]
 

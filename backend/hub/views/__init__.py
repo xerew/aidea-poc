@@ -7,6 +7,8 @@ from .access_requests import (
 from .admin import (
     AdminAccessRequestListView,
     AdminAccessRequestReviewView,
+    AdminPathwaysRebuildView,
+    AdminPathwaysView,
     AdminRecomputeRecommendationsView,
     AdminUserListView,
     AdminUserRoleView,
@@ -128,6 +130,8 @@ __all__ = [
     'AccessRequestSeenView',
     'AccessRequestView',
     'AdminAccessRequestListView',
+    'AdminPathwaysRebuildView',
+    'AdminPathwaysView',
     'AdminRecomputeRecommendationsView',
     'AdminAccessRequestReviewView',
     'AdminUserListView',

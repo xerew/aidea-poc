@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import client from '../api/client'
 import ContinueLearningBanner from '../components/ContinueLearningBanner'
 import { useAuth } from '../context/AuthContext'
 import { subjectLabel } from '../lib/subjects'
 import './HomePage.css'
+
+// The recommender returns at most 5 personal recommendations.
+const FULL_RECOMMENDATIONS = 5
 
 PillarCard.propTypes = {
   pillar: PropTypes.shape({
@@ -215,11 +218,17 @@ export default function HomePage() {
               {[1, 2, 3].map((i) => <div key={i} className="rec-card rec-card-skeleton" />)}
             </div>
           ) : (
-            <div className="recommendations-grid">
-              {personalRecs.map((rec, i) => (
-                <RecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />
-              ))}
-            </div>
+            <>
+              <div className="recommendations-grid">
+                {personalRecs.map((rec, i) => (
+                  <RecCard key={rec.course_id} rec={rec} rank={i + 1} onFireEvent={fireEvent} />
+                ))}
+              </div>
+              {/* Only relevant courses are recommended, so a short list points to the catalogue. */}
+              {personalRecs.length < FULL_RECOMMENDATIONS && (
+                <Link to="/courses" className="recommendations-more">{t('home.browseAllCourses')} →</Link>
+              )}
+            </>
           )}
         </section>
       )}

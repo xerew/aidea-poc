@@ -396,7 +396,8 @@
       "personalNoSubject": "Adatto al tuo livello ({{level}})",
       "peers": "Il {{pct}}% dei docenti come te ({{subject}}) si è iscritto",
       "peersNoSubject": "Il {{pct}}% dei docenti come te si è iscritto"
-    }
+    },
+    "browseAllCourses": "Vedi tutti i corsi"
   },
   "courses": {
     "title": "Corsi",
@@ -461,7 +462,8 @@
       "title": "Il tuo percorso non ha ancora corsi",
       "no_published_courses": "Non ci sono ancora corsi pubblicati sulla piattaforma. Il tuo percorso si riempirà automaticamente appena verranno pubblicati dei corsi.",
       "above_level": "Tutti i corsi pubblicati sono attualmente sopra il tuo livello di competenza, quindi non ne è stato aggiunto nessuno. L’autovalutazione delle competenze sull’IA può collocarti a un livello più alto; il percorso si aggiorna anche quando vengono pubblicati nuovi corsi per il tuo livello.",
-      "study_curriculum_empty": "Segui il programma fisso dello studio e nessuno dei suoi corsi è ancora pubblicato. Torna più tardi."
+      "study_curriculum_empty": "Segui il programma fisso dello studio e nessuno dei suoi corsi è ancora pubblicato. Torna più tardi.",
+      "no_match": "Nessuno dei corsi pubblicati del tuo livello corrisponde ancora ai tuoi pilastri, obiettivi o alla tua materia. Il tuo percorso si aggiorna man mano che vengono pubblicati corsi pertinenti; nel frattempo puoi vedere tutti i corsi."
     },
     "notOnboarded": "Il tuo percorso viene creato quando completi la breve configurazione iniziale (materia, livello di insegnamento, ruolo e obiettivi).",
     "startOnboarding": "Completa la configurazione iniziale",
@@ -987,6 +989,18 @@
       "queuing": "In coda…",
       "queued": "Aggiornamento delle raccomandazioni in coda.",
       "failed": "Impossibile mettere in coda l'aggiornamento. Riprova."
+    },
+    "pathways": {
+      "title": "Percorsi di apprendimento",
+      "description": "Pubblicare un corso non cambia il percorso di nessuno. Quando lo ritieni opportuno, ricostruisci tutti i percorsi: i corsi iniziati o completati restano, i nuovi corsi vengono aggiunti solo se corrispondono ai pilastri, agli obiettivi o alla materia della persona, e i corsi ritirati vengono rimossi.",
+      "nonePending": "Nessun corso è stato pubblicato o ritirato dall’ultima ricostruzione.",
+      "published": "pubblicato",
+      "unpublished": "ritirato",
+      "lastRebuilt": "Ultima ricostruzione: {{date}}",
+      "button": "Ricostruisci i percorsi",
+      "queuing": "In coda…",
+      "queued": "Ricostruzione dei percorsi in coda.",
+      "failed": "Impossibile avviare la ricostruzione. Riprova."
     },
     "djangoAdmin": {
       "title": "Amministrazione Django",

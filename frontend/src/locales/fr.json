@@ -396,7 +396,8 @@
       "personalNoSubject": "Adapté à votre niveau ({{level}})",
       "peers": "{{pct}} % des enseignants comme vous ({{subject}}) se sont inscrits",
       "peersNoSubject": "{{pct}} % des enseignants comme vous se sont inscrits"
-    }
+    },
+    "browseAllCourses": "Voir tous les cours"
   },
   "courses": {
     "title": "Cours",
@@ -461,7 +462,8 @@
       "title": "Votre parcours ne contient pas encore de cours",
       "no_published_courses": "Aucun cours n’est encore publié sur la plateforme. Votre parcours se remplira automatiquement dès que des cours seront publiés.",
       "above_level": "Tous les cours publiés sont actuellement au-dessus de votre niveau de compétence ; aucun n’a donc été ajouté. L’auto-évaluation des compétences en IA peut vous placer à un niveau supérieur ; votre parcours se met aussi à jour quand de nouveaux cours de votre niveau sont publiés.",
-      "study_curriculum_empty": "Vous suivez le programme fixe de l’étude et aucun de ses cours n’est encore publié. Revenez plus tard."
+      "study_curriculum_empty": "Vous suivez le programme fixe de l’étude et aucun de ses cours n’est encore publié. Revenez plus tard.",
+      "no_match": "Aucun cours publié à votre niveau ne correspond encore à vos piliers, objectifs ou à votre discipline. Votre parcours est mis à jour quand des cours pertinents sont publiés ; en attendant, vous pouvez parcourir tous les cours."
     },
     "notOnboarded": "Votre parcours est créé lorsque vous terminez la courte prise en main (matière, niveau d’enseignement, rôle et objectifs).",
     "startOnboarding": "Terminer la prise en main",
@@ -987,6 +989,18 @@
       "queuing": "Mise en file…",
       "queued": "Actualisation des recommandations mise en file d'attente.",
       "failed": "Impossible de lancer l'actualisation. Veuillez réessayer."
+    },
+    "pathways": {
+      "title": "Parcours d’apprentissage",
+      "description": "Publier un cours ne modifie le parcours de personne. Quand vous le souhaitez, reconstruisez tous les parcours : les cours commencés ou terminés restent, les nouveaux cours ne sont ajoutés que s’ils correspondent aux piliers, objectifs ou à la discipline de la personne, et les cours dépubliés sont retirés.",
+      "nonePending": "Aucun cours n’a été publié ou dépublié depuis la dernière reconstruction.",
+      "published": "publié",
+      "unpublished": "dépublié",
+      "lastRebuilt": "Dernière reconstruction : {{date}}",
+      "button": "Reconstruire les parcours",
+      "queuing": "Mise en file…",
+      "queued": "Reconstruction des parcours mise en file.",
+      "failed": "Impossible de lancer la reconstruction. Veuillez réessayer."
     },
     "djangoAdmin": {
       "title": "Administration Django",

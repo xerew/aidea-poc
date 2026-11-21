@@ -103,3 +103,11 @@ def profile_text(profile):
         'both': 'teacher and school leader',
     }.get(profile.school_role, 'teacher')
     return f'{subject} {role}, {level}, competency {profile.competency_score}/6, goals: {goals}'
+
+
+def top_recommendations(scored, min_similarity, limit=5):
+    """scored: (course, raw_similarity, boosted_score) triples. Keep the courses
+    whose raw similarity to the person reaches min_similarity, best boosted score
+    first: fewer, relevant recommendations rather than five padded with weak ones."""
+    kept = [(course, boosted) for course, raw, boosted in scored if raw >= min_similarity]
+    return sorted(kept, key=lambda pair: pair[1], reverse=True)[:limit]

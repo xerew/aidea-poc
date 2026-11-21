@@ -325,6 +325,15 @@
   margin: 0;
 }
 
+/* Courses published / unpublished since the last pathway rebuild */
+.admin-pathway-changes {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
 /* Onboarding translations */
 .onboarding-tr-list {
   list-style: none;

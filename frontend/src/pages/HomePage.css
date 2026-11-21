@@ -114,6 +114,20 @@
   margin: 0 0 1.25rem;
 }
 
+/* Shown when there are fewer than 5 relevant recommendations */
+.recommendations-more {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.recommendations-more:hover {
+  text-decoration: underline;
+}
+
 .recommendations-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

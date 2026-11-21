@@ -396,7 +396,8 @@
       "personalNoSubject": "Se ajusta a tu nivel ({{level}})",
       "peers": "El {{pct}} % de los docentes como tú ({{subject}}) se inscribió",
       "peersNoSubject": "El {{pct}} % de los docentes como tú se inscribió"
-    }
+    },
+    "browseAllCourses": "Ver todos los cursos"
   },
   "courses": {
     "title": "Cursos",
@@ -461,7 +462,8 @@
       "title": "Tu itinerario aún no tiene cursos",
       "no_published_courses": "Todavía no hay cursos publicados en la plataforma. Tu itinerario se completará automáticamente en cuanto se publiquen cursos.",
       "above_level": "Todos los cursos publicados están ahora por encima de tu nivel de competencia, así que no se añadió ninguno. La autoevaluación de competencias en IA puede situarte en un nivel superior; tu itinerario también se actualiza cuando se publican nuevos cursos de tu nivel.",
-      "study_curriculum_empty": "Sigues el programa fijo del estudio y ninguno de sus cursos está publicado todavía. Vuelve más tarde."
+      "study_curriculum_empty": "Sigues el programa fijo del estudio y ninguno de sus cursos está publicado todavía. Vuelve más tarde.",
+      "no_match": "Ninguno de los cursos publicados de su nivel coincide todavía con sus pilares, objetivos o materia. Su itinerario se actualiza a medida que se publican cursos relevantes; mientras tanto, puede ver todos los cursos."
     },
     "notOnboarded": "Tu itinerario se crea cuando completas la breve configuración inicial (materia, nivel educativo, función y objetivos).",
     "startOnboarding": "Completar la configuración inicial",
@@ -987,6 +989,18 @@
       "queuing": "Encolando…",
       "queued": "Actualización de recomendaciones en cola.",
       "failed": "No se pudo poner en cola la actualización. Inténtalo de nuevo."
+    },
+    "pathways": {
+      "title": "Itinerarios de aprendizaje",
+      "description": "Publicar un curso no cambia el itinerario de nadie. Cuando quiera, reconstruya todos los itinerarios: los cursos empezados o terminados se mantienen, los cursos nuevos solo se añaden si coinciden con los pilares, objetivos o la materia de la persona, y los cursos retirados desaparecen.",
+      "nonePending": "No se ha publicado ni retirado ningún curso desde la última reconstrucción.",
+      "published": "publicado",
+      "unpublished": "retirado",
+      "lastRebuilt": "Última reconstrucción: {{date}}",
+      "button": "Reconstruir itinerarios",
+      "queuing": "En cola…",
+      "queued": "Reconstrucción de itinerarios en cola.",
+      "failed": "No se pudo poner en cola la reconstrucción. Inténtelo de nuevo."
     },
     "djangoAdmin": {
       "title": "Administración de Django",
