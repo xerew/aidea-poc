@@ -4,15 +4,19 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft } from 'lucide-react'
 import './LegalLayout.css'
 
-export default function LegalLayout({ title, children }) {
-  const { t } = useTranslation()
+// `updated` (a Date) is shown in the viewer's language; pages without it keep July 2026.
+export default function LegalLayout({ title, updated, children }) {
+  const { t, i18n } = useTranslation()
+  const updatedText = updated
+    ? updated.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })
+    : 'July 2026'
   return (
     <div className="legal-page">
       <div className="legal-card">
         <Link to="/" className="legal-back"><ArrowLeft size={16} /> {t('common.back')}</Link>
         <img src="/images/logos/aidea-logo.png" alt="AIDEA" className="legal-logo" />
         <h1 className="legal-title">{title}</h1>
-        <p className="legal-updated">{t('legal.lastUpdated', { date: 'July 2026' })}</p>
+        <p className="legal-updated">{t('legal.lastUpdated', { date: updatedText })}</p>
         <div className="legal-body">{children}</div>
         <div className="legal-footer">
           <Link to="/terms">{t('legal.termsTitle')}</Link>
@@ -26,4 +30,4 @@ export default function LegalLayout({ title, children }) {
   )
 }
 
-LegalLayout.propTypes = { title: PropTypes.string.isRequired, children: PropTypes.node }
+LegalLayout.propTypes = { title: PropTypes.string.isRequired, updated: PropTypes.instanceOf(Date), children: PropTypes.node }
