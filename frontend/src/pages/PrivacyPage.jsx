@@ -23,6 +23,7 @@ export default function PrivacyPage() {
         <li><strong>Account information:</strong> your name, username, and email address.</li>
         <li><strong>Profile information:</strong> optional details such as gender, country, school, subject, language and biography.</li>
         <li><strong>Learning activity:</strong> enrolments, progress, quiz results, assignment submissions, engagement data and how you use each course resource (see section 11).</li>
+        <li><strong>Sign-in and platform activity:</strong> when you sign in (date and time, device type and browser name), and actions you take on the platform such as editing or translating courses, reviewing assignments, or sending messages and feedback (see section 12).</li>
         <li><strong>Technical data:</strong> information needed to keep you signed in and to operate the service securely.</li>
       </ul>
 
@@ -72,7 +73,8 @@ export default function PrivacyPage() {
       <p>
         We keep your personal data for as long as your account is active and as needed to provide
         the service. You may request deletion of your account, after which we will remove or
-        anonymise your personal data except where retention is required by law.
+        anonymise your personal data except where retention is required by law. Sign-in records are
+        kept for 12 months and then deleted automatically.
       </p>
 
       <h2>9. Cookies and local storage</h2>
@@ -85,10 +87,12 @@ export default function PrivacyPage() {
       <p>
         We use Matomo, a privacy-friendly analytics tool that we host ourselves on our own
         infrastructure within the European Union, to understand how the platform is used (for
-        example, which pages are visited) so that we can improve it. Matomo runs{' '}
-        <strong>without cookies</strong>, anonymises IP addresses, and we do not share this data
-        with any third party. The legal basis is our legitimate interest in maintaining and
-        improving an educational platform.
+        example, which pages are visited and how long they stay open) so that we can improve it.
+        Matomo runs <strong>without cookies</strong> and anonymises IP addresses. When you are signed
+        in, your visits are linked to your internal AIDEA user number. This is a number, not your name
+        or email address, and it lets administrators see how an individual account uses the platform.
+        We do not share this data with any third party. The legal basis is our legitimate interest in
+        maintaining and improving an educational platform.
       </p>
 
       <h2>11. Learning activity records</h2>
@@ -111,7 +115,34 @@ export default function PrivacyPage() {
         consent also applies.
       </p>
 
-      <h2>12. AI review of assignments</h2>
+      <h2>12. Sign-in records and platform activity</h2>
+      <p>To keep the platform secure and to support and improve it, we record:</p>
+      <ul>
+        <li>
+          <strong>Sign-ins:</strong> the date and time, the type of device (desktop, tablet or mobile)
+          and the browser name. We do not record your IP address or your location. Sign-in records are
+          deleted after 12 months.
+        </li>
+        <li>
+          <strong>Actions on the platform:</strong> for example creating, editing, publishing,
+          translating or deleting course content; adding or removing course collaborators; reviewing
+          assignments; changing a user&rsquo;s role; and changing AI reviewer settings.
+        </li>
+        <li>
+          <strong>Messages and feedback:</strong> only that you sent a message, feedback or a
+          content-creator access request, and when. We do not record the content of your messages, or
+          who you sent them to, for this purpose.
+        </li>
+      </ul>
+      <p>
+        Administrators can see these records, together with your learning activity (section 11), on
+        an activity overview of your account, and can export it to a spreadsheet. Only administrators
+        have access to this overview. Apart from sign-in records, these records are kept like the rest
+        of your account data and deleted with your account. The legal basis is our legitimate interest
+        in operating a secure platform and supporting its users.
+      </p>
+
+      <h2>13. AI review of assignments</h2>
       <p>
         Assignment submissions may be checked by an AI model running on servers operated by the
         AIDEA project (not an external AI service). It compares your submission with the
@@ -122,7 +153,7 @@ export default function PrivacyPage() {
         your submissions are still reviewed as usual.
       </p>
 
-      <h2>13. Presentations</h2>
+      <h2>14. Presentations</h2>
       <p>
         Some activities show slide presentations in Microsoft&rsquo;s Office viewer, embedded in the
         page. To play them, your browser loads the viewer from Microsoft, so Microsoft receives your IP
@@ -130,7 +161,7 @@ export default function PrivacyPage() {
         AIDEA. No names or learning records are sent to Microsoft.
       </p>
 
-      <h2>14. Changes and complaints</h2>
+      <h2>15. Changes and complaints</h2>
       <p>
         We may update this Policy; material changes will be notified through the platform. If you
         believe your data has been handled improperly, you may lodge a complaint with your national
