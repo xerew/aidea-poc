@@ -359,3 +359,72 @@ def feed(user, before=None, category=None, limit=FEED_PAGE):
         page.extend(source.build(qs.filter(at=cut)))
     more = any(qs.filter(at__lt=cut).exists() for _, qs in querysets)
     return _newest_first(page), (cut if more else None)
+
+
+# ── Page sections ─────────────────────────────────────────────────────────────
+
+LOGIN_ROWS_MAX = 500
+
+
+def summary(user):
+    from django.db.models import Sum as _Sum
+    from django.utils import timezone
+
+    from hub.models import LoginRecord
+    from hub.models.tracking import ResourceVisit
+    profile = getattr(user, 'profile', None)
+    total = ResourceVisit.objects.filter(user=user).aggregate(s=_Sum('active_seconds'))['s'] or 0
+    month_ago = timezone.now() - timedelta(days=30)
+    return {
+        'id': user.id, 'name': _name(user), 'username': user.username, 'email': user.email,
+        'role': profile.user_type if profile else '',
+        'joined': user.date_joined, 'last_login': user.last_login,
+        'onboarding_completed': bool(profile and profile.onboarding_completed),
+        'competency_score': profile.competency_score if profile else None,
+        'total_active_s': total,
+        'logins_30d': LoginRecord.objects.filter(user=user, at__gte=month_ago).count(),
+    }
+
+
+def course_rows(user):
+    """Each enrollment with the same progress, time and status the course's
+    Analytics page shows for this learner."""
+    from analytics.learning import CourseData, learner_row
+    from hub.models import Enrollment
+    rows = []
+    for enrollment in Enrollment.objects.filter(user=user).select_related('course__pillar'):
+        cd = CourseData(enrollment.course)
+        mine = next((e for e in cd.enrollments if e.user_id == user.id), enrollment)
+        row = learner_row(cd, mine)
+        rows.append({
+            'course_id': enrollment.course_id, 'title': enrollment.course.title,
+            'pillar': enrollment.course.pillar.name if enrollment.course.pillar else '',
+            'progress_pct': row['progress_pct'], 'active_s': row['active_s'], 'status': row['status'],
+            'enrolled_at': row['enrolled_at'], 'last_active': row['last_active'],
+            'completed_at': row['completed_at'],
+        })
+    return rows
+
+
+def authoring_rows(user):
+    from django.db.models import Count
+
+    from hub.models import Course, CourseCollaborator, CourseEditHistory
+    edits = dict(CourseEditHistory.objects.filter(editor=user).values('course_id')
+                 .annotate(n=Count('id')).values_list('course_id', 'n'))
+    rows = [{'course_id': c.id, 'title': c.title, 'role': 'author', 'is_published': c.is_published,
+             'edits': edits.get(c.id, 0)} for c in Course.objects.filter(created_by=user).order_by('title')]
+    for collab in CourseCollaborator.objects.filter(user=user).select_related('course').order_by('course__title'):
+        c = collab.course
+        rows.append({'course_id': c.id, 'title': c.title, 'role': collab.role, 'is_published': c.is_published,
+                     'edits': edits.get(c.id, 0)})
+    return rows
+
+
+def login_rows(user):
+    from django.utils import timezone
+
+    from hub.models import LoginRecord
+    since = timezone.now() - timedelta(days=365)
+    return [{'at': r.at, 'device': r.device, 'browser': r.browser}
+            for r in LoginRecord.objects.filter(user=user, at__gte=since)[:LOGIN_ROWS_MAX]]

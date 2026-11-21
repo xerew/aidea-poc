@@ -4,7 +4,9 @@ from datetime import timedelta
 
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APITestCase
 
 from hub.models import (
     AccessRequest,
@@ -187,3 +189,66 @@ class FeedTests(FeedFixture):
             self.login(self.user, self.now - timedelta(minutes=i))
         items, before = feed(self.user, limit=None)
         self.assertEqual((len(items), before), (70, None))
+
+
+class ActivityApiTests(APITestCase, FeedFixture):
+    def setUp(self):
+        FeedFixture.setUp(self)
+        self.admin = User.objects.create_user('fa_admin')
+        UserProfile.objects.create(user=self.admin, user_type=UserProfile.UserType.ADMIN)
+        self.client.force_authenticate(self.admin)
+
+    def _url(self, name='admin-user-activity', pk=None):
+        return reverse(name, kwargs={'pk': pk or self.user.pk})
+
+    def test_admin_gets_all_sections(self):
+        from analytics.learning import CourseData, learner_row
+        Enrollment.objects.create(user=self.user, course=self.course, progress_pct=40)
+        self.login(self.user, self.now)
+        res = self.client.get(self._url())
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(set(res.data), {'summary', 'courses', 'authoring', 'logins', 'feed', 'next_before'})
+        cd = CourseData(self.course)
+        expected = learner_row(cd, next(e for e in cd.enrollments if e.user_id == self.user.id))
+        self.assertEqual(res.data['courses'][0]['status'], expected['status'])
+        self.assertEqual(res.data['courses'][0]['progress_pct'], 40)
+        self.assertEqual(res.data['summary']['logins_30d'], 1)
+        self.assertEqual(len(res.data['logins']), 1)
+
+    def test_authoring_roles(self):
+        from hub.models import CourseCollaborator
+        authored = Course.objects.create(title='Mine', pillar=self.course.pillar, created_by=self.user)
+        CourseCollaborator.objects.create(course=self.course, user=self.user, role='co_editor')
+        for _ in range(2):
+            CourseEditHistory.objects.create(course=authored, editor=self.user, changes={'module_added': {}})
+        CourseEditHistory.objects.create(course=self.course, editor=self.user, changes={'lesson_added': {}})
+        rows = {r['title']: r for r in self.client.get(self._url()).data['authoring']}
+        self.assertEqual((rows['Mine']['role'], rows['Mine']['edits']), ('author', 2))
+        self.assertEqual((rows['AI basics']['role'], rows['AI basics']['edits']), ('co_editor', 1))
+
+    def test_feed_endpoint_pages(self):
+        for i in range(60):
+            self.login(self.user, self.now - timedelta(minutes=i))
+        first = self.client.get(self._url()).data
+        self.assertEqual(len(first['feed']), 50)
+        page2 = self.client.get(self._url('admin-user-activity-feed'), {'before': first['next_before']}).data
+        self.assertEqual((len(page2['items']), page2['next_before']), (10, None))
+
+    def test_bad_params_400(self):
+        url = self._url('admin-user-activity-feed')
+        self.assertEqual(self.client.get(url, {'before': 'nonsense'}).status_code, 400)
+        self.assertEqual(self.client.get(url, {'category': 'x'}).status_code, 400)
+
+    def test_non_admin_403_unknown_404(self):
+        creator = User.objects.create_user('fa_creator')
+        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.client.force_authenticate(creator)
+        self.assertEqual(self.client.get(self._url()).status_code, 403)
+        self.client.force_authenticate(self.admin)
+        self.assertEqual(self.client.get(self._url(pk=999999)).status_code, 404)
+
+    def test_user_without_profile(self):
+        bare = User.objects.create_user('noprof')
+        res = self.client.get(self._url(pk=bare.pk))
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual((res.data['summary']['role'], res.data['summary']['competency_score']), ('', None))
