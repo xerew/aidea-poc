@@ -993,6 +993,11 @@
       "description": "Öppna Django-administrationswebbplatsen för att hantera databasposter direkt (användare, kurser, introduktionsfrågor).",
       "button": "Öppna Django-administration"
     },
+    "webAnalytics": {
+      "title": "Webbplatsstatistik",
+      "description": "Öppna Matomo för att se besök, sidvisningar och hur plattformen används.",
+      "button": "Öppna statistik"
+    },
     "selfEfficacy": {
       "title": "Bedömning av AI-kompetens",
       "description": "Lärare gör självskattningen en gång. Öppna ett fönster så att de kan svara igen — varje slutförande sparas så att du kan jämföra över tid.",

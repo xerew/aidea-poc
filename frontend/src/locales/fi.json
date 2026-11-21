@@ -993,6 +993,11 @@
       "description": "Avaa Django-hallintasivusto tietokannan tietueiden hallintaan suoraan (käyttäjät, kurssit, perehdytyskysymykset).",
       "button": "Avaa Django-hallinta"
     },
+    "webAnalytics": {
+      "title": "Sivuston analytiikka",
+      "description": "Avaa Matomo nähdäksesi käynnit, sivunäytöt ja sen, miten alustaa käytetään.",
+      "button": "Avaa analytiikka"
+    },
     "selfEfficacy": {
       "title": "Tekoälyosaamisen arviointi",
       "description": "Opettajat tekevät itsearvioinnin kerran. Avaa uusintaikkuna, jotta he voivat vastata uudelleen — jokainen suoritus tallennetaan vertailua varten.",

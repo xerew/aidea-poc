@@ -993,6 +993,11 @@
       "description": "Åpne Django-administrasjonsnettstedet for å administrere databaseoppføringer direkte (brukere, kurs, introduksjonsspørsmål).",
       "button": "Åpne Django-administrasjon"
     },
+    "webAnalytics": {
+      "title": "Nettstedsstatistikk",
+      "description": "Åpne Matomo for å se besøk, sidevisninger og hvordan plattformen brukes.",
+      "button": "Åpne statistikk"
+    },
     "selfEfficacy": {
       "title": "Vurdering av AI-kompetanse",
       "description": "Lærere gjennomfører selvvurderingen én gang. Åpne et vindu så de kan svare på nytt — hver fullføring lagres slik at du kan sammenligne over tid.",

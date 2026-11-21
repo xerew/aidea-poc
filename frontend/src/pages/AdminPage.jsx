@@ -5,7 +5,10 @@ import { useTranslation } from 'react-i18next'
 import { Search } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import client from '../api/client'
+import { analyticsDashboardUrl } from '../lib/analyticsDashboard'
 import './AdminPage.css'
+
+const analyticsUrl = analyticsDashboardUrl()
 
 const PER_PAGE = 10
 
@@ -605,6 +608,15 @@ function SystemTab() {
           {t('admin.djangoAdmin.button')}
         </a>
       </div>
+      {analyticsUrl && (
+        <div className="admin-system-card">
+          <h2>{t('admin.webAnalytics.title')}</h2>
+          <p className="admin-system-desc">{t('admin.webAnalytics.description')}</p>
+          <a className="admin-approve-btn" href={analyticsUrl} target="_blank" rel="noopener noreferrer">
+            {t('admin.webAnalytics.button')}
+          </a>
+        </div>
+      )}
       <div className="admin-system-card">
         <h2>{t('admin.recompute.title')}</h2>
         <p className="admin-system-desc">{t('admin.recompute.description')}</p>

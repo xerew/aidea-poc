@@ -993,6 +993,11 @@
       "description": "Ouvrez le site d'administration Django pour gérer directement les enregistrements de la base de données (utilisateurs, cours, questions d'intégration).",
       "button": "Ouvrir l'administration Django"
     },
+    "webAnalytics": {
+      "title": "Statistiques du site",
+      "description": "Ouvrez Matomo pour voir les visites, les pages vues et l’utilisation de la plateforme.",
+      "button": "Ouvrir les statistiques"
+    },
     "selfEfficacy": {
       "title": "Évaluation des compétences en IA",
       "description": "Les enseignants réalisent l'auto-évaluation une fois. Ouvrez une fenêtre pour qu'ils répondent à nouveau — chaque réalisation est enregistrée afin de comparer dans le temps.",

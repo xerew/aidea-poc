@@ -993,6 +993,11 @@
       "description": "Öffnen Sie die Django-Administrationsseite, um Datenbankeinträge direkt zu verwalten (Benutzer, Kurse, Onboarding-Fragen).",
       "button": "Django-Administration öffnen"
     },
+    "webAnalytics": {
+      "title": "Website-Analyse",
+      "description": "Öffnen Sie Matomo, um Besuche, Seitenaufrufe und die Nutzung der Plattform zu sehen.",
+      "button": "Analyse öffnen"
+    },
     "selfEfficacy": {
       "title": "KI-Kompetenzbewertung",
       "description": "Lehrkräfte führen die Selbsteinschätzung einmal durch. Öffnen Sie ein Fenster, damit sie erneut antworten können — jeder Abschluss wird gespeichert, sodass Sie im Zeitverlauf vergleichen können.",
