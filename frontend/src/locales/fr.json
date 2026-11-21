@@ -1141,6 +1141,7 @@
       "empty": "Rien n’a encore été enregistré.",
       "noLogins": "Aucune connexion enregistrée pour l’instant.",
       "loadError": "Impossible de charger l’activité de cet utilisateur.",
+      "downloadError": "Le fichier Excel n’a pas pu être téléchargé. Veuillez réessayer.",
       "never": "Jamais",
       "filters": {
         "all": "Tout",

@@ -1141,6 +1141,7 @@
       "empty": "Noch nichts aufgezeichnet.",
       "noLogins": "Noch keine Anmeldungen aufgezeichnet.",
       "loadError": "Die Aktivität dieses Benutzers konnte nicht geladen werden.",
+      "downloadError": "Die Excel-Datei konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.",
       "never": "Nie",
       "filters": {
         "all": "Alle",

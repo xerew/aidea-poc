@@ -1141,6 +1141,7 @@
       "empty": "Aún no hay nada registrado.",
       "noLogins": "Aún no hay inicios de sesión registrados.",
       "loadError": "No se pudo cargar la actividad de este usuario.",
+      "downloadError": "No se pudo descargar el archivo Excel. Inténtelo de nuevo.",
       "never": "Nunca",
       "filters": {
         "all": "Todo",

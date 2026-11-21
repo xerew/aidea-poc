@@ -67,6 +67,8 @@ export default function UserActivityPage() {
   const [items, setItems] = useState([])
   const [nextBefore, setNextBefore] = useState(null)
   const [loadingMore, setLoadingMore] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState('')
   // Filter switches and "Load more" can overlap; only the newest response is used.
   const latest = useRef(createLatest())
 
@@ -124,7 +126,17 @@ export default function UserActivityPage() {
   const minutes = (seconds) => t('admin.activity.minutes', { count: Math.round((seconds || 0) / 60) })
   const roleLabel = ROLE_KEYS[s.role] ? t(`admin.roles.${ROLE_KEYS[s.role]}`) : (s.role || '—')
   const matomoUrl = matomoVisitorLogUrl(import.meta.env, s.id)
-  const download = () => downloadXlsx(`/admin/users/${id}/activity/export/`, {}, `${s.username}-activity.xlsx`).catch(() => {})
+  const download = async () => {
+    setDownloading(true)
+    setDownloadError('')
+    try {
+      await downloadXlsx(`/admin/users/${id}/activity/export/`, {}, `${s.username}-activity.xlsx`)
+    } catch {
+      setDownloadError(t('admin.activity.downloadError'))
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   return (
     <div className="ua-page">
@@ -136,8 +148,8 @@ export default function UserActivityPage() {
           <p className="ua-sub">@{s.username} · {s.email || '—'} · {roleLabel}</p>
         </div>
         <div className="ua-actions">
-          <button type="button" className="ua-btn ua-btn--primary" onClick={download}>
-            <Download size={16} /> {t('admin.activity.download')}
+          <button type="button" className="ua-btn ua-btn--primary" onClick={download} disabled={downloading}>
+            <Download size={16} /> {downloading ? t('common.loading') : t('admin.activity.download')}
           </button>
           {matomoUrl && (
             <a className="ua-btn" href={matomoUrl} target="_blank" rel="noopener noreferrer">
@@ -145,6 +157,7 @@ export default function UserActivityPage() {
             </a>
           )}
         </div>
+        {downloadError && <p className="ua-download-error" role="alert">{downloadError}</p>}
       </header>
 
       <Section title={t('admin.activity.summary')}>

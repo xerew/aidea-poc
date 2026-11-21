@@ -1141,6 +1141,7 @@
       "empty": "Ancora nulla di registrato.",
       "noLogins": "Nessun accesso registrato finora.",
       "loadError": "Impossibile caricare l’attività di questo utente.",
+      "downloadError": "Impossibile scaricare il file Excel. Riprova.",
       "never": "Mai",
       "filters": {
         "all": "Tutto",

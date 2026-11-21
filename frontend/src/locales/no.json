@@ -1141,6 +1141,7 @@
       "empty": "Ingenting er registrert ennå.",
       "noLogins": "Ingen innlogginger er registrert ennå.",
       "loadError": "Kunne ikke laste brukerens aktivitet.",
+      "downloadError": "Excel-filen kunne ikke lastes ned. Prøv igjen.",
       "never": "Aldri",
       "filters": {
         "all": "Alt",

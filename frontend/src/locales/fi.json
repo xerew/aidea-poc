@@ -1141,6 +1141,7 @@
       "empty": "Mitään ei ole vielä tallennettu.",
       "noLogins": "Kirjautumisia ei ole vielä tallennettu.",
       "loadError": "Käyttäjän toimintaa ei voitu ladata.",
+      "downloadError": "Excel-tiedostoa ei voitu ladata. Yritä uudelleen.",
       "never": "Ei koskaan",
       "filters": {
         "all": "Kaikki",

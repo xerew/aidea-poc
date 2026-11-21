@@ -1141,6 +1141,7 @@
       "empty": "Nothing recorded yet.",
       "noLogins": "No logins recorded yet.",
       "loadError": "Could not load this user’s activity.",
+      "downloadError": "The Excel file could not be downloaded. Please try again.",
       "never": "Never",
       "filters": {
         "all": "All",

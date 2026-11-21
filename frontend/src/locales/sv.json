@@ -1141,6 +1141,7 @@
       "empty": "Inget har registrerats ännu.",
       "noLogins": "Inga inloggningar har registrerats ännu.",
       "loadError": "Det gick inte att läsa in användarens aktivitet.",
+      "downloadError": "Excel-filen kunde inte laddas ner. Försök igen.",
       "never": "Aldrig",
       "filters": {
         "all": "Allt",

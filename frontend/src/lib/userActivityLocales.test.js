@@ -22,7 +22,7 @@ const KINDS = [
 
 const KEYS = [
   'column', 'button', 'title', 'back', 'download', 'openMatomo', 'summary', 'courses', 'authoring', 'feed',
-  'logins', 'loadMore', 'empty', 'noLogins', 'loadError', 'never',
+  'logins', 'loadMore', 'empty', 'noLogins', 'loadError', 'downloadError', 'never',
   'filters.all', 'filters.learning', 'filters.authoring', 'filters.reviews', 'filters.account',
   'fields.role', 'fields.joined', 'fields.lastLogin', 'fields.onboarding', 'fields.competency',
   'fields.totalTime', 'fields.logins30d', 'yes', 'no', 'minutes',
