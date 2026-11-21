@@ -249,6 +249,26 @@ class ActivityApiTests(AdminClientFixture):
         self.client.force_authenticate(self.admin)
         self.assertEqual(self.client.get(self._url(pk=999999)).status_code, 404)
 
+    def test_last_login_comes_from_login_records(self):
+        record = self.login(self.user, self.now - timedelta(hours=2))
+        record.refresh_from_db()
+        summary = self.client.get(self._url()).data['summary']
+        self.assertEqual(summary['last_login'], record.at)
+
+    def test_course_rows_load_only_this_persons_data(self):
+        from unittest import mock
+
+        import analytics.learning as learning
+        from hub.user_activity import course_rows
+        Enrollment.objects.create(user=self.user, course=self.course)
+        Enrollment.objects.create(user=self.other, course=self.course)
+        with mock.patch.object(learning, 'CourseData', wraps=learning.CourseData) as spy:
+            rows = course_rows(self.user)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(spy.call_args.kwargs.get('user_ids'), [self.user.id])
+        cd = learning.CourseData(self.course, user_ids=[self.user.id])
+        self.assertEqual([e.user_id for e in cd.enrollments], [self.user.id])
+
     def test_user_without_profile(self):
         bare = User.objects.create_user('noprof')
         res = self.client.get(self._url(pk=bare.pk))

@@ -51,7 +51,9 @@ def time_summary(visits):
 
 
 class CourseData:
-    def __init__(self, course, now=None):
+    def __init__(self, course, now=None, user_ids=None):
+        """user_ids narrows everything to those learners (the admin activity page
+        needs one person's rows, not the whole course's tracking data)."""
         self.course = course
         self.now = now or timezone.now()
         self.modules = list(Module.objects.filter(course=course).order_by('order', 'id'))
@@ -69,8 +71,11 @@ class CourseData:
             self.resources_of[resource.activity_id].append(resource)
         self.resource_by_id = {r.id: r for r in self.resources}
 
+        enrollments = Enrollment.objects.filter(course=course)
+        if user_ids is not None:
+            enrollments = enrollments.filter(user_id__in=user_ids)
         self.enrollments = list(
-            Enrollment.objects.filter(course=course)
+            enrollments
             .select_related('user__profile__subject', 'user__study')
             .order_by('user__first_name', 'user__last_name', 'user__username')
         )

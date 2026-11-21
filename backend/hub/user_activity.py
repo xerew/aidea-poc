@@ -378,7 +378,10 @@ def summary(user):
     return {
         'id': user.id, 'name': _name(user), 'username': user.username, 'email': user.email,
         'role': profile.user_type if profile else '',
-        'joined': user.date_joined, 'last_login': user.last_login,
+        # Logins are recorded by the platform (JWT sign-ins don't update last_login).
+        'joined': user.date_joined,
+        'last_login': (LoginRecord.objects.filter(user=user).values_list('at', flat=True).first()
+                       or user.last_login),
         'onboarding_completed': bool(profile and profile.onboarding_completed),
         'competency_score': profile.competency_score if profile else None,
         'total_active_s': total,
@@ -393,7 +396,7 @@ def course_rows(user):
     from hub.models import Enrollment
     rows = []
     for enrollment in Enrollment.objects.filter(user=user).select_related('course__pillar'):
-        cd = CourseData(enrollment.course)
+        cd = CourseData(enrollment.course, user_ids=[user.id])
         mine = next((e for e in cd.enrollments if e.user_id == user.id), enrollment)
         row = learner_row(cd, mine)
         rows.append({

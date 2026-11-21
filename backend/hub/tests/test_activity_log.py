@@ -49,6 +49,15 @@ class LoginRecordTests(APITestCase):
         record = LoginRecord.objects.get()
         self.assertEqual((record.user, record.device, record.browser), (self.user, 'mobile', 'Safari'))
 
+    def test_login_by_email_or_padded_username_is_recorded(self):
+        self.user.email = 'lr@example.com'
+        self.user.save()
+        for identifier in ('lr@example.com', ' lr_user '):
+            res = self.client.post(reverse('auth-login'), {'username': identifier, 'password': 'pass12345'},
+                                   format='json')
+            self.assertEqual(res.status_code, 200, identifier)
+        self.assertEqual(LoginRecord.objects.filter(user=self.user).count(), 2)
+
     def test_failed_login_is_not_recorded(self):
         self.assertEqual(self._login(password='wrong').status_code, 401)
         self.assertEqual(LoginRecord.objects.count(), 0)

@@ -24,7 +24,10 @@ class LoginView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
-            user = User.objects.filter(username=request.data.get('username')).first()
+            # The account that actually signed in (the serializer resolves emails
+            # and trims spaces), not a second lookup of what was typed.
+            user_id = (response.data.get('user') or {}).get('id')
+            user = User.objects.filter(pk=user_id).first() if user_id else None
             if user is not None:
                 record_login(request, user)
         return response

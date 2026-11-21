@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Download, ExternalLink } from 'lucide-react'
 import client from '../api/client'
 import { downloadXlsx } from '../components/analytics/download'
+import { createLatest } from '../lib/latestRequest'
 import { matomoVisitorLogUrl } from '../lib/matomoLink'
 import './UserActivityPage.css'
 
@@ -66,6 +67,8 @@ export default function UserActivityPage() {
   const [items, setItems] = useState([])
   const [nextBefore, setNextBefore] = useState(null)
   const [loadingMore, setLoadingMore] = useState(false)
+  // Filter switches and "Load more" can overlap; only the newest response is used.
+  const latest = useRef(createLatest())
 
   useEffect(() => {
     client.get(`/admin/users/${id}/activity/`)
@@ -82,26 +85,33 @@ export default function UserActivityPage() {
   }
 
   const changeFilter = async (cat) => {
+    const request = latest.current.start()
     setCategory(cat)
+    setLoadingMore(false)
     try {
       const page = await fetchFeed(cat, null)
+      if (!latest.current.isCurrent(request)) return
       setItems(page.items)
       setNextBefore(page.next_before)
+      setError('')
     } catch {
-      setError(t('admin.activity.loadError'))
+      if (latest.current.isCurrent(request)) setError(t('admin.activity.loadError'))
     }
   }
 
   const loadMore = async () => {
+    const request = latest.current.start()
     setLoadingMore(true)
     try {
       const page = await fetchFeed(category, nextBefore)
+      if (!latest.current.isCurrent(request)) return
       setItems((prev) => [...prev, ...page.items])
       setNextBefore(page.next_before)
+      setError('')
     } catch {
-      setError(t('admin.activity.loadError'))
+      if (latest.current.isCurrent(request)) setError(t('admin.activity.loadError'))
     } finally {
-      setLoadingMore(false)
+      if (latest.current.isCurrent(request)) setLoadingMore(false)
     }
   }
 
