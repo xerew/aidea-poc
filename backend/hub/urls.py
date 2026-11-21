@@ -100,7 +100,11 @@ from .views import (
     UnreadMessageCountView,
     VerifyEmailView,
 )
-from .views.admin_user_activity import AdminUserActivityFeedView, AdminUserActivityView
+from .views.admin_user_activity import (
+    AdminUserActivityExportView,
+    AdminUserActivityFeedView,
+    AdminUserActivityView,
+)
 from .views.ai_review import (
     AuthoringAIReviewDraftView,
     AuthoringAIReviewExamplesView,
@@ -183,6 +187,7 @@ urlpatterns = [
     path('admin/users/<int:pk>/role/',          AdminUserRoleView.as_view(),           name='admin-user-role'),
     path('admin/users/<int:pk>/activity/',      AdminUserActivityView.as_view(), name='admin-user-activity'),
     path('admin/users/<int:pk>/activity/feed/', AdminUserActivityFeedView.as_view(), name='admin-user-activity-feed'),
+    path('admin/users/<int:pk>/activity/export/', AdminUserActivityExportView.as_view(), name='admin-user-activity-export'),
     path('admin/pathways/',                     AdminPathwaysView.as_view(), name='admin-pathways'),
     path('admin/pathways/rebuild/',             AdminPathwaysRebuildView.as_view(), name='admin-pathways-rebuild'),
     path('admin/recompute-recommendations/',    AdminRecomputeRecommendationsView.as_view(), name='admin-recompute-recommendations'),

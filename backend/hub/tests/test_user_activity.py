@@ -191,7 +191,7 @@ class FeedTests(FeedFixture):
         self.assertEqual((len(items), before), (70, None))
 
 
-class ActivityApiTests(APITestCase, FeedFixture):
+class AdminClientFixture(APITestCase, FeedFixture):
     def setUp(self):
         FeedFixture.setUp(self)
         self.admin = User.objects.create_user('fa_admin')
@@ -201,6 +201,8 @@ class ActivityApiTests(APITestCase, FeedFixture):
     def _url(self, name='admin-user-activity', pk=None):
         return reverse(name, kwargs={'pk': pk or self.user.pk})
 
+
+class ActivityApiTests(AdminClientFixture):
     def test_admin_gets_all_sections(self):
         from analytics.learning import CourseData, learner_row
         Enrollment.objects.create(user=self.user, course=self.course, progress_pct=40)
@@ -252,3 +254,40 @@ class ActivityApiTests(APITestCase, FeedFixture):
         res = self.client.get(self._url(pk=bare.pk))
         self.assertEqual(res.status_code, 200)
         self.assertEqual((res.data['summary']['role'], res.data['summary']['competency_score']), ('', None))
+
+
+class ActivityExportTests(AdminClientFixture):
+    def test_export_sheets_and_rows(self):
+        from io import BytesIO
+
+        from openpyxl import load_workbook
+
+        from hub.user_activity import feed
+        Enrollment.objects.create(user=self.user, course=self.course, progress_pct=40)
+        for i in range(3):
+            self.login(self.user, self.now - timedelta(minutes=i))
+        res = self.client.get(self._url('admin-user-activity-export'))
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('spreadsheetml', res['Content-Type'])
+        self.assertIn('fa_user-activity.xlsx', res['Content-Disposition'])
+        wb = load_workbook(BytesIO(res.content))
+        self.assertEqual(wb.sheetnames, ['Summary', 'Courses', 'Authoring', 'Activity', 'Logins'])
+        self.assertEqual(wb['Activity'].max_row, len(feed(self.user, limit=None)[0]) + 1)
+        self.assertEqual([c.value for c in wb['Logins'][1]], ['Time', 'Device', 'Browser'])
+        self.assertEqual(wb['Logins'].max_row, 4)
+
+    def test_formula_text_is_neutralised(self):
+        from io import BytesIO
+
+        from openpyxl import load_workbook
+        self.course.title = '=HYPERLINK("x")'
+        self.course.save()
+        Enrollment.objects.create(user=self.user, course=self.course)
+        wb = load_workbook(BytesIO(self.client.get(self._url('admin-user-activity-export')).content))
+        self.assertEqual(wb['Courses']['B2'].value, '\'=HYPERLINK("x")')
+
+    def test_export_admin_only(self):
+        creator = User.objects.create_user('fa_creator2')
+        UserProfile.objects.create(user=creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.client.force_authenticate(creator)
+        self.assertEqual(self.client.get(self._url('admin-user-activity-export')).status_code, 403)

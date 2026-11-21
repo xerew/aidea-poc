@@ -49,3 +49,16 @@ class AdminUserActivityFeedView(APIView):
             return Response({'detail': 'Unknown category.'}, status=status.HTTP_400_BAD_REQUEST)
         items, next_before = feed(user, before=before or None, category=category)
         return Response({'items': items, 'next_before': next_before})
+
+
+class AdminUserActivityExportView(APIView):
+    """GET — everything on the page (the complete feed) as <username>-activity.xlsx."""
+    permission_classes = [IsAdmin]
+
+    def get(self, request, pk):
+        from analytics.views import _xlsx_response
+        from hub.user_activity_workbook import build_user_workbook
+        user, failure = _user_or_404(pk)
+        if failure:
+            return failure
+        return _xlsx_response(build_user_workbook(user), f'{user.username}-activity.xlsx')
