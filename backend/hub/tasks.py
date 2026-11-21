@@ -491,6 +491,28 @@ def recompute_all_recommendations() -> None:
         compute_user_recommendations.delay(uid)
 
 
+@shared_task
+def refresh_all_pathways() -> None:
+    """Rebuild every onboarded person's pathway (courses they started stay)."""
+    from hub.models.pathway import UserLearningPath
+    from hub.pathway_gen import refresh_pathway
+    paths = (UserLearningPath.objects.select_related('user__profile')
+             .filter(user__is_active=True, user__profile__onboarding_completed=True))
+    for user_path in paths:
+        refresh_pathway(user_path)
+
+
+@shared_task
+def refresh_after_publish(course_ids: list[int]) -> None:
+    """Courses were published or unpublished: refresh their embeddings, then
+    everyone's recommendations and pathways once (the 02:00 run stays as a safety net)."""
+    from hub.models import Course
+    for course_id in Course.objects.filter(pk__in=course_ids, is_published=True).values_list('pk', flat=True):
+        compute_course_embeddings(course_id)
+    recompute_all_recommendations()
+    refresh_all_pathways()
+
+
 # ── Translation helpers (per-unit; used by both full and partial jobs) ────────
 
 def _tr_quiz(quiz_data, src, target):

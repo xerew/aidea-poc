@@ -76,3 +76,19 @@ def generate_pathway(user, limit=PATHWAY_SIZE):
 
     scored.sort()
     return [course_id for _, _, course_id in scored[:limit]]
+
+
+def refresh_pathway(user_path):
+    """Rebuild a saved pathway from the currently published courses, keeping the
+    published courses the person has already started (first, in their old order)."""
+    from hub.models import Enrollment
+
+    old = list(user_path.course_ids or [])
+    started = set(
+        Enrollment.objects.filter(user=user_path.user, course_id__in=old, course__is_published=True)
+        .values_list('course_id', flat=True)
+    )
+    kept = [cid for cid in old if cid in started]
+    fresh = [cid for cid in generate_pathway(user_path.user) if cid not in started]
+    user_path.course_ids = kept + fresh[:max(0, PATHWAY_SIZE - len(kept))]
+    user_path.save(update_fields=['course_ids'])

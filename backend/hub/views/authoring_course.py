@@ -1,3 +1,4 @@
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -173,6 +174,12 @@ class AuthoringCourseDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+def _refresh_after_publish(course):
+    """New or withdrawn course: rebuild recommendations and pathways once saved."""
+    from hub.tasks import refresh_after_publish
+    transaction.on_commit(lambda: refresh_after_publish.delay([course.pk]))
+
+
 class AuthoringCoursePublishView(APIView):
     permission_classes = [IsContentCreator]
 
@@ -196,6 +203,7 @@ class AuthoringCoursePublishView(APIView):
             editor=request.user,
             changes={'course_published': {'title': course.title}},
         )
+        _refresh_after_publish(course)
         return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
 
@@ -222,6 +230,7 @@ class AuthoringCourseUnpublishView(APIView):
             editor=request.user,
             changes={'course_unpublished': {'title': course.title}},
         )
+        _refresh_after_publish(course)
         return Response(CourseAuthoringSerializer(course, context={'request': request}).data)
 
 

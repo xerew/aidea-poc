@@ -262,3 +262,65 @@ class PathwayFollowsCompetencyChangeTests(TestCase):
         self.assertEqual(user_path.path.slug, 'adv')
         self.assertIn(advanced.id, user_path.course_ids)
         self.assertIn(beginner.id, user_path.course_ids)
+
+
+class PathwayRefreshOnPublishTests(APITestCase):
+    """Publishing or unpublishing a course rebuilds everyone's recommendations and
+    pathways; courses a person has already started stay in their pathway."""
+
+    def setUp(self):
+        from unittest import mock
+        self.pillar = make_pillar()
+        self.creator = User.objects.create_user(username='author', password='pass')
+        UserProfile.objects.create(user=self.creator, user_type=UserProfile.UserType.CONTENT_CREATOR)
+        self.teacher = make_teacher()
+        self.teacher.profile.competency_score = 1      # beginner band: advanced courses are out of range
+        self.teacher.profile.onboarding_completed = True
+        self.teacher.profile.save()
+        self.started = Course.objects.create(title='Started', pillar=self.pillar, level='advanced', is_published=True)
+        Enrollment.objects.create(user=self.teacher, course=self.started, progress_pct=30)
+        self.path = LearningPath.objects.create(name='P', slug='p', competency_min=0, competency_max=10)
+        self.user_path = UserLearningPath.objects.create(user=self.teacher, path=self.path, course_ids=[self.started.id])
+        self.draft = Course.objects.create(title='New', pillar=self.pillar, level='beginner',
+                                           is_published=False, created_by=self.creator)
+        self.client.force_authenticate(self.creator)
+        patcher = mock.patch('hub.tasks.recompute_all_recommendations')
+        self.recompute = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def _post(self, action):
+        url = reverse(f'authoring-course-{action}', kwargs={'pk': self.draft.pk})
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(url)
+
+    def test_publishing_adds_the_course_to_pathways_and_refreshes_recommendations(self):
+        self.assertEqual(self._post('publish').status_code, 200)
+        self.user_path.refresh_from_db()
+        self.assertIn(self.draft.id, self.user_path.course_ids)
+        self.recompute.assert_called_once()
+
+    def test_a_started_course_stays_in_the_pathway(self):
+        self._post('publish')
+        self.user_path.refresh_from_db()
+        self.assertEqual(self.user_path.course_ids, [self.started.id, self.draft.id])
+
+    def test_unpublishing_also_refreshes(self):
+        self._post('publish')
+        self.recompute.reset_mock()
+        self.assertEqual(self._post('unpublish').status_code, 200)
+        self.user_path.refresh_from_db()
+        self.assertEqual(self.user_path.course_ids, [self.started.id])
+        self.recompute.assert_called_once()
+
+    def test_publishing_from_django_admin_also_refreshes(self):
+        from django.contrib.admin.sites import site
+        from django.test import RequestFactory
+
+        from hub.admin import CourseAdmin
+        admin_obj = CourseAdmin(Course, site)
+        admin_obj.message_user = lambda *a, **k: None
+        with self.captureOnCommitCallbacks(execute=True):
+            admin_obj.publish_courses(RequestFactory().post('/'), Course.objects.filter(pk=self.draft.pk))
+        self.user_path.refresh_from_db()
+        self.assertIn(self.draft.id, self.user_path.course_ids)
+        self.recompute.assert_called_once()

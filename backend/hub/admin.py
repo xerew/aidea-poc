@@ -213,6 +213,15 @@ class CourseCollaboratorInline(admin.TabularInline):
     autocomplete_fields = ['user', 'added_by']
 
 
+def _refresh_after_publish(course_ids):
+    """New or withdrawn courses: rebuild recommendations and pathways once saved."""
+    if course_ids:
+        from django.db import transaction
+
+        from hub.tasks import refresh_after_publish
+        transaction.on_commit(lambda: refresh_after_publish.delay(course_ids))
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display  = ['title', 'pillar', 'level', 'content_format', 'is_published', 'created_by', 'created_at']
@@ -234,12 +243,16 @@ class CourseAdmin(admin.ModelAdmin):
 
     @admin.action(description='Publish selected courses')
     def publish_courses(self, request, queryset):
-        count = queryset.filter(is_published=False).update(is_published=True)
+        ids = list(queryset.filter(is_published=False).values_list('pk', flat=True))
+        count = Course.objects.filter(pk__in=ids).update(is_published=True)
+        _refresh_after_publish(ids)
         self.message_user(request, f'{count} course(s) published.')
 
     @admin.action(description='Unpublish selected courses')
     def unpublish_courses(self, request, queryset):
-        count = queryset.filter(is_published=True).update(is_published=False)
+        ids = list(queryset.filter(is_published=True).values_list('pk', flat=True))
+        count = Course.objects.filter(pk__in=ids).update(is_published=False)
+        _refresh_after_publish(ids)
         self.message_user(request, f'{count} course(s) unpublished.')
 
 
