@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.activity_log import record_action, resource_title
 from hub.models import Activity, CourseEditHistory, Resource
 from hub.serializers import ResourceSerializer
 from hub.translation import LANGUAGE_NAMES
@@ -108,6 +109,8 @@ class AuthoringResourceDetailView(APIView):
             resource.translations[lang] = blob
             resource.save(update_fields=['translations'])
             mark_edited(resource, lang)
+            record_action(request.user, 'resource_edited', course=course, label=course.title,
+                          resource_title=resource_title(resource), resource_type=resource.type, language=lang)
             return Response(ResourceSerializer(resource).data)
 
         serializer = ResourceSerializer(resource, data=request.data, partial=True)
@@ -119,6 +122,8 @@ class AuthoringResourceDetailView(APIView):
         serializer.save()
         if changed:
             resync_resource(resource)
+        record_action(request.user, 'resource_edited', course=course, label=course.title,
+                      resource_title=resource_title(resource), resource_type=resource.type)
         return Response(ResourceSerializer(resource).data)
 
     def delete(self, request, pk, module_pk, lesson_pk, resource_pk):
@@ -133,7 +138,11 @@ class AuthoringResourceDetailView(APIView):
                 {'detail': 'An activity needs at least one resource.'},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        course = resource.activity.module.course
+        title, kind = resource_title(resource), resource.type
         resource.delete()
+        record_action(request.user, 'resource_deleted', course=course, label=course.title,
+                      resource_title=title, resource_type=kind)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

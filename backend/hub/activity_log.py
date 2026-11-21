@@ -32,3 +32,17 @@ def record_login(request, user):
         LoginRecord.objects.create(user=user, device=device, browser=browser)
     except Exception as exc:
         logger.warning('Could not record a login for user %s: %s', getattr(user, 'pk', None), exc)
+
+
+def record_action(user, kind, course=None, label='', **details):
+    """One PlatformAction row; `label` is a title snapshot (see the model)."""
+    try:
+        from hub.models import PlatformAction
+        PlatformAction.objects.create(user=user, kind=kind, course=course, label=(label or '')[:255],
+                                      details=details)
+    except Exception as exc:
+        logger.warning('Could not record %s for user %s: %s', kind, getattr(user, 'pk', None), exc)
+
+
+def resource_title(resource):
+    return resource.title or resource.type

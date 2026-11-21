@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.activity_log import record_action
 from hub.models import Course, CourseCollaborator, UserProfile
 
 from .permissions import (
@@ -83,6 +84,8 @@ class AuthoringCourseCollaboratorsView(APIView):
         if previous != role:  # newly added, or given a different role
             from hub.emails import send_collaborator_added_email
             send_collaborator_added_email(collab)
+            record_action(request.user, 'collaborator_added', course=course, label=course.title,
+                          collaborator=user.username, role=role)
         return Response(_serialize(collab), status=status.HTTP_201_CREATED)
 
 
@@ -121,5 +124,9 @@ class AuthoringCourseCollaboratorDetailView(APIView):
         if not can_manage_course(request.user, course):
             return Response({'detail': 'Only the author can manage collaborators.'},
                             status=status.HTTP_403_FORBIDDEN)
-        CourseCollaborator.objects.filter(course=course, user_id=user_id).delete()
+        removed = CourseCollaborator.objects.filter(course=course, user_id=user_id).select_related('user').first()
+        if removed is not None:
+            removed.delete()
+            record_action(request.user, 'collaborator_removed', course=course, label=course.title,
+                          collaborator=removed.user.username)
         return Response(status=status.HTTP_204_NO_CONTENT)

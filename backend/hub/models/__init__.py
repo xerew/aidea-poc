@@ -1,6 +1,6 @@
 from .access_request import AccessRequest
 from .activity import LearnerActivityConfig, LessonSession
-from .activity_log import LoginRecord
+from .activity_log import LoginRecord, PlatformAction
 from .ai_review import AIReview, AIReviewSettings, AssignmentReviewConfig, ReviewExample
 from .assignment import AssignmentSubmission
 from .competency import CompetencyChange
@@ -84,5 +84,6 @@ __all__ = [
     'UserLearningPath',
     'PathwayCourseChange',
     'LoginRecord',
+    'PlatformAction',
     'UserProfile',
 ]

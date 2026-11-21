@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.activity_log import record_action, resource_title
 from hub.ai_review import model
 from hub.ai_review.pipeline import assignment_stats, auto_approve_unlocked
 from hub.models import AIReviewSettings, AssignmentReviewConfig, Resource, ReviewExample
@@ -94,6 +95,9 @@ class AuthoringAIReviewView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
             config.auto_approve = wanted
         config.save()
+        course = resource.activity.module.course
+        record_action(request.user, 'ai_review_saved', course=course, label=course.title,
+                      resource_title=resource_title(resource))
         if newly_approved:
             from hub.tasks import translate_review_criteria
             translate_review_criteria.delay(config.id)

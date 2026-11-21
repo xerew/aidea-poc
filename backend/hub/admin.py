@@ -25,6 +25,7 @@ from .models import (
     LessonSession,
     LoginRecord,
     Module,
+    PlatformAction,
     PreferenceOption,
     PreferenceQuestion,
     ResourceVisit,
@@ -624,6 +625,21 @@ class LoginRecordAdmin(admin.ModelAdmin):
     list_display = ['user', 'at', 'device', 'browser']
     list_filter = ['device', 'browser']
     search_fields = ['user__username', 'user__email']
+    date_hierarchy = 'at'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PlatformAction)
+class PlatformActionAdmin(admin.ModelAdmin):
+    """Read-only log of platform actions (see the per-user activity page)."""
+    list_display = ['user', 'at', 'kind', 'label']
+    list_filter = ['kind']
+    search_fields = ['user__username', 'label']
     date_hierarchy = 'at'
 
     def has_add_permission(self, request):

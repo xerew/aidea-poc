@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.activity_log import record_action
 from hub.models import AccessRequest, UserProfile
 from hub.serializers.admin import (
     AccessRequestAdminSerializer,
@@ -50,8 +51,12 @@ class AdminUserRoleView(APIView):
             return Response({'error': 'User not found.'}, status=404)
         serializer = AdminUserRoleSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        old_role = user.profile.user_type
         user.profile.user_type = serializer.validated_data['user_type']
         user.profile.save()
+        if old_role != user.profile.user_type:
+            record_action(request.user, 'role_changed', label=user.username, target=user.username,
+                          old_role=old_role, new_role=user.profile.user_type)
         return Response(AdminUserSerializer(user).data)
 
 
@@ -99,6 +104,7 @@ class AdminPathwaysRebuildView(APIView):
         from hub.tasks import refresh_all_pathways
         applied = PathwayCourseChange.objects.filter(applied_at__isnull=True).update(applied_at=timezone.now())
         transaction.on_commit(refresh_all_pathways.delay)
+        record_action(request.user, 'pathways_rebuilt', applied=applied)
         return Response({'detail': 'Pathway rebuild queued.', 'applied': applied}, status=status.HTTP_202_ACCEPTED)
 
 

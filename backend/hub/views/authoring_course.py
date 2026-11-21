@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from hub.activity_log import record_action
 from hub.models import Activity, Course, CourseEditHistory, LearningPillar
 from hub.publication import course_publication_changed
 from hub.serializers import CourseAuthoringSerializer, PillarSerializer
@@ -170,7 +171,9 @@ class AuthoringCourseDetailView(APIView):
                 {'detail': 'Only the author can delete this course.'},
                 status=status.HTTP_403_FORBIDDEN,
             )
+        title = course.title
         course.delete()
+        record_action(request.user, 'course_deleted', label=title)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -288,6 +291,8 @@ class AuthoringCourseTranslateView(APIView):
                 tasks.translate_module_full.delay(target.id, language)
             else:
                 tasks.translate_lesson_meta.delay(target.id, language)
+        record_action(request.user, 'translation_requested', course=course, label=course.title,
+                      language=language, scope=scope)
         return Response({'translation_status': course.translation_status}, status=status.HTTP_202_ACCEPTED)
 
 
