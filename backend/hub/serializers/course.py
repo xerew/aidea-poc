@@ -163,12 +163,13 @@ class PillarSummarySerializer(serializers.ModelSerializer):
         model = LearningPillar
         fields = ['id', 'name', 'slug', 'description', 'course_count', 'progress_pct']
 
+    # Learners only ever see published courses: drafts don't count until published.
     def get_course_count(self, obj):
-        return obj.courses.count()
+        return obj.courses.filter(is_published=True).count()
 
     def get_progress_pct(self, obj):
         user = self.context['request'].user
-        enrollments = Enrollment.objects.filter(user=user, course__pillar=obj)
+        enrollments = Enrollment.objects.filter(user=user, course__pillar=obj, course__is_published=True)
         if not enrollments.exists():
             return 0
         return round(enrollments.aggregate(avg=Avg('progress_pct'))['avg'] or 0)

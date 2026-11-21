@@ -63,6 +63,22 @@ class HomeViewTestCase(APITestCase):
         self.assertEqual(pillars['teach-with-ai']['course_count'], 2)
         self.assertEqual(pillars['teach-for-ai']['course_count'], 0)
 
+    def test_home_pillars_count_only_published_courses(self):
+        draft = Course.objects.create(title='Draft', pillar=self.pillar1, is_published=False)
+        pillars = {p['slug']: p for p in self.client.get(reverse('home')).data['pillars']}
+        self.assertEqual(pillars['teach-with-ai']['course_count'], 2)
+        draft.is_published = True          # counted as soon as it is published
+        draft.save()
+        pillars = {p['slug']: p for p in self.client.get(reverse('home')).data['pillars']}
+        self.assertEqual(pillars['teach-with-ai']['course_count'], 3)
+
+    def test_home_pillars_progress_ignores_unpublished_courses(self):
+        Enrollment.objects.create(user=self.user, course=self.course1, progress_pct=40)
+        hidden = Course.objects.create(title='Unpublished', pillar=self.pillar1, is_published=False)
+        Enrollment.objects.create(user=self.user, course=hidden, progress_pct=100)
+        pillars = {p['slug']: p for p in self.client.get(reverse('home')).data['pillars']}
+        self.assertEqual(pillars['teach-with-ai']['progress_pct'], 40)
+
     def test_home_pillars_progress_no_enrollments(self):
         response = self.client.get(reverse('home'))
         for pillar in response.data['pillars']:
