@@ -13,7 +13,10 @@ const KEYS = ['access_token', 'refresh_token', 'user']
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user') || sessionStorage.getItem('user')
-    return stored ? JSON.parse(stored) : null
+    const parsed = stored ? JSON.parse(stored) : null
+    // Before any page view is sent, so the first view after a reload carries it.
+    setAnalyticsUser(parsed?.id ?? null)
+    return parsed
   })
 
   // Persistent login — survives tab close (localStorage)

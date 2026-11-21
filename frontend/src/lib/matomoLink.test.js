@@ -33,3 +33,9 @@ test('the tracker stays cookieless and measures time with a 15 s heartbeat', () 
     ['setSiteId', '1'],
   ])
 })
+
+test('a signed-in user\'s number is set before the first page view after a reload', () => {
+  const commands = matomoSetupCommands('https://a.example/', '1', 7)
+  assert.deepEqual(commands.at(-1), ['setUserId', '7'])
+  assert.ok(!matomoSetupCommands('https://a.example/', '1', null).some(([name]) => name === 'setUserId'))
+})

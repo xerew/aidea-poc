@@ -18,6 +18,8 @@ const env = import.meta.env
 const PROVIDER = (env.VITE_ANALYTICS_PROVIDER || '').toLowerCase()
 
 let started = false
+// The signed-in user's number, remembered even before the tracker starts.
+let currentUserId = null
 
 export function analyticsEnabled() {
   return PROVIDER === 'plausible' || PROVIDER === 'matomo'
@@ -48,7 +50,7 @@ function initMatomo() {
   if (!url || !siteId) return
   const base = url.endsWith('/') ? url : `${url}/`
   window._paq = window._paq || []
-  matomoSetupCommands(base, siteId).forEach((command) => window._paq.push(command))
+  matomoSetupCommands(base, siteId, currentUserId).forEach((command) => window._paq.push(command))
   loadScript(`${base}matomo.js`)
 }
 
@@ -80,7 +82,8 @@ export function trackPageview(url) {
 // (never name or email); null on logout. Admins see the visits through the
 // "Open in Matomo" link on the per-user activity page.
 export function setAnalyticsUser(id) {
-  if (PROVIDER !== 'matomo' || !window._paq) return
+  currentUserId = id ?? null
+  if (PROVIDER !== 'matomo' || !started || !window._paq) return
   try {
     window._paq.push(id == null ? ['resetUserId'] : ['setUserId', String(id)])
   } catch { /* analytics must never break the app */ }
