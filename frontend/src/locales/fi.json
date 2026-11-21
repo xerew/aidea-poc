@@ -1192,6 +1192,12 @@
         "mobile": "puhelin",
         "unknown": "tuntematon laite"
       },
+      "scopes": {
+        "course": "koko kurssi",
+        "details": "kurssin tiedot",
+        "module": "yksi moduuli",
+        "activity": "yksi aktiviteetti"
+      },
       "kinds": {
         "studied": "Opiskeli aktiviteettia ”{{activity}}” kurssilla {{course}} — {{minutes}} min",
         "video_finished": "Katsoi videon ”{{resource}}” loppuun kurssilla {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Suoritti kurssin {{course}}",
         "assignment_submitted": "Palautti tehtävän aktiviteetissa ”{{activity}}” ({{course}})",
         "competency_changed": "Tekoälyosaaminen muuttui tasolta {{old}} tasolle {{new}}",
+        "competency_changed_course": "Tekoälyosaaminen muuttui tasolta {{old}} tasolle {{new}} ({{course}})",
         "course_viewed": "Avasi kurssin {{course}} sivun",
         "assignment_reviewed": "Arvioi käyttäjän {{learner}} tehtävän kurssilla {{course}}: {{outcome}}",
         "edit_course_created": "Loi kurssin {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Latasi esityksen kurssiin {{course}}",
         "pathway_published": "Julkaisi kurssin {{course}} (polkulista)",
         "pathway_unpublished": "Poisti kurssin {{course}} julkaisusta (polkulista)",
-        "translation_requested": "Pyysi kurssin {{course}} käännöstä kielelle {{language}}",
+        "translation_requested": "Pyysi kurssin {{course}} käännöstä kielelle {{language}} ({{scope}})",
         "resource_edited": "Muokkasi materiaalia ”{{resource_title}}” kurssilla {{course}}",
         "resource_deleted": "Poisti materiaalin ”{{resource_title}}” kurssilta {{course}}",
         "course_deleted": "Poisti kurssin ”{{course}}”",

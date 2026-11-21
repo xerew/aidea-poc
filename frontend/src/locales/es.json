@@ -1192,6 +1192,12 @@
         "mobile": "móvil",
         "unknown": "dispositivo desconocido"
       },
+      "scopes": {
+        "course": "curso completo",
+        "details": "datos del curso",
+        "module": "un módulo",
+        "activity": "una actividad"
+      },
       "kinds": {
         "studied": "Estudió «{{activity}}» en {{course}} — {{minutes}} min",
         "video_finished": "Vio el vídeo «{{resource}}» hasta el final en {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Completó {{course}}",
         "assignment_submitted": "Entregó la tarea en «{{activity}}» ({{course}})",
         "competency_changed": "La competencia en IA cambió de {{old}} a {{new}}",
+        "competency_changed_course": "La competencia en IA cambió de {{old}} a {{new}} ({{course}})",
         "course_viewed": "Abrió la página del curso {{course}}",
         "assignment_reviewed": "Revisó la tarea de {{learner}} en {{course}}: {{outcome}}",
         "edit_course_created": "Creó el curso {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Subió una presentación a {{course}}",
         "pathway_published": "Publicó {{course}} (lista de itinerarios)",
         "pathway_unpublished": "Retiró {{course}} (lista de itinerarios)",
-        "translation_requested": "Solicitó una traducción de {{course}} al {{language}}",
+        "translation_requested": "Solicitó una traducción de {{course}} al {{language}} ({{scope}})",
         "resource_edited": "Editó el recurso «{{resource_title}}» en {{course}}",
         "resource_deleted": "Eliminó el recurso «{{resource_title}}» en {{course}}",
         "course_deleted": "Eliminó el curso «{{course}}»",

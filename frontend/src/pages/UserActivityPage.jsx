@@ -5,46 +5,18 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Download, ExternalLink } from 'lucide-react'
 import client from '../api/client'
 import { downloadXlsx } from '../components/analytics/download'
+import { feedText, roleLabel as roleName } from '../lib/activityFeedText'
 import { createLatest } from '../lib/latestRequest'
 import { matomoVisitorLogUrl } from '../lib/matomoLink'
 import './UserActivityPage.css'
 
 // Admin-only: everything one person does on the platform (spec 2026-11-21).
 const FILTERS = ['all', 'learning', 'authoring', 'reviews', 'account']
-const ROLE_KEYS = { teacher: 'teacher', content_creator: 'contentCreator', aidea_partner: 'aideaPartner', admin: 'admin' }
 
 function levelForScore(score) {
   if (score <= 2) return 'beginner'
   if (score <= 4) return 'intermediate'
   return 'advanced'
-}
-
-function languageName(code, uiLanguage) {
-  try {
-    return new Intl.DisplayNames([uiLanguage], { type: 'language' }).of(code) || code
-  } catch {
-    return code
-  }
-}
-
-// One feed line in the viewer's language; the English `text` from the server
-// is the fallback for a kind this build doesn't know yet.
-function feedText(item, t, i18n) {
-  const roleLabel = (role) => (ROLE_KEYS[role] ? t(`admin.roles.${ROLE_KEYS[role]}`) : role)
-  const p = { ...item.params, course: item.course?.title ?? item.params.course ?? '' }
-  if (p.outcome) p.outcome = t(`admin.activity.outcomes.${p.outcome}`)
-  if (item.kind === 'collaborator_added' && p.role) p.role = t(`admin.activity.authorRoles.${p.role}`)
-  if (p.old_role) p.old_role = roleLabel(p.old_role)
-  if (p.new_role) p.new_role = roleLabel(p.new_role)
-  if (p.language) p.language = languageName(p.language, i18n.language)
-  if (item.kind === 'signed_in') {
-    p.device = t(`admin.activity.devices.${p.device || 'unknown'}`)
-    p.browser = p.browser || 'Other'
-  }
-  const key = `admin.activity.kinds.${item.kind}`
-  let text = i18n.exists(key) ? t(key, p) : item.text
-  if (item.kind === 'h5p_attempt' && p.score != null && p.max_score != null) text += ` (${p.score}/${p.max_score})`
-  return text
 }
 
 Section.propTypes = { title: PropTypes.string.isRequired, children: PropTypes.node }
@@ -124,7 +96,7 @@ export default function UserActivityPage() {
   const when = (iso) => (iso ? new Date(iso).toLocaleString(i18n.language) : t('admin.activity.never'))
   const day = (iso) => (iso ? new Date(iso).toLocaleDateString(i18n.language) : '—')
   const minutes = (seconds) => t('admin.activity.minutes', { count: Math.round((seconds || 0) / 60) })
-  const roleLabel = ROLE_KEYS[s.role] ? t(`admin.roles.${ROLE_KEYS[s.role]}`) : (s.role || '—')
+  const roleLabel = s.role ? roleName(s.role, t) : '—'
   const matomoUrl = matomoVisitorLogUrl(import.meta.env, s.id)
   const download = async () => {
     setDownloading(true)

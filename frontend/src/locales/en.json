@@ -1192,6 +1192,12 @@
         "mobile": "mobile",
         "unknown": "unknown device"
       },
+      "scopes": {
+        "course": "whole course",
+        "details": "course details",
+        "module": "one module",
+        "activity": "one activity"
+      },
       "kinds": {
         "studied": "Studied “{{activity}}” in {{course}} — {{minutes}} min",
         "video_finished": "Watched the video “{{resource}}” to the end in {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Completed {{course}}",
         "assignment_submitted": "Submitted the assignment in “{{activity}}” ({{course}})",
         "competency_changed": "AI competency changed from {{old}} to {{new}}",
+        "competency_changed_course": "AI competency changed from {{old}} to {{new}} ({{course}})",
         "course_viewed": "Opened the course page of {{course}}",
         "assignment_reviewed": "Reviewed the assignment by {{learner}} in {{course}}: {{outcome}}",
         "edit_course_created": "Created the course {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Uploaded a presentation to {{course}}",
         "pathway_published": "Published {{course}} (pathway list)",
         "pathway_unpublished": "Unpublished {{course}} (pathway list)",
-        "translation_requested": "Requested a translation of {{course}} into {{language}}",
+        "translation_requested": "Requested a translation of {{course}} into {{language}} ({{scope}})",
         "resource_edited": "Edited the resource “{{resource_title}}” in {{course}}",
         "resource_deleted": "Deleted the resource “{{resource_title}}” in {{course}}",
         "course_deleted": "Deleted the course “{{course}}”",

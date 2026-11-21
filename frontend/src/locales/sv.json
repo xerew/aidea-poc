@@ -1192,6 +1192,12 @@
         "mobile": "mobil",
         "unknown": "okänd enhet"
       },
+      "scopes": {
+        "course": "hela kursen",
+        "details": "kursuppgifter",
+        "module": "en modul",
+        "activity": "en aktivitet"
+      },
       "kinds": {
         "studied": "Studerade ”{{activity}}” i {{course}} — {{minutes}} min",
         "video_finished": "Såg videon ”{{resource}}” till slutet i {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Slutförde {{course}}",
         "assignment_submitted": "Lämnade in uppgiften i ”{{activity}}” ({{course}})",
         "competency_changed": "AI-kompetensen ändrades från {{old}} till {{new}}",
+        "competency_changed_course": "AI-kompetensen ändrades från {{old}} till {{new}} ({{course}})",
         "course_viewed": "Öppnade kurssidan för {{course}}",
         "assignment_reviewed": "Granskade uppgiften från {{learner}} i {{course}}: {{outcome}}",
         "edit_course_created": "Skapade kursen {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Laddade upp en presentation till {{course}}",
         "pathway_published": "Publicerade {{course}} (lärvägslistan)",
         "pathway_unpublished": "Avpublicerade {{course}} (lärvägslistan)",
-        "translation_requested": "Begärde en översättning av {{course}} till {{language}}",
+        "translation_requested": "Begärde en översättning av {{course}} till {{language}} ({{scope}})",
         "resource_edited": "Redigerade resursen ”{{resource_title}}” i {{course}}",
         "resource_deleted": "Tog bort resursen ”{{resource_title}}” i {{course}}",
         "course_deleted": "Tog bort kursen ”{{course}}”",

@@ -1192,6 +1192,12 @@
         "mobile": "Smartphone",
         "unknown": "unbekanntes Gerät"
       },
+      "scopes": {
+        "course": "ganzer Kurs",
+        "details": "Kursangaben",
+        "module": "ein Modul",
+        "activity": "eine Aktivität"
+      },
       "kinds": {
         "studied": "Hat „{{activity}}“ in {{course}} bearbeitet — {{minutes}} Min.",
         "video_finished": "Hat das Video „{{resource}}“ in {{course}} bis zum Ende angesehen",
@@ -1202,6 +1208,7 @@
         "completed": "Hat {{course}} abgeschlossen",
         "assignment_submitted": "Hat die Aufgabe in „{{activity}}“ ({{course}}) eingereicht",
         "competency_changed": "KI-Kompetenz von {{old}} auf {{new}} geändert",
+        "competency_changed_course": "KI-Kompetenz von {{old}} auf {{new}} geändert ({{course}})",
         "course_viewed": "Hat die Kursseite von {{course}} geöffnet",
         "assignment_reviewed": "Hat die Aufgabe von {{learner}} in {{course}} bewertet: {{outcome}}",
         "edit_course_created": "Hat den Kurs {{course}} erstellt",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Hat eine Präsentation zu {{course}} hochgeladen",
         "pathway_published": "Hat {{course}} veröffentlicht (Lernpfad-Liste)",
         "pathway_unpublished": "Hat {{course}} zurückgezogen (Lernpfad-Liste)",
-        "translation_requested": "Hat eine Übersetzung von {{course}} ins {{language}} angefordert",
+        "translation_requested": "Hat eine Übersetzung von {{course}} ins {{language}} angefordert ({{scope}})",
         "resource_edited": "Hat die Ressource „{{resource_title}}“ in {{course}} bearbeitet",
         "resource_deleted": "Hat die Ressource „{{resource_title}}“ in {{course}} gelöscht",
         "course_deleted": "Hat den Kurs „{{course}}“ gelöscht",

@@ -1192,6 +1192,12 @@
         "mobile": "κινητό",
         "unknown": "άγνωστη συσκευή"
       },
+      "scopes": {
+        "course": "όλο το μάθημα",
+        "details": "στοιχεία μαθήματος",
+        "module": "μία ενότητα",
+        "activity": "μία δραστηριότητα"
+      },
       "kinds": {
         "studied": "Μελέτησε το «{{activity}}» στο {{course}} — {{minutes}} λεπτά",
         "video_finished": "Παρακολούθησε ολόκληρο το βίντεο «{{resource}}» στο {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Ολοκλήρωσε το {{course}}",
         "assignment_submitted": "Υπέβαλε την εργασία στο «{{activity}}» ({{course}})",
         "competency_changed": "Η ικανότητα ΤΝ άλλαξε από {{old}} σε {{new}}",
+        "competency_changed_course": "Η ικανότητα ΤΝ άλλαξε από {{old}} σε {{new}} ({{course}})",
         "course_viewed": "Άνοιξε τη σελίδα του μαθήματος {{course}}",
         "assignment_reviewed": "Αξιολόγησε την εργασία του/της {{learner}} στο {{course}}: {{outcome}}",
         "edit_course_created": "Δημιούργησε το μάθημα {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Ανέβασε παρουσίαση στο {{course}}",
         "pathway_published": "Δημοσίευσε το {{course}} (λίστα διαδρομών)",
         "pathway_unpublished": "Απέσυρε το {{course}} (λίστα διαδρομών)",
-        "translation_requested": "Ζήτησε μετάφραση του {{course}} στα {{language}}",
+        "translation_requested": "Ζήτησε μετάφραση του {{course}} στα {{language}} ({{scope}})",
         "resource_edited": "Επεξεργάστηκε το υλικό «{{resource_title}}» στο {{course}}",
         "resource_deleted": "Διέγραψε το υλικό «{{resource_title}}» στο {{course}}",
         "course_deleted": "Διέγραψε το μάθημα «{{course}}»",

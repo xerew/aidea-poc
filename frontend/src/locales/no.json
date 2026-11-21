@@ -1192,6 +1192,12 @@
         "mobile": "mobil",
         "unknown": "ukjent enhet"
       },
+      "scopes": {
+        "course": "hele kurset",
+        "details": "kursopplysninger",
+        "module": "én modul",
+        "activity": "én aktivitet"
+      },
       "kinds": {
         "studied": "Studerte «{{activity}}» i {{course}} — {{minutes}} min",
         "video_finished": "Så videoen «{{resource}}» til slutten i {{course}}",
@@ -1202,6 +1208,7 @@
         "completed": "Fullførte {{course}}",
         "assignment_submitted": "Leverte oppgaven i «{{activity}}» ({{course}})",
         "competency_changed": "KI-kompetansen endret seg fra {{old}} til {{new}}",
+        "competency_changed_course": "KI-kompetansen endret seg fra {{old}} til {{new}} ({{course}})",
         "course_viewed": "Åpnet kurssiden for {{course}}",
         "assignment_reviewed": "Vurderte oppgaven fra {{learner}} i {{course}}: {{outcome}}",
         "edit_course_created": "Opprettet kurset {{course}}",
@@ -1222,7 +1229,7 @@
         "edit_presentation_uploaded": "Lastet opp en presentasjon til {{course}}",
         "pathway_published": "Publiserte {{course}} (stilisten)",
         "pathway_unpublished": "Avpubliserte {{course}} (stilisten)",
-        "translation_requested": "Ba om en oversettelse av {{course}} til {{language}}",
+        "translation_requested": "Ba om en oversettelse av {{course}} til {{language}} ({{scope}})",
         "resource_edited": "Redigerte ressursen «{{resource_title}}» i {{course}}",
         "resource_deleted": "Slettet ressursen «{{resource_title}}» i {{course}}",
         "course_deleted": "Slettet kurset «{{course}}»",

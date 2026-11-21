@@ -18,6 +18,8 @@ const KINDS = [
   'pathway_published', 'pathway_unpublished', 'translation_requested', 'resource_edited',
   'resource_deleted', 'course_deleted', 'collaborator_added', 'collaborator_removed', 'ai_review_saved',
   'role_changed', 'pathways_rebuilt', 'message_sent', 'feedback_sent', 'access_requested', 'signed_in',
+  // Variants the page picks: a competency change that names its course.
+  'competency_changed_course',
 ]
 
 const KEYS = [
@@ -31,6 +33,7 @@ const KEYS = [
   'authorRoles.author', 'authorRoles.co_editor', 'authorRoles.translator',
   'outcomes.approved', 'outcomes.changes_requested',
   'devices.desktop', 'devices.tablet', 'devices.mobile', 'devices.unknown',
+  'scopes.course', 'scopes.details', 'scopes.module', 'scopes.activity',
   ...KINDS.map(k => `kinds.${k}`),
 ].map(k => `admin.activity.${k}`)
 
@@ -56,4 +59,10 @@ test('feed texts use the same {{params}} in every language', () => {
       assert.deepEqual(params(get(json, key)), params(get(en, key)), `${file}: ${key}`)
     }
   }
+})
+
+test('translated feed lines keep the course and the translation scope', () => {
+  const en = load('en.json')
+  assert.ok(params(get(en, 'admin.activity.kinds.translation_requested')).has('scope'))
+  assert.ok(params(get(en, 'admin.activity.kinds.competency_changed_course')).has('course'))
 })
